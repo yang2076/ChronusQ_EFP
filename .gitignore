@@ -1,0 +1,9 @@
+*build*
+external/libint2/include
+external/libint2/lib
+external/libint2/share
+external/libint2/src
+external/libint2/tmp
+external/libint2/libint*/
+doc
+*.*.swp
