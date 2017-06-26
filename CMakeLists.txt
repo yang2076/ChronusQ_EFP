@@ -40,6 +40,7 @@ include_directories("${PROJECT_SOURCE_DIR}/include")
 include_directories("${PROJECT_BINARY_DIR}/include")
 
 include(FindLibint)
+include(Boost)
 
 set(CQEX_LINK ${CQ_EXT_LINK} )
 

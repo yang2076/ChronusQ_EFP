@@ -1,0 +1,246 @@
+#ifndef __INCLUDED_MEMMANAGER_HPP__
+#define __INCLUDED_MEMMANAGER_HPP__
+
+#include <chronusq_sys.hpp>
+#include <boost/pool/simple_segregated_storage.hpp>
+
+//#define MEM_PRINT
+
+namespace ChronusQ {
+
+  typedef boost::simple_segregated_storage<size_t> mem_backend;
+
+  class CQMemManager : public mem_backend {
+
+    size_t N_;            ///< Total bytes to be allocated
+    size_t NAlloc_;       ///< Number of blocks currently allocated
+    size_t BlockSize_;    ///< Segregation block size
+    std::vector<char> V_; ///< Internal memort
+
+    std::unordered_map<void*,size_t> AllocatedBlocks_;
+      ///< Map from block pointer to the size of the block
+
+    bool isAllocated_;
+
+    /**
+     *  \brief Ensures that the memory block (N_) is divisible by
+     *  the segregation block size (BlockSize_)
+     */ 
+    inline void fixBlockNumber() {
+      if(N_ % BlockSize_) {
+        #ifdef MEM_PRINT
+          std::cerr << "Memory Block not Divisible by BlockSize ("
+                    << BlockSize_ << " Bytes). Increasing allocation by " 
+                    << BlockSize_ - (N_ % BlockSize_) << " Bytes" << std::endl;
+  
+        #endif
+        N_ += BlockSize_ - (N_ % BlockSize_);
+      }
+    };
+
+    public:
+
+    // Disable copy and move construction and assignment
+    CQMemManager(const CQMemManager &)            = delete;
+    CQMemManager(CQMemManager &&)                 = delete;
+    CQMemManager& operator=(const CQMemManager &) = delete;
+    CQMemManager& operator=(CQMemManager &&)      = delete;
+
+    /**
+     *  \brief Constructor.
+     *
+     *  Constructs a CQMemManager object with optionally defaulted values.
+     *  If no paramemters are set, it will default to no memory (0 bytes)
+     *  allocated and a 256 byte segregation length. If the requested
+     *  memory and segregation legnth are not 0 , it will allocate and
+     *  segregate the block
+     *
+     *  \param [in] N          Total memory (in bytes) to be allocated
+     *  \param [in] BlockSize  Segregation block size
+     *
+     */ 
+     CQMemManager(size_t N = 0, size_t BlockSize = 256) :
+       mem_backend(), N_(N), BlockSize_(BlockSize), isAllocated_(false),
+       NAlloc_(0) {
+       if( N_ and BlockSize_ ) allocMem();
+     };
+
+     /**
+      *  Allocates the memory block
+      */ 
+     void allocMem() {
+       assert(not isAllocated_);
+
+       fixBlockNumber(); // fix buffer length
+       V_.resize(N_);    // allocate the memory
+
+       // segregate (uses functionality from boost::simple_segregated_storage
+       this->add_ordered_block(&V_.front(),V_.size(),BlockSize_);
+
+       isAllocated_ = true; // ensure no additional allocs can be made
+
+       #ifdef MEM_PRINT
+         std::cerr << "Creating Memory Partition of " << N_
+                   << " bytes starting at " << (int*) &V_.front() 
+                   << std::endl;
+       #endif
+     };
+
+
+     /**
+      *  \brief Allocates a contiguous block of memory of a specified
+      *  type.
+      *
+      *  Allocates the correct number of blocks from the segregated
+      *  storage given a type and a number to allocate
+      *
+      *  \param [in] n  Number of items of type T to allocate
+      *  \return        Pointer to contiguous memory block that contains
+      *                 n items of type T
+      */ 
+     template <typename T>
+     T* malloc(size_t n) {
+       // Determine the number of blocks to allocate
+       size_t nBlocks = ( (n-1) * sizeof(T) ) / BlockSize_ + 1;
+      
+       // Check to see if requested memory would overflow allocated
+       // memory. Throw a bad alloc if so
+       if( (NAlloc_ + nBlocks) * BlockSize_ > N_ ) {
+         std::bad_alloc excp;
+         throw excp;
+       }
+
+       // Update the number of allocated blocks
+       NAlloc_ += nBlocks; 
+
+       #ifdef MEM_PRINT
+         std::cerr << "Allocating " << n << " words of " << typeid(T).name()
+                   << " data (" << nBlocks << " blocks): ";
+       #endif
+
+       // Get a pointer from boost::simple_segregated_storage
+       void * ptr = mem_backend::malloc_n(nBlocks,BlockSize_);
+
+       // Throw an error if boost returned a NULL pointer (many
+       // possible causes)
+       if(ptr == NULL) {
+         std::bad_alloc excp;
+         throw excp;
+       }
+
+       #ifdef MEM_PRINT
+         std::cerr << "  PTR = " << ptr << std::endl;
+       #endif
+
+       AllocatedBlocks_[ptr] = nBlocks; // Keep a record of the block
+
+       return static_cast<T*>(ptr); // Return the pointer
+     }; // CQMemManager::malloc
+
+
+     /**
+      *  Frees a contiguous memory block given a pointer previously
+      *  returned by CQMemManager::malloc.
+      *
+      *  \warning Will throw an error if the pointer is not currently
+      *  in the list of allocated pointers
+      *
+      *  \param [in] ptr Pointer to free 
+      */ 
+     template <typename T>
+     void free( T* ptr ) {
+
+       // Attempt to find the pointer in the list of 
+       // allocated blocks
+       auto it = AllocatedBlocks_.find(static_cast<void*>(ptr));
+
+       // Kill the job if the pointer is not in the list of allocated
+       // blocks
+       assert( it != AllocatedBlocks_.end() );
+
+       #ifdef MEM_PRINT
+         std::cerr << "Freeing " << it->second 
+                   << " blocks of data starting from " 
+                   << static_cast<void*>(ptr) << std::endl;
+       #endif
+
+       NAlloc_ -= it->second; // deduct block size from allocated memory
+  
+       // deallocate the memory in an ordered fashion
+       mem_backend::ordered_free_n(ptr,it->second,BlockSize_);
+
+       // Remove pointer from allocated list
+       AllocatedBlocks_.erase(it);
+                
+     }; // CQMemManager::free
+
+
+
+     /**
+      *  Prints the CQMemManager allocation table to a specified output
+      *  device.
+      *
+      *  \param [in] out Output device to print the table
+      */ 
+     void printAllocTable(std::ostream &out) const {
+       out << "Allocation Table (unordered):\n\n";
+       out << std::left;
+       out << std::setw(15) << "Pointer" << std::setw(15) << "Size (Bytes)" 
+           << std::endl;
+       for( auto &block : AllocatedBlocks_ )
+         out << std::setw(15) << static_cast<void*>(block.first) 
+             << std::setw(15) << BlockSize_*block.second << std::endl;
+
+     }; // CQMemManager::printAllocTable
+
+
+    /**
+     *  Outputs a summary of the memory allocation in its current state
+     *
+     *  \param [in/out] out Output device.
+     *  \param [in]     mem CQMemManager object of interest
+     */ 
+    friend inline std::ostream& operator<<(std::ostream &out , 
+      const CQMemManager &mem) {
+
+      out << "Memory Allocation Summary:" << std::endl << std::left;
+
+      out << std::setw(30) << "Total Memory Allocated: ";
+      out << std::setw(15) << mem.N_ << " B / "; 
+      out << std::setw(8) << std::fixed << mem.N_ / 1e3 << " kB / "; 
+      out << std::setw(8) << std::fixed << mem.N_ / 1e6 << " MB / "; 
+      out << std::setw(8) << std::fixed << mem.N_ / 1e9 << " GB"; 
+
+      out << std::endl;
+
+      out << std::setw(30) << "Block Size: ";
+      out << std::setw(15) << mem.BlockSize_ << " B"; 
+      out << " (" << mem.N_ / mem.BlockSize_ << " Blocks)";
+
+      out << std::endl;
+
+      out << std::setw(30) << "Reserved Memory: ";
+      out << std::setw(15) << mem.NAlloc_*mem.BlockSize_ << " B"; 
+      out << " (" << mem.NAlloc_ << " Blocks)";
+
+      out << std::endl;
+
+      out << std::setw(30) << "Free Memory: ";
+      out << std::setw(15) << mem.N_ - mem.NAlloc_*mem.BlockSize_ << " B"; 
+      out << " (" << mem.N_ / mem.BlockSize_ - mem.NAlloc_ << " Blocks)";
+
+      if( mem.NAlloc_ ) {
+        out << std::endl << std::endl;;
+        
+        mem.printAllocTable(out);
+      }
+
+      return out; // Return the ouput device
+
+    }; // CQMemManager operator<<
+
+  }; // class CQMemManager
+
+}; // namespace ChronusQ
+
+#endif

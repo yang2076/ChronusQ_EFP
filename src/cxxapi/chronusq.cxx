@@ -26,6 +26,7 @@
 #include <cxxapi/output.hpp>
 #include <cxxapi/options.hpp>
 
+#include <memmanager.hpp>
 #include <cerr.hpp>
 #include <molecule.hpp>
 #include <basisset.hpp>
@@ -67,7 +68,6 @@ int main(int argc, char *argv[]) {
     };
 
   }
-
 
   // Create output files
   std::ofstream outfile(outFileName);
