@@ -44,4 +44,9 @@
 
 #include <chronusq_config.hpp> // Configuration header
 
+
+#ifdef _OPENMP
+  #include<omp.h>
+#endif
+
 #endif

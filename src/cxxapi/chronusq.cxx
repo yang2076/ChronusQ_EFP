@@ -30,6 +30,7 @@
 #include <cerr.hpp>
 #include <molecule.hpp>
 #include <basisset.hpp>
+#include <aointegrals.hpp>
 
 using namespace ChronusQ;
 
@@ -86,6 +87,14 @@ int main(int argc, char *argv[]) {
   // Create Molecule and BasisSet objects
   Molecule mol(std::move(CQMoleculeOptions(std::cout,input)));
   BasisSet basis(std::move(CQBasisSetOptions(std::cout,input,mol)));
+
+
+  CQMemManager memManager(1e6);
+  AOIntegrals aoints(memManager,mol,basis);
+
+  libint2::initialize();
+  aoints.computeAOOneE();
+  libint2::finalize();
 
   // Output CQ footer
   CQOutputFooter(std::cout);

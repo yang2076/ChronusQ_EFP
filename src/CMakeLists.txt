@@ -22,6 +22,7 @@
 #
 add_subdirectory(molecule)
 add_subdirectory(basisset)
+add_subdirectory(aointegrals)
 
 
 list(REVERSE CQEX_LINK)

@@ -20,43 +20,13 @@
 # Contact the Developers:
 #   E-Mail: xsli@uw.edu
 #
-cmake_minimum_required(VERSION 3.0)
-project(ChronusQ CXX C)
-set(ChronusQ_VERSION_MAJOR 0)
-set(ChronusQ_VERSION_MINOR 1)
-set(ChronusQ_VERSION_PATCH 0)
+add_library(aointegrals STATIC aointegrals.cxx aointegrals_builders.cxx)
 
+if(TARGET libint)
+  add_dependencies(aointegrals libint)
+endif()
 
-# Append local cmake directory to find CMAKE Modules
-set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
-
-
-# C++11
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_STANDARD 11)
-
-# Define include directories
-include_directories("${PROJECT_SOURCE_DIR}/include")
-include_directories("${PROJECT_BINARY_DIR}/include")
-
-include(FindLibint)
-include(Boost)
-find_package(Eigen3)
-include_directories("${EIGEN3_INCLUDE_DIR}")
-
-set(CQEX_LINK ${CQ_EXT_LINK} )
-
-
-
-set(BASIS_PATH     "${PROJECT_SOURCE_DIR}/basis"     )
-set(AUTHOR_PATH    "${PROJECT_SOURCE_DIR}/AUTHORS"   )
-
-configure_file(
-  "${PROJECT_SOURCE_DIR}/include/chronusq_config.hpp.in"
-  "${PROJECT_BINARY_DIR}/include/chronusq_config.hpp"
-)
-
-# Recurse into subdirectories
-add_subdirectory(src)
-
+# Append aointegrals to executable link
+list(APPEND CQEX_LINK aointegrals)
+set(CQEX_LINK ${CQEX_LINK} PARENT_SCOPE)
 

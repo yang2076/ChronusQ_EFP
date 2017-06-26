@@ -171,7 +171,7 @@ namespace ChronusQ {
       *  \param [in] ptr Pointer to free 
       */ 
      template <typename T>
-     void free( T* ptr ) {
+     void free( T* &ptr ) {
 
        // Attempt to find the pointer in the list of 
        // allocated blocks
@@ -195,7 +195,31 @@ namespace ChronusQ {
        // Remove pointer from allocated list
        AllocatedBlocks_.erase(it);
                 
+       ptr = NULL; // NULL out the pointer
      }; // CQMemManager::free
+
+
+     /**
+      *  Returns the size of an allocated memory block
+      *
+      *  \warning  Dies if pointer is not in the memory block
+      *
+      *  \param [in] ptr Pointer of interest
+      *  \returns        Size of the allocated block in terms of type T
+      */ 
+     template <typename T>
+     size_t getSize(T* ptr) {
+       // Attempt to find the pointer in the list of 
+       // allocated blocks
+       auto it = AllocatedBlocks_.find(static_cast<void*>(ptr));
+
+       // Kill the job if the pointer is not in the list of allocated
+       // blocks
+       assert( it != AllocatedBlocks_.end() );
+
+       return it->second / sizeof(T);
+     }; // CQMemManager::getSize
+
 
 
 
