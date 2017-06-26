@@ -23,6 +23,7 @@
  */
 
 #include <cxxapi/input.hpp>
+#include <cerr.hpp>
 
 namespace ChronusQ {
 
@@ -35,6 +36,10 @@ namespace ChronusQ {
    */
   void CQInputFile::parse() {
   
+    // Check if file actually exists
+    if(not inFile_.good()) CErr("Input File Couldn't Be Found!",std::cout);
+
+
     bool parseSection(false);
     bool prevLineData(false);
   
