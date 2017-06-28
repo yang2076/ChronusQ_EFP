@@ -264,14 +264,11 @@ namespace ChronusQ {
     std::fill_n(ortho1,nSQ_,0.);
     std::fill_n(ortho2,nSQ_,0.);
 
-
     // Allocate scratch
     double* SCR1 = memManager_.malloc<double>(nSQ_);
 
     // Copy the overlap over to scratch space
     std::copy_n(overlap,nSQ_,SCR1);
-
-    orthoType_ = CHOLESKY;
 
     if(orthoType_ == LOWDIN) {
 
@@ -306,14 +303,13 @@ namespace ChronusQ {
         1.,SCR2,basisSet_.nBasis,SCR1,basisSet_.nBasis,0.,ortho2,
         basisSet_.nBasis);
 
-      // Debug code to validate the Lowdin orthogonalization
 #ifdef _DEBUGORTHO
+      // Debug code to validate the Lowdin orthogonalization
 
       std::cerr << "Debugging Lowdin Orthogonalization" << std::endl;
-      bool good(true);
+      double maxDiff(-10000000);
 
       // Check that ortho1 and ortho2 are inverses of eachother
-      good = true;
       Gemm('N','N',basisSet_.nBasis,basisSet_.nBasis,basisSet_.nBasis,
         1.,ortho1,basisSet_.nBasis,ortho2,basisSet_.nBasis,0.,SCR1,
         basisSet_.nBasis);
@@ -321,35 +317,33 @@ namespace ChronusQ {
       for(auto j = 0; j < basisSet_.nBasis; j++)
       for(auto i = 0; i < basisSet_.nBasis; i++) {
 
-        if( i == j ) good = good and
-          (1. - SCR1[i + j*basisSet_.nBasis]) < 1e-12;
-        else good = good and SCR1[i + j*basisSet_.nBasis] < 1e-12; 
+        if( i == j ) maxDiff = 
+          std::max(maxDiff, std::abs(1. - SCR1[i + j*basisSet_.nBasis]));
+        else maxDiff = 
+          std::max(maxDiff,std::abs(SCR1[i + j*basisSet_.nBasis])); 
 
       }
 
-      std::cerr << "  Ortho1 * Ortho2 = I: " << std::boolalpha << good 
-                << std::endl;
+      std::cerr << "  Ortho1 * Ortho2 = I: " << maxDiff << std::endl;
 
       // Check that ortho2 * ortho2 is the overlap
-      good = true;
       Gemm('N','N',basisSet_.nBasis,basisSet_.nBasis,basisSet_.nBasis,
         1.,ortho2,basisSet_.nBasis,ortho2,basisSet_.nBasis,0.,SCR1,
         basisSet_.nBasis);
       
+      maxDiff = -100000;
       for(auto j = 0; j < basisSet_.nBasis; j++)
       for(auto i = 0; i < basisSet_.nBasis; i++) {
 
-        good = good and 
-          (SCR1[i + j*basisSet_.nBasis] - overlap[i + j*basisSet_.nBasis]) <
-          1e-12; 
+          maxDiff = std::max(maxDiff,
+          std::abs(SCR1[i + j*basisSet_.nBasis] - 
+            overlap[i + j*basisSet_.nBasis])); 
 
       }
 
-      std::cerr << "  Ortho2 * Ortho2 = S: " << std::boolalpha << good 
-                << std::endl;
+      std::cerr << "  Ortho2 * Ortho2 = S: " << maxDiff << std::endl;
 
       // Check that ortho1 * ortho1 is the inverse of the overlap
-      good = true;
       Gemm('N','N',basisSet_.nBasis,basisSet_.nBasis,basisSet_.nBasis,
         1.,ortho1,basisSet_.nBasis,ortho1,basisSet_.nBasis,0.,SCR1,
         basisSet_.nBasis);
@@ -357,17 +351,18 @@ namespace ChronusQ {
         1.,SCR1,basisSet_.nBasis,overlap,basisSet_.nBasis,0.,SCR2,
         basisSet_.nBasis);
       
+      maxDiff = -10000;
       for(auto j = 0; j < basisSet_.nBasis; j++)
       for(auto i = 0; i < basisSet_.nBasis; i++) {
 
-        if( i == j ) good = good and
-          (1. - SCR2[i + j*basisSet_.nBasis]) < 1e-10;
-        else good = good and SCR2[i + j*basisSet_.nBasis] < 1e-10; 
+        if( i == j ) maxDiff = 
+          std::max(maxDiff, std::abs(1. - SCR2[i + j*basisSet_.nBasis]));
+        else maxDiff = 
+          std::max(maxDiff,std::abs(SCR2[i + j*basisSet_.nBasis])); 
 
       }
 
-      std::cerr << "  Ortho1 * Ortho1 * S = I: " << std::boolalpha << good 
-                << std::endl;
+      std::cerr << "  Ortho1 * Ortho1 * S = I: " << maxDiff << std::endl;
 
 #endif
 
@@ -375,6 +370,10 @@ namespace ChronusQ {
       memManager_.free(sE,SCR2);
 
     } else if(orthoType_ == CHOLESKY) {
+
+      std::cout << 
+      "*** WARNING: Cholesky orthogonalization has not yet been confirmed ***" 
+      << std::endl;
 
       // Compute the Cholesky factorization of the overlap S = L * L**T
       Cholesky('L',basisSet_.nBasis,SCR1,basisSet_.nBasis);
@@ -397,9 +396,41 @@ namespace ChronusQ {
       for(auto i = 0; i < j               ; i++)
         ortho1[i + j*basisSet_.nBasis] = 0.;
 
+#ifdef _DEBUGORTHO
+      // Debug code to validate the Lowdin orthogonalization
+
+      std::cerr << "Debugging Cholesky Orthogonalization" << std::endl;
+
+      // Debug code to validate the Cholesky orthogonalization
+      double* SCR2 = memManager_.malloc<double>(nSQ_);
+        
+      double maxDiff = -1000;
+      Gemm('T','N',basisSet_.nBasis,basisSet_.nBasis,basisSet_.nBasis,
+        1.,ortho1,basisSet_.nBasis,overlap,basisSet_.nBasis,0.,SCR1,
+        basisSet_.nBasis);
+      Gemm('N','N',basisSet_.nBasis,basisSet_.nBasis,basisSet_.nBasis,
+        1.,SCR1,basisSet_.nBasis,ortho1,basisSet_.nBasis,0.,SCR2,
+        basisSet_.nBasis);
+
+      for(auto j = 0; j < basisSet_.nBasis; j++)
+      for(auto i = 0; i < basisSet_.nBasis; i++) {
+
+        if( i == j ) maxDiff = 
+          std::max(maxDiff, std::abs(1. - SCR2[i + j*basisSet_.nBasis]));
+        else maxDiff = 
+          std::max(maxDiff,std::abs(SCR2[i + j*basisSet_.nBasis])); 
+
+      }
+
+      std::cerr << "Ortho1**T * S ** Ortho1 = I: " << maxDiff << std::endl;
+
+      memManager_.free(SCR2); // Free SCR2
+#endif
+        
+
     }
 
-    memManager_.free(SCR1);
+    memManager_.free(SCR1); // Free SCR1
 
   }; // AOIntegrals::computeOrtho
 
