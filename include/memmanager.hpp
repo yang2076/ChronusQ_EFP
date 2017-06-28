@@ -198,6 +198,26 @@ namespace ChronusQ {
        ptr = NULL; // NULL out the pointer
      }; // CQMemManager::free
 
+     /**
+      *  Parameter pack of CQMemManager::free. Allows for subsequent
+      *  deallocation of an arbitrary number of memory blocks.
+      *
+      *  z.B.
+      *
+      *  free(X,Y,Z); 
+      *
+      *  is equivalant to
+      *
+      *  free(X);
+      *  free(Y);
+      *  free(Z);
+      */ 
+     template <typename T, typename... Targs>
+     void free( T* &ptr, Targs... args) {
+       // Free the first pointer then recurse down
+       free(ptr); free(args...);
+     }; // CQMemManager::free (parameter pack)
+
 
      /**
       *  Returns the size of an allocated memory block
