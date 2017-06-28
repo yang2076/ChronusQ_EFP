@@ -149,7 +149,9 @@ namespace ChronusQ {
    *  Deallocates the internal memory an AOIntegrals object
    */ 
   void AOIntegrals::dealloc() {
+
     AOIntegrals_COLLECTIVE_OP(DUMMY,DEALLOC_OP,DEALLOC_VEC_OP);
+
   }; // AOIntegrals::dealloc()
 
 

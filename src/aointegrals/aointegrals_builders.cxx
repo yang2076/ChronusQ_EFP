@@ -27,6 +27,7 @@
 
 // Debug directives
 //#define _DEBUGORTHO
+#define _DEBUGERI
 
 namespace ChronusQ {
 
@@ -152,9 +153,14 @@ namespace ChronusQ {
 
       // Loop over unique shell pairs
       for(size_t s1(0), bf1_s(0), s12(0); s1 < shells.size(); bf1_s+=n1, s1++){ 
-        n1 = shells[s1].size();
+        n1 = shells[s1].size(); // Size of Shell 1
       for(size_t s2(0), bf2_s(0); s2 <= s1; bf2_s+=n2, s2++, s12++) {
-        n2 = shells[s2].size();
+        n2 = shells[s2].size(); // Size of Shell 2
+
+        // Round Robbin work distribution
+        #ifdef _OPENMP
+        if( s12 % nthreads != thread_id ) continue;
+        #endif
 
         // Compute the integrals       
         engines[thread_id].compute(shells[s1],shells[s2]);
@@ -246,6 +252,131 @@ namespace ChronusQ {
 
 
   }; // AOIntegrals::computeAOOneE
+
+  void AOIntegrals::computeERI() {
+
+    // Determine the number of OpenMP threads
+#ifdef _OPENMP
+    int nthreads = omp_get_max_threads();
+#else
+    int nthreads = 1;
+#endif
+    
+    
+    // Create a vector of libint2::Engines for possible threading
+    std::vector<libint2::Engine> engines(nthreads);
+
+    // Initialize the first engine for the integral evaluation
+    engines[0] = libint2::Engine(libint2::Operator::coulomb,
+      basisSet_.maxPrim,basisSet_.maxL,0);
+    engines[0].set_precision(0.);
+
+
+    // Copy over the engines to other threads if need be
+    for(size_t i = 1; i < nthreads; i++) engines[i] = engines[0];
+
+
+    // Allocate and zero out ERIs
+    size_t NB  = basisSet_.nBasis;
+    size_t NB2 = NB*NB;
+    size_t NB3 = NB2*NB;
+    size_t NB4 = NB2*NB2;
+
+    ERI = memManager_.malloc<double>(NB4);
+    std::fill_n(ERI,NB4,0.);
+
+
+    #pragma omp parallel
+    {
+#ifdef _OPENMP
+      int thread_id = omp_get_thread_num();
+#else
+      int thread_id = 0;
+#endif
+      // Get threads result buffer
+      const auto& buf_vec = engines[thread_id].results();
+
+      size_t n1,n2,n3,n4,i,j,k,l,ijkl,bf1,bf2,bf3,bf4;
+      size_t s4_max;
+      for(size_t s1(0), bf1_s(0), s1234(0); s1 < basisSet_.nShell; 
+          bf1_s+=n1, s1++) { 
+
+        n1 = basisSet_.shells[s1].size(); // Size of Shell 1
+
+      for(size_t s2(0), bf2_s(0); s2 <= s1; bf2_s+=n2, s2++) {
+
+        n2 = basisSet_.shells[s2].size(); // Size of Shell 2
+
+      for(size_t s3(0), bf3_s(0); s3 <= s1; bf3_s+=n3, s3++) {
+
+        n3 = basisSet_.shells[s3].size(); // Size of Shell 3
+        s4_max = (s1 == s3) ? s2 : s3; // Determine the unique max of Shell 4
+
+      for(size_t s4(0), bf4_s(0); s4 <= s4_max; bf4_s+=n4, s4++, s1234++) {
+
+
+        // Round Robbin work distribution
+        #ifdef _OPENMP
+        if( s1234 % nthreads != thread_id ) continue;
+        #endif
+
+        n4 = basisSet_.shells[s4].size(); // Size of Shell 4
+
+        // Evaluate ERI for shell quartet
+        engines[thread_id].compute2<
+          libint2::Operator::coulomb, libint2::BraKet::xx_xx, 0>(
+          basisSet_.shells[s1],
+          basisSet_.shells[s2],
+          basisSet_.shells[s3],
+          basisSet_.shells[s4]
+        );
+
+        // Libint2 internal screening
+        const double *buff = buf_vec[0];
+        if(buff == nullptr) continue;
+
+        // Place shell quartet into persistent storage with
+        // permutational symmetry
+        for(i = 0ul, bf1 = bf1_s, ijkl = 0ul ; i < n1; ++i, bf1++) 
+        for(j = 0ul, bf2 = bf2_s             ; j < n2; ++j, bf2++) 
+        for(k = 0ul, bf3 = bf3_s             ; k < n3; ++k, bf3++) 
+        for(l = 0ul, bf4 = bf4_s             ; l < n4; ++l, bf4++, ++ijkl) {
+
+            // (12 | 34)
+            ERI[bf1 + bf2*NB + bf3*NB2 + bf4*NB3] = buff[ijkl];
+            // (12 | 43)
+            ERI[bf1 + bf2*NB + bf4*NB2 + bf3*NB3] = buff[ijkl];
+            // (21 | 34)
+            ERI[bf2 + bf1*NB + bf3*NB2 + bf4*NB3] = buff[ijkl];
+            // (21 | 43)
+            ERI[bf2 + bf1*NB + bf4*NB2 + bf3*NB3] = buff[ijkl];
+            // (34 | 12)
+            ERI[bf3 + bf4*NB + bf1*NB2 + bf2*NB3] = buff[ijkl];
+            // (43 | 12)
+            ERI[bf4 + bf3*NB + bf1*NB2 + bf2*NB3] = buff[ijkl];
+            // (34 | 21)
+            ERI[bf3 + bf4*NB + bf2*NB2 + bf1*NB3] = buff[ijkl];
+            // (43 | 21)
+            ERI[bf4 + bf3*NB + bf2*NB2 + bf1*NB3] = buff[ijkl];
+
+        }; // ijkl loop
+      }; // s4
+      }; // s3
+      }; // s2
+      }; // s1
+    }; // omp region
+
+#ifdef _DEBUGERI
+    std::cout << "Two-Electron Integrals (ERIs)" << std::endl;
+    for(auto i = 0ul; i < NB; i++)
+    for(auto j = 0ul; j < NB; j++)
+    for(auto k = 0ul; k < NB; k++)
+    for(auto l = 0ul; l < NB; l++){
+      std::cout << "(" << i << "," << j << "|" << k << "," << l << ")  ";
+      std::cout << ERI[i + j*NB  + k*NB2 + l*NB3] << std::endl;
+    };
+#endif
+  }; // AOIntegrals::computeERI
 
 
   /**

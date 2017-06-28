@@ -33,11 +33,23 @@
 
 namespace ChronusQ {
 
+  /**
+   *   \brief The AOIntegrals class. A class to handle the evaluation and
+   *   storage of integrals in the atomic orbital (AO) gaussian--type
+   *   orbital (GTO) basis. General functionality extends to both the 
+   *   contracted (CGTO) and uncontracted (primitive, PGTO) bases.
+   *
+   *   Also handles the contraction of 2-body (3,4 index) integrals
+   *   with 1-body (2 index) operators.
+   *
+   *   \warning Currently only functional for real GTOs.
+   */
   class AOIntegrals {
   public:
 
     typedef double* oper_t; ///< Storage of an operator
     typedef std::vector<oper_t> oper_t_coll; ///< A collection of operators
+
   private:
 
     enum CONTRACTION_ALGORITHM {
@@ -58,8 +70,8 @@ namespace ChronusQ {
 
     double threshSchwartz_; ///< Schwartz screening threshold
 
-    CONTRACTION_ALGORITHM cAlg_;
-    ORTHO_TYPE            orthoType_;
+    CONTRACTION_ALGORITHM cAlg_;      ///< Algorithm for 2-body contraction
+    ORTHO_TYPE            orthoType_; ///< Orthogonalization scheme
 
     CQMemManager &memManager_; ///< CQMemManager to allocate matricies
     Molecule     &molecule_;   ///< Molecule object for nuclear potential
@@ -83,8 +95,8 @@ namespace ChronusQ {
     // Meta data relating to screening, orthonormalization, etc
       
     oper_t schwartz; ///< Schwartz bounds for the ERIs
-    oper_t ortho1;
-    oper_t ortho2;
+    oper_t ortho1;   ///< Orthogonalization matrix which S -> I
+    oper_t ortho2;   ///< Inverse of ortho1
 
     // 1-e integrals
     
@@ -105,13 +117,20 @@ namespace ChronusQ {
     
     // 2-e Storage
       
-    oper_t ERI;     
+    oper_t ERI;    ///< Electron-Electron repulsion integrals (4 index) 
 
     // Constructors
     
     // Disable default constructor
     AOIntegrals() = delete;
 
+    /**
+     *  AOIntegrals Constructor. Constructs an AOIntegrals object.
+     *
+     *  \param [in] memManager Memory manager for matrix allocation
+     *  \param [in] mol        Molecule object for molecular specification
+     *  \param [in] basis      The GTO basis for integral evaluation
+     */ 
     AOIntegrals(CQMemManager &memManager, Molecule &mol, BasisSet &basis) :
       threshSchwartz_(1e-14), cAlg_(DIRECT), orthoType_(LOWDIN), 
       memManager_(memManager), basisSet_(basis), molecule_(mol), 

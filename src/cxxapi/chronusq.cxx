@@ -92,8 +92,10 @@ int main(int argc, char *argv[]) {
   CQMemManager memManager(100e6);
   AOIntegrals aoints(memManager,mol,basis);
 
+  omp_set_num_threads(2);
   libint2::initialize();
   aoints.computeAOOneE();
+  aoints.computeERI();
   libint2::finalize();
 
   // Output CQ footer
