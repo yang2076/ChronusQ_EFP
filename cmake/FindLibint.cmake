@@ -27,6 +27,8 @@ set( LIBINT2_INCLUDEDIR ${LIBINT2_PREFIX}/include
   ${LIBINT2_PREFIX}/include/libint2 )
 set( LIBINT2_LIBDIR ${LIBINT2_PREFIX}/lib )
 
+add_definitions(-DLIBINT2_DOES_NOT_INLINE_)
+
 include_directories("${LIBINT2_INCLUDEDIR}")
 link_directories("${LIBINT2_LIBDIR}")
 

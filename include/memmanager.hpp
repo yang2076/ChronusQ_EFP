@@ -40,7 +40,7 @@ namespace ChronusQ {
     size_t BlockSize_;    ///< Segregation block size
     std::vector<char> V_; ///< Internal memort
 
-    std::unordered_map<void*,size_t> AllocatedBlocks_;
+    std::unordered_map<void*,std::pair<size_t,size_t>> AllocatedBlocks_;
       ///< Map from block pointer to the size of the block
 
     bool isAllocated_;
@@ -155,7 +155,8 @@ namespace ChronusQ {
          std::cerr << "  PTR = " << ptr << std::endl;
        #endif
 
-       AllocatedBlocks_[ptr] = nBlocks; // Keep a record of the block
+       // Keep a record of the block
+       AllocatedBlocks_[ptr] = { n * sizeof(T), nBlocks }; 
 
        return static_cast<T*>(ptr); // Return the pointer
      }; // CQMemManager::malloc
@@ -187,10 +188,10 @@ namespace ChronusQ {
                    << static_cast<void*>(ptr) << std::endl;
        #endif
 
-       NAlloc_ -= it->second; // deduct block size from allocated memory
+       NAlloc_ -= it->second.second; // deduct block size from allocated memory
   
        // deallocate the memory in an ordered fashion
-       mem_backend::ordered_free_n(ptr,it->second,BlockSize_);
+       mem_backend::ordered_free_n(ptr,it->second.second,BlockSize_);
 
        // Remove pointer from allocated list
        AllocatedBlocks_.erase(it);
@@ -237,7 +238,7 @@ namespace ChronusQ {
        // blocks
        assert( it != AllocatedBlocks_.end() );
 
-       return it->second / sizeof(T);
+       return std::floor(it->second.first / sizeof(T));
      }; // CQMemManager::getSize
 
 
@@ -256,7 +257,8 @@ namespace ChronusQ {
            << std::endl;
        for( auto &block : AllocatedBlocks_ )
          out << std::setw(15) << static_cast<void*>(block.first) 
-             << std::setw(15) << BlockSize_*block.second << std::endl;
+             << std::setw(15) <<  BlockSize_*block.second.second 
+             << std::endl;
 
      }; // CQMemManager::printAllocTable
 

@@ -27,7 +27,7 @@
 
 // Debug directives
 //#define _DEBUGORTHO
-#define _DEBUGERI
+//#define _DEBUGERI
 
 namespace ChronusQ {
 
@@ -253,6 +253,15 @@ namespace ChronusQ {
 
   }; // AOIntegrals::computeAOOneE
 
+
+
+
+  /**
+   *  \brief Allocate, compute and store the full rank-4 ERI tensor using
+   *  Libint2 over the CGTO basis. 
+   *
+   *  Populates internal AOIntegrals::ERI storage
+   */ 
   void AOIntegrals::computeERI() {
 
     // Determine the number of OpenMP threads
@@ -366,6 +375,7 @@ namespace ChronusQ {
       }; // s1
     }; // omp region
 
+    // Debug output of the ERIs
 #ifdef _DEBUGERI
     std::cout << "Two-Electron Integrals (ERIs)" << std::endl;
     for(auto i = 0ul; i < NB; i++)

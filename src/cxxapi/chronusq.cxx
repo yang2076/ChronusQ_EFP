@@ -96,6 +96,29 @@ int main(int argc, char *argv[]) {
   libint2::initialize();
   aoints.computeAOOneE();
   aoints.computeERI();
+
+  double *SX  = memManager.malloc<double>(basis.nBasis*basis.nBasis);
+  double *SX2 = memManager.malloc<double>(basis.nBasis*basis.nBasis);
+  std::vector<TwoBodyContraction<double>> cont = 
+    { 
+      {aoints.overlap, SX , true, COULOMB },
+      {aoints.overlap, SX2, true, EXCHANGE} 
+    };
+
+  aoints.twoBodyContract(cont);
+
+  Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor>> SMap(aoints.overlap,basis.nBasis,basis.nBasis);
+  Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor>> SXMap(SX,basis.nBasis,basis.nBasis);
+  Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor>> SX2Map(SX2,basis.nBasis,basis.nBasis);
+
+  std::cout << SMap << std::endl << std::endl;;
+  std::cout << SXMap << std::endl << std::endl;;
+  std::cout << SX2Map << std::endl;
+
+  memManager.free(SX,SX2);
+
+
+
   libint2::finalize();
 
   // Output CQ footer

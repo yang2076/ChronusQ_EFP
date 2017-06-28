@@ -44,6 +44,31 @@ namespace ChronusQ {
    *
    *   \warning Currently only functional for real GTOs.
    */
+
+  enum TWOBODY_CONTRACTION_TYPE {
+    COULOMB, ///< (mn | kl) X(lk)
+    EXCHANGE,///< (mn | kl) X(nk)
+    PAIR     ///< (mn | kl) X(nl)
+  }; ///< 2-Body Tensor Contraction Specification
+
+
+  /**
+   *  The TwoBodyContraction struct. Stores information
+   *  pertinant for a two body operator contraction with
+   *  a one body (2 index) operator. z.B. The density matrix.
+   */ 
+  template <typename T>
+  struct TwoBodyContraction {
+
+    T*  X;  ///< 1-Body (2 index) operator to contraction
+    T*  AX; ///< 1-Body (2 index) storage for the contraction
+
+    bool HER; ///< Whether or not X is hermetian
+    
+    TWOBODY_CONTRACTION_TYPE contType;
+
+  }; // struct TwoBodyContraction
+
   class AOIntegrals {
   public:
 
@@ -83,11 +108,6 @@ namespace ChronusQ {
 
     public:
 
-    enum ERI_CONTRACTION_TYPE {
-      COULOMB, ///< (mn | kl) X(lk)
-      EXCHANGE,///< (mn | kl) X(nk)
-      PAIR     ///< (mn | kl) X(nl)
-    }; ///< ERI Tensor Contraction Specification
 
 
     // Operator storage
@@ -187,12 +207,34 @@ namespace ChronusQ {
 
 
 
-    // Integral evaluation / contraction
+    // Integral evaluation
     // (see src/aointegrals/aointegrals_builders.cxx for docs)
 
     void computeAOOneE(); // Evaluate and store the 1-e ints in the CGTO basis
     void computeERI();    // Evaluate and store the ERIs in the CGTO basis
     void computeOrtho();  // Evaluate orthonormalization transformations
+
+
+
+    // Integral contraction
+
+    /**
+     *  Contract the two body potential with one body (2 index) operators.
+     *
+     *  Smartly determines whether to do the contraction directly, incore
+     *  or using density fitting depending on context
+     *
+     *  \param [in/ont] contList List of one body operators for contraction.
+     */ 
+    template <typename T>
+    void twoBodyContract(std::vector<TwoBodyContraction<T>> &contList) {
+      twoBodyContractIncore(contList);
+    };
+    
+    // Perform the two body contraction incore (using the rank-4 ERI tensor)
+    // see include/aointegrals/contract.cxx for docs.
+    template <typename T>
+    void twoBodyContractIncore(std::vector<TwoBodyContraction<T>>&);
 
     
   }; // class AOIntegrals
