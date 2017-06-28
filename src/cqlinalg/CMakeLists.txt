@@ -20,7 +20,9 @@
 # Contact the Developers:
 #   E-Mail: xsli@uw.edu
 #
-add_library(cqlinalg STATIC eig.cxx blas3.cxx)
+set( CQLAPACK_SRC eig.cxx factorization.cxx)
+set( CQBLAS_SRC   blas3.cxx)
+add_library(cqlinalg STATIC ${CQLAPACK_SRC} ${CQBLAS_SRC})
 list(APPEND CQEX_LINK cqlinalg)
 set(CQEX_LINK ${CQEX_LINK} PARENT_SCOPE)
 

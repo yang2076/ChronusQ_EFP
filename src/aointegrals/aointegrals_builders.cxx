@@ -26,11 +26,48 @@
 #include <cqlinalg.hpp>
 
 // Debug directives
-#define _DEBUGORTHO
+//#define _DEBUGORTHO
 
 namespace ChronusQ {
+
   typedef std::vector<libint2::Shell> shell_set; 
 
+  /**
+   *  \brief A general wrapper for 1-e (2 index) integral evaluation.
+   *
+   *  Currently computes 1-e integrals using Libint2. Shells sets are
+   *  passed in order to be possibly general to the uncontracted basis.
+   *  Handles all internal memory allocation including the evaluated matricies
+   *  themselves
+   *
+   *  \param [in] op     Operator for which to calculate the 1-e integrals
+   *  \param [in] shells Shell set for the integral evaluation
+   *
+   *  \returns    A vector of properly allocated pointers which store the
+   *              1-e evaluations.
+   *
+   *  This function returns a vector of pointers as it sometimes makes sense
+   *  to evaluate several matricies together if they are inimately related,
+   *  namely the length gauge electric multipoles and the overlap.
+   *
+   *  z.B. op == libint2::Operator::emultipole3
+   *
+   *  The function will return a vector of 20 pointers in the following order
+   *  { overlap, 
+   *    dipole_x, dipole_y, dipole_z, 
+   *    quadrupole_xx, quadrupole_xy, quadrupole_xz, quadrupole_yy,
+   *      quadrupole_yz, quadrupole_zz,
+   *    octupole_xxx, octupole_xxy, octupole_xxz, octupole_xyy,
+   *      octupole_xyz, octupole_xzz, octupole_yyy, octupole_yyz,
+   *      octupole_yzz, octupole_zzz
+   *  }
+   *
+   *  z.B. op == libint2::Operator::kinetic
+   *
+   *  The function will return a vector of 1 pointer
+   *
+   *  { kinetic }
+   */ 
   AOIntegrals::oper_t_coll AOIntegrals::OneEDriver(libint2::Operator op, 
     shell_set& shells) {
 
@@ -152,6 +189,20 @@ namespace ChronusQ {
   }; // AOIntegrals::OneEDriver
 
 
+  /**
+   *  \brief Allocate, compute  and store the 1-e integrals + 
+   *  orthonormalization matricies over the given CGTO basis.
+   *
+   *  Computes:
+   *    Overlap + length gauge Electric Multipoles
+   *    Kinetic energy matrix
+   *    Nuclear potential energy matrix
+   *    Core Hamiltonian (T + V)
+   *    Orthonormalization matricies (Lowdin / Cholesky)
+   *
+   *  TODO: Make this function general to relativistic Hamiltonians
+   *
+   */ 
   void AOIntegrals::computeAOOneE() {
 
     // Compute base 1-e integrals
@@ -197,41 +248,65 @@ namespace ChronusQ {
   }; // AOIntegrals::computeAOOneE
 
 
+  /**
+   *  \brief Allocate, compute and store the orthonormalization matricies 
+   *  over the CGTO basis.
+   *
+   *  Computes either the Lowdin or Cholesky transformation matricies based
+   *  on AOIntegrals::orthoType_
+   */ 
   void AOIntegrals::computeOrtho() {
 
-    // Allocate matricies
+    // Allocate orthogonalization matricies
     ortho1 = memManager_.malloc<double>(nSQ_);
     ortho2 = memManager_.malloc<double>(nSQ_);
 
+    std::fill_n(ortho1,nSQ_,0.);
+    std::fill_n(ortho2,nSQ_,0.);
+
+
+    // Allocate scratch
+    double* SCR1 = memManager_.malloc<double>(nSQ_);
+
+    // Copy the overlap over to scratch space
+    std::copy_n(overlap,nSQ_,SCR1);
+
+    orthoType_ = CHOLESKY;
+
     if(orthoType_ == LOWDIN) {
 
+      // Allocate more scratch
       double* sE   = memManager_.malloc<double>(basisSet_.nBasis);
-      double* SCR1 = memManager_.malloc<double>(nSQ_);
       double* SCR2 = memManager_.malloc<double>(nSQ_);
 
-      std::copy_n(overlap,nSQ_,SCR1);
       
+      // Diagonalize the overlap in scratch S = V * s * V**T
       HermetianEigen('V','U',basisSet_.nBasis,SCR1,basisSet_.nBasis,
         sE,memManager_);
 
+      // Compute X = V * s^{-1/2} 
       for(auto j = 0; j < basisSet_.nBasis; j++)
       for(auto i = 0; i < basisSet_.nBasis; i++)
         SCR2[i + j*basisSet_.nBasis] = 
           SCR1[i + j*basisSet_.nBasis] / std::sqrt(sE[j]);
 
+      // Compute O1 = X * V**T
       Gemm('N','T',basisSet_.nBasis,basisSet_.nBasis,basisSet_.nBasis,
         1.,SCR2,basisSet_.nBasis,SCR1,basisSet_.nBasis,0.,ortho1,
         basisSet_.nBasis);
 
+      // Compute X = V * s^{1/2} in place (by multiplying by s)
       for(auto j = 0; j < basisSet_.nBasis; j++)
       for(auto i = 0; i < basisSet_.nBasis; i++)
         SCR2[i + j*basisSet_.nBasis] = 
           SCR2[i + j*basisSet_.nBasis] * sE[j];
 
+      // Compute O2 = X * V**T
       Gemm('N','T',basisSet_.nBasis,basisSet_.nBasis,basisSet_.nBasis,
         1.,SCR2,basisSet_.nBasis,SCR1,basisSet_.nBasis,0.,ortho2,
         basisSet_.nBasis);
 
+      // Debug code to validate the Lowdin orthogonalization
 #ifdef _DEBUGORTHO
 
       std::cerr << "Debugging Lowdin Orthogonalization" << std::endl;
@@ -296,11 +371,35 @@ namespace ChronusQ {
 
 #endif
 
-      memManager_.free(sE); memManager_.free(SCR1), memManager_.free(SCR2);
+      // Free Scratch Space
+      memManager_.free(sE,SCR2);
 
     } else if(orthoType_ == CHOLESKY) {
 
+      // Compute the Cholesky factorization of the overlap S = L * L**T
+      Cholesky('L',basisSet_.nBasis,SCR1,basisSet_.nBasis);
+
+      // Copy the lower triangle to ortho2 (O2 = L)
+      for(auto j = 0; j < basisSet_.nBasis; j++)
+      for(auto i = j; i < basisSet_.nBasis; i++)
+        ortho2[i + j*basisSet_.nBasis] = SCR1[i + j*basisSet_.nBasis];
+
+      // Compute the inverse of the overlap using the Cholesky factors
+      CholeskyInv('L',basisSet_.nBasis,SCR1,basisSet_.nBasis);
+
+      // O1 = O2**T * S^{-1}
+      Gemm('T','N',basisSet_.nBasis,basisSet_.nBasis,basisSet_.nBasis,
+        1.,ortho2,basisSet_.nBasis,SCR1,basisSet_.nBasis,0.,ortho1,
+        basisSet_.nBasis);
+
+      // Remove upper triangle junk from O1
+      for(auto j = 0; j < basisSet_.nBasis; j++)
+      for(auto i = 0; i < j               ; i++)
+        ortho1[i + j*basisSet_.nBasis] = 0.;
+
     }
+
+    memManager_.free(SCR1);
 
   }; // AOIntegrals::computeOrtho
 

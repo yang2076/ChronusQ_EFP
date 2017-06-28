@@ -21,18 +21,43 @@
  *    E-Mail: xsli@uw.edu
  *  
  */
-
-#ifndef __INCLUDED_CQLINALG_HPP
-#define __INCLUDED_CQLINALG_HPP
-
-#include <cqlinalg/cqlinalg_config.hpp>
-#include <cqlinalg/util.hpp>
-
-// BLAS
-#include <cqlinalg/blas3.hpp>
-
-// LAPACK
-#include <cqlinalg/eig.hpp>
 #include <cqlinalg/factorization.hpp>
 
-#endif
+namespace ChronusQ {
+
+  // Cholesky specializations
+
+  // Real wraps DPOTRF
+  template <>
+  int Cholesky(char UPLO, int N, double *A, int LDA) {
+    int INFO;
+    dpotrf_(&UPLO,&N,A,&LDA,&INFO);
+    return INFO;
+  }; // Cholesky (real)
+
+  // Complex wraps ZPOTRF
+  template <>
+  int Cholesky(char UPLO, int N, dcomplex *A, int LDA) {
+    int INFO;
+    zpotrf_(&UPLO,&N,A,&LDA,&INFO);
+    return INFO;
+  }; // Cholesky (complex)
+
+
+  // Real wraps DPOTRI
+  template <>
+  int CholeskyInv(char UPLO, int N, double *A, int LDA) {
+    int INFO;
+    dpotri_(&UPLO,&N,A,&LDA,&INFO);
+    return INFO;
+  }; // CholeskyInv (real)
+
+  // Complex wraps ZPOTRI
+  template <>
+  int CholeskyInv(char UPLO, int N, dcomplex *A, int LDA) {
+    int INFO;
+    zpotri_(&UPLO,&N,A,&LDA,&INFO);
+    return INFO;
+  }; // CholeskyInv (complex)
+
+}; // namespace ChronusQ
