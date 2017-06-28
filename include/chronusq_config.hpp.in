@@ -37,3 +37,5 @@
 
 // Basis Path
 #define BASIS_PATH "@BASIS_PATH@"
+
+#cmakedefine _CQ_MKL

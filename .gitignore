@@ -5,5 +5,11 @@ external/libint2/share
 external/libint2/src
 external/libint2/tmp
 external/libint2/libint*/
+external/openblas/include
+external/openblas/lib
+external/openblas/src
+external/openblas/tmp
+external/openblas/bin
+external/openblas/Open*/
 doc
 *.*.swp

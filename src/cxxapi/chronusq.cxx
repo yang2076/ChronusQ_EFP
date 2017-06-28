@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
   BasisSet basis(std::move(CQBasisSetOptions(std::cout,input,mol)));
 
 
-  CQMemManager memManager(1e6);
+  CQMemManager memManager(100e6);
   AOIntegrals aoints(memManager,mol,basis);
 
   libint2::initialize();

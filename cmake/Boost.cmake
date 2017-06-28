@@ -19,11 +19,11 @@
 # 
 # Contact the Developers:
 #   E-Mail: xsli@uw.edu
-#
+
 set(Boost_USE_STATIC_LIBS    ON)
 set(Boost_USE_MULTITHREADED  ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost REQUIRED system)
+find_package(Boost REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIRS})
-list(APPEND CQ_EXT_LINK ${Boost_LIBRARIES})
+#list(APPEND CQ_EXT_LINK ${Boost_LIBRARIES})

@@ -20,6 +20,7 @@
 # Contact the Developers:
 #   E-Mail: xsli@uw.edu
 #
+add_subdirectory(cqlinalg)
 add_subdirectory(molecule)
 add_subdirectory(basisset)
 add_subdirectory(aointegrals)

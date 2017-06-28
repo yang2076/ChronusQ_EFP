@@ -26,6 +26,7 @@
 
 // System Headers (standard C++)
 #include <string>        
+#include <cassert>
 #include <iterator>
 #include <array>         
 #include <unordered_map> 
@@ -41,6 +42,7 @@
 #include <locale>
 #include <algorithm>
 #include <unistd.h>
+#include <complex>
 
 #include <chronusq_config.hpp> // Configuration header
 
@@ -48,5 +50,9 @@
 #ifdef _OPENMP
   #include<omp.h>
 #endif
+
+
+// Standard typedefs
+typedef std::complex<double> dcomplex;
 
 #endif

@@ -1,4 +1,32 @@
+/* 
+ *  This file is part of the Chronus Quantum (ChronusQ) software package
+ *  
+ *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *  
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *  
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *  
+ *  Contact the Developers:
+ *    E-Mail: xsli@uw.edu
+ *  
+ */
+
 #include <aointegrals.hpp>
+#include <cqlinalg.hpp>
+
+// Debug directives
+#define _DEBUGORTHO
 
 namespace ChronusQ {
   typedef std::vector<libint2::Shell> shell_set; 
@@ -154,7 +182,7 @@ namespace ChronusQ {
     ;
 
     // H = T + V
-    #pragma omp parallel for shared(coreH,kinetic,potential) \
+    #pragma omp parallel for default(shared) \
        schedule(static,chunk)
       for(size_t i = 0; i < nSQ_; i++) 
         coreH.back()[i] = kinetic[i] + potential[i];
@@ -171,13 +199,104 @@ namespace ChronusQ {
 
   void AOIntegrals::computeOrtho() {
 
+    // Allocate matricies
+    ortho1 = memManager_.malloc<double>(nSQ_);
+    ortho2 = memManager_.malloc<double>(nSQ_);
+
     if(orthoType_ == LOWDIN) {
 
-      double* sE  = memManager_.malloc<double>(std::sqrt(nSQ_));
-      double* sEV = memManager_.malloc<double>(nSQ_);
+      double* sE   = memManager_.malloc<double>(basisSet_.nBasis);
+      double* SCR1 = memManager_.malloc<double>(nSQ_);
+      double* SCR2 = memManager_.malloc<double>(nSQ_);
 
+      std::copy_n(overlap,nSQ_,SCR1);
+      
+      HermetianEigen('V','U',basisSet_.nBasis,SCR1,basisSet_.nBasis,
+        sE,memManager_);
 
-      memManager_.free(sE); memManager_.free(sEV);
+      for(auto j = 0; j < basisSet_.nBasis; j++)
+      for(auto i = 0; i < basisSet_.nBasis; i++)
+        SCR2[i + j*basisSet_.nBasis] = 
+          SCR1[i + j*basisSet_.nBasis] / std::sqrt(sE[j]);
+
+      Gemm('N','T',basisSet_.nBasis,basisSet_.nBasis,basisSet_.nBasis,
+        1.,SCR2,basisSet_.nBasis,SCR1,basisSet_.nBasis,0.,ortho1,
+        basisSet_.nBasis);
+
+      for(auto j = 0; j < basisSet_.nBasis; j++)
+      for(auto i = 0; i < basisSet_.nBasis; i++)
+        SCR2[i + j*basisSet_.nBasis] = 
+          SCR2[i + j*basisSet_.nBasis] * sE[j];
+
+      Gemm('N','T',basisSet_.nBasis,basisSet_.nBasis,basisSet_.nBasis,
+        1.,SCR2,basisSet_.nBasis,SCR1,basisSet_.nBasis,0.,ortho2,
+        basisSet_.nBasis);
+
+#ifdef _DEBUGORTHO
+
+      std::cerr << "Debugging Lowdin Orthogonalization" << std::endl;
+      bool good(true);
+
+      // Check that ortho1 and ortho2 are inverses of eachother
+      good = true;
+      Gemm('N','N',basisSet_.nBasis,basisSet_.nBasis,basisSet_.nBasis,
+        1.,ortho1,basisSet_.nBasis,ortho2,basisSet_.nBasis,0.,SCR1,
+        basisSet_.nBasis);
+      
+      for(auto j = 0; j < basisSet_.nBasis; j++)
+      for(auto i = 0; i < basisSet_.nBasis; i++) {
+
+        if( i == j ) good = good and
+          (1. - SCR1[i + j*basisSet_.nBasis]) < 1e-12;
+        else good = good and SCR1[i + j*basisSet_.nBasis] < 1e-12; 
+
+      }
+
+      std::cerr << "  Ortho1 * Ortho2 = I: " << std::boolalpha << good 
+                << std::endl;
+
+      // Check that ortho2 * ortho2 is the overlap
+      good = true;
+      Gemm('N','N',basisSet_.nBasis,basisSet_.nBasis,basisSet_.nBasis,
+        1.,ortho2,basisSet_.nBasis,ortho2,basisSet_.nBasis,0.,SCR1,
+        basisSet_.nBasis);
+      
+      for(auto j = 0; j < basisSet_.nBasis; j++)
+      for(auto i = 0; i < basisSet_.nBasis; i++) {
+
+        good = good and 
+          (SCR1[i + j*basisSet_.nBasis] - overlap[i + j*basisSet_.nBasis]) <
+          1e-12; 
+
+      }
+
+      std::cerr << "  Ortho2 * Ortho2 = S: " << std::boolalpha << good 
+                << std::endl;
+
+      // Check that ortho1 * ortho1 is the inverse of the overlap
+      good = true;
+      Gemm('N','N',basisSet_.nBasis,basisSet_.nBasis,basisSet_.nBasis,
+        1.,ortho1,basisSet_.nBasis,ortho1,basisSet_.nBasis,0.,SCR1,
+        basisSet_.nBasis);
+      Gemm('N','N',basisSet_.nBasis,basisSet_.nBasis,basisSet_.nBasis,
+        1.,SCR1,basisSet_.nBasis,overlap,basisSet_.nBasis,0.,SCR2,
+        basisSet_.nBasis);
+      
+      for(auto j = 0; j < basisSet_.nBasis; j++)
+      for(auto i = 0; i < basisSet_.nBasis; i++) {
+
+        if( i == j ) good = good and
+          (1. - SCR2[i + j*basisSet_.nBasis]) < 1e-10;
+        else good = good and SCR2[i + j*basisSet_.nBasis] < 1e-10; 
+
+      }
+
+      std::cerr << "  Ortho1 * Ortho1 * S = I: " << std::boolalpha << good 
+                << std::endl;
+
+#endif
+
+      memManager_.free(sE); memManager_.free(SCR1), memManager_.free(SCR2);
 
     } else if(orthoType_ == CHOLESKY) {
 
