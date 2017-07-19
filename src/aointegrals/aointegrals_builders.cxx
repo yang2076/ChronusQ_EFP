@@ -291,7 +291,14 @@ namespace ChronusQ {
     size_t NB3 = NB2*NB;
     size_t NB4 = NB2*NB2;
 
-    ERI = memManager_.malloc<double>(NB4);
+    try { ERI = memManager_.malloc<double>(NB4); } 
+    catch(...) {
+      std::cout << std::fixed;
+      std::cout << "Insufficient memory for the full ERI tensor (" 
+                << (NB4/1e9) * sizeof(double) << " GB)" << std::endl;
+      std::cout << std::endl << memManager_ << std::endl;
+      CErr();
+    }
     std::fill_n(ERI,NB4,0.);
 
 

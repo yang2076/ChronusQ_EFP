@@ -59,13 +59,12 @@
 
 
 // Deallocation functions
-#define DEALLOC_OP(typ,PTR) if(PTR != NULL) memManager_.free(PTR);
+#define DEALLOC_OP(typ,PTR) if(PTR != nullptr) memManager_.free(PTR);
 
 #define DEALLOC_VEC_OP(typ, VEC_PTR) \
   for(auto i = 0; i < VEC_PTR.size(); i++) \
-    if(VEC_PTR[i] != NULL) DEALLOC_OP(typ,VEC_PTR[i]); \
+    if(VEC_PTR[i] != nullptr) DEALLOC_OP(typ,VEC_PTR[i]); \
   VEC_PTR.clear();
-
 
 
 
@@ -74,7 +73,7 @@
 #define COPY_OTHER_MEMBER(X) X = other.X;
 
 #define COPY_OTHER_OP(typ,PTR) \
-  if(other.PTR != NULL) { \
+  if(other.PTR != nullptr) { \
     size_t OPSZ = memManager_.getSize<typ>(other.PTR); \
     PTR = memManager_.malloc<typ>(OPSZ); \
     std::copy_n(other.PTR, OPSZ, PTR); \
@@ -82,7 +81,7 @@
 
 #define COPY_OTHER_VEC_OP(typ, VEC_PTR) \
   for(auto i = 0; i < other.VEC_PTR.size(); i++) \
-    if(other.VEC_PTR[i] != NULL) { \
+    if(other.VEC_PTR[i] != nullptr) { \
       size_t OPSZ = memManager_.getSize<typ>(other.VEC_PTR[i]); \
       VEC_PTR.emplace_back(memManager_.malloc<typ>(OPSZ)); \
       std::copy_n(other.VEC_PTR[i], OPSZ, VEC_PTR.back()); \
@@ -92,7 +91,7 @@
 
 // Move functions
 #define MOVE_OTHER_OP(typ,PTR) \
-  if(other.PTR != NULL) { \
+  if(other.PTR != nullptr) { \
     size_t OPSZ = memManager_.getSize<typ>(other.PTR); \
     PTR = memManager_.malloc<typ>(OPSZ); \
     std::copy_n(other.PTR, OPSZ, PTR); \
@@ -101,7 +100,7 @@
 
 #define MOVE_OTHER_VEC_OP(typ, VEC_PTR) \
   for(auto i = 0; i < other.VEC_PTR.size(); i++) \
-    if(other.VEC_PTR[i] != NULL) { \
+    if(other.VEC_PTR[i] != nullptr) { \
       size_t OPSZ = memManager_.getSize<typ>(other.VEC_PTR[i]); \
       VEC_PTR.emplace_back(memManager_.malloc<typ>(OPSZ)); \
       std::copy_n(other.VEC_PTR[i], OPSZ, VEC_PTR.back()); \

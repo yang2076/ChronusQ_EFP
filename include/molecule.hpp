@@ -26,6 +26,7 @@
 
 #include <chronusq_sys.hpp>
 #include <atom.hpp>
+#include <cerr.hpp>
 
 namespace ChronusQ {
 
@@ -149,6 +150,13 @@ namespace ChronusQ {
         nTotalE = std::accumulate(atoms.begin(),atoms.end(),charge,
                     [&](int c, const Atom &a){ return a.atomicNumber + c; }
                   );
+
+        if((nTotalE % 2) != 0 and (multip % 2) != 0) {
+          std::stringstream ss;
+          ss << "Multiplicity = " << multip << " is not compatible with "
+             << "NTotalE = " << nTotalE;
+          CErr(ss.str(),std::cout);
+        }
 
         computeRIJ();
         computeNNRep();

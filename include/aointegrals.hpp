@@ -196,6 +196,10 @@ namespace ChronusQ {
     // Member functions
 
 
+    // Getters
+    CQMemManager& memManager() { return memManager_; }
+    BasisSet&     basisSet()   { return basisSet_;   }
+    Molecule&     molecule()   { return molecule_;   }
 
 
     // Memory

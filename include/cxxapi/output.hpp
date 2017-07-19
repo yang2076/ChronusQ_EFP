@@ -21,8 +21,8 @@
  *    E-Mail: xsli@uw.edu
  *  
  */
-#ifndef _INCLUDED_OUTPUT_HPP_
-#define _INCLUDED_OUTPUT_HPP_
+#ifndef __INCLUDED_OUTPUT_HPP__
+#define __INCLUDED_OUTPUT_HPP__
 
 
 #include <chronusq_sys.hpp>
