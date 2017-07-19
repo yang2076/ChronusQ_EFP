@@ -20,15 +20,9 @@
 # Contact the Developers:
 #   E-Mail: xsli@uw.edu
 #
-add_subdirectory(cqlinalg)
-add_subdirectory(molecule)
-add_subdirectory(basisset)
-add_subdirectory(aointegrals)
-add_subdirectory(quantum)
-add_subdirectory(wavefunction)
-add_subdirectory(singleslater)
+add_library(singleslater STATIC impl.cxx)
 
+# Append aointegrals to executable link
+list(APPEND CQEX_LINK singleslater)
+set(CQEX_LINK ${CQEX_LINK} PARENT_SCOPE)
 
-
-list(REVERSE CQEX_LINK)
-add_subdirectory(cxxapi)

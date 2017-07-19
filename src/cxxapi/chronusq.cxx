@@ -31,6 +31,7 @@
 #include <molecule.hpp>
 #include <basisset.hpp>
 #include <aointegrals.hpp>
+#include <singleslater.hpp>
 
 using namespace ChronusQ;
 
@@ -97,6 +98,7 @@ int main(int argc, char *argv[]) {
   aoints.computeAOOneE();
   aoints.computeERI();
 
+/*
   double *SX  = memManager.malloc<double>(basis.nBasis*basis.nBasis);
   double *SX2 = memManager.malloc<double>(basis.nBasis*basis.nBasis);
   std::vector<TwoBodyContraction<double>> cont = 
@@ -116,6 +118,17 @@ int main(int argc, char *argv[]) {
   std::cout << SX2Map << std::endl;
 
   memManager.free(SX,SX2);
+*/
+
+  SingleSlater<double> ss(aoints,1);
+  SingleSlater<double> ss2(ss); // C-DD
+  SingleSlater<double> ss3(std::move(ss)); // M-DD
+  SingleSlater<dcomplex> ss4(ss2); // C-ZD
+  SingleSlater<dcomplex> ss5(ss4); // C-ZZ
+  SingleSlater<dcomplex> ss6(std::move(ss2)); // M-ZD
+  SingleSlater<dcomplex> ss7(std::move(ss4)); // M-ZZ
+
+//SingleSlater<dcomplex> ss1(std::move(ss));
 
 
 
