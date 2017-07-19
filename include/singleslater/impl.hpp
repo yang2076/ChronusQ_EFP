@@ -26,6 +26,7 @@
 
 #include <singleslater.hpp>
 #include <util/preprocessor.hpp>
+#include <quantum/preprocessor.hpp>
 
 // Template for a collective operation on the members of a 
 // SingleSlater object
@@ -38,7 +39,6 @@
   OP_VEC_OP(T,this,other,this->memManager,K); \
   OP_VEC_OP(T,this,other,this->memManager,PT);\
   OP_VEC_OP(T,this,other,this->memManager,onePDMOrtho);
-
 
 namespace ChronusQ {
 
@@ -137,70 +137,14 @@ namespace ChronusQ {
 
     size_t NB = this->aoints.basisSet().nBasis;
 
-    // Always allocate Scalar matricies
-    fockScalar        = this->memManager.template malloc<T>(NB*NB);
-    fockOrthoScalar   = this->memManager.template malloc<T>(NB*NB);
-    JScalar           = this->memManager.template malloc<T>(NB*NB);
-    KScalar           = this->memManager.template malloc<T>(NB*NB);
-    PTScalar          = this->memManager.template malloc<T>(NB*NB);
-    onePDMOrthoScalar = this->memManager.template malloc<T>(NB*NB);
- 
-    // Populate vectors
-    fock       .emplace_back(fockScalar         );
-    fockOrtho  .emplace_back(fockOrthoScalar    );
-    K          .emplace_back(KScalar            );
-    PT         .emplace_back(PTScalar           );
-    onePDMOrtho.emplace_back(onePDMOrthoScalar  );
+    SPIN_OPERATOR_ALLOC(NB,fock);
+    SPIN_OPERATOR_ALLOC(NB,fockOrtho);
+    SPIN_OPERATOR_ALLOC(NB,K);
+    SPIN_OPERATOR_ALLOC(NB,PT);
+    SPIN_OPERATOR_ALLOC(NB,onePDMOrtho);
 
-    // If 2C or open shell, populate Mz storage
-    if(this->nC > 1 or not this->iCS) {
-      fockMz        = this->memManager.template malloc<T>(NB*NB);
-      fockOrthoMz   = this->memManager.template malloc<T>(NB*NB);
-      KMz           = this->memManager.template malloc<T>(NB*NB);
-      PTMz          = this->memManager.template malloc<T>(NB*NB);
-      onePDMOrthoMz = this->memManager.template malloc<T>(NB*NB);
- 
-      // Populate vectors
-      fock       .emplace_back(fockMz       );
-      fockOrtho  .emplace_back(fockOrthoMz  );
-      K          .emplace_back(KMz          );
-      PT         .emplace_back(PTMz         );
-      onePDMOrtho.emplace_back(onePDMOrthoMz);
-    };
-
-   // If 2C, populate My / Mx
-    if(this->nC > 1 or not this->iCS) {
-
-      // My Storage
-      fockMy        = this->memManager.template malloc<T>(NB*NB);
-      fockOrthoMy   = this->memManager.template malloc<T>(NB*NB);
-      KMy           = this->memManager.template malloc<T>(NB*NB);
-      PTMy          = this->memManager.template malloc<T>(NB*NB);
-      onePDMOrthoMy = this->memManager.template malloc<T>(NB*NB);
- 
-      // Populate vectors
-      fock       .emplace_back(fockMy       );
-      fockOrtho  .emplace_back(fockOrthoMy  );
-      K          .emplace_back(KMy          );
-      PT         .emplace_back(PTMy         );
-      onePDMOrtho.emplace_back(onePDMOrthoMy);
-
-      // Mx Storage
-      fockMx        = this->memManager.template malloc<T>(NB*NB);
-      fockOrthoMx   = this->memManager.template malloc<T>(NB*NB);
-      KMx           = this->memManager.template malloc<T>(NB*NB);
-      PTMx          = this->memManager.template malloc<T>(NB*NB);
-      onePDMOrthoMx = this->memManager.template malloc<T>(NB*NB);
- 
-      // Populate vectors
-      fock       .emplace_back(fockMx       );
-      fockOrtho  .emplace_back(fockOrthoMx  );
-      K          .emplace_back(KMx          );
-      PT         .emplace_back(PTMx         );
-      onePDMOrtho.emplace_back(onePDMOrthoMx);
-
-    };
-
+    // J only has a scalar component
+    JScalar = this->memManager.template malloc<T>(NB*NB);
 
 
   }; // SingleSlater<T>::alloc

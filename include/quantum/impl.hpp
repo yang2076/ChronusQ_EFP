@@ -26,6 +26,7 @@
 
 #include <quantum.hpp>
 #include <util/preprocessor.hpp>
+#include <quantum/preprocessor.hpp>
 
 // Template for a collective operation on the members of a 
 // Quantum object
@@ -161,23 +162,7 @@ namespace ChronusQ {
     std::cout << "Quantum::alloc " << this << std::endl;
 #endif
 
-    // Always allocate onePDMScalar
-    onePDMScalar = memManager.template malloc<T>(N*N);
-    onePDM.emplace_back(onePDMScalar);
-
-    // If 2C or not closed shell allocate onePDMMz
-    if(nC > 1 or not iCS) {
-      onePDMMz = memManager.template malloc<T>(N*N);
-      onePDM.emplace_back(onePDMMz);
-    }
-
-    // If 2C, allocate onePDMMy/Mx
-    if( nC > 1 ) {
-      onePDMMy = memManager.template malloc<T>(N*N);
-      onePDMMx = memManager.template malloc<T>(N*N);
-      onePDM.emplace_back(onePDMMy);
-      onePDM.emplace_back(onePDMMx);
-    }
+    SPIN_OPERATOR_ALLOC(N,onePDM);
 
   }; // Quantum<T>::alloc
 
