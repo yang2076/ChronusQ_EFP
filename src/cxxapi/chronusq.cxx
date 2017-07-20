@@ -25,6 +25,7 @@
 #include <cxxapi/input.hpp>
 #include <cxxapi/output.hpp>
 #include <cxxapi/options.hpp>
+#include <cxxapi/boilerplate.hpp>
 
 #include <memmanager.hpp>
 #include <cerr.hpp>
@@ -36,6 +37,8 @@
 using namespace ChronusQ;
 
 int main(int argc, char *argv[]) {
+
+  ChronusQ::initialize();
 
   std::string inFileName, outFileName;
 
@@ -93,8 +96,6 @@ int main(int argc, char *argv[]) {
   CQMemManager memManager(100e6);
   AOIntegrals aoints(memManager,mol,basis);
 
-  omp_set_num_threads(2);
-  libint2::initialize();
   aoints.computeAOOneE();
   aoints.computeERI();
 
@@ -132,10 +133,10 @@ int main(int argc, char *argv[]) {
 
 
 
-  libint2::finalize();
-
   // Output CQ footer
   CQOutputFooter(std::cout);
+
+  ChronusQ::finalize();
 
   return 0;
 }
