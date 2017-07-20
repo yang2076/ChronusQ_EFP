@@ -28,7 +28,7 @@
 #include <memmanager.hpp>
 
 // Debug print (triggers WaveFunction, etc)
-#define _QuantumDebug
+//#define _QuantumDebug
 
 namespace ChronusQ {
 

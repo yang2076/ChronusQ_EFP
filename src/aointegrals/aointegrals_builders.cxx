@@ -24,6 +24,7 @@
 
 #include <aointegrals.hpp>
 #include <cqlinalg.hpp>
+#include <util/matout.hpp>
 
 // Debug directives
 //#define _DEBUGORTHO
@@ -244,6 +245,8 @@ namespace ChronusQ {
       for(size_t i = 0; i < nSQ_; i++) 
         coreH.back()[i] = kinetic[i] + potential[i];
 
+    prettyPrintSmart(std::cout,"Core H",coreH.back(),basisSet_.nBasis, 
+      basisSet_.nBasis, basisSet_.nBasis);
 
 
 
