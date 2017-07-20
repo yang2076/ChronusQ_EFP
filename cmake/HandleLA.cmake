@@ -1,7 +1,8 @@
 include(ExternalProject)
 
 
-find_package(Eigen3)
+find_package(Eigen3 REQUIRED)
+message(STATUS "Found Eigen3 -- ${EIGEN3_INCLUDE_DIR}")
 include_directories("${EIGEN3_INCLUDE_DIR}")
 
 if(${CMAKE_CXX_COMPILER} MATCHES "icpc.*$")

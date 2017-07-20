@@ -42,7 +42,7 @@ include_directories("${PROJECT_BINARY_DIR}/include")
 include(FindLibint)
 include(Boost)
 include(HandleLA)
-find_package(OpenMP REQUIRED)
+find_package(OpenMP)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 
 set(CQEX_LINK ${CQ_EXT_LINK} )
