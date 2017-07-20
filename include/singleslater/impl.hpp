@@ -43,7 +43,7 @@
 namespace ChronusQ {
 
   /**
-   *  Constructs a SingleSlater object to another of the same type by copy.
+   *  Constructs a SingleSlater object from another of the same type by copy.
    *
    *  \param [in] other SingleSlater object to copy
    */ 
@@ -52,8 +52,9 @@ namespace ChronusQ {
     WaveFunction<T>(dynamic_cast<const WaveFunction<T>&>(other)) {
 
 #ifdef _SingleSlaterDebug
-    std::cout << "SingleSlater<T>::SingleSlater(const SingleSlater<T>&) " 
-              << this << std::endl;
+    std::cout << "SingleSlater<T>::SingleSlater(const SingleSlater<T>&) "
+              << "(this = " << this << ", other = " << &other << ")" 
+              << std::endl;
 #endif
 
     SingleSlater_COLLECTIVE_OP(COPY_OTHER_MEMBER_OP, COPY_OTHER_MEMBER_VEC_OP);
@@ -62,7 +63,7 @@ namespace ChronusQ {
 
 
   /**
-   *  Constructs a SingleSlater object to another of a different type by copy.
+   *  Constructs a SingleSlater object from another of a different type by copy.
    *
    *  \param [in] other SingleSlater object to copy
    */ 
@@ -72,8 +73,9 @@ namespace ChronusQ {
     WaveFunction<T>(dynamic_cast<const WaveFunction<U>&>(other)) {
 
 #ifdef _SingleSlaterDebug
-    std::cout << "SingleSlater<T>::SingleSlater(const SingleSlater<U>&) " 
-              << this << std::endl;
+    std::cout << "SingleSlater<T>::SingleSlater(const SingleSlater<U>&) "
+              << "(this = " << this << ", other = " << &other << ")" 
+              << std::endl;
 #endif
 
     SingleSlater_COLLECTIVE_OP(COPY_OTHER_MEMBER_OP, COPY_OTHER_MEMBER_VEC_OP);
@@ -83,7 +85,7 @@ namespace ChronusQ {
 
 
   /**
-   *  Constructs a SingleSlater object to another of the same type by move.
+   *  Constructs a SingleSlater object from another of the same type by move.
    *
    *  \warning Deallocates the passed SingleSlater object
    *
@@ -94,7 +96,8 @@ namespace ChronusQ {
     WaveFunction<T>(dynamic_cast<WaveFunction<T>&&>(other)) {
 
 #ifdef _SingleSlaterDebug
-    std::cout << "SingleSlater<T>::SingleSlater(SingleSlater<T>&&) " << this 
+    std::cout << "SingleSlater<T>::SingleSlater(SingleSlater<T>&&) "
+              << "(this = " << this << ", other = " << &other << ")" 
               << std::endl;
 #endif
 
@@ -104,7 +107,7 @@ namespace ChronusQ {
     
 
   /**
-   *  Constructs a SingleSlater object to another of a different by move.
+   *  Constructs a SingleSlater object from another of a different by move.
    *
    *  \warning Deallocates the passed SingleSlater object
    *
@@ -116,7 +119,8 @@ namespace ChronusQ {
     WaveFunction<T>(dynamic_cast<WaveFunction<U>&&>(other)) {
 
 #ifdef _SingleSlaterDebug
-    std::cout << "SingleSlater<T>::SingleSlater(SingleSlater<U>&&) " << this 
+    std::cout << "SingleSlater<T>::SingleSlater(SingleSlater<U>&&) "
+              << "(this = " << this << ", other = " << &other << ")" 
               << std::endl;
 #endif
 
@@ -132,7 +136,7 @@ namespace ChronusQ {
   void SingleSlater<T>::alloc() {
 
 #ifdef _SingleSlaterDebug
-    std::cout << "SingleSlater::alloc " << this << std::endl;
+    std::cout << "SingleSlater::alloc (this = " << this << ")" << std::endl;
 #endif
 
     size_t NB = this->aoints.basisSet().nBasis;
@@ -157,7 +161,7 @@ namespace ChronusQ {
   void SingleSlater<T>::dealloc() {
 
 #ifdef _SingleSlaterDebug
-    std::cout << "SingleSlater::dealloc " << this << std::endl;
+    std::cout << "SingleSlater::dealloc (this = " << this << ")" << std::endl;
 #endif
 
     SingleSlater_COLLECTIVE_OP(DEALLOC_OP_5, DEALLOC_VEC_OP_5);

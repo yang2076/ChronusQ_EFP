@@ -102,7 +102,7 @@ namespace ChronusQ {
      *  \param [in] N     Dimension of the density matricies to be allocated
      */ 
     Quantum(CQMemManager &mem, size_t _nC = 1, bool _iCS = true, 
-      size_t N = 0): 
+      size_t N = 0, bool doAlloc = true): 
       memManager(mem), nC(_nC), iCS(_iCS), onePDMScalar(nullptr), 
       onePDMMz(nullptr), onePDMMx(nullptr), onePDMMy(nullptr), 
       elecDipole({0.,0.,0.}),
@@ -115,7 +115,7 @@ namespace ChronusQ {
         }}, SExpect({0.,0.,0.}), SSq(0.) {
 
         // Allocate densities
-        if( N != 0 ) alloc(N);
+        if( N != 0 and doAlloc ) alloc(N);
 
     }; // Quantum::Quantum
     

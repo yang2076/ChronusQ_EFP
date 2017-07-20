@@ -47,7 +47,7 @@
 namespace ChronusQ {
 
   /**
-   *  Constructs a WaveFunction object to another of the same type by copy.
+   *  Constructs a WaveFunction object from another of the same type by copy.
    *
    *  \param [in] other WaveFunction object to copy
    */ 
@@ -57,8 +57,9 @@ namespace ChronusQ {
     aoints(other.aoints) {
 
 #ifdef _WaveFunctionDebug
-    std::cout << "WaveFunction<T>::WaveFunction(const WaveFunction<T>&) " 
-              << this << std::endl;
+    std::cout << "WaveFunction<T>::WaveFunction(const WaveFunction<T>&) "
+              << "(this = " << this << ", other = " << &other << ")" 
+              << std::endl;
 #endif
 
     WaveFunction_COLLECTIVE_OP(COPY_OTHER_MEMBER,COPY_OTHER_MEMBER_OP);
@@ -67,7 +68,7 @@ namespace ChronusQ {
     
 
   /**
-   *  Constructs a WaveFunction object to another of a different type by copy.
+   *  Constructs a WaveFunction object from another of a different type by copy.
    *
    *  \param [in] other WaveFunction object to copy
    */ 
@@ -78,8 +79,9 @@ namespace ChronusQ {
     aoints(other.aoints) {
 
 #ifdef _WaveFunctionDebug
-    std::cout << "WaveFunction<T>::WaveFunction(const WaveFunction<U>&) " 
-              << this << std::endl;
+    std::cout << "WaveFunction<T>::WaveFunction(const WaveFunction<U>&) "
+              << "(this = " << this << ", other = " << &other << ")" 
+              << std::endl;
 #endif
 
     WaveFunction_COLLECTIVE_OP(COPY_OTHER_MEMBER,COPY_OTHER_MEMBER_OP);
@@ -88,7 +90,7 @@ namespace ChronusQ {
 
 
   /**
-   *  Constructs a WaveFunction object to another of the same type by move.
+   *  Constructs a WaveFunction object from another of the same type by move.
    *
    *  \warning Deallocates the passed WaveFunction object
    *
@@ -100,7 +102,8 @@ namespace ChronusQ {
     aoints(other.aoints) {
 
 #ifdef _WaveFunctionDebug
-    std::cout << "WaveFunction<T>::WaveFunction(WaveFunction<T>&&) " << this 
+    std::cout << "WaveFunction<T>::WaveFunction(WaveFunction<T>&&) "
+              << "(this = " << this << ", other = " << &other << ")" 
               << std::endl;
 #endif
 
@@ -110,7 +113,7 @@ namespace ChronusQ {
 
 
   /**
-   *  Constructs a WaveFunction object to another of a different type by move.
+   *  Constructs a WaveFunction object from another of a different type by move.
    *
    *  \warning Deallocates the passed WaveFunction object
    *
@@ -123,7 +126,8 @@ namespace ChronusQ {
     aoints(other.aoints) {
 
 #ifdef _WaveFunctionDebug
-    std::cout << "WaveFunction<T>::WaveFunction(WaveFunction<U>&&) " << this 
+    std::cout << "WaveFunction<T>::WaveFunction(WaveFunction<U>&&) "
+              << "(this = " << this << ", other = " << &other << ")" 
               << std::endl;
 #endif
 
@@ -139,7 +143,7 @@ namespace ChronusQ {
   void WaveFunction<T>::alloc() {
 
 #ifdef _WaveFunctionDebug
-    std::cout << "WaveFunction::alloc " << this << std::endl;
+    std::cout << "WaveFunction::alloc (this = " << this << ")" << std::endl;
 #endif
 
     size_t NB = this->nC * aoints.basisSet().nBasis;
@@ -163,7 +167,7 @@ namespace ChronusQ {
   void WaveFunction<T>::dealloc() {
 
 #ifdef _WaveFunctionDebug
-    std::cout << "WaveFunction::dealloc " << this << std::endl;
+    std::cout << "WaveFunction::dealloc (this = " << this << ")" << std::endl;
 #endif
 
     WaveFunction_COLLECTIVE_OP(DUMMY3,DEALLOC_OP_5);
