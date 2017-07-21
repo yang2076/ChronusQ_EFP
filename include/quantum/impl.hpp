@@ -55,47 +55,26 @@
 namespace ChronusQ {
 
   /**
-   *  Constructs a Quantum object from another of the same type by copy.
+   *  Constructs a Quantum object from another of a another (possibly the same) 
+   *  type by copy.
    *
    *  \param [in] other Quantum object to copy
-   */ 
-  template <typename T>
-  Quantum<T>::Quantum(const Quantum<T> &other) : 
-    Quantum<T>(other.memManager,other.nC,other.iCS,
-    (other.onePDMScalar == nullptr) ? 
-       0 : std::sqrt(other.memManager.template getSize<T>(other.onePDMScalar)),
-    false
-    ) {
-
-#ifdef _QuantumDebug
-    std::cout << "Quantum<T>::Quantum(const Quantum<T>&) (this = " << this 
-              << ", other = " << &other << ")" << std::endl;
-#endif
-
-    Quantum_COLLECTIVE_OP(COPY_OTHER_MEMBER,COPY_OTHER_MEMBER_OP);
-    Form_1PDM_VEC();
-
-  }; // Quantum<T>::Quantum(const Quantum<T> &)
-
-
-  /**
-   *  Constructs a Quantum object from another of a different type by copy.
-   *
-   *  \param [in] other Quantum object to copy
+   *  \param [in] dummy Dummy argument to fix calling signature for delegation 
+   *    to copy constructor
    */ 
   template <typename T>
   template <typename U>
-  Quantum<T>::Quantum(const Quantum<U> &other) : 
+  Quantum<T>::Quantum(const Quantum<U> &other, int dummy) : 
     Quantum<T>(other.memManager,other.nC,other.iCS,
     (other.onePDMScalar == nullptr) ? 
        0 : std::sqrt(other.memManager.template getSize<U>(other.onePDMScalar)),
     false
     ) {
 
-#ifdef _QuantumDebug
+    #ifdef _QuantumDebug
     std::cout << "Quantum<T>::Quantum(const Quantum<U>&) (this = " << this 
               << ", other = " << &other << ")" << std::endl;
-#endif
+    #endif
 
     Quantum_COLLECTIVE_OP(COPY_OTHER_MEMBER,COPY_OTHER_MEMBER_OP);
     Form_1PDM_VEC();
@@ -104,58 +83,42 @@ namespace ChronusQ {
     
 
   /**
-   *  Constructs a Quantum object from another of the same type by move.
+   *  Constructs a Quantum object from another of a another (possibly the same) 
+   *  type by move.
    *
    *  \warning Deallocates the passed Quantum object
    *
    *  \param [in] other Quantum object to move
-   */ 
-  template <typename T>
-  Quantum<T>::Quantum(Quantum<T> &&other) : 
-    Quantum<T>(other.memManager,other.nC,other.iCS,
-    (other.onePDMScalar == nullptr) ? 
-       0 : std::sqrt(other.memManager.template getSize<T>(other.onePDMScalar)),
-    false
-    ) {
-
-#ifdef _QuantumDebug
-    std::cout << "Quantum<T>::Quantum(Quantum<T>&&) (this = " << this 
-              << ", other = " << &other << ")" << std::endl;
-#endif
-
-    Quantum_COLLECTIVE_OP(MOVE_OTHER_MEMBER,MOVE_OTHER_MEMBER_OP);
-    Form_1PDM_VEC();
-    other.onePDM.clear();
-
-  }; // Quantum<T>::Quantum(Quantum<T> &&)
-    
-
-  /**
-   *  Constructs a Quantum object from another of a different type by move.
-   *
-   *  \warning Deallocates the passed Quantum object
-   *
-   *  \param [in] other Quantum object to move
+   *  \param [in] dummy Dummy argument to fix calling signature for delegation 
+   *    to move constructor
    */ 
   template <typename T>
   template <typename U>
-  Quantum<T>::Quantum(Quantum<U> &&other) : 
+  Quantum<T>::Quantum(Quantum<U> &&other, int dummy) : 
     Quantum<T>(other.memManager,other.nC,other.iCS,
     (other.onePDMScalar == nullptr) ? 
        0 : std::sqrt(other.memManager.template getSize<U>(other.onePDMScalar)),
     false
     ) {
 
-#ifdef _QuantumDebug
+    #ifdef _QuantumDebug
     std::cout << "Quantum<T>::Quantum(Quantum<U>&&) (this = " << this 
               << ", other = " << &other << ")" << std::endl;
-#endif
+    #endif
 
     Quantum_COLLECTIVE_OP(MOVE_OTHER_MEMBER,MOVE_OTHER_MEMBER_OP);
     Form_1PDM_VEC();
     other.onePDM.clear();
 
   }; // Quantum<T>::Quantum(Quantum<U> &&)
+
+  // Delagate the copy constructor to the conversion constructors
+  template <typename T>
+  Quantum<T>::Quantum(const Quantum<T> &other) : Quantum(other,0){ };
+  template <typename T>
+  Quantum<T>::Quantum(Quantum<T> &&other) : Quantum(std::move(other),0){ };
+
+
 
 
   /**
@@ -166,9 +129,9 @@ namespace ChronusQ {
   template <typename T>
   void Quantum<T>::alloc(size_t N) {
 
-#ifdef _QuantumDebug
+    #ifdef _QuantumDebug
     std::cout << "Quantum::alloc (this = " << this << ")" << std::endl;
-#endif
+    #endif
 
     SPIN_OPERATOR_ALLOC(N,onePDM);
 
@@ -181,9 +144,9 @@ namespace ChronusQ {
   template <typename T>
   void Quantum<T>::dealloc() {
 
-#ifdef _QuantumDebug
+    #ifdef _QuantumDebug
     std::cout << "Quantum::dealloc (this = " << this << ")" << std::endl;
-#endif
+    #endif
 
     // Deallocate the 1PDM
     DEALLOC_VEC_OP(memManager,onePDM);

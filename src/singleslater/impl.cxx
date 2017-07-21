@@ -6,12 +6,10 @@ namespace ChronusQ {
   template class SingleSlater<dcomplex>;
 
   // Instantiate copy constructors
-  template SingleSlater<double>::SingleSlater(  const SingleSlater<double> &);
-  template SingleSlater<dcomplex>::SingleSlater(const SingleSlater<dcomplex> &);
-  template SingleSlater<dcomplex>::SingleSlater(const SingleSlater<double> &);
+  template SingleSlater<dcomplex>::SingleSlater(const SingleSlater<double> &,
+    int);
+
   // Instantiate copy ructors
-  template SingleSlater<double>::SingleSlater(   SingleSlater<double> &&);
-  template SingleSlater<dcomplex>::SingleSlater( SingleSlater<dcomplex> &&);
-  template SingleSlater<dcomplex>::SingleSlater( SingleSlater<double> &&);
+  template SingleSlater<dcomplex>::SingleSlater( SingleSlater<double> &&, int);
 
 }; // namespace ChronusQ

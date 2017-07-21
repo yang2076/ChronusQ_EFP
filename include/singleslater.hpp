@@ -118,13 +118,13 @@ namespace ChronusQ {
     // See include/singleslater/impl.hpp for documentation 
     // on the following constructors
 
-    // Same type
-    SingleSlater(const SingleSlater &); // Copy
-    SingleSlater(SingleSlater &&);      // Move
-
     // Different type
-    template <typename U> SingleSlater(const SingleSlater<U> &); // Copy 
-    template <typename U> SingleSlater(SingleSlater<U> &&);      // Move 
+    template <typename U> SingleSlater(const SingleSlater<U> &, int dummy = 0);
+    template <typename U> SingleSlater(SingleSlater<U> &&     , int dummy = 0);
+
+    // Same type
+    SingleSlater(const SingleSlater &);
+    SingleSlater(SingleSlater &&);     
 
     /**
      *  Destructor.

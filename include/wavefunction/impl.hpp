@@ -47,34 +47,16 @@
 namespace ChronusQ {
 
   /**
-   *  Constructs a WaveFunction object from another of the same type by copy.
+   *  Constructs a WaveFunction object from another of a another (possibly the 
+   *  same) type by copy.
    *
    *  \param [in] other WaveFunction object to copy
-   */ 
-  template <typename T>
-  WaveFunction<T>::WaveFunction(const WaveFunction<T> &other) : 
-    Quantum<T>(dynamic_cast<const Quantum<T>&>(other)),
-    aoints(other.aoints) {
-
-#ifdef _WaveFunctionDebug
-    std::cout << "WaveFunction<T>::WaveFunction(const WaveFunction<T>&) "
-              << "(this = " << this << ", other = " << &other << ")" 
-              << std::endl;
-#endif
-
-    WaveFunction_COLLECTIVE_OP(COPY_OTHER_MEMBER,COPY_OTHER_MEMBER_OP);
-
-  }; // WaveFunction<T>::WaveFunction(const WaveFunction<T> &)
-    
-
-  /**
-   *  Constructs a WaveFunction object from another of a different type by copy.
-   *
-   *  \param [in] other WaveFunction object to copy
+   *  \param [in] dummy Dummy argument to fix calling signature for delegation 
+   *    to copy constructor
    */ 
   template <typename T>
   template <typename U>
-  WaveFunction<T>::WaveFunction(const WaveFunction<U> &other) : 
+  WaveFunction<T>::WaveFunction(const WaveFunction<U> &other, int dummy) : 
     Quantum<T>(dynamic_cast<const Quantum<U>&>(other)),
     aoints(other.aoints) {
 
@@ -90,39 +72,19 @@ namespace ChronusQ {
 
 
   /**
-   *  Constructs a WaveFunction object from another of the same type by move.
+   *  Constructs a WaveFunction object from another of a another (possibly the 
+   *  same) type by move.
    *
    *  \warning Deallocates the passed WaveFunction object
    *
    *  \param [in] other WaveFunction object to move
-   */ 
-  template <typename T>
-  WaveFunction<T>::WaveFunction(WaveFunction<T> &&other) : 
-    Quantum<T>(dynamic_cast<Quantum<T>&&>(other)),
-    aoints(other.aoints) {
-
-#ifdef _WaveFunctionDebug
-    std::cout << "WaveFunction<T>::WaveFunction(WaveFunction<T>&&) "
-              << "(this = " << this << ", other = " << &other << ")" 
-              << std::endl;
-#endif
-
-    WaveFunction_COLLECTIVE_OP(MOVE_OTHER_MEMBER,MOVE_OTHER_MEMBER_OP);
-
-  }; // WaveFunction<T>::WaveFunction(WaveFunction<T> &&)
-
-
-  /**
-   *  Constructs a WaveFunction object from another of a different type by move.
-   *
-   *  \warning Deallocates the passed WaveFunction object
-   *
-   *  \param [in] other WaveFunction object to move
+   *  \param [in] dummy Dummy argument to fix calling signature for delegation 
+   *    to move constructor
    */ 
   template <typename T>
   template <typename U>
-  WaveFunction<T>::WaveFunction(WaveFunction<U> &&other) : 
-    Quantum<T>(dynamic_cast<Quantum<U>&&>(other)),
+  WaveFunction<T>::WaveFunction(WaveFunction<U> &&other, int dummy) : 
+    Quantum<T>(dynamic_cast<Quantum<U>&&>(std::move(other))),
     aoints(other.aoints) {
 
 #ifdef _WaveFunctionDebug
@@ -134,6 +96,18 @@ namespace ChronusQ {
     WaveFunction_COLLECTIVE_OP(MOVE_OTHER_MEMBER,MOVE_OTHER_MEMBER_OP);
 
   }; // WaveFunction<T>::WaveFunction(WaveFunction<U> &&)
+
+
+  // Delagate the copy constructor to the conversion constructors
+  template <typename T>
+  WaveFunction<T>::WaveFunction(const WaveFunction<T> &other) : 
+    WaveFunction(other,0){ };
+  template <typename T>
+  WaveFunction<T>::WaveFunction(WaveFunction<T> &&other) : 
+    WaveFunction(std::move(other),0){ };
+
+
+
 
 
   /**

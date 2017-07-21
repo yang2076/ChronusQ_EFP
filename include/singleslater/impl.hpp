@@ -43,33 +43,16 @@
 namespace ChronusQ {
 
   /**
-   *  Constructs a SingleSlater object from another of the same type by copy.
+   *  Constructs a SingleSlater object from another of a another (possibly the 
+   *  same) type by copy.
    *
    *  \param [in] other SingleSlater object to copy
-   */ 
-  template <typename T>
-  SingleSlater<T>::SingleSlater(const SingleSlater<T> &other) : 
-    WaveFunction<T>(dynamic_cast<const WaveFunction<T>&>(other)) {
-
-#ifdef _SingleSlaterDebug
-    std::cout << "SingleSlater<T>::SingleSlater(const SingleSlater<T>&) "
-              << "(this = " << this << ", other = " << &other << ")" 
-              << std::endl;
-#endif
-
-    SingleSlater_COLLECTIVE_OP(COPY_OTHER_MEMBER_OP, COPY_OTHER_MEMBER_VEC_OP);
-
-  }; // SingleSlater<T>::SingleSlater(const SingleSlater<T> &)
-
-
-  /**
-   *  Constructs a SingleSlater object from another of a different type by copy.
-   *
-   *  \param [in] other SingleSlater object to copy
+   *  \param [in] dummy Dummy argument to fix calling signature for delegation 
+   *    to copy constructor
    */ 
   template <typename T>
   template <typename U>
-  SingleSlater<T>::SingleSlater(const SingleSlater<U> &other) : 
+  SingleSlater<T>::SingleSlater(const SingleSlater<U> &other,int dummy) : 
     WaveFunction<T>(dynamic_cast<const WaveFunction<U>&>(other)) {
 
 #ifdef _SingleSlaterDebug
@@ -85,38 +68,19 @@ namespace ChronusQ {
 
 
   /**
-   *  Constructs a SingleSlater object from another of the same type by move.
+   *  Constructs a SingleSlater object from another of a another (possibly the 
+   *  same) by move.
    *
    *  \warning Deallocates the passed SingleSlater object
    *
    *  \param [in] other SingleSlater object to move
-   */ 
-  template <typename T>
-  SingleSlater<T>::SingleSlater(SingleSlater<T> &&other) : 
-    WaveFunction<T>(dynamic_cast<WaveFunction<T>&&>(other)) {
-
-#ifdef _SingleSlaterDebug
-    std::cout << "SingleSlater<T>::SingleSlater(SingleSlater<T>&&) "
-              << "(this = " << this << ", other = " << &other << ")" 
-              << std::endl;
-#endif
-
-    SingleSlater_COLLECTIVE_OP(MOVE_OTHER_MEMBER_OP, MOVE_OTHER_MEMBER_VEC_OP);
-
-  }; // SingleSlater<T>::SingleSlater(SingleSlater<T> &&)
-    
-
-  /**
-   *  Constructs a SingleSlater object from another of a different by move.
-   *
-   *  \warning Deallocates the passed SingleSlater object
-   *
-   *  \param [in] other SingleSlater object to move
+   *  \param [in] dummy Dummy argument to fix calling signature for delegation 
+   *    to move constructor
    */ 
   template <typename T>
   template <typename U>
-  SingleSlater<T>::SingleSlater(SingleSlater<U> &&other) : 
-    WaveFunction<T>(dynamic_cast<WaveFunction<U>&&>(other)) {
+  SingleSlater<T>::SingleSlater(SingleSlater<U> &&other,int dummy) : 
+    WaveFunction<T>(dynamic_cast<WaveFunction<U>&&>(std::move(other))) {
 
 #ifdef _SingleSlaterDebug
     std::cout << "SingleSlater<T>::SingleSlater(SingleSlater<U>&&) "
@@ -127,6 +91,17 @@ namespace ChronusQ {
     SingleSlater_COLLECTIVE_OP(MOVE_OTHER_MEMBER_OP, MOVE_OTHER_MEMBER_VEC_OP);
 
   }; // SingleSlater<T>::SingleSlater(SingleSlater<U> &&)
+
+
+  // Delagate the copy constructor to the conversion constructors
+  template <typename T>
+  SingleSlater<T>::SingleSlater(const SingleSlater<T> &other) : 
+    SingleSlater(other,0){ };
+  template <typename T>
+  SingleSlater<T>::SingleSlater(SingleSlater<T> &&other) : 
+    SingleSlater(std::move(other),0){ };
+
+
 
 
   /**

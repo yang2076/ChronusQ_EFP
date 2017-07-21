@@ -123,13 +123,14 @@ namespace ChronusQ {
     // See include/quantum/impl.hpp for documentation 
     // on the following constructors
 
-    // Same type
-    Quantum(const Quantum &); // Copy constructor
-    Quantum(Quantum &&);      // Move constructor
 
     // Different type
-    template <typename U> Quantum(const Quantum<U> &); // Copy constructor
-    template <typename U> Quantum(Quantum<U> &&);      // Move constructor
+    template <typename U> Quantum(const Quantum<U> &, int dummy = 0);
+    template <typename U> Quantum(Quantum<U> &&     , int dummy = 0);
+
+    // Same type
+    Quantum(const Quantum &);
+    Quantum(Quantum &&);     
 
     /**
      *  Deconstructor

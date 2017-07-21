@@ -105,13 +105,14 @@ namespace ChronusQ {
     // See include/wavefunction/impl.hpp for documentation 
     // on the following constructors
 
-    // Same type
-    WaveFunction(const WaveFunction &); // Copy 
-    WaveFunction(WaveFunction &&);      // Move 
 
     // Different type
-    template <typename U> WaveFunction(const WaveFunction<U> &); // Copy 
-    template <typename U> WaveFunction(WaveFunction<U> &&);      // Move 
+    template <typename U> WaveFunction(const WaveFunction<U> &, int dummy = 0);
+    template <typename U> WaveFunction(WaveFunction<U> &&     , int dummy = 0);
+
+    // Same type
+    WaveFunction(const WaveFunction &);
+    WaveFunction(WaveFunction &&);     
     
 
     /**
