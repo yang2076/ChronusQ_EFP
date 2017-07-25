@@ -32,6 +32,23 @@ namespace ChronusQ {
 
     #ifdef _CQ_MKL
       mkl_domatadd('C',TRANSA,TRANSB,M,N,ALPHA,A,LDA,BETA,B,LDB,C,LDC);
+    #else
+      assert( TRANSA == 'N' and TRANSB == 'N' );
+      #pragma omp parallel
+      {
+        double *locA = A;
+        double *locB = B;
+        double *locC = C;
+        #pragma omp for
+        for(int j = 0; j < N; j++) {
+          #pragma omp simd
+          for(int i = 0; i < M; i++)
+            locC[i] = ALPHA * locA[i] + BETA * locB[i];
+          locA += LDA;
+          locB += LDB;
+          locC += LDC;
+        }
+      }
     #endif
 
   }; // MatAdd (real, real, real)

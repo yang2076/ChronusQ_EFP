@@ -86,15 +86,12 @@ namespace ChronusQ {
     out << std::scientific << std::setprecision(7);
     // Current Change in Energy
     out << std::setw(14) << std::right << scfConv.deltaEnergy;
-/*
     out << "   ";
-    out << std::setw(13) << std::right << PARMS;
-    if(!this->isClosedShell && this->nTCS_ == 1) {
+    out << std::setw(13) << std::right << scfConv.RMSDenScalar;
+    if(not this->iCS or this->nC > 1) {
       out << "   ";
-      out << std::setw(13) << std::scientific << std::right 
-                         << std::setprecision(7) << PBRMS;
+      out << std::setw(13) << std::right << scfConv.RMSDenMag;
     }
-*/
   
     out << std::endl;
   }; // SingleSlater<T>::printSCFProg
@@ -191,9 +188,16 @@ namespace ChronusQ {
     // Check density convergence
 
     formDelta(); // Get change in density
-    double RMSScalar = 0.;
 
-    bool denConv(true);
+    size_t DSize = this->memManager. template getSize(fock[0]);
+    scfConv.RMSDenScalar = TwoNorm<double>(DSize,deltaOnePDM[0],1);
+    scfConv.RMSDenMag = 0.;
+    for(auto i = 1; i < deltaOnePDM.size(); i++)
+      scfConv.RMSDenMag += std::pow(TwoNorm<double>(DSize,deltaOnePDM[i],1),2.);
+    scfConv.RMSDenMag = std::sqrt(scfConv.RMSDenMag);
+    
+
+    bool denConv = scfConv.RMSDenScalar < scfControls.denConvTol;
 
     // Check FP convergence
     bool FDConv(false);

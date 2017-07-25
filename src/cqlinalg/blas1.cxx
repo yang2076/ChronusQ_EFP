@@ -46,8 +46,7 @@ namespace ChronusQ {
 
   template<>
   dcomplex InnerProd(int N, double *X, int INCX, double *Y, int INCY) {
-    return dcomplex(InnerProd<double>(N,X,INCX,Y,INCY),0.);
-        
+    return dcomplex(InnerProd<double>(N,X,INCX,Y,INCY));
   }; // InnerProd complex = (real,real)
 
 
@@ -124,6 +123,7 @@ namespace ChronusQ {
         reinterpret_cast<double*>(Y),&INCY);
 #endif
   }; // InnerProd real = (complex,complex)
+
 
 
   template<>
