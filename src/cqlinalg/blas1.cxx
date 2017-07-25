@@ -27,13 +27,18 @@ namespace ChronusQ {
 
   template<>
   double InnerProd(int N, double *X, int INCX, double *Y, int INCY) {
-    return 
+    
 #ifdef _CQ_MKL
-      ddot
+    return ddot(&N,X,&INCX,Y,&INCY);
 #else
-      ddot_
+    assert(INCX > 0 and INCY > 0);
+    double res(0.);
+    #pragma omp parallel for
+    for(int j = 0; j < N; j++){
+      res += X[j*INCX] * Y[j*INCY];
+    }
 #endif 
-        (&N,X,&INCX,Y,&INCY);
+        
   }; // InnerProd real = (real,real)
 
 
@@ -41,13 +46,8 @@ namespace ChronusQ {
 
   template<>
   dcomplex InnerProd(int N, double *X, int INCX, double *Y, int INCY) {
-    return dcomplex(
-#ifdef _CQ_MKL
-      ddot
-#else
-      ddot_
-#endif 
-        (&N,X,&INCX,Y,&INCY),0.);
+    return dcomplex(InnerProd<double>(N,X,INCX,Y,INCY),0.);
+        
   }; // InnerProd complex = (real,real)
 
 
@@ -108,6 +108,9 @@ namespace ChronusQ {
 #endif
   }; // InnerProd complex = (complex,complex)
 
+
+
+
   /**
    *  \warning Discards imaginary part of inner product
    */ 
@@ -121,4 +124,28 @@ namespace ChronusQ {
         reinterpret_cast<double*>(Y),&INCY);
 #endif
   }; // InnerProd real = (complex,complex)
+
+
+  template<>
+  double TwoNorm(int N, double *X, int INCX) {
+    return
+#ifdef _CQ_MKL
+      dnrm2
+#else
+      dnrm2_
+#endif
+      (&N,X,&INCX);
+  }; // TwoNorm double = (double)
+
+  template<>
+  double TwoNorm(int N, dcomplex *X, int INCX) {
+    return
+#ifdef _CQ_MKL
+      dznrm2(&N,X,&INCX);
+#else
+      dznrm2_(&N,reinterpret_cast<double*>(X),&INCX);
+#endif
+      
+  }; // TwoNorm double = (dcomplex)
+
 };

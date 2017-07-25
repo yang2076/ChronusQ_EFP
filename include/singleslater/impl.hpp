@@ -31,6 +31,9 @@
 // Template for a collective operation on the members of a 
 // SingleSlater object
   
+
+// FIXME: For copy and move, this only populates the lists, not the
+// explicit pointers
 #define SingleSlater_COLLECTIVE_OP(OP_OP,OP_VEC_OP) \
   /* Handle Operators */\
   OP_VEC_OP(T,this,other,this->memManager,fock); \
@@ -38,7 +41,11 @@
   OP_OP(T,this,other,this->memManager,JScalar); \
   OP_VEC_OP(T,this,other,this->memManager,K); \
   OP_VEC_OP(T,this,other,this->memManager,GD);\
-  OP_VEC_OP(T,this,other,this->memManager,onePDMOrtho);
+  OP_VEC_OP(T,this,other,this->memManager,onePDMOrtho);\
+  \
+  OP_VEC_OP(T,this,other,this->memManager,curOnePDM);\
+  OP_VEC_OP(T,this,other,this->memManager,deltaOnePDM);\
+  OP_VEC_OP(T,this,other,this->memManager,prevFock);
 
 namespace ChronusQ {
 
@@ -125,6 +132,10 @@ namespace ChronusQ {
     // J only has a scalar component
     JScalar = this->memManager.template malloc<T>(NB*NB);
 
+    for(auto i = 0; i < onePDMOrtho.size(); i++) {
+      curOnePDM.emplace_back(this->memManager.template malloc<T>(NB*NB));
+      deltaOnePDM.emplace_back(this->memManager.template malloc<T>(NB*NB));
+    }
 
   }; // SingleSlater<T>::alloc
 
