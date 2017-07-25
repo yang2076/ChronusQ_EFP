@@ -55,9 +55,19 @@ namespace ChronusQ {
     double denConvTol = 1e-8;  ///< Density convergence criteria
     double eneConvTol = 1e-10; ///< Energy convergence criteria
 
-    // DIIS settings (TODO)
+    // TODO: need to add logic to set this
+    // Extrapolation flag (DIIS/Damping/etc.)
+    bool doExtrap = true;
+
+    // DIIS settings 
     DIIS_ALG diisAlg = CDIIS;
     size_t nKeep = 6;
+
+    // Damping settings
+    bool   doDamp         = true;
+    double dampStartParam = 0.7;
+    double dampParam      = dampStartParam;
+    double dampError      = 1e-1;
 
     // Misc control
     size_t maxSCFIter = 128; ///< Maximum SCF iterations.
@@ -231,6 +241,11 @@ namespace ChronusQ {
     void printSCFProg(std::ostream &out = std::cout);
     virtual void saveCurrentState();
     virtual void formDelta();
+
+    // SCF extrapolation routines
+    void modifyFock();
+    void fockDamping();
+    void saveSCFMatrices();
 
   }; // class SingleSlater
 

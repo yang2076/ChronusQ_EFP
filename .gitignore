@@ -13,3 +13,4 @@ external/openblas/bin
 external/openblas/Open*/
 doc
 *.*.swp
+*~

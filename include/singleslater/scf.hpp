@@ -142,6 +142,10 @@ namespace ChronusQ {
     // Transform AO fock into the orthonormal basis
     ao2orthoFock();
 
+    // Modify fock matrix if requested
+    // TODO: need a better flag than this
+    if (scfControls.doExtrap) modifyFock();
+
     // Diagonalize the orthonormal fock Matrix
     diagOrthoFock();
 
@@ -196,6 +200,21 @@ namespace ChronusQ {
 
 
     bool isConverged = FDConv or (energyConv and denConv);
+
+    // Save matrices for next iteration if not converged
+    if(not isConverged) saveSCFMatrices();
+
+    // Toggle damping based on energy difference
+    bool largeEDiff = std::abs(scfConv.deltaEnergy) > scfControls.dampError;
+    if( scfControls.doDamp and not largeEDiff) {
+      std::cout << "    *** Damping Disabled After "<<
+        scfControls.dampError << " Converged Met ***" << std::endl;
+      scfControls.dampParam = 0.;
+    } else if( scfControls.doDamp and largeEDiff) {
+      std::cout << "    *** Damping Enabled due to "<<
+        scfControls.dampError << " Oscillation in Energy ***" << std::endl;
+      scfControls.dampParam = scfControls.dampStartParam;
+    }
 
     return isConverged;
 
@@ -273,6 +292,60 @@ namespace ChronusQ {
       this->aoints.Ortho1Trans(onePDMOrtho[i],this->onePDM[i]);
 
   }; // SingleSlater<T>::ao2orthoFock
+
+ /**
+   *  \brief Control routine for DIIS, damping and other
+   *  ways to modify a Fock matrix during an SCF procedure
+   *  
+   */ 
+  template <typename T>
+  void SingleSlater<T>::modifyFock() {
+
+    // DIIS extrapolation
+//  if (scfControls.diisAlg != NONE) scfDIIS();
+
+    // Static Damping
+    if (scfControls.doDamp) fockDamping();
+
+  }; // SingleSlater<T>::modifyFock
+
+ /**
+   *  \brief Static Fock Damping routine
+   *
+   *  F^k = (1-dp)*F^k + dp*F^{k-1}
+   *  
+   */ 
+  template <typename T>
+  void SingleSlater<T>::fockDamping() {
+
+    std::cout << "  PJL inside fockDamping: " << std::endl;
+
+    size_t NB = this->aoints.basisSet().nBasis;
+    double dp = scfControls.dampParam;
+   
+    // Damp the current orthonormal fock matrix 
+    for(auto i = 0; i < fockOrtho.size(); i++)
+      MatAdd('N','N', NB, NB, T(1-dp), fockOrtho[i], NB, T(dp), 
+        prevFock[i], NB, fockOrtho[i], NB);
+
+
+  }; // SingleSlater<T>::fockDamping
+
+ /**
+   *  \brief Save SCF matrices for the next iteration
+   *  
+   */ 
+  template <typename T>
+  void SingleSlater<T>::saveSCFMatrices() {
+
+    std::cout << "  PJL inside saveSCFMatrices: " << std::endl;
+
+    // Copy the current orthonormal Fock to use during the next iteration 
+    size_t NB = this->aoints.basisSet().nBasis;
+    for(auto i = 0; i < this->fockOrtho.size(); i++)
+      std::copy_n(this->fockOrtho[i],NB*NB,prevFock[i]);
+
+  }; // SingleSlater<T>::saveSCFMatrices
 
 }; // namespace ChronusQ
 
