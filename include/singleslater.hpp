@@ -35,6 +35,41 @@
 
 namespace ChronusQ {
 
+  /**
+   *  \brief A struct to hold the information pertaining to
+   *  the control of an SCF procedure.
+   *
+   *  Holds information like convergence critera, DIIS settings, 
+   *  max iterations, etc.
+   */ 
+  struct SCFControls {
+
+    // Convergence crieteria
+    double denConvTol = 1e-8;  ///< Density convergence criteria
+    double eneConvTol = 1e-10; ///< Energy convergence criteria
+
+    // DIIS settings (TODO)
+
+    // Misc control
+    size_t maxSCFIter = 128; ///< Maximum SCF iterations.
+
+  }; // SCFControls struct
+
+  /**
+   *  \brief A struct to hold the current status of an SCF procedure
+   *
+   *  Holds information like current density / energy changes, number of 
+   *  iterations, etc.
+   */ 
+  struct SCFConvergence {
+
+    double deltaEnergy;  ///< Convergence of Energy
+    double RMSDenScalar; ///< RMS change in Scalar density
+    double RMSDenMag;    ///< RMS change in magnetization (X,Y,Z) density
+
+    size_t nSCFIter = 0; ///< Number of SCF Iterations
+
+  }; // SCFConvergence struct
 
   template <typename T>
   class SingleSlater : public WaveFunction<T> {
@@ -50,45 +85,48 @@ namespace ChronusQ {
     // Operator storage
 
     // AO Fock Matrix
-    oper_t      fockScalar;
-    oper_t      fockMz;
-    oper_t      fockMy;
-    oper_t      fockMx;
-    oper_t_coll fock;
+    oper_t      fockScalar; ///< Scalar AO Fock matrix
+    oper_t      fockMz;     ///< Mz AO Fock matrix
+    oper_t      fockMy;     ///< My AO Fock matrix
+    oper_t      fockMx;     ///< Mx AO Fock matrix
+    oper_t_coll fock;       ///< List of populated AO Fock matricies
 
     // Orthonormal Fock
-    oper_t      fockOrthoScalar;
-    oper_t      fockOrthoMz;
-    oper_t      fockOrthoMy;
-    oper_t      fockOrthoMx;
-    oper_t_coll fockOrtho;
+    oper_t      fockOrthoScalar; ///< Scalar orthonormal Fock matrix
+    oper_t      fockOrthoMz; ///< Mz orthonormal Fock matrix
+    oper_t      fockOrthoMy; ///< My orthonormal Fock matrix
+    oper_t      fockOrthoMx; ///< Mx orthonormal Fock matrix
+    oper_t_coll fockOrtho;   ///< List of populated orthonormal Fock matricies
 
-    // Coulomb (J[P])
-    oper_t JScalar;
+    // Coulomb (J[D])
+    oper_t JScalar; ///< Scalar Coulomb Matrix
 
-    // Exchange (K[P])
-    oper_t      KScalar;
-    oper_t      KMz;
-    oper_t      KMy;
-    oper_t      KMx;
-    oper_t_coll K;
+    // Exchange (K[D])
+    oper_t      KScalar; ///< Scalar exact (HF) exchange matrix
+    oper_t      KMz;     ///< Mz exact (HF) exchange matrix
+    oper_t      KMy;     ///< My exact (HF) exchange matrix
+    oper_t      KMx;     ///< Mx exact (HF) exchange matrix
+    oper_t_coll K;       ///< List of populated exact (HF) exchange matricies
 
-    // Perturbation Tensor (G[P])
-    oper_t      PTScalar;
-    oper_t      PTMz;
-    oper_t      PTMy;
-    oper_t      PTMx;
-    oper_t_coll PT;
+    // Exact Perturbation Tensor (G[D])
+    oper_t      GDScalar;///< HF Scalar perturbation tensor
+    oper_t      GDMz;    ///< HF Mz perturbation tensor
+    oper_t      GDMy;    ///< HF My perturbation tensor
+    oper_t      GDMx;    ///< HF Mx perturbation tensor
+    oper_t_coll GD;      ///< List of populated HF perturbation tensors
 
 
     // Orthonormal density
-    oper_t      onePDMOrthoScalar;
-    oper_t      onePDMOrthoMz;
-    oper_t      onePDMOrthoMy;
-    oper_t      onePDMOrthoMx;
-    oper_t_coll onePDMOrtho;
+    oper_t      onePDMOrthoScalar; ///< Scalar orthonormal 1PDM matrix
+    oper_t      onePDMOrthoMz; ///< Mz orthonormal 1PDM matrix
+    oper_t      onePDMOrthoMy; ///< My orthonormal 1PDM matrix
+    oper_t      onePDMOrthoMx; ///< Mx orthonormal 1PDM matrix
+    oper_t_coll onePDMOrtho;   ///< List of populated orthonormal 1PDM matricies
 
 
+    // SCF Variables
+    SCFControls    scfControls; ///< Controls for the SCF procedure
+    SCFConvergence scfConv;     ///< Current status of SCF convergence
 
 
     // Constructors
@@ -106,7 +144,7 @@ namespace ChronusQ {
         fockOrthoMx(nullptr),
       JScalar(nullptr),
       KScalar(nullptr), KMz(nullptr), KMy(nullptr), KMx(nullptr),
-      PTScalar(nullptr), PTMz(nullptr), PTMy(nullptr), PTMx(nullptr),
+      GDScalar(nullptr), GDMz(nullptr), GDMy(nullptr), GDMx(nullptr),
       onePDMOrthoScalar(nullptr), onePDMOrthoMz(nullptr), 
         onePDMOrthoMy(nullptr), onePDMOrthoMx(nullptr) { 
 
@@ -142,10 +180,40 @@ namespace ChronusQ {
     void dealloc();
 
 
-    // Declarations from Quantum
-    void formDensity(){ };
+    // Declarations from Quantum 
+    // (see include/singleslater/quantum.hpp for docs)
+    void formDensity();
+    void computeEnergy();
 
+    // Form a fock matrix (see include/singleslater/fock.hpp for docs)
+    virtual void formFock(bool increment = false);
+    void formGD();
+
+    // Form initial guess orbitals
+    // see include/singleslater/guess.hpp for docs)
+    void formGuess();
     
+
+
+
+    // SCF procedural functions (see include/singleslater/scf.hpp for docs)
+      
+    // Perform the SCF
+    void SCF(); 
+
+    // Transformation functions to and from the orthonormal basis
+    void ao2orthoFock();
+    void ortho2aoDen();
+
+    // Evaluate convergence
+    bool evalConver();
+
+    // Obtain new orbitals
+    void getNewOrbitals();
+
+    // Misc procedural
+    void diagOrthoFock();
+    void printSCFProg(std::ostream &out = std::cout);
 
   }; // class SingleSlater
 

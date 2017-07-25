@@ -37,7 +37,7 @@
   OP_VEC_OP(T,this,other,this->memManager,fockOrtho); \
   OP_OP(T,this,other,this->memManager,JScalar); \
   OP_VEC_OP(T,this,other,this->memManager,K); \
-  OP_VEC_OP(T,this,other,this->memManager,PT);\
+  OP_VEC_OP(T,this,other,this->memManager,GD);\
   OP_VEC_OP(T,this,other,this->memManager,onePDMOrtho);
 
 namespace ChronusQ {
@@ -119,7 +119,7 @@ namespace ChronusQ {
     SPIN_OPERATOR_ALLOC(NB,fock);
     SPIN_OPERATOR_ALLOC(NB,fockOrtho);
     SPIN_OPERATOR_ALLOC(NB,K);
-    SPIN_OPERATOR_ALLOC(NB,PT);
+    SPIN_OPERATOR_ALLOC(NB,GD);
     SPIN_OPERATOR_ALLOC(NB,onePDMOrtho);
 
     // J only has a scalar component
@@ -144,4 +144,12 @@ namespace ChronusQ {
   }; // SingleSlater<T>::dealloc
 
 }; // namespace ChronusQ
+
+
+// Other implementation files
+#include <singleslater/quantum.hpp> // Quantum declarations
+#include <singleslater/fock.hpp>    // Fock matrix header
+#include <singleslater/guess.hpp>   // Guess header
+#include <singleslater/scf.hpp>     // SCF Header
+
 #endif

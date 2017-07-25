@@ -38,4 +38,30 @@ namespace ChronusQ {
   }; // GEMM (real,real,real)
 
 
+  template<>
+  void Gemm(char TRANSA, char TRANSB, int M, int N, int K, dcomplex ALPHA,
+    dcomplex *A, int LDA, dcomplex *B, int LDB, dcomplex BETA, dcomplex *C, 
+    int LDC){
+#ifdef _CQ_MKL
+    zgemm(&TRANSA,&TRANSB,&M,&N,&K,&ALPHA,A,&LDA,B,&LDB,&BETA,C,&LDC);
+#else
+    zgemm_(&TRANSA,&TRANSB,&M,&N,&K,reinterpret_cast<double*>(&ALPHA),
+      reinterpret_cast<double*>(A),&LDA,reinterpret_cast<double*>(B),&LDB,
+      reinterpret_cast<double*>(&BETA),reinterpret_cast<double*>(C),&LDC);
+#endif
+
+  }; // GEMM (complex,complex,complex)
+
+
+  template<>
+  void Gemm(char TRANSA, char TRANSB, int M, int N, int K, dcomplex ALPHA,
+    double *A, int LDA, dcomplex *B, int LDB, dcomplex BETA, dcomplex *C, 
+    int LDC){
+#ifdef _CQ_MKL
+    dzgemm(&TRANSA,&TRANSB,&M,&N,&K,&ALPHA,A,&LDA,B,&LDB,&BETA,C,&LDC);
+#endif
+
+  }; // GEMM (real,complex,complex)
+
+
 }; // namespace ChronusQ

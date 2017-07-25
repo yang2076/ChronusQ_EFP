@@ -21,17 +21,42 @@
  *    E-Mail: xsli@uw.edu
  *  
  */
-#include <wavefunction/impl.hpp>
+#ifndef __INCLUDED_SINGLESLATER_GUESS_HPP__
+#define __INCLUDED_SINGLESLATER_GUESS_HPP__
+
+#include <singleslater.hpp>
+#include <cqlinalg.hpp>
 
 namespace ChronusQ {
 
-  template class WaveFunction<double>;
-  template class WaveFunction<dcomplex>;
+  /**
+   *  \brief Forms a set of guess orbitals for a single slater
+   *  determininant in various ways
+   *
+   *  XXX: Currently only supports CORE guess
+   */ 
+  template <typename T>
+  void SingleSlater<T>::formGuess() {
 
-  // Instantiate copy constructors
-  template WaveFunction<dcomplex>::WaveFunction(const WaveFunction<double> &,
-    int);
-  // Instantiate copy ructors
-  template WaveFunction<dcomplex>::WaveFunction( WaveFunction<double> &&,int);
+    size_t FSize = this->memManager.template getSize(fock[0]);
+
+    // CORE guess (F = H)
+      
+    // Zero out the Fock
+    for(auto &F : fock) std::fill_n(F,FSize,0.);
+
+    // Copy over the Core Hamiltonian
+    std::copy_n(this->aoints.coreH[0], FSize, fock[0]);
+    // FIXME: This must be multiplied by "i" for 2C
+    for(auto i = 1; i < this->aoints.coreH.size(); i++)
+      std::copy_n(this->aoints.coreH[i], FSize, fock[i]);
+
+
+    // Common to all guess
+    getNewOrbitals();
+
+  }; // SingleSlater<T>::formGuess
 
 }; // namespace ChronusQ
+
+#endif

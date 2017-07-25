@@ -22,6 +22,9 @@
  *  
  */
 
+
+#ifndef __INCLUDED_CHRONUSQ_CONFIG_HPP__
+#define __INCLUDED_CHRONUSQ_CONFIG_HPP__
 // The Configured Options and Settings for ChronusQ 
     
 
@@ -39,3 +42,5 @@
 #define BASIS_PATH "@BASIS_PATH@"
 
 #cmakedefine _CQ_MKL
+
+#endif

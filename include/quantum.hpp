@@ -26,6 +26,7 @@
 
 #include <chronusq_sys.hpp>
 #include <memmanager.hpp>
+#include <cqlinalg/blas1.hpp>
 
 // Debug print (triggers WaveFunction, etc)
 //#define _QuantumDebug
@@ -35,6 +36,15 @@ namespace ChronusQ {
   enum DENSITY_TYPE {
     SCALAR,MZ,MX,MY
   }; ///< Enumerate the types of densities for contraction
+
+  // Helper function for operator traces
+  // see src/quantum/properties.cxx for docs
+
+  template <typename Scalar, typename Left, typename Right>
+  static inline Scalar OperatorTrace(size_t N, const Left& op1 , 
+    const Right& op2) {
+    return InnerProd<Scalar>(N,op1,1,op2,1);
+  } 
 
   template <typename T>
   class Quantum {
@@ -50,13 +60,10 @@ namespace ChronusQ {
 
   private:
 
-    // Functions for the automatic evaluation of properties
+    // Helper functions for the automatic evaluation of properties
     // see include/quantum/properties.hpp for documentation
 
-    template<typename Scalar, typename Left, typename Right>
-    static Scalar OperatorTrace(const Left& , const Right& ); 
-
-    template<typename Scalar, DENSITY_TYPE DenTyp, typename Op>
+    template <typename Scalar, DENSITY_TYPE DenTyp, typename Op>
     Scalar OperatorSpinCombine(const Op&);
 
   public:
@@ -86,6 +93,10 @@ namespace ChronusQ {
     cartvec_t SExpect; ///< Expectation values of Sx, Sy and Sz
     double    SSq;     ///< Expectation value of S^2
 
+    // Energy expectation values
+    double OBEnergy;
+    double MBEnergy;
+    double totalEnergy;
 
     // Constructors
       
@@ -112,7 +123,8 @@ namespace ChronusQ {
           {{{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}},
           {{{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}},
           {{{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}}
-        }}, SExpect({0.,0.,0.}), SSq(0.) {
+        }}, SExpect({0.,0.,0.}), SSq(0.), OBEnergy(0.), MBEnergy(0.),
+      totalEnergy(0.) {
 
         // Allocate densities
         if( N != 0 and doAlloc ) alloc(N);
@@ -122,7 +134,6 @@ namespace ChronusQ {
        
     // See include/quantum/impl.hpp for documentation 
     // on the following constructors
-
 
     // Different type
     template <typename U> Quantum(const Quantum<U> &, int dummy = 0);
@@ -144,7 +155,31 @@ namespace ChronusQ {
     void dealloc();
 
 
+    // Public interfaces for property evaluation
+      
+    /**
+     *  \brief Computes a 1-body property through a trace with the
+     *  proper components of the 1PDM.
+     *
+     *  \param [template] DenTyp Which spin component of the 1PDM to trace with
+     *  \param [in]       op     Square matrix to trace with 1PDM
+     *  \returns          Trace of op with the DenTyp 1PDM (cast to type Scalar)
+     */ 
+    template <typename Scalar, DENSITY_TYPE DenTyp, typename Op>
+    inline Scalar computeOBProperty(const Op &op) {
+      return OperatorSpinCombine<Scalar,DenTyp>(op);
+    }; // Quantum<T>::computeOBProperty (single operator)
 
+    /**
+     *
+     */ 
+    template <typename Scalar, DENSITY_TYPE DenTyp, typename Op>
+    inline std::vector<Scalar> computeOBProperty(const std::vector<Op> &opv) {
+      std::vector<Scalar> results;
+      for(auto &op : opv) 
+        results.emplace_back(computeOBProperty<Scalar,DenTyp>(op));
+      return results;
+    }; // Quantum<T>::computeOBProperty (many operators)
 
     // Procedural
       
@@ -152,6 +187,11 @@ namespace ChronusQ {
      *  Function to form the density. Pure virtual
      */ 
     virtual void formDensity() = 0;
+
+    /**
+     *  Function to compute the energy expectation value(s)
+     */ 
+    virtual void computeEnergy() = 0;
 
   }; // class Quantum
 

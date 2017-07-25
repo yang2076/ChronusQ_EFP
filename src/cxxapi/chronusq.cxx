@@ -27,6 +27,8 @@
 #include <cxxapi/options.hpp>
 #include <cxxapi/boilerplate.hpp>
 
+#include <util/matout.hpp>
+
 #include <memmanager.hpp>
 #include <cerr.hpp>
 #include <molecule.hpp>
@@ -122,15 +124,8 @@ int main(int argc, char *argv[]) {
 */
 
   SingleSlater<double> ss(aoints,1);
-  SingleSlater<double> ss2(ss); // C-DD
-  SingleSlater<double> ss3(std::move(ss)); // M-DD
-  SingleSlater<dcomplex> ss4(ss2); // C-ZD
-  SingleSlater<dcomplex> ss5(ss4); // C-ZZ
-  SingleSlater<dcomplex> ss6(std::move(ss2)); // M-ZD
-  SingleSlater<dcomplex> ss7(std::move(ss4)); // M-ZZ
-
-//SingleSlater<dcomplex> ss1(std::move(ss));
-
+  ss.formGuess();
+  ss.SCF();
 
 
   // Output CQ footer

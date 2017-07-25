@@ -63,8 +63,7 @@ namespace ChronusQ {
    *
    *  Populates internal member data for ReferenceBasisSet for the
    *  basis set file object. Terminates program if it cannot find the 
-   *  file. FIXME: Should just throw an error to allow for handeling
-   *  outside of the structure.
+   *  file. 
    */
   void ReferenceBasisSet::findBasisFile(){
   

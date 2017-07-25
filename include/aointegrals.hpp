@@ -21,8 +21,8 @@
  *    E-Mail: xsli@uw.edu
  *  
  */
-#ifndef __INCLUDED_AOINTEGRALS_HPP_
-#define __INCLUDED_AOINTEGRALS_HPP_
+#ifndef __INCLUDED_AOINTEGRALS_HPP__
+#define __INCLUDED_AOINTEGRALS_HPP__
 
 #include <chronusq_sys.hpp>
 #include <molecule.hpp>
@@ -236,10 +236,19 @@ namespace ChronusQ {
     };
     
     // Perform the two body contraction incore (using the rank-4 ERI tensor)
-    // see include/aointegrals/contract.cxx for docs.
+    // see include/aointegrals/contract.hpp for docs.
     template <typename T>
     void twoBodyContractIncore(std::vector<TwoBodyContraction<T>>&);
 
+
+
+    // Transformations to and from the orthonormal basis
+    // see include/aointegrals/ortho.hpp for docs
+      
+    template <typename T> void Ortho1Trans(T* A, T* TransA); 
+    template <typename T> void Ortho2Trans(T* A, T* TransA); 
+    template <typename T> void Ortho1TransT(T* A, T* TransA);
+    template <typename T> void Ortho2TransT(T* A, T* TransA);
     
   }; // class AOIntegrals
 

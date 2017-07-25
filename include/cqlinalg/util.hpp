@@ -29,7 +29,7 @@
 namespace ChronusQ {
 
   /**
-   *  Helper function to obtain optimal LAPACK workspace
+   *  \brief Helper function to obtain optimal LAPACK workspace
    *  dimension.
    *
    *  \param [in] func Function which returns the optimal workspace

@@ -21,17 +21,38 @@
  *    E-Mail: xsli@uw.edu
  *  
  */
-#include <wavefunction/impl.hpp>
+#ifndef __INCLUDED_CQLINALG_BLAS1_HPP__
+#define __INCLUDED_CQLINALG_BLAS1_HPP__
+
+#include <cqlinalg/cqlinalg_config.hpp>
 
 namespace ChronusQ {
 
-  template class WaveFunction<double>;
-  template class WaveFunction<dcomplex>;
+  /**
+   *  \brief Takes the inner product of two, possibly strided
+   *  vectors
+   *
+   *  \f[
+   *    a = \sum_i x_i^* y_i
+   *  \f]
+   *
+   *  General to real, complex and mixed expressions.
+   *
+   *  \warning Real return involving complex vectors will
+   *  return only the real part and discard the imaginary part.
+   *
+   *  Wraps BLAS functions. See
+   *    http://www.netlib.org/lapack/lapack-3.1.1/html/ddot.f.html or
+   *    http://www.netlib.org/lapack/lapack-3.1.1/html/zdotc.f.html for
+   *  parameter documentation.
+   */ 
+  template <typename _F1, typename _F2, typename _F3>
+  _F1 InnerProd(int N, _F2 *X, int INCX, _F3 *Y, int INCY);
 
-  // Instantiate copy constructors
-  template WaveFunction<dcomplex>::WaveFunction(const WaveFunction<double> &,
-    int);
-  // Instantiate copy ructors
-  template WaveFunction<dcomplex>::WaveFunction( WaveFunction<double> &&,int);
+  
 
 }; // namespace ChronusQ
+
+
+#endif
+

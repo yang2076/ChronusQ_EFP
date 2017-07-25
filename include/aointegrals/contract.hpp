@@ -21,27 +21,45 @@
  *    E-Mail: xsli@uw.edu
  *  
  */
+#ifndef __INCLUDED_AOINTEGRALS_CONTRACT_HPP__
+#define __INCLUDED_AOINTEGRALS_CONTRACT_HPP__
+
 
 #include <aointegrals.hpp>
 #include <cqlinalg/blas3.hpp>
 
+// Use stupid but bullet proof incore contraction for debug
 //#define _BULLET_PROOF_INCORE
 
 namespace ChronusQ {
 
+  /**
+   *  \brief Perform various tensor contractions of the full ERI
+   *  tensor in core.
+   *
+   *  Currently supports
+   *    - Coulomb-type (34,12) contractions
+   *    - Exchange-type (23,12) contractions
+   *
+   *  Works with both real and complex matricies
+   *
+   *  \param [in/out] list Contains information pertinent to the 
+   *    matricies to be contracted with. See TwoBodyContraction
+   *    for details
+   */ 
   template <typename T>
   void AOIntegrals::twoBodyContractIncore(
     std::vector<TwoBodyContraction<T>> &list) {
 
     size_t NB3 = basisSet_.nBasis * nSQ_;
 
+    // Loop over matricies to contract with
     for(auto &C : list) {
-      // Sanity check
+      // Sanity check of dimensions
       assert(memManager_.template getSize<T>(C.X)  == nSQ_);
       assert(memManager_.template getSize<T>(C.AX) == nSQ_);
 
-      std::fill_n(C.AX,nSQ_,0.);
-
+      // Coulomb-type (34,12) ERI contraction
       // AX(mn) = (mn | kl) X(kl)
       if( C.contType == COULOMB ) {
 
@@ -58,11 +76,12 @@ namespace ChronusQ {
 
         #else
   
-        Gemm('N','N',nSQ_,1,nSQ_,1.,ERI,nSQ_,C.X,nSQ_,1.,C.AX,nSQ_);
+        Gemm('N','N',nSQ_,1,nSQ_,T(1.),ERI,nSQ_,C.X,nSQ_,T(0.),C.AX,nSQ_);
 
         #endif
 
 
+      // Exchange-type (23,12) ERI contraction
       // AX(mn) = (mk |ln) X(kl)
       } else if( C.contType == EXCHANGE ) {
 
@@ -80,16 +99,18 @@ namespace ChronusQ {
         #else
 
         for(auto nu = 0; nu < basisSet_.nBasis; nu++) {
-          Gemm('N','N',basisSet_.nBasis,1,nSQ_,1.,
+          Gemm('N','N',basisSet_.nBasis,1,nSQ_,T(1.),
             ERI  + nu * NB3,              basisSet_.nBasis,
-            C.X,                          nSQ_,1.,
+            C.X,                          nSQ_,T(0.),
             C.AX + nu * basisSet_.nBasis, basisSet_.nBasis);
         }
 
         #endif
       }
-    }
+    } // loop over matricies
     
-  };
+  }; // AOIntegrals::twoBodyContractIncore
 
-};
+}; // namespace ChronusQ
+
+#endif

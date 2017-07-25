@@ -30,10 +30,26 @@
 
 namespace ChronusQ {
 
+// Smallest value to print
 constexpr long double PRINT_SMALL = 1e-10;
 
+/**
+ *  \brief Base routine to print out a matrix given raw storage and dimension
+ *  parameters in a standard (pretty) way.
+ *
+ *  \warning T should be a "real" type (float, double, etc)
+ *
+ *  \param [in/out] out        Output device
+ *  \param [in]     A          Raw storage of the matrix A
+ *  \param [in]     M          Number of rows of the matrix A
+ *  \param [in]     N          Number of cols of the matrix A
+ *  \param [in]     LDA        Leading dimension of the matrix A
+ *  \param [in]     colStride  Column stride of A
+ *  \param [in]     list       Number of columns to print before page break
+ *  \param [in]     printWidth Field with of a matrix column
+ */
 template <typename T>
-void prettyPrintSmartBase(std::ostream& out, const T* A, const size_t M, 
+void prettyPrintSmartBase(std::ostream& out, T* A, const size_t M, 
   const size_t N, const size_t LDA, const size_t colStride = 1, 
   const size_t list = 5, const size_t printWidth = 16) {
 
@@ -65,10 +81,23 @@ void prettyPrintSmartBase(std::ostream& out, const T* A, const size_t M,
 
 }; // prettyPrintSmartBase
 
+/**
+ *  \brief Print a real matrix in a standard way given raw storage and
+ *  dimension parameters
+ *
+ *  \param [in/out] out        Output device
+ *  \param [in]     A          Raw storage of the matrix A
+ *  \param [in]     M          Number of rows of the matrix A
+ *  \param [in]     N          Number of cols of the matrix A
+ *  \param [in]     LDA        Leading dimension of the matrix A
+ *  \param [in]     colStride  Column stride of A
+ *  \param [in]     list       Number of columns to print before page break
+ *  \param [in]     printWidth Field with of a matrix column
+ */
 template <typename T, 
           typename std::enable_if<
                      std::is_same<T,double>::value,int>::type = 0>
-void prettyPrintSmart(std::ostream& out, std::string str, const T* A, 
+void prettyPrintSmart(std::ostream& out, std::string str, T* A, 
   const size_t M, const size_t N, const size_t LDA, const size_t colStride = 1, 
   const size_t list = 5, const size_t printWidth = 16) {
 
@@ -80,10 +109,25 @@ void prettyPrintSmart(std::ostream& out, std::string str, const T* A,
 
 }; // prettyPrintSmart (T = double)
 
+/**
+ *  \brief Print a complex matrix in a standard way given raw storage and
+ *  dimension parameters.
+ *
+ *  Prints real and imaginary parts as separate matricies
+ *
+ *  \param [in/out] out        Output device
+ *  \param [in]     A          Raw storage of the matrix A
+ *  \param [in]     M          Number of rows of the matrix A
+ *  \param [in]     N          Number of cols of the matrix A
+ *  \param [in]     LDA        Leading dimension of the matrix A
+ *  \param [in]     colStride  Column stride of A
+ *  \param [in]     list       Number of columns to print before page break
+ *  \param [in]     printWidth Field with of a matrix column
+ */
 template <typename T, 
           typename std::enable_if<
                      std::is_same<T,dcomplex>::value,int>::type = 0>
-void prettyPrintSmart(std::ostream& out, std::string str, const T* A, 
+void prettyPrintSmart(std::ostream& out, std::string str, T* A, 
   const size_t M, const size_t N, const size_t LDA, const size_t colStride = 1, 
   const size_t list = 5, const size_t printWidth = 16) {
 

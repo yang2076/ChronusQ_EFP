@@ -230,25 +230,10 @@ namespace ChronusQ {
 
     // Allocate and compute the core Hamiltonian
     coreH.emplace_back(memManager_.malloc<double>(nSQ_));
-    std::fill_n(coreH.back(),nSQ_,0.);
 
-    // Do the add in chunks in parallel to improve cache utilization
-    size_t chunk = 2*nSQ_ 
-    #ifdef _OPENMP
-      / omp_get_max_threads()
-    #endif
-    ;
-
-    // H = T + V
-    #pragma omp parallel for default(shared) \
-       schedule(static,chunk)
-      for(size_t i = 0; i < nSQ_; i++) 
-        coreH.back()[i] = kinetic[i] + potential[i];
-
-    prettyPrintSmart(std::cout,"Core H",coreH.back(),basisSet_.nBasis, 
-      basisSet_.nBasis, basisSet_.nBasis);
-
-
+    MatAdd('N','N',basisSet_.nBasis,basisSet_.nBasis,2.,kinetic,
+      basisSet_.nBasis,2.,potential,basisSet_.nBasis,coreH[0],
+      basisSet_.nBasis);
 
     // Compute Orthonormalization trasformations
     computeOrtho();

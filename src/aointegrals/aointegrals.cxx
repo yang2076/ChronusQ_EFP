@@ -42,77 +42,18 @@
     OP_OP(double,this,other,memManager_,overlap); \
     OP_OP(double,this,other,memManager_,kinetic); \
     OP_OP(double,this,other,memManager_,potential); \
-//  OP_VEC_OP(double,this,other,memManager_,lenElecDipole); \
-//  OP_VEC_OP(double,this,other,memManager_,lenElecQuadrupole); \
-//  OP_VEC_OP(double,this,other,memManager_,lenElecOctupole); \
-//  OP_VEC_OP(double,this,other,memManager_,velElecDipole); \
-//  OP_VEC_OP(double,this,other,memManager_,velElecQuadrupole); \
-//  OP_VEC_OP(double,this,other,memManager_,velElecOctupole); \
-//  OP_VEC_OP(double,this,other,memManager_,coreH); \
-//  \
-//  /* 2-e Integrals */ \
-//  OP_OP(double,this,other,memManager_,ERI)
+    OP_VEC_OP(double,this,other,memManager_,lenElecDipole); \
+    OP_VEC_OP(double,this,other,memManager_,lenElecQuadrupole); \
+    OP_VEC_OP(double,this,other,memManager_,lenElecOctupole); \
+    OP_VEC_OP(double,this,other,memManager_,velElecDipole); \
+    OP_VEC_OP(double,this,other,memManager_,velElecQuadrupole); \
+    OP_VEC_OP(double,this,other,memManager_,velElecOctupole); \
+    OP_VEC_OP(double,this,other,memManager_,coreH); \
+    \
+    /* 2-e Integrals */ \
+    OP_OP(double,this,other,memManager_,ERI)
 
 
-
-/*
-// Dummy function
-#define DUMMY(X) 
-#define DUMMY2(X,Y) 
-
-
-// Deallocation functions
-#define DEALLOC_OP(typ,PTR) if(PTR != nullptr) memManager_.free(PTR);
-
-#define DEALLOC_VEC_OP(typ, VEC_PTR) \
-  for(auto i = 0; i < VEC_PTR.size(); i++) \
-    if(VEC_PTR[i] != nullptr) DEALLOC_OP(typ,VEC_PTR[i]); \
-  VEC_PTR.clear();
-
-
-
-
-// Copy functions
-#define COPY_OTHER_MEMBER(X) X = other.X;
-
-#define COPY_OTHER_OP(typ,PTR) \
-  if(other.PTR != nullptr) { \
-    size_t OPSZ = memManager_.getSize(other.PTR); \
-    PTR = memManager_.malloc<typ>(OPSZ); \
-    std::copy_n(other.PTR, OPSZ, PTR); \
-  } else PTR = nullptr;
-
-#define COPY_OTHER_VEC_OP(typ, VEC_PTR) \
-  for(auto i = 0; i < other.VEC_PTR.size(); i++) \
-    if(other.VEC_PTR[i] != nullptr) { \
-      size_t OPSZ = memManager_.getSize<typ>(other.VEC_PTR[i]); \
-      VEC_PTR.emplace_back(memManager_.malloc<typ>(OPSZ)); \
-      std::copy_n(other.VEC_PTR[i], OPSZ, VEC_PTR.back()); \
-    } 
-
-
-
-// Move functions
-#define MOVE_OTHER_OP(typ,PTR) \
-  if(other.PTR != nullptr) { \
-    size_t OPSZ = memManager_.getSize<typ>(other.PTR); \
-    PTR = memManager_.malloc<typ>(OPSZ); \
-    std::copy_n(other.PTR, OPSZ, PTR); \
-    DEALLOC_OP(typ,other.PTR); \
-  } else PTR = nullptr; 
-
-#define MOVE_OTHER_VEC_OP(typ, VEC_PTR) \
-  for(auto i = 0; i < other.VEC_PTR.size(); i++) \
-    if(other.VEC_PTR[i] != nullptr) { \
-      size_t OPSZ = memManager_.getSize<typ>(other.VEC_PTR[i]); \
-      VEC_PTR.emplace_back(memManager_.malloc<typ>(OPSZ)); \
-      std::copy_n(other.VEC_PTR[i], OPSZ, VEC_PTR.back()); \
-      DEALLOC_OP(typ,other.VEC_PTR[i]); \
-    } \
-  other.VEC_PTR.clear();
-*/
-
-    
 
 namespace ChronusQ {
 

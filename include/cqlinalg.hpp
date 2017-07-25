@@ -22,14 +22,16 @@
  *  
  */
 
-#ifndef __INCLUDED_CQLINALG_HPP
-#define __INCLUDED_CQLINALG_HPP
+#ifndef __INCLUDED_CQLINALG_HPP__
+#define __INCLUDED_CQLINALG_HPP__
 
 #include <cqlinalg/cqlinalg_config.hpp>
 #include <cqlinalg/util.hpp>
 
 // BLAS
+#include <cqlinalg/blas1.hpp>
 #include <cqlinalg/blas3.hpp>
+#include <cqlinalg/blasext.hpp>
 
 // LAPACK
 #include <cqlinalg/eig.hpp>

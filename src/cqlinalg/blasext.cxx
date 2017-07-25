@@ -21,17 +21,30 @@
  *    E-Mail: xsli@uw.edu
  *  
  */
-#include <wavefunction/impl.hpp>
+#include <cqlinalg/blasext.hpp>
 
 namespace ChronusQ {
 
-  template class WaveFunction<double>;
-  template class WaveFunction<dcomplex>;
+  template<>
+  void MatAdd(char TRANSA, char TRANSB, size_t M, size_t N, double ALPHA, 
+    double *A, size_t LDA, double BETA, double *B, size_t LDB, double *C, 
+    size_t LDC) {
 
-  // Instantiate copy constructors
-  template WaveFunction<dcomplex>::WaveFunction(const WaveFunction<double> &,
-    int);
-  // Instantiate copy ructors
-  template WaveFunction<dcomplex>::WaveFunction( WaveFunction<double> &&,int);
+    #ifdef _CQ_MKL
+      mkl_domatadd('C',TRANSA,TRANSB,M,N,ALPHA,A,LDA,BETA,B,LDB,C,LDC);
+    #endif
+
+  }; // MatAdd (real, real, real)
+
+  template<>
+  void MatAdd(char TRANSA, char TRANSB, size_t M, size_t N, dcomplex ALPHA, 
+    dcomplex *A, size_t LDA, dcomplex BETA, dcomplex *B, size_t LDB, 
+    dcomplex *C, size_t LDC) {
+
+    #ifdef _CQ_MKL
+      mkl_zomatadd('C',TRANSA,TRANSB,M,N,ALPHA,A,LDA,BETA,B,LDB,C,LDC);
+    #endif
+
+  }; // MatAdd (complex, complex, complex)
 
 }; // namespace ChronusQ

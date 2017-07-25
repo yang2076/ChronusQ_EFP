@@ -23,6 +23,7 @@
  */
 
 #include <aointegrals/contract.hpp>
+#include <aointegrals/ortho.hpp>
 
 
 // Instantiate libint2::engine
@@ -34,5 +35,14 @@ namespace ChronusQ {
 
   template void AOIntegrals::twoBodyContractIncore(
     std::vector<TwoBodyContraction<double>> &list);
+  template void AOIntegrals::twoBodyContractIncore(
+    std::vector<TwoBodyContraction<dcomplex>> &list);
+
+  // Explicit instantiations of orthonormal transformation functions
+
+  template void AOIntegrals::Ortho1Trans(double*,double*);
+  template void AOIntegrals::Ortho1Trans(dcomplex*,dcomplex*);
+  template void AOIntegrals::Ortho1TransT(double*,double*);
+  template void AOIntegrals::Ortho1TransT(dcomplex*,dcomplex*);
 
 };
