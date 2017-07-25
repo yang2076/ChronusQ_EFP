@@ -26,6 +26,7 @@
 
 #include <singleslater.hpp>
 #include <util/matout.hpp>
+#include <cqlinalg/blas1.hpp>
 
 namespace ChronusQ {
 
@@ -43,6 +44,9 @@ namespace ChronusQ {
     computeEnergy();
     for( scfConv.nSCFIter = 0; scfConv.nSCFIter < scfControls.maxSCFIter; 
          scfConv.nSCFIter++) {
+
+      // Save current state of the wave function (method specific)
+      saveCurrentState();
 
       // Exit loop on convergence
       if(isConverged) break;
@@ -82,19 +86,46 @@ namespace ChronusQ {
     out << std::scientific << std::setprecision(7);
     // Current Change in Energy
     out << std::setw(14) << std::right << scfConv.deltaEnergy;
-/*
     out << "   ";
-    out << std::setw(13) << std::right << PARMS;
-    if(!this->isClosedShell && this->nTCS_ == 1) {
+    out << std::setw(13) << std::right << scfConv.RMSDenScalar;
+    if(not this->iCS or this->nC > 1) {
       out << "   ";
-      out << std::setw(13) << std::scientific << std::right 
-                         << std::setprecision(7) << PBRMS;
+      out << std::setw(13) << std::right << scfConv.RMSDenMag;
     }
-*/
   
     out << std::endl;
   }; // SingleSlater<T>::printSCFProg
 
+
+  /**
+   *  \brief Saves the current state of wave function
+   *
+   *  Saves a copy of the current AO 1PDM
+   */ 
+  template <typename T>
+  void SingleSlater<T>::saveCurrentState() {
+    size_t OSize = this->memManager.template getSize(fock[0]);
+
+    // Copy over current AO density matrix
+    for(auto i = 0; i < this->onePDM.size(); i++)
+      std::copy_n(this->onePDM[i],OSize,curOnePDM[i]);
+
+  }; // SingleSlater<T>::saveCurrentState()
+
+  /**
+   *  \brief Computes the change in the current wave function
+   *
+   *  Saves onePDM - curOnePDM in deltaOnePDM
+   */ 
+  template <typename T>
+  void SingleSlater<T>::formDelta() {
+
+    size_t NB = this->aoints.basisSet().nBasis;
+    for(auto i = 0; i < this->onePDM.size(); i++)
+      MatAdd('N','N',NB,NB,T(1.),this->onePDM[i],NB,T(-1.),
+        curOnePDM[i],NB,deltaOnePDM[i],NB);
+
+  }; // SingleSlater<T>:formDelta
 
   
   /**
@@ -151,8 +182,17 @@ namespace ChronusQ {
 
 
     // Check density convergence
-    bool denConv(true);
 
+    formDelta(); // Get change in density
+    size_t DSize = this->memManager. template getSize(fock[0]);
+    scfConv.RMSDenScalar = TwoNorm<double>(DSize,deltaOnePDM[0],1);
+    scfConv.RMSDenMag = 0.;
+    for(auto i = 1; i < deltaOnePDM.size(); i++)
+      scfConv.RMSDenMag += std::pow(TwoNorm<double>(DSize,deltaOnePDM[i],1),2.);
+    scfConv.RMSDenMag = std::sqrt(scfConv.RMSDenMag);
+    
+
+    bool denConv = scfConv.RMSDenScalar < scfControls.denConvTol;
 
     // Check FP convergence
     bool FDConv(false);

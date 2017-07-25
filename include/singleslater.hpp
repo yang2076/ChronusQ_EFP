@@ -35,6 +35,13 @@
 
 namespace ChronusQ {
 
+  enum DIIS_ALG {
+    CDIIS,
+    EDIIS,
+    CEDIIS,
+    NONE = -1
+  };
+
   /**
    *  \brief A struct to hold the information pertaining to
    *  the control of an SCF procedure.
@@ -49,6 +56,8 @@ namespace ChronusQ {
     double eneConvTol = 1e-10; ///< Energy convergence criteria
 
     // DIIS settings (TODO)
+    DIIS_ALG diisAlg = CDIIS;
+    size_t nKeep = 6;
 
     // Misc control
     size_t maxSCFIter = 128; ///< Maximum SCF iterations.
@@ -128,6 +137,12 @@ namespace ChronusQ {
     SCFControls    scfControls; ///< Controls for the SCF procedure
     SCFConvergence scfConv;     ///< Current status of SCF convergence
 
+
+    // Current / change in state information (for use with SCF)
+    oper_t_coll curOnePDM;    ///< List of the current 1PDMs
+    oper_t_coll deltaOnePDM;  ///< List of the changes in the 1PDMs
+    
+    oper_t_coll prevFock;
 
     // Constructors
       
@@ -214,6 +229,8 @@ namespace ChronusQ {
     // Misc procedural
     void diagOrthoFock();
     void printSCFProg(std::ostream &out = std::cout);
+    virtual void saveCurrentState();
+    virtual void formDelta();
 
   }; // class SingleSlater
 

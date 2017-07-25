@@ -49,6 +49,17 @@ namespace ChronusQ {
   template <typename _F1, typename _F2, typename _F3>
   _F1 InnerProd(int N, _F2 *X, int INCX, _F3 *Y, int INCY);
 
+  /**
+   *  \brief Returns the euclidian norm of a vector
+   *
+   *  Wraps BLAS functions. See
+   *    http://www.netlib.org/lapack/lapack-3.1.1/html/dnrm2.f.html or
+   *    http://www.netlib.org/lapack/lapack-3.1.1/html/dznrm2.f.html for
+   *  parameter documentation.
+   *    
+   */
+  template <typename _F1, typename _F2>
+  _F1 TwoNorm(int N, _F2 *X, int INCX);
   
 
 }; // namespace ChronusQ
