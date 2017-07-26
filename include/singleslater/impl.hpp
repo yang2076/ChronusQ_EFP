@@ -132,10 +132,8 @@ namespace ChronusQ {
     // J only has a scalar component
     JScalar = this->memManager.template malloc<T>(NB*NB);
 
-    for(auto i = 0; i < onePDMOrtho.size(); i++) {
-      curOnePDM.emplace_back(this->memManager.template malloc<T>(NB*NB));
-      deltaOnePDM.emplace_back(this->memManager.template malloc<T>(NB*NB));
-    }
+    SPIN_OPERATOR_ALLOC(NB,curOnePDM);
+    SPIN_OPERATOR_ALLOC(NB,deltaOnePDM);
 
   }; // SingleSlater<T>::alloc
 

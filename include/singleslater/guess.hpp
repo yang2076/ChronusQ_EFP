@@ -38,7 +38,7 @@ namespace ChronusQ {
   template <typename T>
   void SingleSlater<T>::formGuess() {
 
-    size_t FSize = this->memManager.template getSize(fock[0]);
+    size_t FSize = this->memManager.template getSize(fock[SCALAR]);
 
     // CORE guess (F = H)
       
@@ -46,7 +46,7 @@ namespace ChronusQ {
     for(auto &F : fock) std::fill_n(F,FSize,0.);
 
     // Copy over the Core Hamiltonian
-    std::copy_n(this->aoints.coreH[0], FSize, fock[0]);
+    std::copy_n(this->aoints.coreH[SCALAR], FSize, fock[SCALAR]);
     // FIXME: This must be multiplied by "i" for X2C
     for(auto i = 1; i < this->aoints.coreH.size(); i++)
       std::copy_n(this->aoints.coreH[i], FSize, fock[i]);

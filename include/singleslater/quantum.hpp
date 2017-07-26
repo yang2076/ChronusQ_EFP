@@ -46,27 +46,27 @@ namespace ChronusQ {
 
       // DS = DA = CA * CA**H
       Gemm('N', 'C', NB, NB, this->nOA, T(1.), this->mo1, NB, this->mo1,
-        NB, T(0.), this->onePDMScalar, NB);
+        NB, T(0.), this->onePDM[SCALAR], NB);
 
       if(not this->iCS) {
 
         // DZ = DB = CB * CB**H
         Gemm('N', 'C', NB, NB, this->nOB, T(1.), this->mo2, NB, this->mo2,
-          NB, T(0.), this->onePDMMz, NB);
+          NB, T(0.), this->onePDM[MZ], NB);
 
         // DS = DA + DB
         // DZ = DA - DB
         for(auto j = 0; j < NB2; j++) {
-          T tmp = this->onePDMScalar[j];
-          this->onePDMScalar[j] = this->onePDMScalar[j] + this->onePDMMz[j]; 
-          this->onePDMMz[j]     = tmp - this->onePDMMz[j]; 
+          T tmp = this->onePDM[SCALAR][j];
+          this->onePDM[SCALAR][j] = this->onePDM[SCALAR][j] + this->onePDM[MZ][j]; 
+          this->onePDM[MZ][j]     = tmp - this->onePDM[MZ][j]; 
         }
 
       } else {
 
         // DS = 2 * DA
-        std::transform(this->onePDMScalar, this->onePDMScalar + NB2,
-          this->onePDMScalar,[](T a){ return 2.*a; }
+        std::transform(this->onePDM[SCALAR], this->onePDM[SCALAR] + NB2,
+          this->onePDM[SCALAR],[](T a){ return 2.*a; }
         );
 
       }
@@ -103,7 +103,7 @@ namespace ChronusQ {
     // Scalar core hamiltonian contribution to the energy
     this->OBEnergy = 
       this->template computeOBProperty<double,DENSITY_TYPE::SCALAR>(
-        this->aoints.coreH[0]);
+        this->aoints.coreH[SCALAR]);
 
  
 
@@ -112,13 +112,13 @@ namespace ChronusQ {
     if(this->aoints.coreH.size() > 1) {
       SOEnergy = 
         this->template computeOBProperty<dcomplex,DENSITY_TYPE::MZ>(
-          this->aoints.coreH[1]);
+          this->aoints.coreH[MZ]);
       SOEnergy += 
         this->template computeOBProperty<dcomplex,DENSITY_TYPE::MY>(
-          this->aoints.coreH[2]);
+          this->aoints.coreH[MY]);
       SOEnergy += 
         this->template computeOBProperty<dcomplex,DENSITY_TYPE::MX>(
-          this->aoints.coreH[3]);
+          this->aoints.coreH[MX]);
     };
 
     SOEnergy *= dcomplex(0.,1.);
@@ -131,13 +131,13 @@ namespace ChronusQ {
     // *** These calls are safe as proper zeros are returned by
     // property engine ***
     this->MBEnergy = 
-      this->template computeOBProperty<double,DENSITY_TYPE::SCALAR>(GDScalar);
+      this->template computeOBProperty<double,DENSITY_TYPE::SCALAR>(GD[SCALAR]);
     this->MBEnergy += 
-      this->template computeOBProperty<double,DENSITY_TYPE::MZ>(GDMz);
+      this->template computeOBProperty<double,DENSITY_TYPE::MZ>(GD[MZ]);
     this->MBEnergy += 
-      this->template computeOBProperty<double,DENSITY_TYPE::MY>(GDMy);
+      this->template computeOBProperty<double,DENSITY_TYPE::MY>(GD[MY]);
     this->MBEnergy += 
-      this->template computeOBProperty<double,DENSITY_TYPE::MX>(GDMx);
+      this->template computeOBProperty<double,DENSITY_TYPE::MX>(GD[MX]);
 
     this->MBEnergy *= 0.25;
 

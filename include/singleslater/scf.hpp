@@ -156,7 +156,7 @@ namespace ChronusQ {
    */ 
   template <typename T>
   void SingleSlater<T>::saveCurrentState() {
-    size_t OSize = this->memManager.template getSize(fock[0]);
+    size_t OSize = this->memManager.template getSize(fock[SCALAR]);
 
     // Copy over current AO density matrix
     for(auto i = 0; i < this->onePDM.size(); i++)
@@ -236,8 +236,8 @@ namespace ChronusQ {
     // Check density convergence
 
     formDelta(); // Get change in density
-    size_t DSize = this->memManager. template getSize(fock[0]);
-    scfConv.RMSDenScalar = TwoNorm<double>(DSize,deltaOnePDM[0],1);
+    size_t DSize = this->memManager. template getSize(fock[SCALAR]);
+    scfConv.RMSDenScalar = TwoNorm<double>(DSize,deltaOnePDM[SCALAR],1);
     scfConv.RMSDenMag = 0.;
     for(auto i = 1; i < deltaOnePDM.size(); i++)
       scfConv.RMSDenMag += std::pow(TwoNorm<double>(DSize,deltaOnePDM[i],1),2.);
@@ -273,13 +273,13 @@ namespace ChronusQ {
 
     // Copy over the fockOrtho into MO storage
     if(this->nC == 1 and this->iCS) 
-      std::transform(fockOrtho[0],fockOrtho[0] + NB2,this->mo1,
+      std::transform(fockOrtho[SCALAR],fockOrtho[SCALAR] + NB2,this->mo1,
         [](T a){ return a / 2.; }
       );
     else if(this->nC == 1)
       for(auto j = 0; j < NB2; j++) {
-        this->mo1[j] = 0.5 * (fockOrtho[0][j] + fockOrtho[1][j]); 
-        this->mo2[j] = 0.5 * (fockOrtho[0][j] - fockOrtho[1][j]); 
+        this->mo1[j] = 0.5 * (fockOrtho[SCALAR][j] + fockOrtho[MZ][j]); 
+        this->mo2[j] = 0.5 * (fockOrtho[SCALAR][j] - fockOrtho[MZ][j]); 
       }
     else { 
       // TODO 2C 

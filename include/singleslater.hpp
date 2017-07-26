@@ -97,42 +97,22 @@ namespace ChronusQ {
     // Operator storage
 
     // AO Fock Matrix
-    oper_t      fockScalar; ///< Scalar AO Fock matrix
-    oper_t      fockMz;     ///< Mz AO Fock matrix
-    oper_t      fockMy;     ///< My AO Fock matrix
-    oper_t      fockMx;     ///< Mx AO Fock matrix
     oper_t_coll fock;       ///< List of populated AO Fock matricies
 
     // Orthonormal Fock
-    oper_t      fockOrthoScalar; ///< Scalar orthonormal Fock matrix
-    oper_t      fockOrthoMz; ///< Mz orthonormal Fock matrix
-    oper_t      fockOrthoMy; ///< My orthonormal Fock matrix
-    oper_t      fockOrthoMx; ///< Mx orthonormal Fock matrix
     oper_t_coll fockOrtho;   ///< List of populated orthonormal Fock matricies
 
     // Coulomb (J[D])
     oper_t JScalar; ///< Scalar Coulomb Matrix
 
     // Exchange (K[D])
-    oper_t      KScalar; ///< Scalar exact (HF) exchange matrix
-    oper_t      KMz;     ///< Mz exact (HF) exchange matrix
-    oper_t      KMy;     ///< My exact (HF) exchange matrix
-    oper_t      KMx;     ///< Mx exact (HF) exchange matrix
     oper_t_coll K;       ///< List of populated exact (HF) exchange matricies
 
     // Exact Perturbation Tensor (G[D])
-    oper_t      GDScalar;///< HF Scalar perturbation tensor
-    oper_t      GDMz;    ///< HF Mz perturbation tensor
-    oper_t      GDMy;    ///< HF My perturbation tensor
-    oper_t      GDMx;    ///< HF Mx perturbation tensor
     oper_t_coll GD;      ///< List of populated HF perturbation tensors
 
 
     // Orthonormal density
-    oper_t      onePDMOrthoScalar; ///< Scalar orthonormal 1PDM matrix
-    oper_t      onePDMOrthoMz; ///< Mz orthonormal 1PDM matrix
-    oper_t      onePDMOrthoMy; ///< My orthonormal 1PDM matrix
-    oper_t      onePDMOrthoMx; ///< Mx orthonormal 1PDM matrix
     oper_t_coll onePDMOrtho;   ///< List of populated orthonormal 1PDM matricies
 
 
@@ -156,15 +136,7 @@ namespace ChronusQ {
      *  \param [in] nC  Number of spin components (1 and 2 are supported)
      */ 
     SingleSlater(AOIntegrals &aoi, size_t nC) : 
-      WaveFunction<T>(aoi,nC),
-      fockScalar(nullptr), fockMz(nullptr), fockMy(nullptr), fockMx(nullptr),
-      fockOrthoScalar(nullptr), fockOrthoMz(nullptr), fockOrthoMy(nullptr), 
-        fockOrthoMx(nullptr),
-      JScalar(nullptr),
-      KScalar(nullptr), KMz(nullptr), KMy(nullptr), KMx(nullptr),
-      GDScalar(nullptr), GDMz(nullptr), GDMy(nullptr), GDMx(nullptr),
-      onePDMOrthoScalar(nullptr), onePDMOrthoMz(nullptr), 
-        onePDMOrthoMy(nullptr), onePDMOrthoMx(nullptr) { 
+      WaveFunction<T>(aoi,nC), JScalar(nullptr) {
 
       // Allocate SingleSlater Object
       alloc(); 

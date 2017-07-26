@@ -34,16 +34,16 @@
 namespace ChronusQ {
 
   enum DENSITY_TYPE {
-    SCALAR,MZ,MX,MY
+    SCALAR=0,MZ,MY,MX
   }; ///< Enumerate the types of densities for contraction
 
   // Helper function for operator traces
   // see src/quantum/properties.cxx for docs
 
-  template <typename Scalar, typename Left, typename Right>
-  static inline Scalar OperatorTrace(size_t N, const Left& op1 , 
+  template <typename RetTyp, typename Left, typename Right>
+  static inline RetTyp OperatorTrace(size_t N, const Left& op1 , 
     const Right& op2) {
-    return InnerProd<Scalar>(N,op1,1,op2,1);
+    return InnerProd<RetTyp>(N,op1,1,op2,1);
   } 
 
   template <typename T>
@@ -63,8 +63,8 @@ namespace ChronusQ {
     // Helper functions for the automatic evaluation of properties
     // see include/quantum/properties.hpp for documentation
 
-    template <typename Scalar, DENSITY_TYPE DenTyp, typename Op>
-    Scalar OperatorSpinCombine(const Op&);
+    template <typename RetTyp, DENSITY_TYPE DenTyp, typename Op>
+    RetTyp OperatorSpinCombine(const Op&);
 
   public:
 
@@ -75,11 +75,6 @@ namespace ChronusQ {
 
     // 1PDM storage
 
-    oper_t onePDMScalar; ///< Scalar part of the 1PDM
-    oper_t onePDMMz;     ///< Z-Magnetization part of the 1PDM
-    oper_t onePDMMy;     ///< Y-Magnetization part of the 1PDM
-    oper_t onePDMMx;     ///< X-Magnetization part of the 1PDM
-    
     oper_t_coll onePDM;  ///< 1PDM array (Scalar + Magnetization)
 
     // Property storage
@@ -114,8 +109,7 @@ namespace ChronusQ {
      */ 
     Quantum(CQMemManager &mem, size_t _nC = 1, bool _iCS = true, 
       size_t N = 0, bool doAlloc = true): 
-      memManager(mem), nC(_nC), iCS(_iCS), onePDMScalar(nullptr), 
-      onePDMMz(nullptr), onePDMMx(nullptr), onePDMMy(nullptr), 
+      memManager(mem), nC(_nC), iCS(_iCS), 
       elecDipole({0.,0.,0.}),
       elecQuadrupole{{{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}},
       elecOctupole{
@@ -163,21 +157,21 @@ namespace ChronusQ {
      *
      *  \param [template] DenTyp Which spin component of the 1PDM to trace with
      *  \param [in]       op     Square matrix to trace with 1PDM
-     *  \returns          Trace of op with the DenTyp 1PDM (cast to type Scalar)
+     *  \returns          Trace of op with the DenTyp 1PDM (cast to type RetTyp)
      */ 
-    template <typename Scalar, DENSITY_TYPE DenTyp, typename Op>
-    inline Scalar computeOBProperty(const Op &op) {
-      return OperatorSpinCombine<Scalar,DenTyp>(op);
+    template <typename RetTyp, DENSITY_TYPE DenTyp, typename Op>
+    inline RetTyp computeOBProperty(const Op &op) {
+      return OperatorSpinCombine<RetTyp,DenTyp>(op);
     }; // Quantum<T>::computeOBProperty (single operator)
 
     /**
      *
      */ 
-    template <typename Scalar, DENSITY_TYPE DenTyp, typename Op>
-    inline std::vector<Scalar> computeOBProperty(const std::vector<Op> &opv) {
-      std::vector<Scalar> results;
+    template <typename RetTyp, DENSITY_TYPE DenTyp, typename Op>
+    inline std::vector<RetTyp> computeOBProperty(const std::vector<Op> &opv) {
+      std::vector<RetTyp> results;
       for(auto &op : opv) 
-        results.emplace_back(computeOBProperty<Scalar,DenTyp>(op));
+        results.emplace_back(computeOBProperty<RetTyp,DenTyp>(op));
       return results;
     }; // Quantum<T>::computeOBProperty (many operators)
 

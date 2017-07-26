@@ -51,7 +51,7 @@ namespace ChronusQ {
     for(auto &F : fock) std::fill_n(F,NB2,0.);
 
     // Copy over the Core Hamiltonian
-    std::copy_n(this->aoints.coreH[0], NB2, fock[0]);
+    std::copy_n(this->aoints.coreH[SCALAR], NB2, fock[SCALAR]);
     // FIXME: This must be multiplied by "i" for 2C
     for(auto i = 1; i < this->aoints.coreH.size(); i++)
       std::copy_n(this->aoints.coreH[i], NB2, fock[i]);
@@ -78,7 +78,7 @@ namespace ChronusQ {
     std::vector<TwoBodyContraction<T>> cont;
     
     // Always do Scalar Coulomb
-    cont.push_back({this->onePDMScalar, JScalar, true, COULOMB}); 
+    cont.push_back({this->onePDM[SCALAR], JScalar, true, COULOMB}); 
 
     // Determine how many (if any) exchange terms to calculate
     for(auto i = 0; i < K.size(); i++)
@@ -95,8 +95,8 @@ namespace ChronusQ {
       MatAdd('N','N', NB, NB, T(0.), GD[i], NB, T(-1.), K[i], NB,
         GD[i], NB);
 
-    MatAdd('N','N', NB, NB, T(1.), GD[0], NB, T(2.), JScalar, NB,
-      GD[0], NB);
+    MatAdd('N','N', NB, NB, T(1.), GD[SCALAR], NB, T(2.), JScalar, NB,
+      GD[SCALAR], NB);
       
 
   }; // SingleSlater<T>::formGD
