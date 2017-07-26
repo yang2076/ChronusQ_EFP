@@ -36,7 +36,7 @@
   } \
   \
   /* If 2C, populate My / Mx */ \
-  if(this->nC > 1 or not this->iCS) { \
+  if(this->nC > 1) { \
     X##My = this->memManager.template malloc<T>(NB*NB);\
     X##Mz = this->memManager.template malloc<T>(NB*NB);\
     X.emplace_back(X##My); \

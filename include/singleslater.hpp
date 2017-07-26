@@ -98,6 +98,9 @@ namespace ChronusQ {
     typedef T*                   oper_t;
     typedef std::vector<oper_t>  oper_t_coll;
 
+    std::string refLongName_;
+    std::string refShortName_;
+
   private:
   public:
     
@@ -176,6 +179,28 @@ namespace ChronusQ {
       // Allocate SingleSlater Object
       alloc(); 
 
+      // Determine method string
+      if(std::is_same<T,double>::value) {
+        refLongName_  = "Real ";
+        refShortName_ = "R-";
+      } else {
+        refLongName_  = "Complex ";
+        refShortName_ = "C-";
+      }
+
+      if(this->nC == 1) {
+        if(this->iCS) {
+          refLongName_  += "Restricted Hartree-Fock";
+          refShortName_ += "RHF";
+        } else {
+          refLongName_  += "Unrestricted Hartree-Fock";
+          refShortName_ += "UHF";
+        }
+      } else {
+        refLongName_  += "Generalized Hartree-Fock";
+        refShortName_ += "GHF";
+      }
+
     }
 
     // See include/singleslater/impl.hpp for documentation 
@@ -239,6 +264,7 @@ namespace ChronusQ {
     // Misc procedural
     void diagOrthoFock();
     void printSCFProg(std::ostream &out = std::cout);
+    void printSCFHeader(std::ostream &out = std::cout);
     virtual void saveCurrentState();
     virtual void formDelta();
 
