@@ -51,7 +51,6 @@ namespace ChronusQ {
     for(auto i = 1; i < this->aoints.coreH.size(); i++)
       std::copy_n(this->aoints.coreH[i], FSize, fock[i]);
 
-
     // Allocate memory to store previous orthonormal Fock for damping 
     if (scfControls.doDamp) {
       for(auto i = 0; i < this->fock.size(); i++) {

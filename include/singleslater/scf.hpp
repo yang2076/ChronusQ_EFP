@@ -57,7 +57,7 @@ namespace ChronusQ {
       formFock();
 
       // Get new orbtials and densities from current Fock: F(k) -> C/D(k + 1)
-      getNewOrbitals();
+      getNewOrbitals(scfControls.doExtrap);
 
       // Evaluate convergence
       isConverged = evalConver();
@@ -92,14 +92,23 @@ namespace ChronusQ {
            << std::endl;
 
     out << std::setprecision(6) << std::scientific;
-    out << std::setw(38)   << std::left << "  Density Convergence Tolerence:" 
+    out << std::setw(38) << std::left << "  Density Convergence Tolerence:" 
            <<  scfControls.denConvTol << std::endl;
 
-    out << std::setw(38)   << std::left << "  Energy Convergence Tolerence:" 
+    out << std::setw(38) << std::left << "  Energy Convergence Tolerence:" 
            <<  scfControls.eneConvTol << std::endl;
 
     out << std::setw(38) << std::left << "  Maximum Number of SCF Cycles:" 
            << scfControls.maxSCFIter << std::endl;
+
+    if(scfControls.doDamp) {
+      out << std::setw(38)   << std::left << "  Damping Factor:" 
+             <<  scfControls.dampParam << std::endl;
+      out << std::setw(38)   << std::left << "  Damping Error:" 
+             <<  scfControls.dampError << std::endl;
+    }
+
+
 
     out << std::endl << BannerMid << std::endl << std::endl;
     out << std::setw(16) << "SCF Iteration";
@@ -186,14 +195,13 @@ namespace ChronusQ {
    *  Currently implements the fixed-point SCF procedure.
    */ 
   template <typename T>
-  void SingleSlater<T>::getNewOrbitals() {
+  void SingleSlater<T>::getNewOrbitals(bool extrap) {
 
     // Transform AO fock into the orthonormal basis
     ao2orthoFock();
 
     // Modify fock matrix if requested
-    // TODO: need a better flag than this
-    if (scfControls.doExtrap) modifyFock();
+    if(extrap) modifyFock();
 
     // Diagonalize the orthonormal fock Matrix
     diagOrthoFock();
@@ -260,14 +268,15 @@ namespace ChronusQ {
     // Save matrices for next iteration if not converged
     if(not isConverged) saveSCFMatrices();
 
+    // TODO: should enable print statements only when print flag is high enough
     // Toggle damping based on energy difference
     bool largeEDiff = std::abs(scfConv.deltaEnergy) > scfControls.dampError;
-    if( scfControls.doDamp and not largeEDiff) {
-      std::cout << "    *** Damping Disabled After "<<
-        scfControls.dampError << " Converged Met ***" << std::endl;
+    if( scfControls.doDamp and not largeEDiff and scfControls.dampParam > 0.) {
+      std::cout << "    *** Damping Disabled - Energy Difference Fell Below " <<
+        scfControls.dampError << " ***" << std::endl;
       scfControls.dampParam = 0.;
-    } else if( scfControls.doDamp and largeEDiff) {
-      std::cout << "    *** Damping Enabled due to "<<
+    } else if( scfControls.doDamp and largeEDiff and scfControls.dampParam <= 0.) {
+      std::cout << "    *** Damping Enabled Due to "<<
         scfControls.dampError << " Oscillation in Energy ***" << std::endl;
       scfControls.dampParam = scfControls.dampStartParam;
     }
@@ -374,8 +383,6 @@ namespace ChronusQ {
   template <typename T>
   void SingleSlater<T>::fockDamping() {
 
-    std::cout << "  PJL inside fockDamping: " << std::endl;
-
     size_t NB = this->aoints.basisSet().nBasis;
     double dp = scfControls.dampParam;
    
@@ -383,7 +390,6 @@ namespace ChronusQ {
     for(auto i = 0; i < fockOrtho.size(); i++)
       MatAdd('N','N', NB, NB, T(1-dp), fockOrtho[i], NB, T(dp), 
         prevFock[i], NB, fockOrtho[i], NB);
-
 
   }; // SingleSlater<T>::fockDamping
 
@@ -393,8 +399,6 @@ namespace ChronusQ {
    */ 
   template <typename T>
   void SingleSlater<T>::saveSCFMatrices() {
-
-    std::cout << "  PJL inside saveSCFMatrices: " << std::endl;
 
     // Copy the current orthonormal Fock to use during the next iteration 
     size_t NB = this->aoints.basisSet().nBasis;
