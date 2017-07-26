@@ -40,6 +40,8 @@ namespace ChronusQ {
   template <typename T>
   void SingleSlater<T>::SCF() {
 
+    printSCFHeader(std::cout);
+
     bool isConverged = false;
     computeEnergy();
     for( scfConv.nSCFIter = 0; scfConv.nSCFIter < scfControls.maxSCFIter; 
@@ -65,8 +67,58 @@ namespace ChronusQ {
 
     }; // Iteration loop
 
+    if(not isConverged)
+      CErr(std::string("SCF Failed to converged within ") + 
+        std::to_string(scfControls.maxSCFIter) + 
+        std::string(" iterations"));
+    else {
+      std::cout << std::endl << "SCF Completed: E("
+                << refShortName_ << ") = " << std::fixed
+                << std::setprecision(10) << this->totalEnergy
+                << " Eh after " << scfConv.nSCFIter
+                << " SCF Iterations" << std::endl;
+    } 
+    std::cout << BannerEnd << std::endl;
+    
   }; // SingleSlater<T>::SCF()
 
+  
+  template <typename T>
+  void SingleSlater<T>::printSCFHeader(std::ostream &out) {
+    out << BannerTop << std::endl;
+    out << "Self Consistent Field (SCF) Settings:" << std::endl << std::endl;
+
+    out << std::setw(38) << std::left << "  SCF Type:" << refLongName_ 
+           << std::endl;
+
+    out << std::setprecision(6) << std::scientific;
+    out << std::setw(38)   << std::left << "  Density Convergence Tolerence:" 
+           <<  scfControls.denConvTol << std::endl;
+
+    out << std::setw(38)   << std::left << "  Energy Convergence Tolerence:" 
+           <<  scfControls.eneConvTol << std::endl;
+
+    out << std::setw(38) << std::left << "  Maximum Number of SCF Cycles:" 
+           << scfControls.maxSCFIter << std::endl;
+
+    out << std::endl << BannerMid << std::endl << std::endl;
+    out << std::setw(16) << "SCF Iteration";
+    out << std::setw(18) << "Energy (Eh)";
+    out << std::setw(18) << "\u0394E (Eh)";
+    out << std::setw(18) << " |\u0394P(S)|";
+    if(not this->iCS or this->nC > 1)
+      out << std::setw(18) << "  |\u0394P(M)|";
+     
+    out << std::endl;
+    out << std::setw(16) << "-------------";
+    out << std::setw(18) << "-----------";
+    out << std::setw(18) << "-------";
+    out << std::setw(18) << "-------";
+    if(not this->iCS or this->nC > 1)
+      out << std::setw(18) << "-------";
+    out << std::endl;
+
+  }; // SingleSlater<T>::printSCFHeader
 
 
   /**
