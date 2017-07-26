@@ -59,6 +59,20 @@ namespace ChronusQ {
     int LDC){
 #ifdef _CQ_MKL
     dzgemm(&TRANSA,&TRANSB,&M,&N,&K,&ALPHA,A,&LDA,B,&LDB,&BETA,C,&LDC);
+#else
+    assert(TRANSA == 'N' and TRANSB == 'N');
+
+    Eigen::Map<
+      Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor>
+    > AMap(A,LDA,K);
+
+    Eigen::Map<
+      Eigen::Matrix<dcomplex,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor>
+    > BMap(B,LDB,N), CMap(C,LDC,N);
+
+    CMap.block(0,0,M,N).noalias() = 
+      AMap.block(0,0,M,K).cast<dcomplex>() *
+      BMap.block(0,0,K,N);
 #endif
 
   }; // GEMM (real,complex,complex)

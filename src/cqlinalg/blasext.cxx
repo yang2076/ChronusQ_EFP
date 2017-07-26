@@ -53,6 +53,7 @@ namespace ChronusQ {
     size_t, dcomplex, double*, size_t, dcomplex*, size_t);
 
 #ifdef _CQ_MKL
+
   template<>
   void MatAdd(char TRANSA, char TRANSB, size_t M, size_t N, double ALPHA, 
     double *A, size_t LDA, double BETA, double *B, size_t LDB, double *C, 
