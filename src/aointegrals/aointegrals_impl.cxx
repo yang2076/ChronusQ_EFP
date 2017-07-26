@@ -34,9 +34,9 @@ namespace ChronusQ {
   // Explicit instantiations of 2-body contraction engines
 
   template void AOIntegrals::twoBodyContractIncore(
-    std::vector<TwoBodyContraction<double>> &list);
+    std::vector<TwoBodyContraction<double,double>> &list);
   template void AOIntegrals::twoBodyContractIncore(
-    std::vector<TwoBodyContraction<dcomplex>> &list);
+    std::vector<TwoBodyContraction<dcomplex,dcomplex>> &list);
 
   // Explicit instantiations of orthonormal transformation functions
 

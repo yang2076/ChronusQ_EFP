@@ -103,7 +103,7 @@ namespace ChronusQ {
     oper_t_coll fockOrtho;   ///< List of populated orthonormal Fock matricies
 
     // Coulomb (J[D])
-    oper_t JScalar; ///< Scalar Coulomb Matrix
+    double* JScalar; ///< Scalar Coulomb Matrix
 
     // Exchange (K[D])
     oper_t_coll K;       ///< List of populated exact (HF) exchange matricies

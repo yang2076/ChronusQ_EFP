@@ -75,19 +75,24 @@ namespace ChronusQ {
   template <typename T>
   void SingleSlater<T>::formGD() {
 
-    std::vector<TwoBodyContraction<T>> cont;
+    std::vector<TwoBodyContraction<T,double>> jContract =
+      { {this->onePDM[SCALAR], JScalar, true, COULOMB} };
     
-    // Always do Scalar Coulomb
-    cont.push_back({this->onePDM[SCALAR], JScalar, true, COULOMB}); 
+
+    std::vector<TwoBodyContraction<T,T>> kContract;
 
     // Determine how many (if any) exchange terms to calculate
     for(auto i = 0; i < K.size(); i++)
-      cont.push_back({this->onePDM[i], K[i], true, EXCHANGE});
+      kContract.push_back({this->onePDM[i], K[i], true, EXCHANGE});
 
-    // Perform contraction
-    this->aoints.twoBodyContract(cont);
 
-    // Form GD: G[D] = J[D] - 0.5*K[D]
+    // Perform J contraction
+    this->aoints.twoBodyContract(jContract);
+
+    // Perform K contraction
+    this->aoints.twoBodyContract(kContract);
+
+    // Form GD: G[D] = 2.0*J[D] - K[D]
     size_t NB = this->aoints.basisSet().nBasis * this->nC;
     size_t NB2 = NB*NB;
 

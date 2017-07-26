@@ -38,7 +38,7 @@
   /* Handle Operators */\
   OP_VEC_OP(T,this,other,this->memManager,fock); \
   OP_VEC_OP(T,this,other,this->memManager,fockOrtho); \
-  OP_OP(T,this,other,this->memManager,JScalar); \
+  OP_OP(double,this,other,this->memManager,JScalar); \
   OP_VEC_OP(T,this,other,this->memManager,K); \
   OP_VEC_OP(T,this,other,this->memManager,GD);\
   OP_VEC_OP(T,this,other,this->memManager,onePDMOrtho);\
@@ -130,7 +130,7 @@ namespace ChronusQ {
     SPIN_OPERATOR_ALLOC(NB,onePDMOrtho);
 
     // J only has a scalar component
-    JScalar = this->memManager.template malloc<T>(NB*NB);
+    JScalar = this->memManager.template malloc<double>(NB*NB);
 
     SPIN_OPERATOR_ALLOC(NB,curOnePDM);
     SPIN_OPERATOR_ALLOC(NB,deltaOnePDM);
