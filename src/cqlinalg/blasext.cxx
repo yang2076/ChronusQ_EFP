@@ -25,20 +25,17 @@
 
 namespace ChronusQ {
 
-  template<>
-  void MatAdd(char TRANSA, char TRANSB, size_t M, size_t N, double ALPHA, 
-    double *A, size_t LDA, double BETA, double *B, size_t LDB, double *C, 
-    size_t LDC) {
+  template <typename _F1, typename _F2, typename _F3, typename _FScale1, 
+    typename _FScale2>
+  void MatAdd(char TRANSA, char TRANSB, size_t M, size_t N, _FScale1 ALPHA, 
+    _F1 *A, size_t LDA, _FScale2 BETA, _F2 *B, size_t LDB, _F3 *C, size_t LDC){
 
-    #ifdef _CQ_MKL
-      mkl_domatadd('C',TRANSA,TRANSB,M,N,ALPHA,A,LDA,BETA,B,LDB,C,LDC);
-    #else
       assert( TRANSA == 'N' and TRANSB == 'N' );
       #pragma omp parallel
       {
-        double *locA = A;
-        double *locB = B;
-        double *locC = C;
+        _F1 *locA = A;
+        _F2 *locB = B;
+        _F3 *locC = C;
         #pragma omp for
         for(int j = 0; j < N; j++) {
           #pragma omp simd
@@ -49,7 +46,20 @@ namespace ChronusQ {
           locC += LDC;
         }
       }
-    #endif
+
+  }; // MatAdd generic template
+
+  template void MatAdd( char, char, size_t, size_t, dcomplex, dcomplex*, 
+    size_t, dcomplex, double*, size_t, dcomplex*, size_t);
+
+#ifdef _CQ_MKL
+
+  template<>
+  void MatAdd(char TRANSA, char TRANSB, size_t M, size_t N, double ALPHA, 
+    double *A, size_t LDA, double BETA, double *B, size_t LDB, double *C, 
+    size_t LDC) {
+
+      mkl_domatadd('C',TRANSA,TRANSB,M,N,ALPHA,A,LDA,BETA,B,LDB,C,LDC);
 
   }; // MatAdd (real, real, real)
 
@@ -58,10 +68,18 @@ namespace ChronusQ {
     dcomplex *A, size_t LDA, dcomplex BETA, dcomplex *B, size_t LDB, 
     dcomplex *C, size_t LDC) {
 
-    #ifdef _CQ_MKL
       mkl_zomatadd('C',TRANSA,TRANSB,M,N,ALPHA,A,LDA,BETA,B,LDB,C,LDC);
-    #endif
 
   }; // MatAdd (complex, complex, complex)
+
+#else
+
+  template void MatAdd( char, char, size_t, size_t, dcomplex, dcomplex*, 
+    size_t, dcomplex, dcomplex*, size_t, dcomplex*, size_t);
+
+  template void MatAdd( char, char, size_t, size_t, double, double*, 
+    size_t, double, double*, size_t, double*, size_t);
+
+#endif
 
 }; // namespace ChronusQ

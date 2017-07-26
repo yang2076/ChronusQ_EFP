@@ -26,21 +26,16 @@
 
 #define SPIN_OPERATOR_ALLOC(NB,X) \
   /* Always allocate Scalar matricies */ \
-  X##Scalar = this->memManager.template malloc<T>(NB*NB);\
-  X.emplace_back(X##Scalar); \
+  X.emplace_back(this->memManager.template malloc<T>(NB*NB)); \
   \
   /* If 2C or open shell, populate Mz storage */ \
-  if(this->nC > 1 or not this->iCS) { \
-    X##Mz = this->memManager.template malloc<T>(NB*NB);\
-    X.emplace_back(X##Mz); \
-  } \
+  if(this->nC > 1 or not this->iCS) \
+    X.emplace_back(this->memManager.template malloc<T>(NB*NB)); \
   \
   /* If 2C, populate My / Mx */ \
   if(this->nC > 1) { \
-    X##My = this->memManager.template malloc<T>(NB*NB);\
-    X##Mz = this->memManager.template malloc<T>(NB*NB);\
-    X.emplace_back(X##My); \
-    X.emplace_back(X##Mz); \
+    X.emplace_back(this->memManager.template malloc<T>(NB*NB)); \
+    X.emplace_back(this->memManager.template malloc<T>(NB*NB)); \
   }
 
 

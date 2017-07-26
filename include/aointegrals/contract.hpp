@@ -35,7 +35,8 @@ namespace ChronusQ {
 
   /**
    *  \brief Perform various tensor contractions of the full ERI
-   *  tensor in core.
+   *  tensor in core. Wraps other helper functions and provides
+   *  loop structure
    *
    *  Currently supports
    *    - Coulomb-type (34,12) contractions
@@ -47,69 +48,148 @@ namespace ChronusQ {
    *    matricies to be contracted with. See TwoBodyContraction
    *    for details
    */ 
-  template <typename T>
+  template <typename T, typename G>
   void AOIntegrals::twoBodyContractIncore(
-    std::vector<TwoBodyContraction<T>> &list) {
-
-    size_t NB3 = basisSet_.nBasis * nSQ_;
+    std::vector<TwoBodyContraction<T,G>> &list) {
 
     // Loop over matricies to contract with
     for(auto &C : list) {
-      // Sanity check of dimensions
-      assert(memManager_.template getSize<T>(C.X)  == nSQ_);
-      assert(memManager_.template getSize<T>(C.AX) == nSQ_);
 
       // Coulomb-type (34,12) ERI contraction
       // AX(mn) = (mn | kl) X(kl)
-      if( C.contType == COULOMB ) {
-
-        #ifdef _BULLET_PROOF_INCORE
-
-        for(auto i = 0; i < basisSet_.nBasis; ++i)
-        for(auto j = 0; j < basisSet_.nBasis; ++j)
-        for(auto k = 0; k < basisSet_.nBasis; ++k)
-        for(auto l = 0; l < basisSet_.nBasis; ++l) {
-          C.AX[i + j*basisSet_.nBasis] +=
-            ERI[i + j*basisSet_.nBasis + k*nSQ_ + l*NB3] *
-            C.X[k + l*basisSet_.nBasis];
-        }
-
-        #else
-  
-        Gemm('N','N',nSQ_,1,nSQ_,T(1.),ERI,nSQ_,C.X,nSQ_,T(0.),C.AX,nSQ_);
-
-        #endif
-
+      if( C.contType == COULOMB ) JContractIncore(C);
 
       // Exchange-type (23,12) ERI contraction
       // AX(mn) = (mk |ln) X(kl)
-      } else if( C.contType == EXCHANGE ) {
+      else if( C.contType == EXCHANGE ) KContractIncore(C);
 
-        #ifdef _BULLET_PROOF_INCORE
-
-        for(auto i = 0; i < basisSet_.nBasis; ++i)
-        for(auto j = 0; j < basisSet_.nBasis; ++j)
-        for(auto k = 0; k < basisSet_.nBasis; ++k)
-        for(auto l = 0; l < basisSet_.nBasis; ++l) {
-          C.AX[i + j*basisSet_.nBasis] +=
-            ERI[i + k*basisSet_.nBasis + l*nSQ_ + j*NB3] *
-            C.X[k + l*basisSet_.nBasis];
-        }
-
-        #else
-
-        for(auto nu = 0; nu < basisSet_.nBasis; nu++) {
-          Gemm('N','N',basisSet_.nBasis,1,nSQ_,T(1.),
-            ERI  + nu * NB3,              basisSet_.nBasis,
-            C.X,                          nSQ_,T(0.),
-            C.AX + nu * basisSet_.nBasis, basisSet_.nBasis);
-        }
-
-        #endif
-      }
     } // loop over matricies
     
   }; // AOIntegrals::twoBodyContractIncore
+
+
+  /**
+   *  \brief Perform a Coulomb-type (34,12) ERI contraction with
+   *  a one-body operator.
+   */   
+  template<>
+  void AOIntegrals::twoBodyContractIncore(
+    std::vector<TwoBodyContraction<dcomplex,double>> &list) {
+
+    assert(std::all_of(list.begin(),list.end(),
+      [](TwoBodyContraction<dcomplex,double>& C){ 
+        return C.contType == COULOMB; 
+      }));
+
+    for(auto &C : list) JContractIncore(C);
+    
+  }; // AOIntegrals::twoBodyContractIncore (complex, real)
+
+
+
+  template <typename T, typename G>
+  void AOIntegrals::JContractIncore(TwoBodyContraction<T,G> &C) {
+
+    // Sanity check of dimensions
+    assert(memManager_.template getSize<T>(C.X)  == nSQ_);
+    assert(memManager_.template getSize<G>(C.AX) == nSQ_);
+
+    #ifdef _BULLET_PROOF_INCORE
+
+    for(auto i = 0; i < basisSet_.nBasis; ++i)
+    for(auto j = 0; j < basisSet_.nBasis; ++j)
+    for(auto k = 0; k < basisSet_.nBasis; ++k)
+    for(auto l = 0; l < basisSet_.nBasis; ++l) {
+      C.AX[i + j*basisSet_.nBasis] +=
+        ERI[i + j*basisSet_.nBasis + k*nSQ_ + l*NB3] *
+        C.X[k + l*basisSet_.nBasis];
+    }
+
+    #else
+
+
+    // Hermetian code
+    if( C.HER ) {
+      double *X, *AX;
+
+      // Handle smart allocation of real matricies for Coulomb contraction
+      // with Hermetian matricies
+        
+      if( std::is_same<double,T>::value ) 
+        X = reinterpret_cast<double*>(C.X);
+      else {
+        // Copy over real part into allocated temporary
+        X = memManager_.malloc<double>(nSQ_);
+        std::transform(C.X,C.X + nSQ_,X,
+          []( T a ) -> double { return std::real(a); }
+        ); 
+      }
+
+      if( std::is_same<double,G>::value ) 
+        AX = reinterpret_cast<double*>(C.AX);
+      else 
+        AX = memManager_.malloc<double>(nSQ_);  
+
+      Gemm('N','N',nSQ_,1,nSQ_,1.,ERI,nSQ_,X,nSQ_,0.,AX,nSQ_);
+
+
+      // Cleanup temporaries
+        
+      if( not std::is_same<double,T>::value ) memManager_.free(X);
+      if( not std::is_same<double,G>::value ) {
+        // Copy over real result into persistant storage
+        std::copy_n(AX,nSQ_,C.AX);
+        memManager_.free(AX);
+      }
+
+    // Non-hermetian code
+    } else {
+
+      assert( (std::is_same<T,G>::value) );
+
+      Gemm('N','N',nSQ_,1,nSQ_,T(1.),ERI,nSQ_,reinterpret_cast<T*>(C.X),nSQ_,
+        T(0.),reinterpret_cast<T*>(C.AX),nSQ_);
+
+    }
+
+
+    #endif
+
+  }; // AOIntegrals::JContractIncore
+
+
+
+  template <typename T, typename G>
+  void AOIntegrals::KContractIncore(TwoBodyContraction<T,G> &C) {
+
+    size_t NB3 = basisSet_.nBasis * nSQ_;
+
+    // Sanity check of dimensions
+    assert(memManager_.template getSize<T>(C.X)  == nSQ_);
+    assert(memManager_.template getSize<G>(C.AX) == nSQ_);
+
+    #ifdef _BULLET_PROOF_INCORE
+
+    for(auto i = 0; i < basisSet_.nBasis; ++i)
+    for(auto j = 0; j < basisSet_.nBasis; ++j)
+    for(auto k = 0; k < basisSet_.nBasis; ++k)
+    for(auto l = 0; l < basisSet_.nBasis; ++l) {
+      C.AX[i + j*basisSet_.nBasis] +=
+        ERI[i + k*basisSet_.nBasis + l*nSQ_ + j*NB3] *
+        C.X[k + l*basisSet_.nBasis];
+    }
+
+    #else
+
+    for(auto nu = 0; nu < basisSet_.nBasis; nu++) 
+      Gemm('N','N',basisSet_.nBasis,1,nSQ_,T(1.),
+        ERI  + nu * NB3,              basisSet_.nBasis,
+        C.X,                          nSQ_,T(0.),
+        C.AX + nu * basisSet_.nBasis, basisSet_.nBasis);
+
+    #endif
+
+  }; // AOIntegrals::KContractIncore
 
 }; // namespace ChronusQ
 

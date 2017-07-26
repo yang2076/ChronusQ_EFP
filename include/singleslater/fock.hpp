@@ -51,7 +51,7 @@ namespace ChronusQ {
     for(auto &F : fock) std::fill_n(F,NB2,0.);
 
     // Copy over the Core Hamiltonian
-    std::copy_n(this->aoints.coreH[0], NB2, fock[0]);
+    std::copy_n(this->aoints.coreH[SCALAR], NB2, fock[SCALAR]);
     // FIXME: This must be multiplied by "i" for X2C
     for(auto i = 1; i < this->aoints.coreH.size(); i++)
       std::copy_n(this->aoints.coreH[i], NB2, fock[i]);
@@ -75,19 +75,24 @@ namespace ChronusQ {
   template <typename T>
   void SingleSlater<T>::formGD() {
 
-    std::vector<TwoBodyContraction<T>> cont;
+    std::vector<TwoBodyContraction<T,double>> jContract =
+      { {this->onePDM[SCALAR], JScalar, true, COULOMB} };
     
-    // Always do Scalar Coulomb
-    cont.push_back({this->onePDMScalar, JScalar, true, COULOMB}); 
+
+    std::vector<TwoBodyContraction<T,T>> kContract;
 
     // Determine how many (if any) exchange terms to calculate
     for(auto i = 0; i < K.size(); i++)
-      cont.push_back({this->onePDM[i], K[i], true, EXCHANGE});
+      kContract.push_back({this->onePDM[i], K[i], true, EXCHANGE});
 
-    // Perform contraction
-    this->aoints.twoBodyContract(cont);
 
-    // Form GD: G[D] = J[D] - 0.5*K[D]
+    // Perform J contraction
+    this->aoints.twoBodyContract(jContract);
+
+    // Perform K contraction
+    this->aoints.twoBodyContract(kContract);
+
+    // Form GD: G[D] = 2.0*J[D] - K[D]
     size_t NB = this->aoints.basisSet().nBasis * this->nC;
     size_t NB2 = NB*NB;
 
@@ -95,8 +100,8 @@ namespace ChronusQ {
       MatAdd('N','N', NB, NB, T(0.), GD[i], NB, T(-1.), K[i], NB,
         GD[i], NB);
 
-    MatAdd('N','N', NB, NB, T(1.), GD[0], NB, T(2.), JScalar, NB,
-      GD[0], NB);
+    MatAdd('N','N', NB, NB, T(1.), GD[SCALAR], NB, T(2.), JScalar, NB,
+      GD[SCALAR], NB);
       
 
   }; // SingleSlater<T>::formGD

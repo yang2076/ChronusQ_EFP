@@ -57,11 +57,11 @@ namespace ChronusQ {
    *  pertinant for a two body operator contraction with
    *  a one body (2 index) operator. z.B. The density matrix.
    */ 
-  template <typename T>
+  template <typename T, typename G>
   struct TwoBodyContraction {
 
     T*  X;  ///< 1-Body (2 index) operator to contraction
-    T*  AX; ///< 1-Body (2 index) storage for the contraction
+    G*  AX; ///< 1-Body (2 index) storage for the contraction
 
     bool HER; ///< Whether or not X is hermetian
     
@@ -230,16 +230,21 @@ namespace ChronusQ {
      *
      *  \param [in/ont] contList List of one body operators for contraction.
      */ 
-    template <typename T>
-    void twoBodyContract(std::vector<TwoBodyContraction<T>> &contList) {
+    template <typename T, typename G>
+    void twoBodyContract(std::vector<TwoBodyContraction<T,G>> &contList) {
       twoBodyContractIncore(contList);
     };
     
     // Perform the two body contraction incore (using the rank-4 ERI tensor)
     // see include/aointegrals/contract.hpp for docs.
-    template <typename T>
-    void twoBodyContractIncore(std::vector<TwoBodyContraction<T>>&);
+    template <typename T, typename G>
+    void twoBodyContractIncore(std::vector<TwoBodyContraction<T,G>>&);
 
+    template <typename T, typename G>
+    void JContractIncore(TwoBodyContraction<T,G> &);
+
+    template <typename T, typename G>
+    void KContractIncore(TwoBodyContraction<T,G> &);
 
 
     // Transformations to and from the orthonormal basis

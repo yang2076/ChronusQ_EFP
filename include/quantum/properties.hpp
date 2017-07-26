@@ -33,12 +33,12 @@ namespace ChronusQ {
    *  property evaluation. Return zeros when necessacy.
    */ 
   template <typename T>
-  template <typename Scalar, DENSITY_TYPE DenTyp, typename Op>
-  Scalar Quantum<T>::OperatorSpinCombine(const Op &op) {
+  template <typename RetTyp, DENSITY_TYPE DenTyp, typename Op>
+  RetTyp Quantum<T>::OperatorSpinCombine(const Op &op) {
     double rZero(0.);
     bool isReal = std::is_same<double,T>::value;
 
-    size_t DSize = memManager.template getSize(onePDMScalar);
+    size_t DSize = memManager.template getSize(onePDM[SCALAR]);
 
     // Scalar trace option always valid
 
@@ -58,22 +58,13 @@ namespace ChronusQ {
 
     // Catch zero evals
     if(isZero)
-      return reinterpret_cast<Scalar(&)[2]>(rZero)[0];
-
+      return reinterpret_cast<RetTyp(&)[2]>(rZero)[0];
 
     // Sanity checks
     assert( memManager.template getSize(op) == DSize );
 
-
     // Perform proper trace
-    if( DenTyp == DENSITY_TYPE::SCALAR )
-      return OperatorTrace<Scalar>(DSize,onePDMScalar,op);
-    else if( DenTyp == DENSITY_TYPE::MZ )
-      return OperatorTrace<Scalar>(DSize,onePDMMz,op);
-    else if( DenTyp == DENSITY_TYPE::MY )
-      return OperatorTrace<Scalar>(DSize,onePDMMy,op);
-    else if( DenTyp == DENSITY_TYPE::MX )
-      return OperatorTrace<Scalar>(DSize,onePDMMx,op);
+    return OperatorTrace<RetTyp>(DSize,onePDM[DenTyp],op);
 
   }; // Quantum<T>::OperatorSpinCombine
 

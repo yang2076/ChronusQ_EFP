@@ -31,18 +31,9 @@
 // Template for a collective operation on the members of a 
 // Quantum object
   
-#define Form_1PDM_VEC() \
-  if(onePDMScalar != nullptr) onePDM.emplace_back(onePDMScalar); \
-  if(onePDMMz != nullptr) onePDM.emplace_back(onePDMMz); \
-  if(onePDMMy != nullptr) onePDM.emplace_back(onePDMMy); \
-  if(onePDMMx != nullptr) onePDM.emplace_back(onePDMMx); 
-
-#define Quantum_COLLECTIVE_OP(OP_MEMBER,OP_OP) \
+#define Quantum_COLLECTIVE_OP(OP_MEMBER,OP_VEC_OP) \
   /* Handle densities */\
-  OP_OP(T,this,other,memManager,onePDMScalar); \
-  OP_OP(T,this,other,memManager,onePDMMz); \
-  OP_OP(T,this,other,memManager,onePDMMy); \
-  OP_OP(T,this,other,memManager,onePDMMx); \
+  OP_VEC_OP(T,this,other,memManager,onePDM); \
   \
   /* Handle Member data */\
   OP_MEMBER(this,other,elecDipole); \
@@ -66,8 +57,8 @@ namespace ChronusQ {
   template <typename U>
   Quantum<T>::Quantum(const Quantum<U> &other, int dummy) : 
     Quantum<T>(other.memManager,other.nC,other.iCS,
-    (other.onePDMScalar == nullptr) ? 
-       0 : std::sqrt(other.memManager.template getSize<U>(other.onePDMScalar)),
+    (other.onePDM.size() != 0) ? 
+       0 : std::sqrt(other.memManager.template getSize<U>(other.onePDM[0])),
     false
     ) {
 
@@ -76,8 +67,7 @@ namespace ChronusQ {
               << ", other = " << &other << ")" << std::endl;
     #endif
 
-    Quantum_COLLECTIVE_OP(COPY_OTHER_MEMBER,COPY_OTHER_MEMBER_OP);
-    Form_1PDM_VEC();
+    Quantum_COLLECTIVE_OP(COPY_OTHER_MEMBER,COPY_OTHER_MEMBER_VEC_OP);
 
   }; // Quantum<T>::Quantum(const Quantum<U> &)
     
@@ -96,8 +86,8 @@ namespace ChronusQ {
   template <typename U>
   Quantum<T>::Quantum(Quantum<U> &&other, int dummy) : 
     Quantum<T>(other.memManager,other.nC,other.iCS,
-    (other.onePDMScalar == nullptr) ? 
-       0 : std::sqrt(other.memManager.template getSize<U>(other.onePDMScalar)),
+    (other.onePDM.size() != 0) ? 
+       0 : std::sqrt(other.memManager.template getSize<U>(other.onePDM[0])),
     false
     ) {
 
@@ -106,9 +96,7 @@ namespace ChronusQ {
               << ", other = " << &other << ")" << std::endl;
     #endif
 
-    Quantum_COLLECTIVE_OP(MOVE_OTHER_MEMBER,MOVE_OTHER_MEMBER_OP);
-    Form_1PDM_VEC();
-    other.onePDM.clear();
+    Quantum_COLLECTIVE_OP(MOVE_OTHER_MEMBER,MOVE_OTHER_MEMBER_VEC_OP);
 
   }; // Quantum<T>::Quantum(Quantum<U> &&)
 

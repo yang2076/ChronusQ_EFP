@@ -21,28 +21,8 @@
  *    E-Mail: xsli@uw.edu
  *  
  */
+#ifndef __INCLUDED_AOINTEGRALS_HPP__
+#define __INCLUDED_AOINTEGRALS_HPP__
 
-#include <aointegrals/contract.hpp>
-#include <aointegrals/ortho.hpp>
+#include <chronusq_sys.hpp>
 
-
-// Instantiate libint2::engine
-#include <libint2/engine.impl.h>
-
-namespace ChronusQ {
-
-  // Explicit instantiations of 2-body contraction engines
-
-  template void AOIntegrals::twoBodyContractIncore(
-    std::vector<TwoBodyContraction<double,double>> &list);
-  template void AOIntegrals::twoBodyContractIncore(
-    std::vector<TwoBodyContraction<dcomplex,dcomplex>> &list);
-
-  // Explicit instantiations of orthonormal transformation functions
-
-  template void AOIntegrals::Ortho1Trans(double*,double*);
-  template void AOIntegrals::Ortho1Trans(dcomplex*,dcomplex*);
-  template void AOIntegrals::Ortho1TransT(double*,double*);
-  template void AOIntegrals::Ortho1TransT(dcomplex*,dcomplex*);
-
-};
