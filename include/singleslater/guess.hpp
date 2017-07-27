@@ -52,6 +52,9 @@ namespace ChronusQ {
       std::copy_n(this->aoints.coreH[i], FSize, fock[i]);
 
     // Allocate memory to store previous orthonormal Fock for damping 
+    //
+    // FIXME: This should be in a separate function allocSCF as it will not
+    // need to persist past the SCF.
     if (scfControls.doDamp) {
       for(auto i = 0; i < this->fock.size(); i++) {
         prevFock.emplace_back(this->memManager.template malloc<T>(FSize));
@@ -59,8 +62,9 @@ namespace ChronusQ {
         }
     }
 
-    // Common to all guess
-    getNewOrbitals();
+    // Common to all guess: form new set of orbitals from
+    // initial guess at Fock.
+    getNewOrbitals(false);
     
 
   }; // SingleSlater<T>::formGuess

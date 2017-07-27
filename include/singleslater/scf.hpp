@@ -53,11 +53,9 @@ namespace ChronusQ {
       // Exit loop on convergence
       if(isConverged) break;
 
-      // Form the Fock matrix D(k) -> F(k)
-      formFock();
-
-      // Get new orbtials and densities from current Fock: F(k) -> C/D(k + 1)
-      getNewOrbitals(scfControls.doExtrap);
+      // Get new orbtials and densities from current state: 
+      //   C/D(k) -> C/D(k + 1)
+      getNewOrbitals();
 
       // Evaluate convergence
       isConverged = evalConver();
@@ -195,13 +193,17 @@ namespace ChronusQ {
    *  Currently implements the fixed-point SCF procedure.
    */ 
   template <typename T>
-  void SingleSlater<T>::getNewOrbitals(bool extrap) {
+  void SingleSlater<T>::getNewOrbitals(bool frmFock) {
+
+    // Form the Fock matrix D(k) -> F(k)
+    if( frmFock ) formFock();
+
 
     // Transform AO fock into the orthonormal basis
     ao2orthoFock();
 
     // Modify fock matrix if requested
-    if(extrap) modifyFock();
+    if( scfControls.doExtrap and frmFock ) modifyFock();
 
     // Diagonalize the orthonormal fock Matrix
     diagOrthoFock();

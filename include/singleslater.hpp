@@ -231,7 +231,7 @@ namespace ChronusQ {
     bool evalConver();
 
     // Obtain new orbitals
-    void getNewOrbitals(bool extrap = false);
+    void getNewOrbitals(bool frmFock = true);
 
     // Misc procedural
     void diagOrthoFock();
