@@ -52,7 +52,7 @@ namespace ChronusQ {
 
     // Copy over the Core Hamiltonian
     std::copy_n(this->aoints.coreH[SCALAR], NB2, fock[SCALAR]);
-    // FIXME: This must be multiplied by "i" for 2C
+    // FIXME: This must be multiplied by "i" for X2C
     for(auto i = 1; i < this->aoints.coreH.size(); i++)
       std::copy_n(this->aoints.coreH[i], NB2, fock[i]);
 

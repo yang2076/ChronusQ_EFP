@@ -27,13 +27,18 @@ namespace ChronusQ {
 
   template<>
   double InnerProd(int N, double *X, int INCX, double *Y, int INCY) {
-    return 
+    
 #ifdef _CQ_MKL
-      ddot
+    return ddot(&N,X,&INCX,Y,&INCY);
 #else
-      ddot_
+    assert(INCX > 0 and INCY > 0);
+    double res(0.);
+    #pragma omp parallel for
+    for(int j = 0; j < N; j++){
+      res += X[j*INCX] * Y[j*INCY];
+    }
 #endif 
-        (&N,X,&INCX,Y,&INCY);
+        
   }; // InnerProd real = (real,real)
 
 
@@ -101,6 +106,9 @@ namespace ChronusQ {
         reinterpret_cast<double*>(Y),&INCY);
 #endif
   }; // InnerProd complex = (complex,complex)
+
+
+
 
   /**
    *  \warning Discards imaginary part of inner product
