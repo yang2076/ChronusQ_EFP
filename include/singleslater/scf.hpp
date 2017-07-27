@@ -57,7 +57,7 @@ namespace ChronusQ {
       formFock();
 
       // Get new orbtials and densities from current Fock: F(k) -> C/D(k + 1)
-      getNewOrbitals();
+      getNewOrbitals(scfControls.doExtrap);
 
       // Evaluate convergence
       isConverged = evalConver();
@@ -92,14 +92,23 @@ namespace ChronusQ {
            << std::endl;
 
     out << std::setprecision(6) << std::scientific;
-    out << std::setw(38)   << std::left << "  Density Convergence Tolerence:" 
+    out << std::setw(38) << std::left << "  Density Convergence Tolerence:" 
            <<  scfControls.denConvTol << std::endl;
 
-    out << std::setw(38)   << std::left << "  Energy Convergence Tolerence:" 
+    out << std::setw(38) << std::left << "  Energy Convergence Tolerence:" 
            <<  scfControls.eneConvTol << std::endl;
 
     out << std::setw(38) << std::left << "  Maximum Number of SCF Cycles:" 
            << scfControls.maxSCFIter << std::endl;
+
+    if(scfControls.doDamp) {
+      out << std::setw(38)   << std::left << "  Damping Factor:" 
+             <<  scfControls.dampParam << std::endl;
+      out << std::setw(38)   << std::left << "  Damping Error:" 
+             <<  scfControls.dampError << std::endl;
+    }
+
+
 
     out << std::endl << BannerMid << std::endl << std::endl;
     out << std::setw(16) << "SCF Iteration";
@@ -186,10 +195,13 @@ namespace ChronusQ {
    *  Currently implements the fixed-point SCF procedure.
    */ 
   template <typename T>
-  void SingleSlater<T>::getNewOrbitals() {
+  void SingleSlater<T>::getNewOrbitals(bool extrap) {
 
     // Transform AO fock into the orthonormal basis
     ao2orthoFock();
+
+    // Modify fock matrix if requested
+    if(extrap) modifyFock();
 
     // Diagonalize the orthonormal fock Matrix
     diagOrthoFock();
@@ -251,6 +263,22 @@ namespace ChronusQ {
 
 
     bool isConverged = FDConv or (energyConv and denConv);
+
+    // Save matrices for next iteration if not converged
+    if(not isConverged) saveSCFMatrices();
+
+    // TODO: should enable print statements only when print flag is high enough
+    // Toggle damping based on energy difference
+    bool largeEDiff = std::abs(scfConv.deltaEnergy) > scfControls.dampError;
+    if( scfControls.doDamp and not largeEDiff and scfControls.dampParam > 0.) {
+      std::cout << "    *** Damping Disabled - Energy Difference Fell Below " <<
+        scfControls.dampError << " ***" << std::endl;
+      scfControls.dampParam = 0.;
+    } else if( scfControls.doDamp and largeEDiff and scfControls.dampParam <= 0.) {
+      std::cout << "    *** Damping Enabled Due to "<<
+        scfControls.dampError << " Oscillation in Energy ***" << std::endl;
+      scfControls.dampParam = scfControls.dampStartParam;
+    }
 
     return isConverged;
 
@@ -328,6 +356,55 @@ namespace ChronusQ {
       this->aoints.Ortho1Trans(onePDMOrtho[i],this->onePDM[i]);
 
   }; // SingleSlater<T>::ao2orthoFock
+
+ /**
+   *  \brief Control routine for DIIS, damping and other
+   *  ways to modify a Fock matrix during an SCF procedure
+   *  
+   */ 
+  template <typename T>
+  void SingleSlater<T>::modifyFock() {
+
+    // DIIS extrapolation
+//  if (scfControls.diisAlg != NONE) scfDIIS();
+
+    // Static Damping
+    if (scfControls.doDamp) fockDamping();
+
+  }; // SingleSlater<T>::modifyFock
+
+ /**
+   *  \brief Static Fock Damping routine
+   *
+   *  F^k = (1-dp)*F^k + dp*F^{k-1}
+   *  
+   */ 
+  template <typename T>
+  void SingleSlater<T>::fockDamping() {
+
+    size_t NB = this->aoints.basisSet().nBasis;
+    double dp = scfControls.dampParam;
+   
+    // Damp the current orthonormal fock matrix 
+    for(auto i = 0; i < fockOrtho.size(); i++)
+      MatAdd('N','N', NB, NB, T(1-dp), fockOrtho[i], NB, T(dp), 
+        prevFock[i], NB, fockOrtho[i], NB);
+
+  }; // SingleSlater<T>::fockDamping
+
+ /**
+   *  \brief Save SCF matrices for the next iteration
+   *  
+   */ 
+  template <typename T>
+  void SingleSlater<T>::saveSCFMatrices() {
+
+    // Copy the current orthonormal Fock to use during the next iteration 
+    size_t NB = this->aoints.basisSet().nBasis;
+    for(auto i = 0; i < this->fockOrtho.size(); i++)
+      std::copy_n(this->fockOrtho[i],NB*NB,prevFock[i]);
+
+  }; // SingleSlater<T>::saveSCFMatrices
 
 }; // namespace ChronusQ
 

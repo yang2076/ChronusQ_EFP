@@ -123,7 +123,7 @@ int main(int argc, char *argv[]) {
   memManager.free(SX,SX2);
 */
 
-  SingleSlater<dcomplex> ss(aoints,1);
+  SingleSlater<double> ss(aoints,1);
   ss.formGuess();
   ss.SCF();
 
