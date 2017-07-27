@@ -38,12 +38,12 @@ namespace ChronusQ {
         _F3 *locC = C;
         #pragma omp for
         for(int j = 0; j < N; j++) {
+          locA = A + j*LDA;
+          locB = B + j*LDB;
+          locC = C + j*LDC;
           #pragma omp simd
           for(int i = 0; i < M; i++)
             locC[i] = ALPHA * locA[i] + BETA * locB[i];
-          locA += LDA;
-          locB += LDB;
-          locC += LDC;
         }
       }
 

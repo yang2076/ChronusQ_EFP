@@ -44,7 +44,7 @@ namespace ChronusQ {
     libint2::initialize();
 #ifdef _OPENMP
     // Thread pool (default serial)
-    omp_set_num_threads(1);
+    omp_set_num_threads(2);
 #endif
 
   }; // initialize

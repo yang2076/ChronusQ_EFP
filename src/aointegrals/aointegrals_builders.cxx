@@ -318,13 +318,13 @@ namespace ChronusQ {
 
       for(size_t s4(0), bf4_s(0); s4 <= s4_max; bf4_s+=n4, s4++, s1234++) {
 
+        n4 = basisSet_.shells[s4].size(); // Size of Shell 4
 
         // Round Robbin work distribution
         #ifdef _OPENMP
         if( s1234 % nthreads != thread_id ) continue;
         #endif
 
-        n4 = basisSet_.shells[s4].size(); // Size of Shell 4
 
         // Evaluate ERI for shell quartet
         engines[thread_id].compute2<
