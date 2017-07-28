@@ -29,5 +29,6 @@
 // Includes definition and (eventually) utilities.
 
 #include <basisset/basisset_def.hpp>
+#include <basisset/basisset_util.hpp>
 
 #endif

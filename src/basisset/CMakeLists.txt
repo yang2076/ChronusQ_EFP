@@ -20,7 +20,7 @@
 # Contact the Developers:
 #   E-Mail: xsli@uw.edu
 #
-add_library(basisset STATIC reference.cxx basisset.cxx)
+add_library(basisset STATIC reference.cxx basisset.cxx basisset_eval.cxx)
 
 if(TARGET libint)
   add_dependencies(basisset libint)
