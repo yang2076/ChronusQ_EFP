@@ -21,21 +21,27 @@
  *    E-Mail: xsli@uw.edu
  *  
  */
-
-#ifndef __INCLUDED_CQLINALG_HPP__
-#define __INCLUDED_CQLINALG_HPP__
+#ifndef __INCLUDED_CQLINALG_SOLVE_HPP__
+#define __INCLUDED_CQLINALG_SOLVE_HPP__
 
 #include <cqlinalg/cqlinalg_config.hpp>
-#include <cqlinalg/util.hpp>
 
-// BLAS
-#include <cqlinalg/blas1.hpp>
-#include <cqlinalg/blas3.hpp>
-#include <cqlinalg/blasext.hpp>
+namespace ChronusQ {
 
-// LAPACK
-#include <cqlinalg/eig.hpp>
-#include <cqlinalg/factorization.hpp>
-#include <cqlinalg/solve.hpp>
+  /**
+   *  \brief Solves a linear system AX = B. Smart wrapper around
+   *  DGESV or ZGESV depending on context.
+   *
+   *  Allocates memory internally through CQMemManager.
+   *
+   *  See http://www.netlib.org/lapack/lapack-3.1.1/html/dgesv.f.html or
+   *      http://www.netlib.org/lapack/lapack-3.1.1/html/zgesv.f.html for
+   *  parameter documentation.
+   */ 
+  template <typename _F>
+  int LinSolve(int N, int NRHS, _F *A, int LDA, _F *B, 
+    int LDB, CQMemManager &mem);
+
+}; // namespace ChronusQ
 
 #endif

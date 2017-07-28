@@ -53,6 +53,48 @@ namespace ChronusQ {
    */  
   template <typename _F>
   int CholeskyInv(char UPLO, int N, _F *A, int LDA);
+
+
+  /**
+   *  \brief Computes the LU factorization of a matrix A. Smart wrapper
+   *  around DGETRF or ZGETRF depending on context.
+   *
+   *  See http://www.netlib.org/lapack/lapack-3.1.1/html/dgetrf.f.html or
+   *      http://www.netlib.org/lapack/lapack-3.1.1/html/zgetrf.f.html for
+   *  parameter documentation.
+   */ 
+  template <typename _F>
+  int LU(int M, int N, _F *A, int LDA, int *IPIV);
+
+
+  /**
+   *  \brief Computes the LU factorization of a matrix A. Wraps LU function
+   *  with internal allocation of IPIV through a CQMemManager.
+   */ 
+  template <typename _F>
+  int LU(int M, int N, _F *A, int LDA, CQMemManager &mem) {
+    int *IPIV = mem.template malloc<int>(std::min(M,N));
+    int INFO = LU(M,N,A,LDA,IPIV);
+    mem.free(IPIV);
+    return INFO;
+  };
+
+  /**
+   *  \brief Computes the inverse of a non-singular matrix A. Initially
+   *  computes the LU factorization then wraps DGETRI / ZGETRI for the
+   *  matrix inversion depending on context.
+   *
+   *  See LU for docs on LU factorization. Allocates memory internally
+   *  through CQMemManager
+   *
+   *  See http://www.netlib.org/lapack/lapack-3.1.1/html/dgetri.f.html or
+   *      http://www.netlib.org/lapack/lapack-3.1.1/html/zgetri.f.html for
+   *  parameter documentation.
+   */ 
+  template <typename _F>
+  int LUInv(int N, _F *A, int LDA, CQMemManager &mem);
+
+
 }; // namespace ChronusQ
 
 #endif

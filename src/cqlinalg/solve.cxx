@@ -21,21 +21,39 @@
  *    E-Mail: xsli@uw.edu
  *  
  */
-
-#ifndef __INCLUDED_CQLINALG_HPP__
-#define __INCLUDED_CQLINALG_HPP__
-
-#include <cqlinalg/cqlinalg_config.hpp>
-#include <cqlinalg/util.hpp>
-
-// BLAS
-#include <cqlinalg/blas1.hpp>
-#include <cqlinalg/blas3.hpp>
-#include <cqlinalg/blasext.hpp>
-
-// LAPACK
-#include <cqlinalg/eig.hpp>
-#include <cqlinalg/factorization.hpp>
 #include <cqlinalg/solve.hpp>
 
-#endif
+namespace ChronusQ {
+
+  // Real wraps DGESV
+  template <>
+  int LinSolve(int N, int NRHS, double *A, int LDA, double *B, 
+    int LDB, CQMemManager &mem) {
+
+    int INFO;
+    int *iPIV = mem.malloc<int>(N);
+
+    dgesv_(&N,&NRHS,A,&LDA,iPIV,B,&LDB,&INFO);
+
+    mem.free(iPIV);
+
+    return INFO;
+  }; // LinSolve (real)
+
+
+  // Complex wraps ZGESV
+  template <>
+  int LinSolve(int N, int NRHS, dcomplex *A, int LDA, 
+    dcomplex *B, int LDB, CQMemManager &mem) {
+
+    int INFO;
+    int *iPIV = mem.malloc<int>(N);
+
+    zgesv_(&N,&NRHS,A,&LDA,iPIV,B,&LDB,&INFO);
+
+    mem.free(iPIV);
+
+    return INFO;
+  }; // LinSolve (complex)
+
+}; // namespace ChronusQ
