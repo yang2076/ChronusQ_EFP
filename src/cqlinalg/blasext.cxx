@@ -30,7 +30,7 @@ namespace ChronusQ {
   void MatAdd(char TRANSA, char TRANSB, size_t M, size_t N, _FScale1 ALPHA, 
     _F1 *A, size_t LDA, _FScale2 BETA, _F2 *B, size_t LDB, _F3 *C, size_t LDC){
 
-      assert( TRANSA == 'N' and TRANSB == 'N' );
+    if( TRANSA == 'N' and TRANSB == 'N' ) {
       #pragma omp parallel
       {
         _F1 *locA = A;
@@ -46,6 +46,47 @@ namespace ChronusQ {
             locC[i] = ALPHA * locA[i] + BETA * locB[i];
         }
       }
+    } else {
+
+      assert( M == N );
+      if( TRANSA != 'N' ) 
+        assert( reinterpret_cast<void*>(A) != reinterpret_cast<void*>(C) );
+      if( TRANSB != 'N' )
+        assert( reinterpret_cast<void*>(B) != reinterpret_cast<void*>(C) );
+
+      Eigen::Map< Eigen::Matrix<_F1,
+          Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor> > AMap(A,LDA,N);
+      Eigen::Map< Eigen::Matrix<_F2,
+          Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor> > BMap(B,LDB,N);
+      Eigen::Map< Eigen::Matrix<_F3,
+          Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor> > CMap(C,LDC,N);
+
+      if( TRANSA == 'C' and TRANSB == 'N' )
+        CMap.block(0,0,M,N).noalias() = 
+          ALPHA * AMap.block(0,0,M,N).adjoint().template cast<_F3>() +
+          BETA  * BMap.block(0,0,M,N).template cast<_F3>();
+      else if( TRANSA == 'N' and TRANSB == 'C' )
+        CMap.block(0,0,M,N).noalias() = 
+          ALPHA * AMap.block(0,0,M,N).template cast<_F3>() +
+          BETA  * BMap.block(0,0,M,N).adjoint().template cast<_F3>();
+      else if( TRANSA == 'C' and TRANSB == 'C' )
+        CMap.block(0,0,M,N).noalias() = 
+          ALPHA * AMap.block(0,0,M,N).adjoint().template cast<_F3>() +
+          BETA  * BMap.block(0,0,M,N).adjoint().template cast<_F3>();
+      else if( TRANSA == 'R' and TRANSB == 'N' )
+        CMap.block(0,0,M,N).noalias() = 
+          ALPHA * AMap.block(0,0,M,N).conjugate().template cast<_F3>() +
+          BETA  * BMap.block(0,0,M,N).template cast<_F3>();
+      else if( TRANSA == 'N' and TRANSB == 'R' )
+        CMap.block(0,0,M,N).noalias() = 
+          ALPHA * AMap.block(0,0,M,N).template cast<_F3>() +
+          BETA  * BMap.block(0,0,M,N).conjugate().template cast<_F3>();
+      else if( TRANSA == 'R' and TRANSB == 'R' )
+        CMap.block(0,0,M,N).noalias() = 
+          ALPHA * AMap.block(0,0,M,N).conjugate().template cast<_F3>() +
+          BETA  * BMap.block(0,0,M,N).conjugate().template cast<_F3>();
+
+    }
 
   }; // MatAdd generic template
 

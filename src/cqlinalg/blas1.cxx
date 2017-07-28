@@ -33,7 +33,7 @@ namespace ChronusQ {
 #else
     assert(INCX > 0 and INCY > 0);
     double res(0.);
-    #pragma omp parallel for
+    #pragma omp parallel for reduction(+:res)
     for(int j = 0; j < N; j++){
       res += X[j*INCX] * Y[j*INCY];
     }
