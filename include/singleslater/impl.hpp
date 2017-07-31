@@ -159,6 +159,7 @@ namespace ChronusQ {
 #include <singleslater/quantum.hpp> // Quantum declarations
 #include <singleslater/fock.hpp>    // Fock matrix header
 #include <singleslater/guess.hpp>   // Guess header
-#include <singleslater/scf.hpp>     // SCF Header
+#include <singleslater/scf.hpp>     // SCF header
+#include <singleslater/extrap.hpp>  // Extrapolate header
 
 #endif

@@ -36,10 +36,10 @@
 namespace ChronusQ {
 
   enum DIIS_ALG {
-    CDIIS,
-    EDIIS,
-    CEDIIS,
-    NONE = -1
+    CDIIS,      ///< Commutator DIIS
+    EDIIS,      ///< Energy DIIS
+    CEDIIS,     ///< Commutator & Energy DIIS
+    NONE = -1  
   };
 
   /**
@@ -51,23 +51,23 @@ namespace ChronusQ {
    */ 
   struct SCFControls {
 
-    // Convergence crieteria
+    // Convergence criteria
     double denConvTol = 1e-8;  ///< Density convergence criteria
     double eneConvTol = 1e-10; ///< Energy convergence criteria
 
     // TODO: need to add logic to set this
-    // Extrapolation flag (DIIS/Damping/etc.)
-    bool doExtrap = true;
+    // Extrapolation flag for DIIS and damping
+    bool doExtrap = true;     ///< Whether to extrapolate Fock matrix
 
     // DIIS settings 
-    DIIS_ALG diisAlg = CDIIS;
-    size_t nKeep = 6;
+    DIIS_ALG diisAlg = CDIIS; ///< Type of DIIS extrapolation 
+    size_t nKeep     = 10;    ///< Number of matrices to use for DIIS
 
-    // Damping settings
-    bool   doDamp         = true;
-    double dampStartParam = 0.7;
-    double dampParam      = dampStartParam;
-    double dampError      = 1e-1;
+    // Static Damping settings
+    bool   doDamp         = true;           ///< Flag for turning on damping
+    double dampStartParam = 0.7;            ///< Starting damping parameter
+    double dampParam      = dampStartParam; ///< Damp parameter current iteration
+    double dampError      = 1e-1;           ///< Energy oscillation to turn off damp
 
     // Misc control
     size_t maxSCFIter = 128; ///< Maximum SCF iterations.
@@ -95,8 +95,9 @@ namespace ChronusQ {
 
   protected:
     // Useful typedefs
-    typedef T*                   oper_t;
-    typedef std::vector<oper_t>  oper_t_coll;
+    typedef T*                        oper_t;
+    typedef std::vector<oper_t>       oper_t_coll;
+    typedef std::vector<oper_t_coll>  oper_t_coll2;
 
     std::string refLongName_;
     std::string refShortName_;
@@ -134,8 +135,14 @@ namespace ChronusQ {
     // Current / change in state information (for use with SCF)
     oper_t_coll curOnePDM;    ///< List of the current 1PDMs
     oper_t_coll deltaOnePDM;  ///< List of the changes in the 1PDMs
-    
-    oper_t_coll prevFock;
+
+    // Stores the previous Fock matrix to use for damping    
+    oper_t_coll prevFock;     ///< AO Fock from the previous SCF iteration
+
+    // Stores the previous matrices to use for DIIS 
+    oper_t_coll2 diisFock;    ///< List of AO Fock matrices for DIIS extrap
+    oper_t_coll2 diisOnePDM;  ///< List of AO Density matrices for DIIS extrap
+    oper_t_coll2 diisError;   ///< List of orthonormal [F,D] for DIIS extrap
 
     // Constructors
       
@@ -240,10 +247,12 @@ namespace ChronusQ {
     virtual void saveCurrentState();
     virtual void formDelta();
 
-    // SCF extrapolation routines
+    // SCF extrapolation functions (see include/singleslater/extrap.hpp for docs)
+    void allocExtrapStorage();
     void modifyFock();
     void fockDamping();
-    void saveSCFMatrices();
+    void scfDIIS(size_t);
+    void FDCommutator();
 
   }; // class SingleSlater
 
