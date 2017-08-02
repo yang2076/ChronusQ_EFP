@@ -249,6 +249,7 @@ namespace ChronusQ {
 
     // SCF extrapolation functions (see include/singleslater/extrap.hpp for docs)
     void allocExtrapStorage();
+    void deallocExtrapStorage();
     void modifyFock();
     void fockDamping();
     void scfDIIS(size_t);

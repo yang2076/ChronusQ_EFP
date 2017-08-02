@@ -29,6 +29,12 @@
 
 namespace ChronusQ {
 
+  /**
+   *   \brief The DIIS class. A class to perform a DIIS extrapolation 
+   *    based on a series of error metrics stored in core. 
+   *
+   */
+
   template <typename T>
   class DIIS {
 
@@ -43,7 +49,7 @@ namespace ChronusQ {
 
     size_t         nExtrap;     ///< Size of extrapolation space
     size_t         nMat;        ///< Number of matrices to trace for each element of B
-    size_t         OSize;       ///< Size of teh error metrics used to construct B
+    size_t         OSize;       ///< Size of the error metrics used to construct B
     std::vector<T> coeffs;      ///< Vector of extrapolation coeficients
     oper_t_coll2   errorMetric; ///< Vector of vectors containing error metrics
 
@@ -58,13 +64,18 @@ namespace ChronusQ {
      *  \param [in]  errorMetric Vector of vectors containing error metrics
      *  \param [out] InvFail     Boolean of whether matrix inversion failed
      */ 
-
     DIIS(size_t nExtrap, size_t nMat, size_t OSize, oper_t_coll2 errorMetric) :
       nExtrap(nExtrap), nMat(nMat), OSize(OSize), errorMetric(errorMetric) {
 
       coeffs.resize(nExtrap+1);
 
-    }
+    };
+
+
+    // Constructors for default, copy, and move
+    DIIS() = delete; 
+    DIIS(const DIIS &) = delete; 
+    DIIS(DIIS &&) = delete;
 
     // Public Member functions
     bool extrapolate();
@@ -73,10 +84,9 @@ namespace ChronusQ {
 
 
 
-
   /**
    *  \brief Performs a DIIS extrapolation using the vectors stored 
-   *         errorMetric
+   *  in errorMetric
    *
    */ 
   template<typename T>
@@ -90,15 +100,19 @@ namespace ChronusQ {
     std::vector<T>   B(N*N,0);
 
     // Build the B matrix
-    for(auto i = 0; i < nMat; i++) {
+    for(auto i = 0ul; i < nMat; i++){ 
       for(auto j = 0ul; j < nExtrap; j++){
         for(auto k = 0ul; k <= j; k++){
-          B[j+k*N] += InnerProd<T>(OSize,errorMetric[j][i],1,errorMetric[k][i],1);
-          if ( j != k ) B[k+j*N] = B[j+k*N];
+          B[k+j*N] += InnerProd<T>(OSize,errorMetric[k][i],1,errorMetric[j][i],1);
         }
       }
     }
-    for(auto l = 0; l < nExtrap; l++){
+    for(auto j = 0ul; j < nExtrap; j++){
+      for(auto k = 0ul; k < j; k++){
+         B[j+k*N] = B[k+j*N];
+      }
+    }
+    for(auto l = 0ul; l < nExtrap; l++){
       B[nExtrap+l*N] = -1.0;
       B[l+nExtrap*N] = -1.0;
     }

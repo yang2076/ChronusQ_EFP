@@ -40,6 +40,10 @@ namespace ChronusQ {
   template <typename T>
   void SingleSlater<T>::SCF() {
 
+    // Allocate additional storage if doing some type of 
+    // extrapolation during the SCF procedure
+    if ( scfControls.doExtrap ) allocExtrapStorage();
+
     printSCFHeader(std::cout);
 
     bool isConverged = false;
@@ -64,6 +68,9 @@ namespace ChronusQ {
       printSCFProg(std::cout);
 
     }; // Iteration loop
+
+    // Deallocate extrapolation storage
+    if ( scfControls.doExtrap ) deallocExtrapStorage();
 
     if(not isConverged)
       CErr(std::string("SCF Failed to converged within ") + 

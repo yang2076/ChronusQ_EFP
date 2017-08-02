@@ -51,17 +51,10 @@ namespace ChronusQ {
     for(auto i = 1; i < this->aoints.coreH.size(); i++)
       std::copy_n(this->aoints.coreH[i], FSize, fock[i]);
 
-    // Allocate aditional storage if doing some type of 
-    // extrapolation during the SCF procedure
-    if ( scfControls.doExtrap ) allocExtrapStorage();
-
     // Common to all guess: form new set of orbitals from
     // initial guess at Fock.
     getNewOrbitals(false);
     
-    computeEnergy();
-    std::cout << "Guess Energy = " << this->totalEnergy << std::endl;
-
   }; // SingleSlater<T>::formGuess
 
 }; // namespace ChronusQ

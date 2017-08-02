@@ -61,7 +61,7 @@ namespace ChronusQ {
   void SingleSlater<T>::fockDamping() {
 
     // Don't damp the first iteration.  We don't want 
-    // to use the guess Fock and it's not save anyway.
+    // to use the guess Fock and it's not saved anyway.
     if(scfConv.nSCFIter == 0) return;
 
     size_t NB = this->aoints.basisSet().nBasis;
@@ -157,6 +157,33 @@ namespace ChronusQ {
 
   }; // SingleSlater<T>::allocExtrapStorage
 
+
+
+ /**
+   *  \brief Deallocates storage for different extrapolation approaches to SCF 
+   *  
+   */ 
+  template <typename T>
+  void SingleSlater<T>::deallocExtrapStorage() {
+
+    // Deallocate memory to store previous orthonormal Focks and densities for DIIS
+    if (scfControls.diisAlg != NONE) {
+      for(auto i = 0; i < scfControls.nKeep; i++) {
+        for(auto j = 0; j < this->fock.size(); j++) {
+          this->memManager.free(diisFock[i][j]);
+          this->memManager.free(diisOnePDM[i][j]);
+          this->memManager.free(diisError[i][j]);
+        } 
+      }
+    }
+
+    // Deallocate memory to store previous orthonormal Fock for damping 
+    if (scfControls.doDamp) {
+      for(auto i = 0; i < this->fock.size(); i++) 
+        this->memManager.free(prevFock[i]);
+    }
+
+  }; // SingleSlater<T>::deallocExtrapStorage
 
 
 
