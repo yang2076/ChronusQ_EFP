@@ -42,6 +42,8 @@ namespace ChronusQ {
     if (scfControls.doDamp) fockDamping();
 
     // DIIS extrapolation
+    if (scfControls.diisAlg == NONE) return;
+
     if (scfControls.diisAlg == CDIIS) {
       size_t nExtrap = std::min(scfConv.nSCFIter+1,scfControls.nKeep);
       scfDIIS(nExtrap);
