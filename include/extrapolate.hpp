@@ -117,7 +117,7 @@ namespace ChronusQ {
       B[l+nExtrap*N] = -1.0;
     }
     B[nExtrap+nExtrap*N] = 0.0;
-//  prettyPrintSmart(std::cout,"B Matrix",&B[0],N,N,N);
+  //prettyPrintSmart(std::cout,"B Matrix",&B[0],N,N,N);
 
     // Initialize LHS of the linear problem
     std::fill_n(&coeffs[0],N,0.);
@@ -137,6 +137,7 @@ namespace ChronusQ {
 //  for(auto i = 0ul; i < N; i++)
 //    std::cout << "coeff = " << coeffs[i] << std::endl;
 
+  //prettyPrintSmart(std::cout,"B Matrix Factored",&B[0],N,N,N);
     InvFail = (INFO != 0);
     return !InvFail;
 

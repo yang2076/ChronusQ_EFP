@@ -85,6 +85,7 @@ namespace ChronusQ {
     double deltaEnergy;  ///< Convergence of Energy
     double RMSDenScalar; ///< RMS change in Scalar density
     double RMSDenMag;    ///< RMS change in magnetization (X,Y,Z) density
+    double nrmFDC;       ///< 2-Norm of [F,D]
 
     size_t nSCFIter = 0; ///< Number of SCF Iterations
 
@@ -244,6 +245,7 @@ namespace ChronusQ {
     void diagOrthoFock();
     void printSCFProg(std::ostream &out = std::cout);
     void printSCFHeader(std::ostream &out = std::cout);
+    void FDCommutator(oper_t_coll &);
     virtual void saveCurrentState();
     virtual void formDelta();
 
@@ -253,7 +255,6 @@ namespace ChronusQ {
     void modifyFock();
     void fockDamping();
     void scfDIIS(size_t);
-    void FDCommutator();
 
   }; // class SingleSlater
 

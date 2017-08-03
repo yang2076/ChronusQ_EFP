@@ -96,7 +96,11 @@ namespace ChronusQ {
     }
 
     // Evaluate orthonormal [F,D] and store in diisError
-    FDCommutator();
+    FDCommutator(diisError[iDIIS]);
+
+    scfConv.nrmFDC = 0.;
+    for(auto &E : diisError[iDIIS])
+      scfConv.nrmFDC = std::max(scfConv.nrmFDC,TwoNorm<double>(NB*NB,E,1));
 
     // Just save the Fock, density, and commutator for the first iteration
     if (scfConv.nSCFIter == 0) return;
@@ -104,18 +108,23 @@ namespace ChronusQ {
     // Build the B matrix and return the coefficients for the extrapolation
     size_t nMat = fockOrtho.size();
     DIIS<T> extrap(nExtrap,nMat,NB*NB,diisError);
-    if(!extrap.extrapolate()) CErr("CDIIS Extraplation Failed",std::cout);
 
-    // Extrapolate Fock and density matrices using DIIS coefficients
-    for(auto i = 0; i < fockOrtho.size(); i++) {
-      std::fill_n(fock[i],NB*NB,0.);
-      std::fill_n(this->onePDM[i],NB*NB,0.);
-      for(auto j = 0; j < nExtrap; j++) {
-        MatAdd('N','N', NB, NB, T(1.), fock[i], NB, T(extrap.coeffs[j]), 
-          diisFock[j][i], NB, fock[i], NB);
-        MatAdd('N','N', NB, NB, T(1.), this->onePDM[i], NB, T(extrap.coeffs[j]), 
-          diisOnePDM[j][i], NB, this->onePDM[i], NB);
-      } 
+
+    if(extrap.extrapolate()) { 
+      // Extrapolate Fock and density matrices using DIIS coefficients
+      for(auto i = 0; i < fockOrtho.size(); i++) {
+        std::fill_n(fock[i],NB*NB,0.);
+        std::fill_n(this->onePDM[i],NB*NB,0.);
+        for(auto j = 0; j < nExtrap; j++) {
+          MatAdd('N','N', NB, NB, T(1.), fock[i], NB, T(extrap.coeffs[j]), 
+            diisFock[j][i], NB, fock[i], NB);
+          MatAdd('N','N', NB, NB, T(1.), this->onePDM[i], NB, 
+            T(extrap.coeffs[j]), diisOnePDM[j][i], NB, this->onePDM[i], NB);
+        } 
+      }
+    } else {
+      std::cout << "\n    *** WARNING: DIIS Inversion Failed -- "
+                << " Defaulting to Fixed-Point step ***\n" << std::endl;
     }
 
     // Transform AO fock into the orthonormal basis
@@ -199,45 +208,44 @@ namespace ChronusQ {
    *
    */ 
   template <typename T>
-  void SingleSlater<T>::FDCommutator() {
+  void SingleSlater<T>::FDCommutator(oper_t_coll &FDC) {
 
     size_t OSize = this->memManager.template getSize(fock[SCALAR]);
-    size_t ND    = scfConv.nSCFIter % scfControls.nKeep;
     size_t NB    = this->aoints.basisSet().nBasis;
     T* SCR       = this->memManager.template malloc<T>(NB*NB);
 
     // FD(S) = F(S)D(S)
     Gemm('N', 'N', NB, NB, NB, T(1.), fockOrtho[SCALAR], NB, 
-      onePDMOrtho[SCALAR], NB, T(0.), diisError[ND][SCALAR], NB);
+      onePDMOrtho[SCALAR], NB, T(0.), FDC[SCALAR], NB);
 
     // FD(S) += F(z)D(z)
     if(this->nC == 2 or !this->iCS) {
       Gemm('N', 'N', NB, NB, NB, T(1.), fockOrtho[MZ], NB, 
         onePDMOrtho[MZ], NB, T(0.), SCR, NB);
-      MatAdd('N','N', NB, NB, T(1.), diisError[ND][SCALAR], NB, T(1.), 
-        SCR, NB, diisError[ND][SCALAR], NB);
+      MatAdd('N','N', NB, NB, T(1.), FDC[SCALAR], NB, T(1.), 
+        SCR, NB, FDC[SCALAR], NB);
     }
 
     // Form {FD - DF}(S)
-    std::copy_n(diisError[ND][SCALAR],OSize,SCR);
-    MatAdd('N','C', NB, NB, T(1.), diisError[ND][SCALAR], NB, T(-1.), 
-      SCR, NB, diisError[ND][SCALAR], NB);
-//  prettyPrintSmart(std::cout,"[F,P]",diisError[ND][SCALAR],NB,NB,NB);
+    std::copy_n(FDC[SCALAR],OSize,SCR);
+    MatAdd('N','C', NB, NB, T(1.), FDC[SCALAR], NB, T(-1.), 
+      SCR, NB, FDC[SCALAR], NB);
+//  prettyPrintSmart(std::cout,"[F,P]",FDC[SCALAR],NB,NB,NB);
 
 
     if(this->nC == 2 or !this->iCS) {
       // FD(z) = F(S)D(z) + F(z)D(S)
       Gemm('N', 'N', NB, NB, NB, T(1.), fockOrtho[SCALAR], NB, 
-        onePDMOrtho[MZ], NB, T(0.), diisError[ND][MZ], NB);
+        onePDMOrtho[MZ], NB, T(0.), FDC[MZ], NB);
       Gemm('N', 'N', NB, NB, NB, T(1.), fockOrtho[MZ], NB, 
         onePDMOrtho[SCALAR], NB, T(0.), SCR, NB);
-      MatAdd('N','N', NB, NB, T(1.), diisError[ND][MZ], NB, T(1.), 
-        SCR, NB, diisError[ND][MZ], NB);
+      MatAdd('N','N', NB, NB, T(1.), FDC[MZ], NB, T(1.), 
+        SCR, NB, FDC[MZ], NB);
 
       // Form {FD - DF}(z)
-      std::copy_n(diisError[ND][MZ],OSize,SCR);
-      MatAdd('N','C', NB, NB, T(1.), diisError[ND][MZ], NB, T(-1.), 
-        SCR, NB, diisError[ND][MZ], NB);
+      std::copy_n(FDC[MZ],OSize,SCR);
+      MatAdd('N','C', NB, NB, T(1.), FDC[MZ], NB, T(-1.), 
+        SCR, NB, FDC[MZ], NB);
     }
 
 
