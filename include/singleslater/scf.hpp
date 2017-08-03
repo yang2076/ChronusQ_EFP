@@ -293,17 +293,27 @@ namespace ChronusQ {
 
     bool isConverged = FDConv or (energyConv and denConv);
 
-    // TODO: should enable print statements only when print flag is high enough
     // Toggle damping based on energy difference
-    bool largeEDiff = std::abs(scfConv.deltaEnergy) > scfControls.dampError;
-    if( scfControls.doDamp and not largeEDiff and scfControls.dampParam > 0.) {
-      std::cout << "    *** Damping Disabled - Energy Difference Fell Below " <<
-        scfControls.dampError << " ***" << std::endl;
-      scfControls.dampParam = 0.;
-    } else if( scfControls.doDamp and largeEDiff and scfControls.dampParam <= 0.) {
-      std::cout << "    *** Damping Enabled Due to "<<
-        scfControls.dampError << " Oscillation in Energy ***" << std::endl;
-      scfControls.dampParam = scfControls.dampStartParam;
+    if( scfControls.doExtrap ) {
+      // TODO: should enable print statements only when print flag is high 
+      // enough 
+      bool largeEDiff = std::abs(scfConv.deltaEnergy) > scfControls.dampError;
+      if( scfControls.doDamp and not largeEDiff and 
+          scfControls.dampParam > 0.) {
+
+        std::cout << 
+          "    *** Damping Disabled - Energy Difference Fell Below " <<
+          scfControls.dampError << " ***" << std::endl;
+        scfControls.dampParam = 0.;
+
+      } else if( scfControls.doDamp and largeEDiff and 
+                 scfControls.dampParam <= 0.) {
+
+        std::cout << "    *** Damping Enabled Due to "<<
+          scfControls.dampError << " Oscillation in Energy ***" << std::endl;
+        scfControls.dampParam = scfControls.dampStartParam;
+
+      }
     }
 
     return isConverged;
