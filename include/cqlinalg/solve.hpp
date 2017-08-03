@@ -32,6 +32,22 @@ namespace ChronusQ {
    *  \brief Solves a linear system AX = B. Smart wrapper around
    *  DGESV or ZGESV depending on context.
    *
+   *  Assumes preallocated IPIV
+   *
+   *  See http://www.netlib.org/lapack/lapack-3.1.1/html/dgesv.f.html or
+   *      http://www.netlib.org/lapack/lapack-3.1.1/html/zgesv.f.html for
+   *  parameter documentation.
+   */ 
+  template <typename _F>
+  int LinSolve(int N, int NRHS, _F *A, int LDA, _F *B, 
+    int LDB, int* IPIV);
+
+
+
+  /**
+   *  \brief Solves a linear system AX = B. Smart wrapper around
+   *  DGESV or ZGESV depending on context.
+   *
    *  Allocates memory internally through CQMemManager.
    *
    *  See http://www.netlib.org/lapack/lapack-3.1.1/html/dgesv.f.html or
@@ -40,7 +56,35 @@ namespace ChronusQ {
    */ 
   template <typename _F>
   int LinSolve(int N, int NRHS, _F *A, int LDA, _F *B, 
-    int LDB, CQMemManager &mem);
+    int LDB, CQMemManager &mem) {
+
+    int* iPIV = mem.malloc<int>(N);
+
+    LinSolve(N,NRHS,A,LDA,B,LDB,iPIV);
+
+    mem.free(iPIV);
+
+  };
+
+
+  /**
+   *  \brief Solves a linear system AX = B. Smart wrapper around
+   *  DGESV or ZGESV depending on context.
+   *
+   *  Allocates on the stack
+   *
+   *  See http://www.netlib.org/lapack/lapack-3.1.1/html/dgesv.f.html or
+   *      http://www.netlib.org/lapack/lapack-3.1.1/html/zgesv.f.html for
+   *  parameter documentation.
+   */ 
+  template <typename _F>
+  int LinSolve(int N, int NRHS, _F *A, int LDA, _F *B, 
+    int LDB) {
+
+    std::vector<int> iPIV(N,0);
+    LinSolve(N,NRHS,A,LDA,B,LDB,&iPIV[0]);
+
+  };
 
 }; // namespace ChronusQ
 

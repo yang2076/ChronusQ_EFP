@@ -92,11 +92,9 @@ namespace ChronusQ {
   template<typename T>
   bool DIIS<T>::extrapolate(){
 
-    int INFO;
     int N          = nExtrap + 1;
     int NRHS       = 1;
     bool InvFail   = false;
-    std::vector<int> iPIV(N,0);
     std::vector<T>   B(N*N,0);
 
     // Build the B matrix
@@ -123,16 +121,7 @@ namespace ChronusQ {
     std::fill_n(&coeffs[0],N,0.);
     coeffs[nExtrap] = -1.0;
  
-    // Solve system of linear equations to get the extrapolation coefficients
-    // TODO: Change to using LinSolve once the memory manager situation is fixed
-    //int INFO = LinSolve(N, 1, B, N, coeffs, N, this->memManager);
-    if(std::is_same<T,dcomplex>::value) {
-      zgesv_(&N,&NRHS,reinterpret_cast<dcomplex*>(&B[0]),&N,&iPIV[0],
-             reinterpret_cast<dcomplex*>(&coeffs[0]),&N,&INFO);
-    } else {
-      dgesv_(&N,&NRHS,reinterpret_cast<double*>(&B[0]),&N,&iPIV[0],
-             reinterpret_cast<double*>(&coeffs[0]),&N,&INFO);
-    }
+    int INFO = LinSolve(N, 1, &B[0], N, &coeffs[0], N);
 
 //  for(auto i = 0ul; i < N; i++)
 //    std::cout << "coeff = " << coeffs[i] << std::endl;

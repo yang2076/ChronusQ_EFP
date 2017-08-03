@@ -28,14 +28,11 @@ namespace ChronusQ {
   // Real wraps DGESV
   template <>
   int LinSolve(int N, int NRHS, double *A, int LDA, double *B, 
-    int LDB, CQMemManager &mem) {
+    int LDB, int *iPIV) {
 
     int INFO;
-    int *iPIV = mem.malloc<int>(N);
 
     dgesv_(&N,&NRHS,A,&LDA,iPIV,B,&LDB,&INFO);
-
-    mem.free(iPIV);
 
     return INFO;
   }; // LinSolve (real)
@@ -44,14 +41,11 @@ namespace ChronusQ {
   // Complex wraps ZGESV
   template <>
   int LinSolve(int N, int NRHS, dcomplex *A, int LDA, 
-    dcomplex *B, int LDB, CQMemManager &mem) {
+    dcomplex *B, int LDB, int* iPIV) {
 
     int INFO;
-    int *iPIV = mem.malloc<int>(N);
 
     zgesv_(&N,&NRHS,A,&LDA,iPIV,B,&LDB,&INFO);
-
-    mem.free(iPIV);
 
     return INFO;
   }; // LinSolve (complex)
