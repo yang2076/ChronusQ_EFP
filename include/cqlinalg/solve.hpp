@@ -60,9 +60,11 @@ namespace ChronusQ {
 
     int* iPIV = mem.malloc<int>(N);
 
-    LinSolve(N,NRHS,A,LDA,B,LDB,iPIV);
+    int INFO = LinSolve(N,NRHS,A,LDA,B,LDB,iPIV);
 
     mem.free(iPIV);
+
+    return INFO;
 
   };
 
@@ -82,7 +84,7 @@ namespace ChronusQ {
     int LDB) {
 
     std::vector<int> iPIV(N,0);
-    LinSolve(N,NRHS,A,LDA,B,LDB,&iPIV[0]);
+    return LinSolve(N,NRHS,A,LDA,B,LDB,&iPIV[0]);
 
   };
 
