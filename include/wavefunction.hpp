@@ -26,9 +26,7 @@
 
 #include <chronusq_sys.hpp>
 #include <quantum.hpp>
-#include <molecule.hpp>
-#include <basisset.hpp>
-#include <aointegrals.hpp>
+#include <wavefunction/base.hpp>
 
 // Debug print triggered by Quantum
   
@@ -38,8 +36,17 @@
 
 namespace ChronusQ {
 
+
+  /**
+   *  \brief The WaveFunction class. The typed abstract interface for
+   *  all classes which admit a well defined wave function (HF, KS, etc).
+   *
+   *  Adds knowledge of storage type to WaveFunctionBase
+   *
+   *  Specializes the Quantum class of the same type; 
+   */
   template <typename T>
-  class WaveFunction : public Quantum<T> {
+  class WaveFunction : virtual public WaveFunctionBase, public Quantum<T> {
   protected:
 
     // Useful typedefs
@@ -48,18 +55,7 @@ namespace ChronusQ {
 
   public:
     
-    // Member data
-
-    AOIntegrals &aoints; ///< AOIntegrals for the evaluation of GTO integrals
-
-    size_t nO;  ///< Total number of occupied orbitals
-    size_t nV;  ///< Total number of virtual orbitals
-    size_t nOA; ///< Number of occupied alpha orbitals (nC == 1)
-    size_t nOB; ///< Number of occupied beta orbitals  (nC == 1)
-    size_t nVA; ///< Number of virtual alpha orbitals  (nC == 1)
-    size_t nVB; ///< Number of virtual beta orbitals   (nC == 1)
-
-
+    // Operator storage
     oper_t  mo1;  ///< Full (nC > 1) / ALPHA (nC == 1) MO coefficient matrix
     oper_t  mo2;  ///< BETA (nC == 1) MO coefficient matrix
     double* eps1; ///< Full (nC > 1) / ALPHA (nC == 1) Fock eigenvalues
@@ -75,27 +71,13 @@ namespace ChronusQ {
      *
      *  \param [in] aoi  AOIntegrals object (which handels the BasisSet, etc)
      *  \param [in] _nC  Number of spin components (1 and 2 are supported)
+     *  \param [in] iCS  Whether or not to treat as closed shell
      */ 
-    WaveFunction(AOIntegrals &aoi, size_t _nC) :
-      Quantum<T>(aoi.memManager(),_nC,(aoi.molecule().multip == 1),
-        aoi.basisSet().nBasis), 
-      aoints(aoi), mo1(nullptr), mo2(nullptr), eps1(nullptr), eps2(nullptr) {
-
-      // Compute meta data
-
-      nO = aoints.molecule().nTotalE;
-      nV = 2*aoints.basisSet().nBasis - nO;
-
-      if( this->iCS ) {
-        nOA = nO / 2; nOB = nO / 2;
-        nVA = nV / 2; nVB = nV / 2;
-      } else {
-        size_t nSingleE = aoints.molecule().multip - 1;
-        nOB = (nO - nSingleE) / 2;
-        nOA = nOB + nSingleE;
-        nVA = aoints.basisSet().nBasis - nOA;
-        nVB = aoints.basisSet().nBasis - nOB;
-      }
+    WaveFunction(AOIntegrals &aoi, size_t _nC, bool iCS) :
+      QuantumBase(aoi.memManager(),_nC,iCS),
+      WaveFunctionBase(aoi,_nC,iCS),
+      Quantum<T>(aoi.memManager(),_nC,iCS,aoi.basisSet().nBasis), 
+      mo1(nullptr), mo2(nullptr), eps1(nullptr), eps2(nullptr) {
 
       // Allocate internal memory
       if(aoi.basisSet().nBasis != 0) alloc();
@@ -104,7 +86,6 @@ namespace ChronusQ {
 
     // See include/wavefunction/impl.hpp for documentation 
     // on the following constructors
-
 
     // Different type
     template <typename U> WaveFunction(const WaveFunction<U> &, int dummy = 0);

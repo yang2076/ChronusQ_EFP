@@ -1,0 +1,136 @@
+/* 
+ *  This file is part of the Chronus Quantum (ChronusQ) software package
+ *  
+ *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *  
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *  
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *  
+ *  Contact the Developers:
+ *    E-Mail: xsli@uw.edu
+ *  
+ */
+#ifndef __INCLUDED_QUANTUM_BASE_HPP__
+#define __INCLUDED_QUANTUM_BASE_HPP__
+
+#include <chronusq_sys.hpp>
+#include <memmanager.hpp>
+#include <cqlinalg/blas1.hpp>
+
+namespace ChronusQ {
+
+  enum DENSITY_TYPE {
+    SCALAR=0,MZ,MY,MX
+  }; ///< Enumerate the types of densities for contraction
+
+  // Helper function for operator traces
+  // see src/quantum/properties.cxx for docs
+
+  template <typename RetTyp, typename Left, typename Right>
+  static inline RetTyp OperatorTrace(size_t N, const Left& op1 , 
+    const Right& op2) {
+    return InnerProd<RetTyp>(N,op1,1,op2,1);
+  } 
+
+  /**
+   *  \brief The QuantumBase class. The abstraction of information
+   *  relating to the Quantum class which are independent of storage
+   *  type.
+   *
+   *  See Quantum for further docs
+   *
+   */ 
+  class QuantumBase {
+
+  protected:
+
+    typedef std::array<double,3>    cartvec_t;
+    typedef std::array<cartvec_t,3> cartmat_t;
+    typedef std::array<cartmat_t,3> cartrk3_t;
+
+  private:
+  public:
+
+    CQMemManager& memManager; ///< Memory manager for matrix allocation
+
+    int   nC;   ///< Number of spin components
+    bool  iCS;  ///< is closed shell?
+
+
+    // Property storage
+
+    // Length gauge electric multipoles
+    cartvec_t elecDipole;     ///< Electric Dipole in the length gauge
+    cartmat_t elecQuadrupole; ///< Electric Quadrupole in the length gauge
+    cartrk3_t elecOctupole;   ///< Electric Octupole in the length gauge
+    
+    // Spin expectation values
+    cartvec_t SExpect; ///< Expectation values of Sx, Sy and Sz
+    double    SSq;     ///< Expectation value of S^2
+
+    // Energy expectation values
+    double OBEnergy;   ///< 1-Body operator contribution to the energy
+    double MBEnergy;   ///< Many(2)-Body operator contribution to the energy
+    double totalEnergy;///< The total energy
+
+
+
+    // Constructors
+      
+    // Disable default constructor
+    QuantumBase() = delete;
+
+    // Default the copy and move constructors
+    QuantumBase(const QuantumBase&) = default;
+    QuantumBase(QuantumBase&&)      = default;
+
+    /**
+     *  QuantumBase Constructor. Constructs a QuantumBase object.
+     *
+     *  \param [in] mem   CQMemManager to handle to allocation of densities
+     *  \param [in] _nC   Number of spin components (1 and 2 are supported)
+     *  \param [in] _iCS  Whether or not system is closed shell
+     *                    (only used when _nC == 1)
+     */ 
+    QuantumBase(CQMemManager &mem, size_t _nC, bool _iCS): 
+      memManager(mem), nC(_nC), iCS(_iCS), 
+      elecDipole({0.,0.,0.}),
+      elecQuadrupole{{{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}},
+      elecOctupole{
+        {
+          {{{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}},
+          {{{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}},
+          {{{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}}
+        }}, SExpect({0.,0.,0.}), SSq(0.), OBEnergy(0.), MBEnergy(0.),
+      totalEnergy(0.) { }; // Quantum::Quantum
+
+
+
+    // Procedural
+      
+    /**
+     *  Function to form the density. Pure virtual
+     */ 
+    virtual void formDensity() = 0;
+
+    /**
+     *  Function to compute the energy expectation value(s)
+     */ 
+    virtual void computeEnergy() = 0;
+
+  }; // class QuantumBase
+
+}; // namespace ChronusQ
+
+#endif

@@ -41,7 +41,7 @@ namespace ChronusQ {
   template <typename T>
   void SingleSlater<T>::formFock(bool increment) {
 
-    size_t NB = this->aoints.basisSet().nBasis * this->nC;
+    size_t NB = aoints.basisSet().nBasis * nC;
     size_t NB2 = NB*NB;
 
     // Form G[D]
@@ -51,10 +51,10 @@ namespace ChronusQ {
     for(auto &F : fock) std::fill_n(F,NB2,0.);
 
     // Copy over the Core Hamiltonian
-    std::copy_n(this->aoints.coreH[SCALAR], NB2, fock[SCALAR]);
+    std::copy_n(aoints.coreH[SCALAR], NB2, fock[SCALAR]);
     // FIXME: This must be multiplied by "i" for X2C
-    for(auto i = 1; i < this->aoints.coreH.size(); i++)
-      std::copy_n(this->aoints.coreH[i], NB2, fock[i]);
+    for(auto i = 1; i < aoints.coreH.size(); i++)
+      std::copy_n(aoints.coreH[i], NB2, fock[i]);
 
     // Add in the perturbation tensor
     for(auto i = 0ul; i < fock.size(); i++)
@@ -87,13 +87,13 @@ namespace ChronusQ {
 
 
     // Perform J contraction
-    this->aoints.twoBodyContract(jContract);
+    aoints.twoBodyContract(jContract);
 
     // Perform K contraction
-    this->aoints.twoBodyContract(kContract);
+    aoints.twoBodyContract(kContract);
 
     // Form GD: G[D] = 2.0*J[D] - K[D]
-    size_t NB = this->aoints.basisSet().nBasis * this->nC;
+    size_t NB = aoints.basisSet().nBasis * nC;
     size_t NB2 = NB*NB;
 
     for(auto i = 0; i < GD.size(); i++)

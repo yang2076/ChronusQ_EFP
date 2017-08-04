@@ -66,7 +66,7 @@ namespace ChronusQ {
     // to use the guess Fock and it's not saved anyway.
     if(scfConv.nSCFIter == 0) return;
 
-    size_t NB = this->aoints.basisSet().nBasis;
+    size_t NB = aoints.basisSet().nBasis;
     double dp = scfControls.dampParam;
    
     // Damp the current orthonormal Fock matrix 
@@ -88,7 +88,7 @@ namespace ChronusQ {
   void SingleSlater<T>::scfDIIS(size_t nExtrap) {
 
     // Save the current AO Fock and density matrices
-    size_t NB    = this->aoints.basisSet().nBasis;
+    size_t NB    = aoints.basisSet().nBasis;
     size_t iDIIS = scfConv.nSCFIter % scfControls.nKeep;
     for(auto i = 0; i < this->fock.size(); i++) {
       std::copy_n(this->fock[i],NB*NB,diisFock[iDIIS][i]);
@@ -141,7 +141,7 @@ namespace ChronusQ {
   template <typename T>
   void SingleSlater<T>::allocExtrapStorage() {
 
-    size_t FSize = this->memManager.template getSize(fock[SCALAR]);
+    size_t FSize = memManager.template getSize(fock[SCALAR]);
 
     // Allocate memory to store previous orthonormal Focks and densities for DIIS
     if (scfControls.diisAlg != NONE) {
@@ -150,9 +150,9 @@ namespace ChronusQ {
         diisOnePDM.emplace_back();
         diisError.emplace_back();
         for(auto j = 0; j < this->fock.size(); j++) {
-          diisFock[i].emplace_back(this->memManager.template malloc<T>(FSize));
-          diisOnePDM[i].emplace_back(this->memManager.template malloc<T>(FSize));
-          diisError[i].emplace_back(this->memManager.template malloc<T>(FSize));
+          diisFock[i].emplace_back(memManager.template malloc<T>(FSize));
+          diisOnePDM[i].emplace_back(memManager.template malloc<T>(FSize));
+          diisError[i].emplace_back(memManager.template malloc<T>(FSize));
           std::fill_n(diisFock[i][j],FSize,0.);
           std::fill_n(diisOnePDM[i][j],FSize,0.);
           std::fill_n(diisError[i][j],FSize,0.);
@@ -163,7 +163,7 @@ namespace ChronusQ {
     // Allocate memory to store previous orthonormal Fock for damping 
     if (scfControls.doDamp) {
       for(auto i = 0; i < this->fock.size(); i++) 
-        prevFock.emplace_back(this->memManager.template malloc<T>(FSize));
+        prevFock.emplace_back(memManager.template malloc<T>(FSize));
     }
 
   }; // SingleSlater<T>::allocExtrapStorage
@@ -181,9 +181,9 @@ namespace ChronusQ {
     if (scfControls.diisAlg != NONE) {
       for(auto i = 0; i < scfControls.nKeep; i++) {
         for(auto j = 0; j < this->fock.size(); j++) {
-          this->memManager.free(diisFock[i][j]);
-          this->memManager.free(diisOnePDM[i][j]);
-          this->memManager.free(diisError[i][j]);
+          memManager.free(diisFock[i][j]);
+          memManager.free(diisOnePDM[i][j]);
+          memManager.free(diisError[i][j]);
         } 
       }
     }
@@ -191,7 +191,7 @@ namespace ChronusQ {
     // Deallocate memory to store previous orthonormal Fock for damping 
     if (scfControls.doDamp) {
       for(auto i = 0; i < this->fock.size(); i++) 
-        this->memManager.free(prevFock[i]);
+        memManager.free(prevFock[i]);
     }
 
   }; // SingleSlater<T>::deallocExtrapStorage
@@ -210,16 +210,16 @@ namespace ChronusQ {
   template <typename T>
   void SingleSlater<T>::FDCommutator(oper_t_coll &FDC) {
 
-    size_t OSize = this->memManager.template getSize(fock[SCALAR]);
-    size_t NB    = this->aoints.basisSet().nBasis;
-    T* SCR       = this->memManager.template malloc<T>(NB*NB);
+    size_t OSize = memManager.template getSize(fock[SCALAR]);
+    size_t NB    = aoints.basisSet().nBasis;
+    T* SCR       = memManager.template malloc<T>(NB*NB);
 
     // FD(S) = F(S)D(S)
     Gemm('N', 'N', NB, NB, NB, T(1.), fockOrtho[SCALAR], NB, 
       onePDMOrtho[SCALAR], NB, T(0.), FDC[SCALAR], NB);
 
     // FD(S) += F(z)D(z)
-    if(this->nC == 2 or !this->iCS) {
+    if(nC == 2 or !iCS) {
       Gemm('N', 'N', NB, NB, NB, T(1.), fockOrtho[MZ], NB, 
         onePDMOrtho[MZ], NB, T(0.), SCR, NB);
       MatAdd('N','N', NB, NB, T(1.), FDC[SCALAR], NB, T(1.), 
@@ -233,7 +233,7 @@ namespace ChronusQ {
 //  prettyPrintSmart(std::cout,"[F,P]",FDC[SCALAR],NB,NB,NB);
 
 
-    if(this->nC == 2 or !this->iCS) {
+    if(nC == 2 or !iCS) {
       // FD(z) = F(S)D(z) + F(z)D(S)
       Gemm('N', 'N', NB, NB, NB, T(1.), fockOrtho[SCALAR], NB, 
         onePDMOrtho[MZ], NB, T(0.), FDC[MZ], NB);
@@ -249,7 +249,7 @@ namespace ChronusQ {
     }
 
 
-    this->memManager.free(SCR);
+    memManager.free(SCR);
 
   }; // SingleSlater<T>::FDCommutator
 

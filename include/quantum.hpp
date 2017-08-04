@@ -25,37 +25,28 @@
 #define __INCLUDED_QUANTUM_HPP__
 
 #include <chronusq_sys.hpp>
-#include <memmanager.hpp>
-#include <cqlinalg/blas1.hpp>
+#include <quantum/base.hpp>
 
 // Debug print (triggers WaveFunction, etc)
 //#define _QuantumDebug
 
 namespace ChronusQ {
 
-  enum DENSITY_TYPE {
-    SCALAR=0,MZ,MY,MX
-  }; ///< Enumerate the types of densities for contraction
-
-  // Helper function for operator traces
-  // see src/quantum/properties.cxx for docs
-
-  template <typename RetTyp, typename Left, typename Right>
-  static inline RetTyp OperatorTrace(size_t N, const Left& op1 , 
-    const Right& op2) {
-    return InnerProd<RetTyp>(N,op1,1,op2,1);
-  } 
-
+  /**
+   *  \brief The Quantum class. The typed abstract interface for all classes 
+   *  which can define a 1PDM and compute 1 and 2 body properties.
+   *
+   *  Adds knowledge of storage type and general property evaluation schemes to 
+   *  QuantumBase.
+   *
+   */
   template <typename T>
-  class Quantum {
+  class Quantum : virtual public QuantumBase {
   protected:
+
     // Useful typedefs
     typedef T*                   oper_t;
     typedef std::vector<oper_t>  oper_t_coll;
-
-    typedef std::array<double,3>    cartvec_t;
-    typedef std::array<cartvec_t,3> cartmat_t;
-    typedef std::array<cartmat_t,3> cartrk3_t;
     
 
   private:
@@ -68,34 +59,15 @@ namespace ChronusQ {
 
   public:
 
-    CQMemManager& memManager; ///< Memory manager for matrix allocation
-
-    int   nC;   ///< Number of spin components
-    bool  iCS;  ///< is closed shell?
 
     // 1PDM storage
 
     oper_t_coll onePDM;  ///< 1PDM array (Scalar + Magnetization)
 
-    // Property storage
-
-    // Length gauge electric multipoles
-    cartvec_t elecDipole;     ///< Electric Dipole in the length gauge
-    cartmat_t elecQuadrupole; ///< Electric Quadrupole in the length gauge
-    cartrk3_t elecOctupole;   ///< Electric Octupole in the length gauge
-    
-    // Spin expectation values
-    cartvec_t SExpect; ///< Expectation values of Sx, Sy and Sz
-    double    SSq;     ///< Expectation value of S^2
-
-    // Energy expectation values
-    double OBEnergy;
-    double MBEnergy;
-    double totalEnergy;
 
     // Constructors
       
-    // Diable default constructor
+    // Disable default constructor
     Quantum() = delete;
 
     /**
@@ -108,17 +80,7 @@ namespace ChronusQ {
      *  \param [in] N     Dimension of the density matricies to be allocated
      */ 
     Quantum(CQMemManager &mem, size_t _nC = 1, bool _iCS = true, 
-      size_t N = 0, bool doAlloc = true): 
-      memManager(mem), nC(_nC), iCS(_iCS), 
-      elecDipole({0.,0.,0.}),
-      elecQuadrupole{{{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}},
-      elecOctupole{
-        {
-          {{{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}},
-          {{{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}},
-          {{{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}}
-        }}, SExpect({0.,0.,0.}), SSq(0.), OBEnergy(0.), MBEnergy(0.),
-      totalEnergy(0.) {
+      size_t N = 0, bool doAlloc = true): QuantumBase(mem,_nC,_iCS) {
 
         // Allocate densities
         if( N != 0 and doAlloc ) alloc(N);
@@ -165,7 +127,12 @@ namespace ChronusQ {
     }; // Quantum<T>::computeOBProperty (single operator)
 
     /**
+     *  \brief Computes set of a 1-body properties through a traces with the
+     *  proper components of the 1PDM.
      *
+     *  \param [template] DenTyp Which spin component of the 1PDM to trace with
+     *  \param [in]       opv    List of qquare matrices to trace with 1PDM
+     *  \returns          List of traces of opv with the DenTyp 1PDM (cast to type RetTyp)
      */ 
     template <typename RetTyp, DENSITY_TYPE DenTyp, typename Op>
     inline std::vector<RetTyp> computeOBProperty(const std::vector<Op> &opv) {
@@ -175,17 +142,6 @@ namespace ChronusQ {
       return results;
     }; // Quantum<T>::computeOBProperty (many operators)
 
-    // Procedural
-      
-    /**
-     *  Function to form the density. Pure virtual
-     */ 
-    virtual void formDensity() = 0;
-
-    /**
-     *  Function to compute the energy expectation value(s)
-     */ 
-    virtual void computeEnergy() = 0;
 
   }; // class Quantum
 

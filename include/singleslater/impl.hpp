@@ -36,16 +36,12 @@
 // explicit pointers
 #define SingleSlater_COLLECTIVE_OP(OP_OP,OP_VEC_OP) \
   /* Handle Operators */\
-  OP_VEC_OP(T,this,other,this->memManager,fock); \
-  OP_VEC_OP(T,this,other,this->memManager,fockOrtho); \
-  OP_OP(double,this,other,this->memManager,JScalar); \
-  OP_VEC_OP(T,this,other,this->memManager,K); \
-  OP_VEC_OP(T,this,other,this->memManager,GD);\
-  OP_VEC_OP(T,this,other,this->memManager,onePDMOrtho);\
-  \
-  OP_VEC_OP(T,this,other,this->memManager,curOnePDM);\
-  OP_VEC_OP(T,this,other,this->memManager,deltaOnePDM);\
-  OP_VEC_OP(T,this,other,this->memManager,prevFock);
+  OP_VEC_OP(T,this,other,memManager,fock); \
+  OP_VEC_OP(T,this,other,memManager,fockOrtho); \
+  OP_OP(double,this,other,memManager,JScalar); \
+  OP_VEC_OP(T,this,other,memManager,K); \
+  OP_VEC_OP(T,this,other,memManager,GD);\
+  OP_VEC_OP(T,this,other,memManager,onePDMOrtho);
 
 namespace ChronusQ {
 
@@ -60,6 +56,9 @@ namespace ChronusQ {
   template <typename T>
   template <typename U>
   SingleSlater<T>::SingleSlater(const SingleSlater<U> &other,int dummy) : 
+    QuantumBase(dynamic_cast<const QuantumBase&>(other)),
+    WaveFunctionBase(dynamic_cast<const WaveFunctionBase&>(other)),
+    SingleSlaterBase(dynamic_cast<const SingleSlaterBase&>(other)),
     WaveFunction<T>(dynamic_cast<const WaveFunction<U>&>(other)) {
 
 #ifdef _SingleSlaterDebug
@@ -87,6 +86,9 @@ namespace ChronusQ {
   template <typename T>
   template <typename U>
   SingleSlater<T>::SingleSlater(SingleSlater<U> &&other,int dummy) : 
+    QuantumBase(dynamic_cast<QuantumBase&&>(std::move(other))),
+    WaveFunctionBase(dynamic_cast<WaveFunctionBase&&>(std::move(other))),
+    SingleSlaterBase(dynamic_cast<SingleSlaterBase&&>(std::move(other))),
     WaveFunction<T>(dynamic_cast<WaveFunction<U>&&>(std::move(other))) {
 
 #ifdef _SingleSlaterDebug
@@ -121,7 +123,7 @@ namespace ChronusQ {
     std::cout << "SingleSlater::alloc (this = " << this << ")" << std::endl;
 #endif
 
-    size_t NB = this->aoints.basisSet().nBasis;
+    size_t NB = aoints.basisSet().nBasis;
 
     SPIN_OPERATOR_ALLOC(NB,fock);
     SPIN_OPERATOR_ALLOC(NB,fockOrtho);
@@ -130,7 +132,7 @@ namespace ChronusQ {
     SPIN_OPERATOR_ALLOC(NB,onePDMOrtho);
 
     // J only has a scalar component
-    JScalar = this->memManager.template malloc<double>(NB*NB);
+    JScalar = memManager.template malloc<double>(NB*NB);
 
     SPIN_OPERATOR_ALLOC(NB,curOnePDM);
     SPIN_OPERATOR_ALLOC(NB,deltaOnePDM);

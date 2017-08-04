@@ -28,152 +28,10 @@
 #include <util/matout.hpp>
 #include <cqlinalg/blas1.hpp>
 
+// SCF definitions for SingleSlaterBase
+#include <singleslater/base/scf.hpp> 
+
 namespace ChronusQ {
-
-  /**
-   *  \brief Performs the self--consistant field procedure given a set of 
-   *  orbitals.
-   *
-   *  \warning SCF procedure assumes that the 1PDM and orbital (mo1/2) storage
-   *  has been populated in some way.
-   */ 
-  template <typename T>
-  void SingleSlater<T>::SCF() {
-
-    // Allocate additional storage if doing some type of 
-    // extrapolation during the SCF procedure
-    if ( scfControls.doExtrap ) allocExtrapStorage();
-
-    printSCFHeader(std::cout);
-
-    bool isConverged = false;
-    computeEnergy();
-    for( scfConv.nSCFIter = 0; scfConv.nSCFIter < scfControls.maxSCFIter; 
-         scfConv.nSCFIter++) {
-
-      // Save current state of the wave function (method specific)
-      saveCurrentState();
-
-      // Exit loop on convergence
-      if(isConverged) break;
-
-      // Get new orbtials and densities from current state: 
-      //   C/D(k) -> C/D(k + 1)
-      getNewOrbitals();
-
-      // Evaluate convergence
-      isConverged = evalConver();
-
-      // Print out iteration information
-      printSCFProg(std::cout);
-
-    }; // Iteration loop
-
-    // Deallocate extrapolation storage
-    if ( scfControls.doExtrap ) deallocExtrapStorage();
-
-    if(not isConverged)
-      CErr(std::string("SCF Failed to converged within ") + 
-        std::to_string(scfControls.maxSCFIter) + 
-        std::string(" iterations"));
-    else {
-      std::cout << std::endl << "SCF Completed: E("
-                << refShortName_ << ") = " << std::fixed
-                << std::setprecision(10) << this->totalEnergy
-                << " Eh after " << scfConv.nSCFIter
-                << " SCF Iterations" << std::endl;
-    } 
-    std::cout << BannerEnd << std::endl;
-    
-  }; // SingleSlater<T>::SCF()
-
-  
-  template <typename T>
-  void SingleSlater<T>::printSCFHeader(std::ostream &out) {
-    out << BannerTop << std::endl;
-    out << "Self Consistent Field (SCF) Settings:" << std::endl << std::endl;
-
-    out << std::setw(38) << std::left << "  SCF Type:" << refLongName_ 
-           << std::endl;
-
-    out << std::setprecision(6) << std::scientific;
-    out << std::setw(38) << std::left << "  Density Convergence Tolerence:" 
-           <<  scfControls.denConvTol << std::endl;
-
-    out << std::setw(38) << std::left << "  Energy Convergence Tolerence:" 
-           <<  scfControls.eneConvTol << std::endl;
-
-    out << std::setw(38) << std::left << "  Maximum Number of SCF Cycles:" 
-           << scfControls.maxSCFIter << std::endl;
-
-    if (scfControls.doExtrap) {
-      if (scfControls.doDamp) {
-        out << std::setw(38)   << std::left << "  Static Damping Factor:" 
-               <<  scfControls.dampParam << std::endl;
-        out << std::setw(38)   << std::left << "  Damping Error:" 
-               <<  scfControls.dampError << std::endl;
-      }
-
-      if (scfControls.diisAlg != NONE) {
-        out << std::setw(38) << std::left << "  DIIS Extrapolation Algorithm:";
-        if (scfControls.diisAlg == CDIIS) out << "CDIIS";
-        out << std::endl;
-      }
- 
-    } else {
-        out << std::setw(38)   << std::left << "  SCF Algorithm:"
-               <<  "Standard Roothaan-Hall" << std::endl;
-    }
-
-
-
-    out << std::endl << BannerMid << std::endl << std::endl;
-    out << std::setw(16) << "SCF Iteration";
-    out << std::setw(18) << "Energy (Eh)";
-    out << std::setw(18) << "\u0394E (Eh)";
-    out << std::setw(18) << " |\u0394P(S)|";
-    if(not this->iCS or this->nC > 1)
-      out << std::setw(18) << "  |\u0394P(M)|";
-     
-    out << std::endl;
-    out << std::setw(16) << "-------------";
-    out << std::setw(18) << "-----------";
-    out << std::setw(18) << "-------";
-    out << std::setw(18) << "-------";
-    if(not this->iCS or this->nC > 1)
-      out << std::setw(18) << "-------";
-    out << std::endl;
-
-  }; // SingleSlater<T>::printSCFHeader
-
-
-  /**
-   *  \brief Print the current convergence information of the SCF
-   *  procedure
-   */ 
-  template <typename T>
-  void SingleSlater<T>::printSCFProg(std::ostream &out) {
-
-    // SCF Iteration
-    out << "  SCFIt: " <<std::setw(6) << std::left << scfConv.nSCFIter + 1;
-
-    // Current Total Energy
-    out << std::setw(18) << std::fixed << std::setprecision(10)
-                         << std::left << this->totalEnergy;
-
-    out << std::scientific << std::setprecision(7);
-    // Current Change in Energy
-    out << std::setw(14) << std::right << scfConv.deltaEnergy;
-    out << "   ";
-    out << std::setw(13) << std::right << scfConv.RMSDenScalar;
-    if(not this->iCS or this->nC > 1) {
-      out << "   ";
-      out << std::setw(13) << std::right << scfConv.RMSDenMag;
-    }
-  
-    out << std::endl;
-  }; // SingleSlater<T>::printSCFProg
-
 
   /**
    *  \brief Saves the current state of wave function
@@ -182,15 +40,17 @@ namespace ChronusQ {
    */ 
   template <typename T>
   void SingleSlater<T>::saveCurrentState() {
-    size_t OSize = this->memManager.template getSize(fock[SCALAR]);
+    size_t OSize = memManager.template getSize(fock[SCALAR]);
 
     // Copy over current AO density matrix
     for(auto i = 0; i < this->onePDM.size(); i++)
       std::copy_n(this->onePDM[i],OSize,curOnePDM[i]);
 
+    // Copy the previous orthonormal Fock matrix for damping. It's the 
+    // previous Fock since saveCurrentState is called at the beginning 
+    // of the SCF loop. 
     if ( scfControls.doExtrap and scfControls.doDamp) {
-      // Copy the previous orthonormal Fock matrix for damping. It's the previous 
-      // Fock since saveCurrentState is called at the beginning of the SCF loop. 
+        
       // Avoid saving the guess Fock for extrapolation
       if (scfConv.nSCFIter > 0) {
         for(auto i = 0; i < this->fockOrtho.size(); i++)
@@ -200,22 +60,10 @@ namespace ChronusQ {
 
   }; // SingleSlater<T>::saveCurrentState()
 
-  /**
-   *  \brief Computes the change in the current wave function
-   *
-   *  Saves onePDM - curOnePDM in deltaOnePDM
-   */ 
-  template <typename T>
-  void SingleSlater<T>::formDelta() {
 
-    size_t NB = this->aoints.basisSet().nBasis;
-    for(auto i = 0; i < this->onePDM.size(); i++)
-      MatAdd('N','N',NB,NB,T(1.),this->onePDM[i],NB,T(-1.),
-        curOnePDM[i],NB,deltaOnePDM[i],NB);
 
-  }; // SingleSlater<T>:formDelta
 
-  
+
   /**
    *  \brief Obtain a new set of orbitals given a Fock matrix.
    *
@@ -244,13 +92,19 @@ namespace ChronusQ {
     // requires the onePDMOrtho storage is populated.
     for(auto i = 0; i < this->onePDM.size(); i++)
       std::copy_n(this->onePDM[i],
-        this->memManager.template getSize(onePDMOrtho[i]),
+        memManager.template getSize(onePDMOrtho[i]),
         onePDMOrtho[i]);
 
     // Transform the orthonormal density to the AO basis
     ortho2aoDen();
 
   }; // SingleSlater<T>::getNewOrbitals
+
+
+
+
+
+
 
   /**
    *  \brief Evaluate SCF convergence based on various criteria.
@@ -278,7 +132,7 @@ namespace ChronusQ {
     // Check density convergence
 
     formDelta(); // Get change in density
-    size_t DSize = this->memManager. template getSize(fock[SCALAR]);
+    size_t DSize = memManager. template getSize(fock[SCALAR]);
     scfConv.RMSDenScalar = TwoNorm<double>(DSize,deltaOnePDM[SCALAR],1);
     scfConv.RMSDenMag = 0.;
     for(auto i = 1; i < deltaOnePDM.size(); i++)
@@ -321,6 +175,28 @@ namespace ChronusQ {
   }; // SingleSlater<T>::evalConver
 
 
+
+
+
+  /**
+   *  \brief Computes the change in the current wave function
+   *
+   *  Saves onePDM - curOnePDM in deltaOnePDM
+   */ 
+  template <typename T>
+  void SingleSlater<T>::formDelta() {
+
+    size_t NB = aoints.basisSet().nBasis;
+    for(auto i = 0; i < this->onePDM.size(); i++)
+      MatAdd('N','N',NB,NB,T(1.),this->onePDM[i],NB,T(-1.),
+        curOnePDM[i],NB,deltaOnePDM[i],NB);
+
+  }; // SingleSlater<T>:formDelta
+
+  
+
+
+
   /**
    *  \brief Diagonalize the orthonormal fock matrix
    *
@@ -332,15 +208,15 @@ namespace ChronusQ {
   template <typename T>
   void SingleSlater<T>::diagOrthoFock() {
 
-    size_t NB = this->aoints.basisSet().nBasis * this->nC;
+    size_t NB = aoints.basisSet().nBasis * nC;
     size_t NB2 = NB*NB;
 
     // Copy over the fockOrtho into MO storage
-    if(this->nC == 1 and this->iCS) 
+    if(nC == 1 and iCS) 
       std::transform(fockOrtho[SCALAR],fockOrtho[SCALAR] + NB2,this->mo1,
         [](T a){ return a / 2.; }
       );
-    else if(this->nC == 1)
+    else if(nC == 1)
       for(auto j = 0; j < NB2; j++) {
         this->mo1[j] = 0.5 * (fockOrtho[SCALAR][j] + fockOrtho[MZ][j]); 
         this->mo2[j] = 0.5 * (fockOrtho[SCALAR][j] - fockOrtho[MZ][j]); 
@@ -351,12 +227,12 @@ namespace ChronusQ {
 
     // Diagonalize the Fock Matrix
     int INFO = HermetianEigen('V', 'L', NB, this->mo1, NB, this->eps1, 
-      this->memManager );
+      memManager );
     if( INFO != 0 ) CErr("HermetianEigen failed in Fock1",std::cout);
 
-    if(this->nC == 1 and not this->iCS) {
+    if(nC == 1 and not iCS) {
       INFO = HermetianEigen('V', 'L', NB, this->mo2, NB, this->eps2, 
-        this->memManager );
+        memManager );
       if( INFO != 0 ) CErr("HermetianEigen failed in Fock2",std::cout);
     }
 
@@ -373,7 +249,7 @@ namespace ChronusQ {
   void SingleSlater<T>::ao2orthoFock() {
 
     for(auto i = 0; i < fock.size(); i++)
-      this->aoints.Ortho1Trans(fock[i],fockOrtho[i]);
+      aoints.Ortho1Trans(fock[i],fockOrtho[i]);
 
   }; // SingleSlater<T>::ao2orthoFock
 
@@ -389,9 +265,42 @@ namespace ChronusQ {
   void SingleSlater<T>::ortho2aoDen() {
 
     for(auto i = 0; i < onePDMOrtho.size(); i++)
-      this->aoints.Ortho1Trans(onePDMOrtho[i],this->onePDM[i]);
+      aoints.Ortho1Trans(onePDMOrtho[i],this->onePDM[i]);
 
   }; // SingleSlater<T>::ao2orthoFock
+
+
+  /**
+   *  \brief Initializes the environment for the SCF caluclation.
+   *
+   *  Allocate memory for extrapolation and compute the energy
+   */ 
+  template <typename T>
+  void SingleSlater<T>::SCFInit() {
+
+    // Allocate additional storage if doing some type of 
+    // extrapolation during the SCF procedure
+    if ( scfControls.doExtrap ) allocExtrapStorage();
+
+    computeEnergy();
+
+  }; // SingleSlater<T>::SCFInit
+
+
+
+
+  /**
+   *  \brief Finalizes the environment for the SCF caluclation.
+   *
+   *  Deallocate the memory allocated for extrapolation.
+   */ 
+  template <typename T>
+  void SingleSlater<T>::SCFFin() {
+
+    // Deallocate extrapolation storage
+    if ( scfControls.doExtrap ) deallocExtrapStorage();
+
+  }; // SingleSlater<T>::SCFFin
 
 }; // namespace ChronusQ
 

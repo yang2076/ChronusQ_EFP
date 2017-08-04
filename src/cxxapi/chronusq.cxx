@@ -123,9 +123,22 @@ int main(int argc, char *argv[]) {
   memManager.free(SX,SX2);
 */
 
-  SingleSlater<double> ss(aoints,1);
+/*
+  //SingleSlater<double> ss(aoints,1,aoints.molecule().multip == 1);
+  HartreeFock<double> ss(aoints,1,aoints.molecule().multip == 1);
   ss.formGuess();
   ss.SCF();
+*/
+
+  std::shared_ptr<SingleSlaterBase> ss(
+    std::dynamic_pointer_cast<SingleSlaterBase>(
+      std::make_shared<HartreeFock<double>>(
+        aoints,1,aoints.molecule().multip == 1
+      )
+    ));
+
+  ss->formGuess();
+  ss->SCF();
 
 
   // Output CQ footer

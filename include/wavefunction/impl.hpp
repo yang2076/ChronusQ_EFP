@@ -36,11 +36,6 @@
   OP_OP(T,this,other,this->memManager,mo2); \
   OP_OP(double,this,other,this->memManager,eps1); \
   OP_OP(double,this,other,this->memManager,eps2); \
-  \
-  /* Handle Member data */\
-  OP_MEMBER(this,other,nO); OP_MEMBER(this,other,nV); \
-  OP_MEMBER(this,other,nOA); OP_MEMBER(this,other,nOB);\
-  OP_MEMBER(this,other,nVA); OP_MEMBER(this,other,nVB);\
 
 
 
@@ -57,8 +52,9 @@ namespace ChronusQ {
   template <typename T>
   template <typename U>
   WaveFunction<T>::WaveFunction(const WaveFunction<U> &other, int dummy) : 
-    Quantum<T>(dynamic_cast<const Quantum<U>&>(other)),
-    aoints(other.aoints) {
+    QuantumBase(dynamic_cast<const QuantumBase &>(other)),
+    WaveFunctionBase(dynamic_cast<const WaveFunctionBase &>(other)),
+    Quantum<T>(dynamic_cast<const Quantum<U>&>(other)) {
 
 #ifdef _WaveFunctionDebug
     std::cout << "WaveFunction<T>::WaveFunction(const WaveFunction<U>&) "
@@ -84,8 +80,9 @@ namespace ChronusQ {
   template <typename T>
   template <typename U>
   WaveFunction<T>::WaveFunction(WaveFunction<U> &&other, int dummy) : 
-    Quantum<T>(dynamic_cast<Quantum<U>&&>(std::move(other))),
-    aoints(other.aoints) {
+    QuantumBase(dynamic_cast<QuantumBase &&>(std::move(other))),
+    WaveFunctionBase(dynamic_cast<WaveFunctionBase &&>(std::move(other))),
+    Quantum<T>(dynamic_cast<Quantum<U>&&>(std::move(other))) {
 
 #ifdef _WaveFunctionDebug
     std::cout << "WaveFunction<T>::WaveFunction(WaveFunction<U>&&) "
@@ -120,7 +117,7 @@ namespace ChronusQ {
     std::cout << "WaveFunction::alloc (this = " << this << ")" << std::endl;
 #endif
 
-    size_t NB = this->nC * aoints.basisSet().nBasis;
+    size_t NB = this->nC * this->aoints.basisSet().nBasis;
 
     mo1  = this->memManager.template malloc<T>(NB*NB);
     eps1 = this->memManager.template malloc<double>(NB);

@@ -39,16 +39,16 @@ namespace ChronusQ {
   template <typename T>
   void SingleSlater<T>::formDensity() {
 
-    size_t NB  = this->aoints.basisSet().nBasis * this->nC;
+    size_t NB  = aoints.basisSet().nBasis * nC;
     size_t NB2 = NB*NB;
 
-    if(this->nC == 1) { 
+    if(nC == 1) { 
 
       // DS = DA = CA * CA**H
       Gemm('N', 'C', NB, NB, this->nOA, T(1.), this->mo1, NB, this->mo1,
         NB, T(0.), this->onePDM[SCALAR], NB);
 
-      if(not this->iCS) {
+      if(not iCS) {
 
         // DZ = DB = CB * CB**H
         Gemm('N', 'C', NB, NB, this->nOB, T(1.), this->mo2, NB, this->mo2,
@@ -103,22 +103,22 @@ namespace ChronusQ {
     // Scalar core hamiltonian contribution to the energy
     this->OBEnergy = 
       this->template computeOBProperty<double,DENSITY_TYPE::SCALAR>(
-        this->aoints.coreH[SCALAR]);
+        aoints.coreH[SCALAR]);
 
  
 
     // One body Spin Orbit
     dcomplex SOEnergy(0.,0.);
-    if(this->aoints.coreH.size() > 1) {
+    if(aoints.coreH.size() > 1) {
       SOEnergy = 
         this->template computeOBProperty<dcomplex,DENSITY_TYPE::MZ>(
-          this->aoints.coreH[MZ]);
+          aoints.coreH[MZ]);
       SOEnergy += 
         this->template computeOBProperty<dcomplex,DENSITY_TYPE::MY>(
-          this->aoints.coreH[MY]);
+          aoints.coreH[MY]);
       SOEnergy += 
         this->template computeOBProperty<dcomplex,DENSITY_TYPE::MX>(
-          this->aoints.coreH[MX]);
+          aoints.coreH[MX]);
     };
 
     SOEnergy *= dcomplex(0.,1.);
@@ -143,7 +143,7 @@ namespace ChronusQ {
 
     // Assemble total energy
     this->totalEnergy = 
-      this->OBEnergy + this->MBEnergy + this->aoints.molecule().nucRepEnergy;
+      this->OBEnergy + this->MBEnergy + aoints.molecule().nucRepEnergy;
 
     // Sanity checks
     assert( not std::isnan(this->OBEnergy) );

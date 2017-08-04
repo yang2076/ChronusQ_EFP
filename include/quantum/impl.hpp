@@ -33,13 +33,7 @@
   
 #define Quantum_COLLECTIVE_OP(OP_MEMBER,OP_VEC_OP) \
   /* Handle densities */\
-  OP_VEC_OP(T,this,other,memManager,onePDM); \
-  \
-  /* Handle Member data */\
-  OP_MEMBER(this,other,elecDipole); \
-  OP_MEMBER(this,other,elecQuadrupole); \
-  OP_MEMBER(this,other,elecOctupole);\
-  OP_MEMBER(this,other,SExpect); OP_MEMBER(this,other,SSq);
+  OP_VEC_OP(T,this,other,memManager,onePDM); 
 
 
 
@@ -56,11 +50,7 @@ namespace ChronusQ {
   template <typename T>
   template <typename U>
   Quantum<T>::Quantum(const Quantum<U> &other, int dummy) : 
-    Quantum<T>(other.memManager,other.nC,other.iCS,
-    (other.onePDM.size() != 0) ? 
-       0 : std::sqrt(other.memManager.template getSize<U>(other.onePDM[0])),
-    false
-    ) {
+    QuantumBase(dynamic_cast<const QuantumBase&>(other)) {
 
     #ifdef _QuantumDebug
     std::cout << "Quantum<T>::Quantum(const Quantum<U>&) (this = " << this 
@@ -85,11 +75,7 @@ namespace ChronusQ {
   template <typename T>
   template <typename U>
   Quantum<T>::Quantum(Quantum<U> &&other, int dummy) : 
-    Quantum<T>(other.memManager,other.nC,other.iCS,
-    (other.onePDM.size() != 0) ? 
-       0 : std::sqrt(other.memManager.template getSize<U>(other.onePDM[0])),
-    false
-    ) {
+    QuantumBase(dynamic_cast<QuantumBase&&>(std::move(other))) {
 
     #ifdef _QuantumDebug
     std::cout << "Quantum<T>::Quantum(Quantum<U>&&) (this = " << this 

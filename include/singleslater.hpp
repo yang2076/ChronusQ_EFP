@@ -26,6 +26,7 @@
 
 #include <chronusq_sys.hpp>
 #include <wavefunction.hpp>
+#include <singleslater/base.hpp>
 
 // Debug print triggered by Wavefunction
   
@@ -35,73 +36,25 @@
 
 namespace ChronusQ {
 
-  enum DIIS_ALG {
-    CDIIS,      ///< Commutator DIIS
-    EDIIS,      ///< Energy DIIS
-    CEDIIS,     ///< Commutator & Energy DIIS
-    NONE = -1  
-  };
 
   /**
-   *  \brief A struct to hold the information pertaining to
-   *  the control of an SCF procedure.
+   *  \brief The SingleSlater class. The typed abstract interface for all
+   *  classes for which the wave function is described by a single slater
+   *  determinant (HF, KS, PHF, etc).
    *
-   *  Holds information like convergence critera, DIIS settings, 
-   *  max iterations, etc.
-   */ 
-  struct SCFControls {
-
-    // Convergence criteria
-    double denConvTol = 1e-8;  ///< Density convergence criteria
-    double eneConvTol = 1e-10; ///< Energy convergence criteria
-
-    // TODO: need to add logic to set this
-    // Extrapolation flag for DIIS and damping
-    bool doExtrap = true;     ///< Whether to extrapolate Fock matrix
-
-    // DIIS settings 
-    DIIS_ALG diisAlg = CDIIS; ///< Type of DIIS extrapolation 
-    size_t nKeep     = 10;    ///< Number of matrices to use for DIIS
-
-    // Static Damping settings
-    bool   doDamp         = true;           ///< Flag for turning on damping
-    double dampStartParam = 0.7;            ///< Starting damping parameter
-    double dampParam      = dampStartParam; ///< Damp parameter current iteration
-    double dampError      = 1e-1;           ///< Energy oscillation to turn off damp
-
-    // Misc control
-    size_t maxSCFIter = 128; ///< Maximum SCF iterations.
-
-  }; // SCFControls struct
-
-  /**
-   *  \brief A struct to hold the current status of an SCF procedure
+   *  Adds knowledge of storage type to SingleSlaterBase
    *
-   *  Holds information like current density / energy changes, number of 
-   *  iterations, etc.
+   *  Specializes the WaveFunction class of the same type
    */ 
-  struct SCFConvergence {
-
-    double deltaEnergy;  ///< Convergence of Energy
-    double RMSDenScalar; ///< RMS change in Scalar density
-    double RMSDenMag;    ///< RMS change in magnetization (X,Y,Z) density
-    double nrmFDC;       ///< 2-Norm of [F,D]
-
-    size_t nSCFIter = 0; ///< Number of SCF Iterations
-
-  }; // SCFConvergence struct
-
   template <typename T>
-  class SingleSlater : public WaveFunction<T> {
+  class SingleSlater : public SingleSlaterBase, public WaveFunction<T> {
 
   protected:
+
     // Useful typedefs
     typedef T*                        oper_t;
     typedef std::vector<oper_t>       oper_t_coll;
     typedef std::vector<oper_t_coll>  oper_t_coll2;
-
-    std::string refLongName_;
-    std::string refShortName_;
 
   private:
   public:
@@ -128,11 +81,6 @@ namespace ChronusQ {
     oper_t_coll onePDMOrtho;   ///< List of populated orthonormal 1PDM matricies
 
 
-    // SCF Variables
-    SCFControls    scfControls; ///< Controls for the SCF procedure
-    SCFConvergence scfConv;     ///< Current status of SCF convergence
-
-
     // Current / change in state information (for use with SCF)
     oper_t_coll curOnePDM;    ///< List of the current 1PDMs
     oper_t_coll deltaOnePDM;  ///< List of the changes in the 1PDMs
@@ -151,15 +99,20 @@ namespace ChronusQ {
      *  SingleSlater Constructor. Constructs a SingleSlater object
      *
      *  \param [in] aoi  AOIntegrals object (which handels the BasisSet, etc)
-     *  \param [in] nC  Number of spin components (1 and 2 are supported)
+     *  \param [in] args Parameter pack for the remaining parameters of the
+     *                   WaveFunction constructor. See include/wavefunction.hpp
+     *                   for details. 
      */ 
-    SingleSlater(AOIntegrals &aoi, size_t nC) : 
-      WaveFunction<T>(aoi,nC), JScalar(nullptr) {
+    template <typename... Args>
+    SingleSlater(AOIntegrals &aoi, Args... args) : 
+      SingleSlaterBase(aoi,args...), WaveFunctionBase(aoi,args...),
+      QuantumBase(aoi.memManager(),args...), WaveFunction<T>(aoi,args...), 
+      JScalar(nullptr) {
 
       // Allocate SingleSlater Object
       alloc(); 
 
-      // Determine method string
+      // Determine Real/Complex part of method string
       if(std::is_same<T,double>::value) {
         refLongName_  = "Real ";
         refShortName_ = "R-";
@@ -168,20 +121,7 @@ namespace ChronusQ {
         refShortName_ = "C-";
       }
 
-      if(this->nC == 1) {
-        if(this->iCS) {
-          refLongName_  += "Restricted Hartree-Fock";
-          refShortName_ += "RHF";
-        } else {
-          refLongName_  += "Unrestricted Hartree-Fock";
-          refShortName_ += "UHF";
-        }
-      } else {
-        refLongName_  += "Generalized Hartree-Fock";
-        refShortName_ += "GHF";
-      }
-
-    }
+    }; // SingleSlater constructor
 
     // See include/singleslater/impl.hpp for documentation 
     // on the following constructors
@@ -210,7 +150,7 @@ namespace ChronusQ {
     void dealloc();
 
 
-    // Declarations from Quantum 
+    // Declarations from QuantumBase 
     // (see include/singleslater/quantum.hpp for docs)
     void formDensity();
     void computeEnergy();
@@ -227,9 +167,6 @@ namespace ChronusQ {
 
 
     // SCF procedural functions (see include/singleslater/scf.hpp for docs)
-      
-    // Perform the SCF
-    void SCF(); 
 
     // Transformation functions to and from the orthonormal basis
     void ao2orthoFock();
@@ -243,11 +180,14 @@ namespace ChronusQ {
 
     // Misc procedural
     void diagOrthoFock();
-    void printSCFProg(std::ostream &out = std::cout);
-    void printSCFHeader(std::ostream &out = std::cout);
     void FDCommutator(oper_t_coll &);
+//  void printSCFProg(std::ostream &out = std::cout);
+//  void printSCFHeader(std::ostream &out = std::cout);
+//  void printSCFFooter(bool,std::ostream &out = std::cout);
     virtual void saveCurrentState();
     virtual void formDelta();
+    void SCFInit();
+    void SCFFin();
 
     // SCF extrapolation functions (see include/singleslater/extrap.hpp for docs)
     void allocExtrapStorage();
@@ -259,5 +199,9 @@ namespace ChronusQ {
   }; // class SingleSlater
 
 }; // namespace ChronusQ
+
+
+// Include headers for specializations of SingleSlater
+#include <singleslater/hartreefock.hpp> // HF specialization
 
 #endif
