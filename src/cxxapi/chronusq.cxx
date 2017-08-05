@@ -98,44 +98,12 @@ int main(int argc, char *argv[]) {
   CQMemManager memManager(100e6);
   AOIntegrals aoints(memManager,mol,basis);
 
+  auto ss = CQSingleSlaterOptions(std::cout,input,aoints);
+  CQSCFOptions(std::cout,input,*ss);
+
+ 
   aoints.computeAOOneE();
   aoints.computeERI();
-
-/*
-  double *SX  = memManager.malloc<double>(basis.nBasis*basis.nBasis);
-  double *SX2 = memManager.malloc<double>(basis.nBasis*basis.nBasis);
-  std::vector<TwoBodyContraction<double>> cont = 
-    { 
-      {aoints.overlap, SX , true, COULOMB },
-      {aoints.overlap, SX2, true, EXCHANGE} 
-    };
-
-  aoints.twoBodyContract(cont);
-
-  Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor>> SMap(aoints.overlap,basis.nBasis,basis.nBasis);
-  Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor>> SXMap(SX,basis.nBasis,basis.nBasis);
-  Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor>> SX2Map(SX2,basis.nBasis,basis.nBasis);
-
-  std::cout << SMap << std::endl << std::endl;;
-  std::cout << SXMap << std::endl << std::endl;;
-  std::cout << SX2Map << std::endl;
-
-  memManager.free(SX,SX2);
-*/
-
-/*
-  //SingleSlater<double> ss(aoints,1,aoints.molecule().multip == 1);
-  HartreeFock<double> ss(aoints,1,aoints.molecule().multip == 1);
-  ss.formGuess();
-  ss.SCF();
-*/
-
-  std::shared_ptr<SingleSlaterBase> ss(
-    std::dynamic_pointer_cast<SingleSlaterBase>(
-      std::make_shared<HartreeFock<double>>(
-        aoints,1,aoints.molecule().multip == 1
-      )
-    ));
 
   ss->formGuess();
   ss->SCF();

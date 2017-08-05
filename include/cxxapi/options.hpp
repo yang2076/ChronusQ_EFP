@@ -28,20 +28,35 @@
 
 #include <molecule.hpp>
 #include <basisset.hpp>
+#include <aointegrals.hpp>
+#include <singleslater.hpp>
 
-// Preprocessor directive to aid the digestion of optional input arguements
+// Preprocessor directive to aid the digestion of optional 
+// input arguments
 #define OPTOPT(x) try{ x; } catch(...) { ; }
 
 namespace ChronusQ {
 
-  // Function definitions ofr option parsing. See src/cxxapi/input/*opts.cxx
-  // for documentation
+  // Function definitions ofr option parsing. 
+  // See src/cxxapi/input/*opts.cxx for documentation
 
   // Parse the options relating to the Molecule object
   Molecule CQMoleculeOptions(std::ostream &, CQInputFile &);
 
   // Parse the options relating to the BasisSet
-  BasisSet CQBasisSetOptions(std::ostream &, CQInputFile &, Molecule &);
+  BasisSet CQBasisSetOptions(std::ostream &, CQInputFile &, 
+    Molecule &);
+
+  // Parse the options relating to the SingleSlater 
+  // (and variants)
+  std::shared_ptr<SingleSlaterBase> CQSingleSlaterOptions(
+    std::ostream &, CQInputFile &, AOIntegrals &);
+
+
+  // Parse the SCF options
+  void CQSCFOptions(std::ostream&, CQInputFile&,
+    SingleSlaterBase &);
 };
+
 
 #endif

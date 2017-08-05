@@ -40,9 +40,12 @@ namespace ChronusQ {
 
     SCFInit();
 
+    // Initialize type independent parameters
+    bool isConverged = false;
+    scfControls.dampParam = scfControls.dampStartParam;
+
     printSCFHeader(std::cout);
 
-    bool isConverged = false;
     for( scfConv.nSCFIter = 0; scfConv.nSCFIter < scfControls.maxSCFIter; 
          scfConv.nSCFIter++) {
 
@@ -112,6 +115,9 @@ namespace ChronusQ {
         out << std::setw(38) << std::left << "  DIIS Extrapolation Algorithm:";
         if (scfControls.diisAlg == CDIIS) out << "CDIIS";
         out << std::endl;
+
+        out << std::left << "    DIIS will track up to " 
+            << scfControls.nKeep << " previous iterations" << std::endl;
       }
  
     } else {

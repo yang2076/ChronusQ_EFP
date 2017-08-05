@@ -22,7 +22,8 @@
 #
 
 set(INPUT_SRC input/parse.cxx)
-set(OPT_SRC input/molopts.cxx input/basisopts.cxx)
+set(OPT_SRC input/molopts.cxx input/basisopts.cxx 
+  input/singleslateropts.cxx input/scfopts.cxx)
 add_executable(chronusq chronusq.cxx ${INPUT_SRC} ${OPT_SRC})
 target_link_libraries(chronusq PUBLIC ${CQEX_LINK})
 
