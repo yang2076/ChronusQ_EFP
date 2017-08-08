@@ -119,6 +119,28 @@ namespace ChronusQ {
 
   }; // BasisSet struct
 
+// SS start  
+  extern std::vector<std::vector<std::array<int,3>>> cart_ang_list; //list of cartesian angular momentum.
+  extern std::vector<std::vector<double>> car2sph_matrix; //SS: external variable,
+          //vector of transform matrix from cartesian to spherical
+  
+  void pop_cart_ang_list(); //SS:populate angular momentum list, can only be called once.   
+
+  void pop_car2sph_matrix(); //populate transform matrix up to L=6
+
+  std::complex<double> cart2sphCoeff(int, int, int, int, int); 
+          //SS: calculate the matrix elements of cartesian to spherical transform
+
+  double factorial(int);
+  
+  double doubleFact(int);
+
+  double polyCoeff(int, int);
+
+  void cart2sph_transform( int, int, std::vector<double>&, std::vector<double>& ); 
+
+// SS end
+ 
 }; // namespace ChronusQ
 
 #endif

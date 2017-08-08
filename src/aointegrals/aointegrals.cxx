@@ -48,6 +48,8 @@
     OP_VEC_OP(double,this,other,memManager_,velElecDipole); \
     OP_VEC_OP(double,this,other,memManager_,velElecQuadrupole); \
     OP_VEC_OP(double,this,other,memManager_,velElecOctupole); \
+    OP_VEC_OP(double,this,other,memManager_,magDipole); \
+    OP_VEC_OP(double,this,other,memManager_,magQuadrupole); \
     OP_VEC_OP(double,this,other,memManager_,coreH); \
     \
     /* 2-e Integrals */ \
@@ -97,8 +99,6 @@ namespace ChronusQ {
     AOIntegrals_COLLECTIVE_OP(DUMMY3,DEALLOC_OP_5,DEALLOC_VEC_OP_5);
 
   }; // AOIntegrals::dealloc()
-
-
 
 
 }; // namespace ChronusQ

@@ -98,6 +98,7 @@ int main(int argc, char *argv[]) {
   CQMemManager memManager(100e6);
   AOIntegrals aoints(memManager,mol,basis);
 
+
   auto ss = CQSingleSlaterOptions(std::cout,input,aoints);
   CQSCFOptions(std::cout,input,*ss);
 

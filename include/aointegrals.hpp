@@ -30,7 +30,6 @@
 #include <memmanager.hpp>
 #include <libint2/engine.h>
 
-
 namespace ChronusQ {
 
   /**
@@ -106,6 +105,143 @@ namespace ChronusQ {
     // See src/aointegrals/aointegrals_builders.cxx for documentation
     oper_t_coll OneEDriver(libint2::Operator, std::vector<libint2::Shell>&);
 
+    // 1-e builder for in-house integral code
+    template <size_t NOPER, bool SYMM, typename F>
+    oper_t_coll OneEDriverLocal(const F&, std::vector<libint2::Shell>&);
+
+    // local one body integrals
+
+    // Overlap integrals
+      
+    // overlap integral of a shell pair  
+    std::vector<std::vector<double>> computeOverlapS(libint2::ShellPair&,
+                                         libint2::Shell&,libint2::Shell&);
+
+    // horizontal recursion of contracted overlap integral 
+    double hRRSab(libint2::ShellPair&, libint2::Shell&,libint2::Shell&,
+                  int,int*,int,int*);
+
+    // horizontal recursion of uncontracted overlap integral
+    double hRRiPPSab(libint2::ShellPair::PrimPairData&,libint2::Shell&,libint2::Shell&,
+                  int,int*,int,int*);
+
+    // vertical recursion of uncontracted overlap integral
+    double vRRSa0(libint2::ShellPair::PrimPairData&,libint2::Shell&,int,int*);
+
+    // angular momentum integrals
+
+    // angular momentum integrals of a shell pair
+    std::vector<std::vector<double>> computeAngularL(libint2::ShellPair&,
+                                        libint2::Shell&,libint2::Shell&);
+
+    // vertical recursion of uncontracted angular momentum integral
+    double Labmu(libint2::ShellPair::PrimPairData&,libint2::Shell&,libint2::Shell&,
+                 double*,double*,int,int*,int,int*,int);
+
+    // momentum integrals
+
+    // electric dipole (velocity gauge) integrals of a shell pair
+    std::vector<std::vector<double>> computeEDipoleE1_vel(libint2::ShellPair&,
+                      libint2::Shell&, libint2::Shell&);
+
+    // contracted momentum integral
+    double Momentummu(libint2::ShellPair&,libint2::Shell&,libint2::Shell&,
+                      int,int*,int,int*,int);
+
+    // electric dipole integrals
+
+    // electric dipole (length gauge) integrals of a shell pair
+    std::vector<std::vector<double>> computeDipoleE1(libint2::ShellPair&,
+                                         libint2::Shell&,libint2::Shell&);
+
+    // contracted electric dipole integrals
+    double DipoleE1(libint2::ShellPair&,libint2::Shell&,libint2::Shell&,
+                    int,int*,int,int*,int);
+
+    // electric quadrupole integrals
+
+    // electric quadrupole integrals of a shell pair
+    std::vector<std::vector<double>> computeEQuadrupoleE2_vel(libint2::ShellPair&,
+                                                  libint2::Shell&,libint2::Shell&); 
+
+    // contracted electric quadrupole integrals of a shell pair
+    double QuadrupoleE2_vel( libint2::ShellPair&,libint2::Shell&,libint2::Shell&,
+                             int,int*,int,int*,int,int );
+
+    // magnetic dipole integrals
+
+    // contracted magnetic dipole integral
+    double MDipoleM1( libint2::ShellPair&,libint2::Shell&,libint2::Shell&,
+                      int,int*,int,int*,int );
+  
+    // magnetic quadrupole integrals
+
+    // contracted magnetic quadrupole integrals 
+    double QuadrupoleM2_vel( libint2::ShellPair&,libint2::Shell&,libint2::Shell&,
+                             int,int*,int,int*,int,int );
+
+    // magnetic quadrupole integrals of a shell pair
+    std::vector<std::vector<double>> computeMQuadrupoleM2_vel( libint2::ShellPair&,
+                                                  libint2::Shell&,libint2::Shell&);
+
+    // electric octupole integrals
+
+    // electric octupole integrals of a shell pair
+    std::vector<std::vector<double>> computeEOctupoleE3_vel( libint2::ShellPair&,
+                                                 libint2::Shell&,libint2::Shell&);
+
+    // contracted electric octupole integral
+    double OctupoleE3_vel( libint2::ShellPair&,libint2::Shell&,libint2::Shell&,
+                           int,int*,int,int*,int,int,int );
+
+
+    // Taylor intrapolation of Boys function
+    void computeFmTTaylor(double*,double,int,int);
+
+    // nuclear potential integrals
+
+    // contracted nuclear potential integrals of a shell pair
+    std::vector<double> computePotentialV(libint2::ShellPair&,
+                               libint2::Shell&,libint2::Shell&); 
+
+    // horizontal recursion of contracted nuclear potential integrals
+    double hRRVab(libint2::ShellPair&,libint2::Shell&,libint2::Shell&,
+                     int,int*,int,int*);
+
+    // Bra vertical recursion of uncontracted nuclear potential integrals
+    double vRRVa0(libint2::ShellPair::PrimPairData&,libint2::Shell&,
+                  double*,double*,int,int,int*,int);
+
+    // horizontal recursion of uncontracted nuclear potential integrals
+    double hRRiPPVab(libint2::ShellPair::PrimPairData&,libint2::Shell&,libint2::Shell&,
+                     int,int*,int,int*,double*,int,int);
+    
+    // Ket vertical recursion of uncontracted nuclear potential integrals
+    double vRRV0b(libint2::ShellPair::PrimPairData&,libint2::Shell&,
+                  double*,double*,int,int,int*,int);
+
+    // spin orbit integrals
+
+    // spin orbit integrals of a shell pair
+    std::vector<std::vector<double>> computeSL(libint2::ShellPair&,
+                                   libint2::Shell&,libint2::Shell&);
+
+    // vertical recursion of uncontracted spin orbit integral
+    double Slabmu(libint2::ShellPair::PrimPairData&,libint2::Shell&,libint2::Shell&,
+                 double*,double*,int,int*,int,int*,int,int,int);
+
+    // pV dot p integrals
+
+    // pV dot p integrals of a shell pair
+    std::vector<std::vector<double>> computepVdotp(libint2::ShellPair&,
+                                        libint2::Shell&,libint2::Shell&); 
+
+    // vertical recursion of uncontracted pV dot p integrals
+    double pVpab(libint2::ShellPair::PrimPairData&,libint2::Shell&,libint2::Shell&,
+                      int,int*,int,int*,int,int); 
+
+    // local one body integrals end
+
     public:
 
 
@@ -131,6 +267,9 @@ namespace ChronusQ {
     oper_t_coll velElecDipole;     ///< Electric Dipole matrix     (velocity)
     oper_t_coll velElecQuadrupole; ///< Electric Quadrupole matrix (velocity)
     oper_t_coll velElecOctupole;   ///< Electric Octuupole matrix  (velocity)
+
+    oper_t_coll magDipole;     ///< Electric Dipole matrix     (length)
+    oper_t_coll magQuadrupole; ///< Electric Quadrupole matrix (length)
 
     oper_t_coll coreH; ///< Core Hamiltonian (scalar and magnetization)
     
@@ -218,8 +357,6 @@ namespace ChronusQ {
     void computeERI();    // Evaluate and store the ERIs in the CGTO basis
     void computeOrtho();  // Evaluate orthonormalization transformations
 
-
-
     // Integral contraction
 
     /**
@@ -256,6 +393,11 @@ namespace ChronusQ {
     template <typename T> void Ortho2TransT(T* A, T* TransA);
     
   }; // class AOIntegrals
+
+  extern std::array<std::array<double,25>,3201> FmTTable;
+
+  void generateFmTTable();  
+
 
 }; // namespace ChronusQ
 

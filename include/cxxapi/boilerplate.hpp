@@ -27,6 +27,7 @@
 
 #include <chronusq_sys.hpp>
 #include <libint2/cxxapi.h>
+#include <aointegrals.hpp> 
 
 namespace ChronusQ {
 
@@ -42,6 +43,13 @@ namespace ChronusQ {
 
     // Bootstrap libint2 env
     libint2::initialize();
+
+    // SS start
+    pop_cart_ang_list();  // populate cartesian angular momentum list  
+    pop_car2sph_matrix();        // populate cartesian to spherical transform matrix
+    generateFmTTable();
+    // SS end
+
 #ifdef _OPENMP
     // Thread pool (default serial)
     omp_set_num_threads(2);

@@ -253,5 +253,209 @@ namespace ChronusQ {
 
   }; // BasisSet::operator<<
 
+  std::vector<std::vector<std::array<int,3>>> cart_ang_list;
+  void pop_cart_ang_list() {
+    // generate angular momentum list, can only be called once. 
+    int k,xx,yy,x,y,z;
+    for (  k = 0 ; k<6 ; k++ ){
+      cart_ang_list.emplace_back();  //loop over possible angular momentum
+      for (  xx=0 ; xx<k+1 ; xx++ ){ 
+        x = k -xx ; 
+        for ( yy = 0 ; yy<xx+1 ; yy++ ){ 
+          y = xx-yy; 
+          z = k - x - y;
+          cart_ang_list[k].push_back({x,y,z});
+        }
+      }
+    }
+  };
+
+
+// sperical to cartesian transform matrix elements
+
+//math functions, like factorial, double factorial and bionomials
+//--------------------------------------//
+// factorial function:  t! = 1*2*3...*t //
+//--------------------------------------//
+double factorial(int t){
+  int i;
+  double tmp = 1.0;
+  if (t<0 ) std::cout<<"Factorial (t!) only defined on domain t in [0,inf)"<<std::endl;
+  if (t==0) return 1.0;
+  else {
+    for(i=1;i<=t;i++) tmp *= i;
+    return tmp;
+  }
+} //factorial
+
+//-----------------------------------------------//
+// double factorial:  (2t-1)!! = 1*3*5*..*(2t-1) //
+//-----------------------------------------------//
+double doubleFact(int t){
+  int i;
+  double tmp = 1.0;
+  if (t<0 ) std::cout<<"Double factorial (t!!) only defined on domain t in [0,inf)" 
+                     <<std::endl;
+  if (t==0) return 1.0;
+  else  {
+    for(i=1;i<=t;i++) tmp *= (2*i-1);
+    return tmp;
+  }
+} // doubleFact
+
+//---------------------------------------------------------//
+// polynomial coeff:   (x+a)^l= sum(coeff * x^i * a^(l-i)) //
+//---------------------------------------------------------//
+double polyCoeff(int l, int i){
+  if (l>= i) return factorial(l)/( factorial(i)*factorial(l-i) );
+  else std::cout<<"polyCoeff error"<<std::endl;
+}
+
+
+std::complex <double> cart2sphCoeff(int L, int m, int lx, int ly, int lz){
+
+//calculate the cartesian to spherical transformation coefficient.
+
+  int Ltotal;
+  dcomplex coeff(0.0);
+  Ltotal = lx+ly+lz;
+  double tmp = 0.0;
+  if (L!=Ltotal) {
+    return  coeff;
+  }
+  double j;
+  j = (double(lx+ly)-std::abs(double(m)))/2;
+  if (fmod(j,1)>0) {
+    return coeff;
+  }
+  dcomplex sumval(0.0);
+  dcomplex ttmmpp,sumsumval;
+  dcomplex pref,absmchooselxm2k,ichoosej;
+  int i,k;
+  if (Ltotal == L) {
+  pref = sqrt(factorial(lx*2)*factorial(2*ly)
+          *factorial(2*lz)*factorial(L)
+          *factorial(L-std::abs(m))
+     /(factorial(2*L)*factorial(lx)*factorial(ly)
+      *factorial(lz)*factorial(L+std::abs(m))))
+     /(factorial(L)*pow(2,L));
+  
+  i = 0;
+  
+  while (i<=double((L-std::abs(m))/2) ) {
+    sumsumval = 0.0;
+    for ( k = 0 ; k <= j ; k++ ) {
+      if (m>=0) {
+        ttmmpp = double(std::abs(m)-lx+2*k)/2;
+      }
+      else {
+        ttmmpp = -double(std::abs(m)-lx+2*k)/2;
+      }
+      
+      if ((std::abs(m)>=(lx-2*k))&&((lx-2*k)>=0)) {
+        absmchooselxm2k =polyCoeff(std::abs(m),lx-2*k);
+      }
+      else {
+        absmchooselxm2k = 0.0;
+      }
+      sumsumval = sumsumval + polyCoeff(j,k)
+                  *absmchooselxm2k*pow(-1.0,ttmmpp);
+    }
+    if (i<j||(j<0)) {
+       ichoosej = 0.0;
+    }
+    else {
+      ichoosej = polyCoeff(i,j);
+    }
+    sumval = sumval + polyCoeff(L,i)*ichoosej*pow(-1,i)
+                *factorial(2*L-2*i)/
+                (factorial(L-std::abs(m)-2*i))*sumsumval;
+    i = i + 1;
+  }
+  coeff = pref * sumval;
+  return coeff;
+  }
+} // cart2sphCoeff   
+
+std::vector<std::vector<double>> car2sph_matrix;
+void pop_car2sph_matrix() {
+ //populate transform matrix up to L=6
+  int l[3];
+  int m;
+  int carsize; //cartesian size
+  double scalecoeff;
+
+  for ( int L ; L<6 ; L++ ) {
+    car2sph_matrix.emplace_back();
+    carsize = (L+1)*(L+2)/2;
+    car2sph_matrix[L].assign((2*L+1)*carsize, 0.0);
+    if ( L==0 ){
+      car2sph_matrix[L][0]=1.0;
+    } 
+    else if (L==1) {
+      car2sph_matrix[L][0*3+0] = 1.0;
+      car2sph_matrix[L][1*3+1] = 1.0;
+      car2sph_matrix[L][2*3+2] = 1.0;
+    }
+    else {
+      for ( int p=0 ; p < L+1 ; p++ )
+      for ( int q=0 ; q < carsize ; q++ ){
+        for ( int k=0 ; k<3 ; k++ ) l[k]=cart_ang_list[L][q][k];
+        m = -L+p;    
+        if ( m<0 ) {
+          auto cplxcoeff = cart2sphCoeff(L,m,l[0],l[1],l[2]);   // complex coefficient
+          
+          car2sph_matrix[L][p*carsize+q] = sqrt(2.0)*(-cplxcoeff.imag());
+
+          car2sph_matrix[L][(2*L-p)*carsize+q] = sqrt(2.0)*cplxcoeff.real();
+
+          double scalecoeff = sqrt(doubleFact(L)/
+          (doubleFact(l[0])*doubleFact(l[1])*doubleFact(l[2])));
+        car2sph_matrix[L][p*carsize+q] = car2sph_matrix[L][p*carsize+q] *scalecoeff;
+        car2sph_matrix[L][(2*L-p)*carsize+q] = car2sph_matrix[L][(2*L-p)
+                                               *carsize+q]*scalecoeff; 
+      } else if ( m ==0 ) {
+        car2sph_matrix[L][p*carsize+q] = cart2sphCoeff(L,m,l[0],l[1],l[2]).real();
+        scalecoeff = sqrt(doubleFact(L)/
+          (doubleFact(l[0])*doubleFact(l[1])*doubleFact(l[2])));
+        car2sph_matrix[L][p*carsize+q] = car2sph_matrix[L][p*carsize+q]*scalecoeff;   
+      } 
+    }
+  }
+
+ } //loop over angular momentum
+
+} //pop_car2sph_matrix()
+
+void cart2sph_transform( int l_i, int l_j, std::vector<double> &shell_element_sph, std::vector<double> &shell_element_cart) {
+
+  int cart_i = (l_i+1)*(l_i+2)/2;
+  int cart_j = (l_j+1)*(l_j+2)/2;
+  int cartsize = cart_i*cart_j;
+  int sphsize  = (2*l_i+1)*(2*l_j+1);
+  double tempVal;
+
+  if (sphsize != shell_element_sph.size() )
+    std::cout<<"spherical dimension doesn't match"<<std::endl;
+  if (cartsize != shell_element_cart.size() )
+    std::cout<<"cartesian dimension doesn't match"<<std::endl;
+ 
+  for( int i = 0 ; i<2*l_i+1 ; i++  ) {
+    for( int j = 0 ; j<2*l_j+1 ; j++ ) {
+      tempVal = 0.0;
+      for( int p = 0 ; p<cart_i ; p++ ) {
+        for( int q = 0 ; q<cart_j ; q++ ) {
+          tempVal += car2sph_matrix[l_i][i*cart_i+p]*car2sph_matrix[l_j][j*cart_j+q]
+                     *shell_element_cart[p*cart_j+q];
+        }
+      }
+
+    if (std::abs(tempVal)<1.0e-15) tempVal=0.0;
+    shell_element_sph[i*(2*l_j+1)+j] = tempVal;
+    }
+  }   
+} //cart2sph_transform   
+
+
 }; // namespace ChronusQ
 
