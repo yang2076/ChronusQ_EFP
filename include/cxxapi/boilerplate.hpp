@@ -52,7 +52,7 @@ namespace ChronusQ {
 
 #ifdef _OPENMP
     // Thread pool (default serial)
-    omp_set_num_threads(2);
+    omp_set_num_threads(1);
 #endif
 
   }; // initialize

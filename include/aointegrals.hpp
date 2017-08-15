@@ -51,6 +51,12 @@ namespace ChronusQ {
   }; ///< 2-Body Tensor Contraction Specification
 
 
+  enum CORE_HAMILTONIAN_TYPE {
+    NON_RELATIVISTIC,
+    EXACT_2C
+  };
+
+
   /**
    *  The TwoBodyContraction struct. Stores information
    *  pertinant for a two body operator contraction with
@@ -201,8 +207,17 @@ namespace ChronusQ {
     // nuclear potential integrals
 
     // contracted nuclear potential integrals of a shell pair
-    std::vector<double> computePotentialV(libint2::ShellPair&,
-                               libint2::Shell&,libint2::Shell&); 
+    std::vector<std::vector<double>> computePotentialV(
+      const std::vector<libint2::Shell> &, libint2::ShellPair&, 
+      libint2::Shell&,libint2::Shell&); 
+
+    inline std::vector<std::vector<double>> computePotentialV(
+      libint2::ShellPair& pair, libint2::Shell &s1, libint2::Shell &s2) {
+    
+      std::vector<libint2::Shell> dummy;
+      return computePotentialV(dummy,pair,s1,s2);
+
+    }
 
     // horizontal recursion of contracted nuclear potential integrals
     double hRRVab(libint2::ShellPair&,libint2::Shell&,libint2::Shell&,
@@ -213,8 +228,8 @@ namespace ChronusQ {
                   double*,double*,int,int,int*,int);
 
     // horizontal recursion of uncontracted nuclear potential integrals
-    double hRRiPPVab(libint2::ShellPair::PrimPairData&,libint2::Shell&,libint2::Shell&,
-                     int,int*,int,int*,double*,int,int);
+    double hRRiPPVab(libint2::ShellPair::PrimPairData&, libint2::Shell&,
+      libint2::Shell&, int,int*,int,int*,double*,int,int);
     
     // Ket vertical recursion of uncontracted nuclear potential integrals
     double vRRV0b(libint2::ShellPair::PrimPairData&,libint2::Shell&,
@@ -223,27 +238,47 @@ namespace ChronusQ {
     // spin orbit integrals
 
     // spin orbit integrals of a shell pair
-    std::vector<std::vector<double>> computeSL(libint2::ShellPair&,
-                                   libint2::Shell&,libint2::Shell&);
+    std::vector<std::vector<double>> computeSL(
+      const std::vector<libint2::Shell>&, libint2::ShellPair&,
+      libint2::Shell&,libint2::Shell&);
+
+    inline std::vector<std::vector<double>> computeSL(libint2::ShellPair &pair,
+      libint2::Shell &s1, libint2::Shell &s2) {
+
+      std::vector<libint2::Shell> dummy;
+      return computeSL(dummy,pair,s1,s2);
+
+    }
 
     // vertical recursion of uncontracted spin orbit integral
-    double Slabmu(libint2::ShellPair::PrimPairData&,libint2::Shell&,libint2::Shell&,
-                 double*,double*,int,int*,int,int*,int,int,int);
+    double Slabmu(libint2::ShellPair::PrimPairData&,libint2::Shell&,
+      libint2::Shell&, double*,double*,int,int*,int,int*,int,int,int);
 
     // pV dot p integrals
 
     // pV dot p integrals of a shell pair
-    std::vector<std::vector<double>> computepVdotp(libint2::ShellPair&,
-                                        libint2::Shell&,libint2::Shell&); 
+    std::vector<std::vector<double>> computepVdotp(
+      const std::vector<libint2::Shell>&, libint2::ShellPair&,
+      libint2::Shell&,libint2::Shell&);
+
+    inline std::vector<std::vector<double>> computepVdotp(
+      libint2::ShellPair &pair, libint2::Shell &s1, libint2::Shell &s2) {
+
+      std::vector<libint2::Shell> dummy;
+      return computepVdotp(dummy,pair,s1,s2);
+
+    }
 
     // vertical recursion of uncontracted pV dot p integrals
-    double pVpab(libint2::ShellPair::PrimPairData&,libint2::Shell&,libint2::Shell&,
-                      int,int*,int,int*,int,int); 
+    double pVpab(libint2::ShellPair::PrimPairData&,libint2::Shell&,
+      libint2::Shell&, int,int*,int,int*,int,int); 
 
     // local one body integrals end
 
     public:
 
+    // Control Variables
+    CORE_HAMILTONIAN_TYPE coreType;
 
 
     // Operator storage
@@ -294,7 +329,7 @@ namespace ChronusQ {
       threshSchwartz_(1e-14), cAlg_(DIRECT), orthoType_(LOWDIN), 
       memManager_(memManager), basisSet_(basis), molecule_(mol), 
       schwartz(NULL), ortho1(NULL), ortho2(NULL), overlap(NULL), 
-      kinetic(NULL), potential(NULL), ERI(NULL) {
+      kinetic(NULL), potential(NULL), ERI(NULL), coreType(NON_RELATIVISTIC) {
 
       nTT_  = basis.nBasis * ( basis.nBasis + 1 ) / 2;
       nSQ_  = basis.nBasis * basis.nBasis;
@@ -353,9 +388,18 @@ namespace ChronusQ {
     // Integral evaluation
     // (see src/aointegrals/aointegrals_builders.cxx for docs)
 
-    void computeAOOneE(); // Evaluate and store the 1-e ints in the CGTO basis
+    void computeAOOneE(bool); // Evaluate the 1-e ints in the CGTO basis
     void computeERI();    // Evaluate and store the ERIs in the CGTO basis
     void computeOrtho();  // Evaluate orthonormalization transformations
+
+    // CH == Core Hamiltonian
+    void computeCoreHam(CORE_HAMILTONIAN_TYPE); // Compute the CH
+    void computeNRCH(double*); // Non-relativistic CH
+    void computeX2CCH(std::vector<double*>&); // X2C CH (aointegrals_rel.cxx)
+    void compute4CCH(std::vector<libint2::Shell>&, double *); // 4C CH
+
+    // Allow for delayed evaluation of CH
+    inline void computeCoreHam() { computeCoreHam(coreType); }
 
     // Integral contraction
 

@@ -212,40 +212,64 @@ namespace ChronusQ {
 
     size_t OSize = memManager.template getSize(fock[SCALAR]);
     size_t NB    = aoints.basisSet().nBasis;
-    T* SCR       = memManager.template malloc<T>(NB*NB);
+    T* SCR       = memManager.template malloc<T>(nC*nC*NB*NB);
 
-    // FD(S) = F(S)D(S)
-    Gemm('N', 'N', NB, NB, NB, T(1.), fockOrtho[SCALAR], NB, 
-      onePDMOrtho[SCALAR], NB, T(0.), FDC[SCALAR], NB);
-
-    // FD(S) += F(z)D(z)
-    if(nC == 2 or !iCS) {
-      Gemm('N', 'N', NB, NB, NB, T(1.), fockOrtho[MZ], NB, 
-        onePDMOrtho[MZ], NB, T(0.), SCR, NB);
-      MatAdd('N','N', NB, NB, T(1.), FDC[SCALAR], NB, T(1.), 
-        SCR, NB, FDC[SCALAR], NB);
-    }
-
-    // Form {FD - DF}(S)
-    std::copy_n(FDC[SCALAR],OSize,SCR);
-    MatAdd('N','C', NB, NB, T(1.), FDC[SCALAR], NB, T(-1.), 
-      SCR, NB, FDC[SCALAR], NB);
-//  prettyPrintSmart(std::cout,"[F,P]",FDC[SCALAR],NB,NB,NB);
-
-
-    if(nC == 2 or !iCS) {
-      // FD(z) = F(S)D(z) + F(z)D(S)
+    if(this->nC == 1) {
+      // FD(S) = F(S)D(S)
       Gemm('N', 'N', NB, NB, NB, T(1.), fockOrtho[SCALAR], NB, 
-        onePDMOrtho[MZ], NB, T(0.), FDC[MZ], NB);
-      Gemm('N', 'N', NB, NB, NB, T(1.), fockOrtho[MZ], NB, 
-        onePDMOrtho[SCALAR], NB, T(0.), SCR, NB);
-      MatAdd('N','N', NB, NB, T(1.), FDC[MZ], NB, T(1.), 
-        SCR, NB, FDC[MZ], NB);
+        onePDMOrtho[SCALAR], NB, T(0.), FDC[SCALAR], NB);
 
-      // Form {FD - DF}(z)
-      std::copy_n(FDC[MZ],OSize,SCR);
-      MatAdd('N','C', NB, NB, T(1.), FDC[MZ], NB, T(-1.), 
-        SCR, NB, FDC[MZ], NB);
+      // FD(S) += F(z)D(z)
+      if(nC == 2 or !iCS) {
+        Gemm('N', 'N', NB, NB, NB, T(1.), fockOrtho[MZ], NB, 
+          onePDMOrtho[MZ], NB, T(0.), SCR, NB);
+        MatAdd('N','N', NB, NB, T(1.), FDC[SCALAR], NB, T(1.), 
+          SCR, NB, FDC[SCALAR], NB);
+      }
+
+      // Form {FD - DF}(S)
+      std::copy_n(FDC[SCALAR],OSize,SCR);
+      MatAdd('N','C', NB, NB, T(1.), FDC[SCALAR], NB, T(-1.), 
+        SCR, NB, FDC[SCALAR], NB);
+
+
+      if(nC == 2 or !iCS) {
+        // FD(z) = F(S)D(z) + F(z)D(S)
+        Gemm('N', 'N', NB, NB, NB, T(1.), fockOrtho[SCALAR], NB, 
+          onePDMOrtho[MZ], NB, T(0.), FDC[MZ], NB);
+        Gemm('N', 'N', NB, NB, NB, T(1.), fockOrtho[MZ], NB, 
+          onePDMOrtho[SCALAR], NB, T(0.), SCR, NB);
+        MatAdd('N','N', NB, NB, T(1.), FDC[MZ], NB, T(1.), 
+          SCR, NB, FDC[MZ], NB);
+
+        // Form {FD - DF}(z)
+        std::copy_n(FDC[MZ],OSize,SCR);
+        MatAdd('N','C', NB, NB, T(1.), FDC[MZ], NB, T(-1.), 
+          SCR, NB, FDC[MZ], NB);
+      }
+    } else {
+
+      T* FO = memManager.template malloc<T>(4*NB*NB);
+      T* DO = memManager.template malloc<T>(4*NB*NB);
+
+      // Gather the orthonormal Fock and densities
+      SpinGather(NB,FO,2*NB,fockOrtho[SCALAR],NB,fockOrtho[MZ],
+        NB,fockOrtho[MY],NB,fockOrtho[MX],NB);
+      SpinGather(NB,DO,2*NB,onePDMOrtho[SCALAR],NB,onePDMOrtho[MZ],
+        NB,onePDMOrtho[MY],NB,onePDMOrtho[MX],NB);
+
+      // Compute FD product
+      Gemm('N','N',2*NB,2*NB,2*NB,T(1.),FO,2*NB,DO,2*NB,T(0.),SCR,2*NB);
+      
+      // Compute FD - DF (Store in FO scratch)
+      MatAdd('N','C',2*NB,2*NB,T(1.),SCR,2*NB,T(-1.),SCR,2*NB,
+        FO,2*NB);
+
+      // Scatter Product into FDC
+      SpinScatter(NB,FO,2*NB,FDC[SCALAR],NB,FDC[MZ],
+        NB,FDC[MY],NB,FDC[MX],NB);
+
+      memManager.free(FO,DO);
     }
 
 

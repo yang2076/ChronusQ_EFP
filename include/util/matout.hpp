@@ -68,7 +68,7 @@ void prettyPrintSmartBase(std::ostream& out, T* A, const size_t M,
       out << std::setw(5) << std::left << j+1;
       out << std::right;
       for(size_t n = i; n < i+end; n++) {
-        T VAL = A[j*colStride + n*LDA];
+        T VAL = A[j*colStride + n*LDA*colStride];
         if(std::abs(VAL) > PRINT_SMALL) out << std::setw(printWidth) << VAL; 
         else if(std::isnan(VAL))        out << std::setw(printWidth) << "NAN";
         else if(std::isinf(VAL))        out << std::setw(printWidth) << "INF";
@@ -143,6 +143,58 @@ void prettyPrintSmart(std::ostream& out, std::string str, T* A,
     list,printWidth);
 
 }; // prettyPrintSmart (T = dcomplex)
+
+
+
+template <typename T, 
+          typename std::enable_if<
+                     std::is_same<T,double>::value,int>::type = 0>
+void mathematicaPrint(std::ostream& out, std::string str, T* A, 
+  const size_t M, const size_t N, const size_t LDA) { 
+
+  out << str << ":   \n";
+
+  out << "{ \n";
+  for(auto i = 0; i < M; i++){
+    out << "{  ";
+  for(auto j = 0; j < N; j++){
+    out << std::setprecision(12) << A[i + j*LDA];
+    if(j != N-1) out << ", ";
+  }
+    out << "}";
+    if( i != M-1 ) out << ",\n";
+  }
+  out << "\n}\n";
+  
+
+};
+
+template <typename T, 
+          typename std::enable_if<
+                     std::is_same<T,dcomplex>::value,int>::type = 0>
+void mathematicaPrint(std::ostream& out, std::string str, T* A, 
+  const size_t M, const size_t N, const size_t LDA) { 
+
+  out << str << ":   \n";
+
+  out << "{ \n";
+  for(auto i = 0; i < M; i++){
+    out << "{  ";
+  for(auto j = 0; j < N; j++){
+    out << "Complex[";
+    out << std::setprecision(12) << std::real(A[i + j*LDA]);
+    out << ",";
+    out << std::setprecision(12) << std::imag(A[i + j*LDA]);
+    out << "]";
+    if(j != N-1) out << ", ";
+  }
+    out << "}";
+    if( i != M-1 ) out << ",\n";
+  }
+  out << "\n}\n";
+  
+
+};
 
 }; // namespace ChronusQ
 

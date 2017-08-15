@@ -22,6 +22,7 @@
  *  
  */
 #include <molecule.hpp>
+#include <physcon.hpp>
 #include <cxxapi/output.hpp>
 
 namespace ChronusQ {
@@ -179,6 +180,45 @@ namespace ChronusQ {
     }
 
   } // Molecule::computeMOI
+
+
+  /**
+   *  \breif Generate gaussian shell definitions for the nuclear
+   *  charge distribution.
+   *
+   *  L. Visscher and K. G. Dyall; Atomic Data and Nuclear Data Tables; 67,
+   *    207-224 (1997)
+   */ 
+  void Molecule::computeCDist() {
+
+
+    for(auto &atom : atoms) {
+      double varience = 
+        0.836 * std::pow(atom.massNumber,1.0/3.0) + 0.570; // fm
+
+      varience *= 1e-5; // Ang
+      varience /= AngPerBohr; // Bohr
+
+      varience *= varience;
+
+      double zeta = 3. / 2. / varience;
+
+      chargeDist.push_back(
+        libint2::Shell {
+          { zeta }, 
+          {{0,false,{double(atom.atomicNumber)}}},
+          atom.coord
+        }
+      );
+
+      // Handle the fact that libint likes to make things square normalized
+      // not normalized
+      chargeDist.back().contr[0].coeff[0] = 
+        atom.atomicNumber * std::pow(zeta / M_PI, 1.5);
+
+    } // loop over atoms
+
+  }; // Molecule::computeCDist
 
 
 

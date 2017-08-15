@@ -91,6 +91,10 @@ namespace ChronusQ {
     }; // WaveFunctionBase ctor
 
 
+    // Print Functions
+    virtual void printMO(std::ostream&)  = 0;
+    virtual void printEPS(std::ostream&) = 0;
+
   }; // class WaveFunctionBase
 
 }; // namespace ChronusQ

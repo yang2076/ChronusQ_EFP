@@ -150,12 +150,18 @@ namespace ChronusQ {
 
     //   7. Print SCF header, footer and progress
     void printSCFHeader(std::ostream &out = std::cout);
-//  virtual void printSCFFooter(bool,std::ostream &out = std::cout) = 0;
     void printSCFProg(std::ostream &out = std::cout);
 
     //   8. Initialize and finalize the SCF environment
     virtual void SCFInit() = 0;
     virtual void SCFFin()  = 0;
+
+    //   9. Print various matricies
+    virtual void printFock(std::ostream& )     = 0;
+    virtual void print1PDMOrtho(std::ostream&) = 0;
+    virtual void printGD(std::ostream&)        = 0;
+    virtual void printJ(std::ostream&)         = 0;
+    virtual void printK(std::ostream&)         = 0;
 
     // Procedural Functions to be shared among all derived classes
       

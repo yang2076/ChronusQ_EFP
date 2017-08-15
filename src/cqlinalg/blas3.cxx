@@ -60,7 +60,9 @@ namespace ChronusQ {
 #ifdef _CQ_MKL
     dzgemm(&TRANSA,&TRANSB,&M,&N,&K,&ALPHA,A,&LDA,B,&LDB,&BETA,C,&LDC);
 #else
-    assert(TRANSA == 'N' and TRANSB == 'N');
+    assert( TRANSA == 'N' and (TRANSB == 'N' or TRANSB == 'C') );
+
+    int COLS_B = (TRANSB == 'N') ? N : K;
 
     Eigen::Map<
       Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor>
@@ -68,11 +70,16 @@ namespace ChronusQ {
 
     Eigen::Map<
       Eigen::Matrix<dcomplex,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor>
-    > BMap(B,LDB,N), CMap(C,LDC,N);
+    > BMap(B,LDB,COLS_B), CMap(C,LDC,N);
 
-    CMap.block(0,0,M,N).noalias() = 
-      AMap.block(0,0,M,K).cast<dcomplex>() *
-      BMap.block(0,0,K,N);
+    if(TRANSB == 'N')
+      CMap.block(0,0,M,N).noalias() = 
+        AMap.block(0,0,M,K).cast<dcomplex>() *
+        BMap.block(0,0,K,N);
+    else
+      CMap.block(0,0,M,N).noalias() = 
+        AMap.block(0,0,M,K).cast<dcomplex>() *
+        BMap.block(0,0,N,K).adjoint();
 #endif
 
   }; // GEMM (real,complex,complex)

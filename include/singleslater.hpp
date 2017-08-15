@@ -181,13 +181,17 @@ namespace ChronusQ {
     // Misc procedural
     void diagOrthoFock();
     void FDCommutator(oper_t_coll &);
-//  void printSCFProg(std::ostream &out = std::cout);
-//  void printSCFHeader(std::ostream &out = std::cout);
-//  void printSCFFooter(bool,std::ostream &out = std::cout);
     virtual void saveCurrentState();
     virtual void formDelta();
     void SCFInit();
     void SCFFin();
+
+    // Print functions
+    void printFock(std::ostream& )    ;
+    void print1PDMOrtho(std::ostream&);
+    void printGD(std::ostream&)       ;
+    void printJ(std::ostream&)        ;
+    void printK(std::ostream&)        ;
 
     // SCF extrapolation functions (see include/singleslater/extrap.hpp for docs)
     void allocExtrapStorage();

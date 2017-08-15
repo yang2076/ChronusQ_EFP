@@ -142,6 +142,8 @@ namespace ChronusQ {
       return results;
     }; // Quantum<T>::computeOBProperty (many operators)
 
+    // Print functions
+    void print1PDM(std::ostream&);
 
   }; // class Quantum
 

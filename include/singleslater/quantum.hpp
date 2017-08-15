@@ -71,8 +71,21 @@ namespace ChronusQ {
 
       }
     } else {
-      // TODO: 2C
+
+      T * SCR = this->memManager.template malloc<T>(NB2);
+
+      Gemm('N', 'C', NB, NB, this->nO, T(1.), this->mo1, NB, this->mo1,
+        NB, T(0.), SCR, NB);
+
+      SpinScatter(NB/2,SCR,NB,this->onePDM[SCALAR],NB/2,this->onePDM[MZ],
+        NB/2,this->onePDM[MY],NB/2,this->onePDM[MX],NB/2);
+
+      this->memManager.free(SCR);
+
     }
+#if 0
+      print1PDM(std::cout);
+#endif
 
   }; // SingleSlater<T>::formDensity
 
@@ -122,9 +135,10 @@ namespace ChronusQ {
     };
 
     SOEnergy *= dcomplex(0.,1.);
-    this->OBEnergy -= std::real(SOEnergy);
+    this->OBEnergy += std::real(SOEnergy);
 
     this->OBEnergy *= 0.5;
+
 
 
     // Compute many-body contribution to energy

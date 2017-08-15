@@ -26,6 +26,10 @@
 #include <basisset/reference.hpp>
 #include <cxxapi/output.hpp>
 
+#include <util/matout.hpp>
+#include <cqlinalg/blas1.hpp>
+#include <cqlinalg/blas3.hpp>
+
 namespace ChronusQ {
 
   // Basis set keyword map
@@ -252,6 +256,86 @@ namespace ChronusQ {
     return out; // return std::ostream reference
 
   }; // BasisSet::operator<<
+
+
+  /**
+   *  \brief Return the uncontracted shell set of the current
+   *  contracted shell set
+   */ 
+  std::vector<libint2::Shell> BasisSet::uncontractShells() {
+
+    std::vector<libint2::Shell> newShells;
+
+    for(auto &shell : shells) // Loop over shells
+    for(auto &a : shell.alpha) // Loop over primitives
+      newShells.push_back(
+        libint2::Shell{
+          { a },
+          { {shell.contr[0].l, shell.contr[0].pure, { 1.0 } } },
+          { { shell.O[0], shell.O[1], shell.O[2] } }
+        }
+      );
+    
+
+
+    return newShells;
+
+
+  }; // BasisSet::uncontractShells
+
+
+  void BasisSet::makeMapPrim2Cont(double *SUn, double *MAP, CQMemManager &mem) {
+
+    memset(MAP,0,nPrimitive * nBasis * sizeof(double));
+
+    double *rA = MAP;
+
+    // Compute the unnormalized mapping
+    for(auto iSh = 0; iSh < nShell; iSh++) {
+
+      size_t nPrim = shells[iSh].alpha.size();
+      size_t nBf   = shells[iSh].size();
+
+      for(auto iP = 0ul; iP < nPrim; iP++)
+      for(auto iB = 0ul; iB < nBf;   iB++) 
+        rA[iB + (iP*nBf + iB)*nBasis] = unNormCont[iSh][iP];
+
+      rA += nPrim * nBf * nBasis + nBf;
+
+    } // loop over shells
+
+  
+    // Compute SUn * MAP
+    double *SCR = mem.malloc<double>(nBasis*nPrimitive);
+    Gemm('N','T',nPrimitive,nBasis,nPrimitive,1.,SUn,nPrimitive,
+      MAP,nBasis,0.,SCR,nPrimitive);
+
+    for(auto i = 0; i < nBasis; i++)  {
+      double fact = InnerProd<double>(nPrimitive,MAP + i,nBasis,
+                                                 SCR + i*nPrimitive,1);
+
+      Scale(nPrimitive,1./std::sqrt(fact),MAP + i,nBasis);
+    }
+    
+    mem.free(SCR);
+
+  };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   std::vector<std::vector<std::array<int,3>>> cart_ang_list;
   void pop_cart_ang_list() {

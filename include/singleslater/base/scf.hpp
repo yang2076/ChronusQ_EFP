@@ -90,7 +90,7 @@ namespace ChronusQ {
     out << BannerTop << std::endl;
     out << "Self Consistent Field (SCF) Settings:" << std::endl << std::endl;
 
-    out << std::setw(38) << std::left << "  SCF Type:" << refLongName_ 
+    out << std::setw(38) << std::left << "  Reference:" << refLongName_ 
            << std::endl;
 
     out << std::setprecision(6) << std::scientific;

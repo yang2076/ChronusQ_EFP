@@ -27,6 +27,7 @@
 #include <singleslater.hpp>
 #include <util/matout.hpp>
 #include <cqlinalg/blas1.hpp>
+#include <cqlinalg/blasutil.hpp>
 
 // SCF definitions for SingleSlaterBase
 #include <singleslater/base/scf.hpp> 
@@ -222,7 +223,10 @@ namespace ChronusQ {
         this->mo2[j] = 0.5 * (fockOrtho[SCALAR][j] - fockOrtho[MZ][j]); 
       }
     else { 
-      // TODO 2C 
+
+      SpinGather(NB/2,this->mo1,NB,fockOrtho[SCALAR],NB/2,fockOrtho[MZ],
+        NB/2,fockOrtho[MY],NB/2,fockOrtho[MX],NB/2);
+
     }
 
     // Diagonalize the Fock Matrix
@@ -235,6 +239,10 @@ namespace ChronusQ {
         memManager );
       if( INFO != 0 ) CErr("HermetianEigen failed in Fock2",std::cout);
     }
+
+#if 0
+    printMO(std::cout);
+#endif
 
   }; // SingleSlater<T>::diagOrthoFock
 
@@ -266,6 +274,10 @@ namespace ChronusQ {
 
     for(auto i = 0; i < onePDMOrtho.size(); i++)
       aoints.Ortho1Trans(onePDMOrtho[i],this->onePDM[i]);
+
+#if 0
+    print1PDMOrtho(std::cout);
+#endif
 
   }; // SingleSlater<T>::ao2orthoFock
 

@@ -31,7 +31,7 @@
 namespace ChronusQ {
 
   enum DENSITY_TYPE {
-    SCALAR=0,MZ,MY,MX
+    SCALAR=0,MZ=1,MY=2,MX=3
   }; ///< Enumerate the types of densities for contraction
 
   // Helper function for operator traces
@@ -129,6 +129,9 @@ namespace ChronusQ {
      */ 
     virtual void computeEnergy() = 0;
 
+
+    // Print functions
+    virtual void print1PDM(std::ostream&) = 0;
   }; // class QuantumBase
 
 }; // namespace ChronusQ

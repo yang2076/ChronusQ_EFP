@@ -87,7 +87,7 @@ namespace ChronusQ {
         iCS = true;
     else if( not refString.compare("UHF") )
       iCS = false;
-    else if( not refString.compare("GHF") ) {
+    else if( not refString.compare("GHF") or not refString.compare("X2C") ) {
       iCS = false; nC = 2;
     }
 
@@ -96,31 +96,47 @@ namespace ChronusQ {
 
     // Determine Real/Complex if need be
     if(not RCflag.compare("AUTO") ) {
-      if( not refString.compare("GHF") )
+      if( nC == 2 )
         RCflag = "COMPLEX";
       else
         RCflag = "REAL";
 
-      out << "  *** Auto-determination of wave function field: AUTO -> " << RCflag << " ***" << std::endl;
+      out << "  *** Auto-determination of wave function field: AUTO -> " 
+          << RCflag << " ***" << std::endl;
     }
 
+    // Override core hamiltoninan type for X2C
+    if( not refString.compare("X2C") ) 
+      aoints.coreType = EXACT_2C;
 
+
+     bool isHF  = true;
+     bool isX2C = not refString.compare("X2C");
 
 
     std::shared_ptr<SingleSlaterBase> ss;
 
-    if( not RCflag.compare("REAL") )
-      ss = std::dynamic_pointer_cast<SingleSlaterBase>(
-          std::make_shared<HartreeFock<double>>(
-            aoints,nC,iCS
-          )
-        );
-    else if( not RCflag.compare("COMPLEX") )
-      ss = std::dynamic_pointer_cast<SingleSlaterBase>(
-          std::make_shared<HartreeFock<dcomplex>>(
-            aoints,nC,iCS
-          )
-        );
+    if( isHF ) {
+      if( not RCflag.compare("REAL") )
+        ss = std::dynamic_pointer_cast<SingleSlaterBase>(
+            std::make_shared<HartreeFock<double>>(
+              aoints,nC,iCS
+            )
+          );
+      else if( not RCflag.compare("COMPLEX") )
+        if( isX2C )
+          ss = std::dynamic_pointer_cast<SingleSlaterBase>(
+              std::make_shared<HartreeFock<dcomplex>>(
+                "Exact Two Component","X2C",aoints,nC,iCS
+              )
+            );
+        else
+          ss = std::dynamic_pointer_cast<SingleSlaterBase>(
+              std::make_shared<HartreeFock<dcomplex>>(
+                aoints,nC,iCS
+              )
+            );
+    }
 
 
     return ss;

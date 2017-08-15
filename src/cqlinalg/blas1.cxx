@@ -148,4 +148,33 @@ namespace ChronusQ {
       
   }; // TwoNorm double = (dcomplex)
 
+
+
+
+
+  template<>
+  void Scale(int N, double ALPHA, double *X, int INCX) {
+
+#ifdef _CQ_MKL
+      dscal
+#else
+      dscal_
+#endif
+      (&N,&ALPHA,X,&INCX);
+
+  }; // Scale (double)
+
+  template<>
+  void Scale(int N, dcomplex ALPHA, dcomplex *X, int INCX) {
+
+#ifdef _CQ_MKL
+      zscal(&N,&ALPHA,X,&INCX);
+#else
+      zscal_(&N,reinterpret_cast<double*>(&ALPHA),reinterpret_cast<double*>(X),
+        &INCX);
+#endif
+      
+
+  }; // Scale (dcomplex)
+
 };

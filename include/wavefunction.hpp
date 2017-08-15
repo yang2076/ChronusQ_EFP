@@ -108,6 +108,10 @@ namespace ChronusQ {
     void alloc();
     void dealloc();
 
+    // Print Functions
+    void printMO(std::ostream&) ;
+    void printEPS(std::ostream&);
+
   }; // class WaveFunction
 
 }; // namespace ChronusQ

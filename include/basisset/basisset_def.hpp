@@ -25,6 +25,7 @@
 #define __INCLUDED_BASISSET_DEF_HPP__
 
 #include <chronusq_sys.hpp>
+#include <memmanager.hpp>
 #include <molecule.hpp>
 
 #include <libint2/shell.h>
@@ -109,6 +110,10 @@ namespace ChronusQ {
     // documentation
     friend std::ostream& operator<<(std::ostream &, const BasisSet&);
 
+    // Misc functions
+      
+    std::vector<libint2::Shell> uncontractShells();
+    void makeMapPrim2Cont(double *, double *, CQMemManager&);
 
 
     private:

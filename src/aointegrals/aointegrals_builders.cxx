@@ -24,11 +24,17 @@
 
 #include <aointegrals.hpp>
 #include <cqlinalg.hpp>
+#include <cqlinalg/blasutil.hpp>
+
 #include <util/matout.hpp>
 
 // Debug directives
 //#define _DEBUGORTHO
 //#define _DEBUGERI
+
+
+// Include inhouse integral builder
+#include "aointegrals_builders_inhouse.cxx"
 
 namespace ChronusQ {
 
@@ -201,94 +207,6 @@ namespace ChronusQ {
 
 
 
-  template <size_t NOPER, bool SYMM, typename F>
-  AOIntegrals::oper_t_coll AOIntegrals::OneEDriverLocal(const F &obFunc, shell_set& shells) {
-
-    // Determine the number of basis functions for the passed shell set
-    size_t NB = std::accumulate(shells.begin(),shells.end(),0,
-      [](size_t init, libint2::Shell &sh) -> size_t {
-        return init + sh.size();
-      }
-    );
-
-    size_t NBSQ = NB*NB;
-
-
-    // Determine the maximum angular momentum of the passed shell set
-    int maxL = std::max_element(shells.begin(), shells.end(),
-      [](libint2::Shell &sh1, libint2::Shell &sh2){
-        return sh1.contr[0].l < sh2.contr[0].l;
-      }
-    )->contr[0].l;
-
-    // Determine the maximum contraction depth of the passed shell set
-    int maxPrim = std::max_element(shells.begin(), shells.end(),
-      [](libint2::Shell &sh1, libint2::Shell &sh2){
-        return sh1.alpha.size() < sh2.alpha.size();
-      }
-    )->alpha.size();
-
-
-    // Determine the number of operators
-    AOIntegrals::oper_t_coll mats(NOPER);
-
-    std::vector<
-      Eigen::Map<
-        Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor>
-      > 
-    > matMaps;
-    for( auto i = 0; i < mats.size(); i++ ) {
-      mats[i] = memManager_.malloc<double>(NBSQ);
-      std::fill_n(mats[i],NBSQ,0.);
-      matMaps.emplace_back(mats[i],NB,NB);
-    }
-
-
-    size_t n1,n2;
-    // Loop over unique shell pairs
-    for(size_t s1(0), bf1_s(0), s12(0); s1 < shells.size(); bf1_s+=n1, s1++){ 
-      n1 = shells[s1].size(); // Size of Shell 1
-    for(size_t s2(0), bf2_s(0); s2 <= s1; bf2_s+=n2, s2++, s12++) {
-      n2 = shells[s2].size(); // Size of Shell 2
-
-      libint2::ShellPair pair_to_use;
-      pair_to_use.init( shells[s1],shells[s2],-1000);
-
-      auto buff = obFunc(pair_to_use,shells[s1],shells[s2]);
-
-      assert(buff.size() == NOPER);
-
-      // Place integral blocks into their respective matricies
-      // XXX: USES EIGEN
-      for(auto iMat = 0; iMat < buff.size(); iMat++){
-        Eigen::Map<
-          const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,
-            Eigen::RowMajor>>
-          bufMat(&buff[iMat][0],n1,n2);
-
-        matMaps[iMat].block(bf1_s,bf2_s,n1,n2) = bufMat;
-      }
-
-    } // Loop over s2 <= s1
-    } // Loop over s1
-
-
-
-    // Symmetrize the matricies 
-    // XXX: USES EIGEN
-    // FIXME: not SYMM -> creates a temporary
-    for(auto nMat = 0; nMat < matMaps.size(); nMat++) {
-      if(SYMM) matMaps[nMat] = matMaps[nMat].selfadjointView<Eigen::Lower>();
-      else {
-        for(auto i = 0  ; i < NB; ++i)
-        for(auto j = i+1; j < NB; ++j)
-          matMaps[nMat](i,j) = - matMaps[nMat](j,i);
-      }
-    }
-
-    return mats;
-
-  }; // AOIntegrals::OneEDriverLocal
 
 
 
@@ -306,46 +224,66 @@ namespace ChronusQ {
    *  TODO: Make this function general to relativistic Hamiltonians
    *
    */ 
-  void AOIntegrals::computeAOOneE() {
+  void AOIntegrals::computeAOOneE(bool finiteWidthNuc ) {
 
     // Compute base 1-e integrals
     auto _multipole = 
       OneEDriver(libint2::Operator::emultipole3,basisSet_.shells);
 
     auto _kinetic = OneEDriver(libint2::Operator::kinetic,basisSet_.shells);
-    auto _potential = OneEDriver(libint2::Operator::nuclear,basisSet_.shells);
+
+
+    // Use Libint for point nuclei, in-house for gaussian nuclei
+    auto _potential = not finiteWidthNuc ? 
+      OneEDriver(libint2::Operator::nuclear,basisSet_.shells) :
+      OneEDriverLocal<1,true>( std::bind(
+                  static_cast<
+                    std::vector<std::vector<double>>
+                    (AOIntegrals::*)(
+                      const shell_set &,
+                      libint2::ShellPair&,libint2::Shell&,libint2::Shell&
+                    )
+                > (&AOIntegrals::computePotentialV),this,molecule_.chargeDist,
+                          std::placeholders::_1, std::placeholders::_2,
+                          std::placeholders::_3),
+                basisSet_.shells);
+
+;
 
     auto _L = OneEDriverLocal<3,false>(
-                std::bind(&AOIntegrals::computeAngularL,this,std::placeholders::_1,
-                          std::placeholders::_2,std::placeholders::_3),
+                std::bind(&AOIntegrals::computeAngularL,this,
+                          std::placeholders::_1, std::placeholders::_2,
+                          std::placeholders::_3),
                 basisSet_.shells);
 
     auto _E1V = OneEDriverLocal<3,false>(
-                std::bind(&AOIntegrals::computeEDipoleE1_vel,this,std::placeholders::_1,
-                          std::placeholders::_2,std::placeholders::_3),
+                std::bind(&AOIntegrals::computeEDipoleE1_vel,this,
+                          std::placeholders::_1, std::placeholders::_2,
+                          std::placeholders::_3),
                 basisSet_.shells);
 
 
     auto _E2V = OneEDriverLocal<6,false>(
-                std::bind(&AOIntegrals::computeEQuadrupoleE2_vel,this,std::placeholders::_1,
-                          std::placeholders::_2,std::placeholders::_3),
+                std::bind(&AOIntegrals::computeEQuadrupoleE2_vel,this,
+                          std::placeholders::_1, std::placeholders::_2,
+                          std::placeholders::_3),
                 basisSet_.shells);
 
 
     auto _E3V = OneEDriverLocal<10,false>(
-                std::bind(&AOIntegrals::computeEOctupoleE3_vel,this,std::placeholders::_1,
-                          std::placeholders::_2,std::placeholders::_3),
+                std::bind(&AOIntegrals::computeEOctupoleE3_vel,this,
+                          std::placeholders::_1, std::placeholders::_2,
+                          std::placeholders::_3),
                 basisSet_.shells);
 
 
     auto _M2  = OneEDriverLocal<9,false>(
-                std::bind(&AOIntegrals::computeMQuadrupoleM2_vel,this,std::placeholders::_1,
-                          std::placeholders::_2,std::placeholders::_3),
+                std::bind(&AOIntegrals::computeMQuadrupoleM2_vel,this,
+                          std::placeholders::_1, std::placeholders::_2,
+                          std::placeholders::_3),
                 basisSet_.shells);
 
 
-
-    
 
     // Extract the pointers
     overlap = _multipole[0];
@@ -358,20 +296,68 @@ namespace ChronusQ {
 
 
     magDipole = { _L[0], _L[1], _L[2] };
-    // Store your stuff here
-
-    // Allocate and compute the core Hamiltonian
-    coreH.emplace_back(memManager_.malloc<double>(nSQ_));
-
-    MatAdd('N','N',basisSet_.nBasis,basisSet_.nBasis,2.,kinetic,
-      basisSet_.nBasis,2.,potential,basisSet_.nBasis,coreH[0],
-      basisSet_.nBasis);
 
     // Compute Orthonormalization trasformations
     computeOrtho();
 
 
   }; // AOIntegrals::computeAOOneE
+
+
+  /**
+   *  \brief Compute the Core Hamiltonian.
+   *
+   *  \param [in] typ Which Hamiltonian to build
+   */ 
+  void AOIntegrals::computeCoreHam(CORE_HAMILTONIAN_TYPE typ) {
+
+    assert(kinetic == nullptr); // Make sure we havent computed 1-e ints
+
+    if( typ == NON_RELATIVISTIC ) {
+
+      computeAOOneE(false);
+
+
+      // Allocate the core Hamiltonian
+      coreH.emplace_back(memManager_.malloc<double>(nSQ_));
+
+      // Compute the non-relativistic core hamiltonian in the CGTO basis
+      computeNRCH(coreH.back());
+
+    } else if( typ == EXACT_2C )    {
+
+      computeAOOneE(true);
+
+      // Allocate space for the spin components of the core Hamiltonian
+      coreH.emplace_back(memManager_.malloc<double>(nSQ_));
+      coreH.emplace_back(memManager_.malloc<double>(nSQ_));
+      coreH.emplace_back(memManager_.malloc<double>(nSQ_));
+      coreH.emplace_back(memManager_.malloc<double>(nSQ_));
+
+      computeX2CCH(coreH);
+
+    }
+
+
+
+
+  }; // AOIntegrals::computeCoreHam
+
+
+
+  /**
+   *  \brief Compute the non-relativistic Core Hamiltonian in the CGTO basis
+   *
+   *  \f[ H(S) = 2(T + V) \f]
+   */ 
+  void AOIntegrals::computeNRCH(double *CH) {
+
+
+    MatAdd('N','N',basisSet_.nBasis,basisSet_.nBasis,2.,kinetic,
+      basisSet_.nBasis,2.,potential,basisSet_.nBasis,CH,
+      basisSet_.nBasis);
+
+  };
 
 
 

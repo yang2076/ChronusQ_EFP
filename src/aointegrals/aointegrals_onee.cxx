@@ -521,9 +521,14 @@ namespace ChronusQ {
    *
    *  \returns Shell block of the potential integral matrix for (shell1 | shell2)
    */ 
-  std::vector<double> AOIntegrals::computePotentialV(libint2::ShellPair &pair, 
+  std::vector<std::vector<double>> AOIntegrals::computePotentialV(
+    const std::vector<libint2::Shell> &nucShell, libint2::ShellPair &pair, 
     libint2::Shell &shell1 , libint2::Shell &shell2 ){
   
+
+    bool useFiniteWidthNuclei = nucShell.size() > 0;
+
+
     std::vector<double> potential_shellpair;
     double V,tmpV;
     int lA[3],lB[3];
@@ -568,7 +573,7 @@ namespace ChronusQ {
     cart2sph_transform(shell1.contr[0].l,shell2.contr[0].l,
                        V_shellpair_sph,potential_shellpair );
   
-    return V_shellpair_sph; 
+    return { V_shellpair_sph }; 
   
   }
   
@@ -582,8 +587,12 @@ namespace ChronusQ {
    *
    *  \returns Shell block of the spin orbit integral matrix for (shell1 | shell2)
    */  
-  std::vector<std::vector<double>> AOIntegrals::computeSL(libint2::ShellPair &pair, 
+  std::vector<std::vector<double>> AOIntegrals::computeSL(
+    const std::vector<libint2::Shell> &nucShell, libint2::ShellPair &pair, 
     libint2::Shell &shell1 , libint2::Shell &shell2 ){
+
+
+    bool useFiniteWidthNuclei = nucShell.size() > 0;
   
     std::array<std::vector<double>,3> SL_shellpair;
     
@@ -675,8 +684,13 @@ namespace ChronusQ {
    *
    *  \returns Shell block of the pV dot p matrix for (shell1 | shell2)
    */ 
-  std::vector<std::vector<double>> AOIntegrals::computepVdotp(libint2::ShellPair &pair, libint2::Shell &shell1 , 
-    libint2::Shell &shell2 ){
+  std::vector<std::vector<double>> AOIntegrals::computepVdotp( 
+    const std::vector<libint2::Shell> &nucShell, libint2::ShellPair &pair, 
+    libint2::Shell &shell1, libint2::Shell &shell2 ){
+
+
+
+    bool useFiniteWidthNuclei = nucShell.size() > 0;
   
     std::vector<double> pVdotp_shellpair;
     double pVp,pVpC,C[3];

@@ -103,7 +103,7 @@ namespace ChronusQ {
         std::placeholders::_2,&INFO);
 
 
-    INFO = LU(N,N,A,N,IPIV);
+    INFO = LU(N,N,A,LDA,IPIV);
 
     if( INFO != 0 ) { mem.free(IPIV); return INFO; }
 
@@ -133,7 +133,7 @@ namespace ChronusQ {
         std::placeholders::_2,&INFO);
 
 
-    INFO = LU(N,N,A,N,IPIV);
+    INFO = LU(N,N,A,LDA,IPIV);
 
     if( INFO != 0 ) { mem.free(IPIV); return INFO; }
 

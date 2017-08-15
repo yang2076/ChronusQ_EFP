@@ -41,7 +41,7 @@ namespace ChronusQ {
   template <typename T>
   void SingleSlater<T>::formFock(bool increment) {
 
-    size_t NB = aoints.basisSet().nBasis * nC;
+    size_t NB = aoints.basisSet().nBasis;
     size_t NB2 = NB*NB;
 
     // Form G[D]
@@ -51,23 +51,23 @@ namespace ChronusQ {
     for(auto &F : fock) std::fill_n(F,NB2,0.);
 
     // Copy over the Core Hamiltonian
-    std::copy_n(aoints.coreH[SCALAR], NB2, fock[SCALAR]);
-    // FIXME: This must be multiplied by "i" for X2C
-    for(auto i = 1; i < aoints.coreH.size(); i++)
-      std::copy_n(aoints.coreH[i], NB2, fock[i]);
+    SetMatRE('N',NB,NB,1.,aoints.coreH[SCALAR],NB,fock[SCALAR],NB);
+    for(auto i = 1; i < aoints.coreH.size(); i++) 
+      SetMatIM('N',NB,NB,1.,aoints.coreH[i],NB,fock[i],NB);
 
     // Add in the perturbation tensor
     for(auto i = 0ul; i < fock.size(); i++)
       MatAdd('N','N', NB, NB, T(1.), fock[i], NB, T(1.), GD[i], NB,
         fock[i], NB);
 
+#if 0
+    printFock(std::cout);
+#endif
+
   }; // SingleSlater<T>::fockFock
 
 
   /**
-   *  XXX: formGD should be SingleSlater pure virtual and specialized
-   *  in derived classes
-   *
    *  \brief Forms the Hartree-Fock perturbation tensor
    *
    *  Populates / overwrites GD storage (and JScalar and K storage)
@@ -93,7 +93,7 @@ namespace ChronusQ {
     aoints.twoBodyContract(kContract);
 
     // Form GD: G[D] = 2.0*J[D] - K[D]
-    size_t NB = aoints.basisSet().nBasis * nC;
+    size_t NB = aoints.basisSet().nBasis;
     size_t NB2 = NB*NB;
 
     for(auto i = 0; i < GD.size(); i++)
@@ -103,6 +103,11 @@ namespace ChronusQ {
     MatAdd('N','N', NB, NB, T(1.), GD[SCALAR], NB, T(2.), JScalar, NB,
       GD[SCALAR], NB);
       
+#if 0
+    printJ(std::cout);
+    printK(std::cout);
+    printGD(std::cout);
+#endif
 
   }; // SingleSlater<T>::formGD
 

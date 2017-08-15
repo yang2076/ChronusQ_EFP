@@ -59,6 +59,19 @@ namespace ChronusQ {
 
     }; // HartreeFock constructor
 
+    // Allow for reference name specification
+    template <typename... Args>
+    HartreeFock(std::string rL, std::string rS, AOIntegrals &aoi, 
+      Args... args) : 
+      SingleSlater<T>(aoi,args...), WaveFunctionBase(aoi,args...),
+      QuantumBase(aoi.memManager(),args...) { 
+
+      this->refLongName_  = rL;
+      this->refShortName_ = rS;
+      
+
+    }; // HartreeFock constructor (with strings)
+
 
     // Copy and Move ctors
 

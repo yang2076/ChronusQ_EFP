@@ -20,7 +20,8 @@
 # Contact the Developers:
 #   E-Mail: xsli@uw.edu
 #
-add_library(aointegrals STATIC aointegrals.cxx aointegrals_builders.cxx aointegrals_onee.cxx aointegrals_impl.cxx)
+add_library(aointegrals STATIC aointegrals.cxx aointegrals_builders.cxx 
+  aointegrals_onee.cxx aointegrals_impl.cxx aointegrals_rel.cxx)
 
 if(TARGET libint)
   add_dependencies(aointegrals libint)

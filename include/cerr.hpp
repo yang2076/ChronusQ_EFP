@@ -25,6 +25,8 @@
 #define __INCLUDED_CERR_HPP__
 
 #include <chronusq_sys.hpp>
+#include <libint2/cxxapi.h>
+//#include <cxxapi/boilerplate.hpp>
 
 #define __CERR_RUNTIMEERR__ // Throw a runtime error on CErr
 
@@ -41,7 +43,7 @@ namespace ChronusQ {
 
     time_t currentTime;
     time(&currentTime); 
-  //libint2::finalize();
+    libint2::finalize();
 
     out << msg << std::endl << "Job terminated: " << ctime(&currentTime)
         << std::endl;

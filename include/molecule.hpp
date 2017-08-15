@@ -28,6 +28,8 @@
 #include <atom.hpp>
 #include <cerr.hpp>
 
+#include <libint2/shell.h>
+
 namespace ChronusQ {
 
 
@@ -62,6 +64,7 @@ namespace ChronusQ {
     std::vector<Atom> atoms; ///< The Atoms of which the Molecule consists
 
 
+    std::vector<libint2::Shell> chargeDist;
 
 
 
@@ -137,6 +140,7 @@ namespace ChronusQ {
       void computeCOM();
       void computeCOC();
       void computeMOI();
+      void computeCDist();
 
       /**
        *  \brief Update Molecule member data
@@ -164,6 +168,7 @@ namespace ChronusQ {
         computeCOM();
         computeCOC();
         computeMOI();
+        computeCDist();
 
       }
   }; // Molecule struct

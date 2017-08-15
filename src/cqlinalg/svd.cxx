@@ -21,43 +21,32 @@
  *    E-Mail: xsli@uw.edu
  *  
  */
-#ifndef __INCLUDED_SINGLESLATER_GUESS_HPP__
-#define __INCLUDED_SINGLESLATER_GUESS_HPP__
 
-#include <singleslater.hpp>
-#include <cqlinalg.hpp>
-#include <util/matout.hpp>
+#include <cqlinalg/svd.hpp>
+#include <cqlinalg/util.hpp>
 
 namespace ChronusQ {
 
-  /**
-   *  \brief Forms a set of guess orbitals for a single slater
-   *  determininant in various ways
-   *
-   *  XXX: Currently only supports CORE guess
-   */ 
-  template <typename T>
-  void SingleSlater<T>::formGuess() {
+  template <>
+  int SVD(char JOBU, char JOBVT, int M, int N, double *A, int LDA, double *S,
+    double *U, int LDU, double *VT, int LDVT, CQMemManager &mem) {
 
-    size_t FSize = memManager.template getSize(fock[SCALAR]);
-    size_t NB    = std::sqrt(FSize);
-
-    // CORE guess (F = H)
-      
-    // Zero out the Fock
-    for(auto &F : fock) std::fill_n(F,FSize,0.);
-
-    // Copy over the Core Hamiltonian
-    SetMatRE('N',NB,NB,1.,aoints.coreH[SCALAR],NB,fock[SCALAR],NB);
-    for(auto i = 1; i < aoints.coreH.size(); i++) 
-      SetMatIM('N',NB,NB,1.,aoints.coreH[i],NB,fock[i],NB);
-
-    // Common to all guess: form new set of orbitals from
-    // initial guess at Fock.
-    getNewOrbitals(false);
+    int INFO;
+  
+    auto test = std::bind(dgesvd_,&JOBU,&JOBVT,&M,&N,A,&LDA,S,U,&LDU,VT,&LDVT,
+      std::placeholders::_1,std::placeholders::_2,&INFO);
+  
+    int LWORK = getLWork<double>(test);
+    double *WORK = mem.malloc<double>(LWORK);
     
-  }; // SingleSlater<T>::formGuess
+    dgesvd_(&JOBU,&JOBVT,&M,&N,A,&LDA,S,U,&LDU,VT,&LDVT,WORK,&LWORK,&INFO);
+
+    mem.free(WORK);
+
+    return INFO;
+
+  }; // SVD (double)
+
 
 }; // namespace ChronusQ
 
-#endif

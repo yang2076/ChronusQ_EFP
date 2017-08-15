@@ -103,7 +103,8 @@ int main(int argc, char *argv[]) {
   CQSCFOptions(std::cout,input,*ss);
 
  
-  aoints.computeAOOneE();
+  //aoints.computeAOOneE();
+  aoints.computeCoreHam();
   aoints.computeERI();
 
   ss->formGuess();

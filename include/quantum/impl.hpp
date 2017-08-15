@@ -129,4 +129,8 @@ namespace ChronusQ {
 
 }; // namespace ChronusQ
 
+
+// Other headers
+#include <quantum/print.hpp>
+
 #endif

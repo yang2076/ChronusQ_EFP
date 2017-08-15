@@ -21,43 +21,33 @@
  *    E-Mail: xsli@uw.edu
  *  
  */
-#ifndef __INCLUDED_SINGLESLATER_GUESS_HPP__
-#define __INCLUDED_SINGLESLATER_GUESS_HPP__
+#ifndef __INCLUDED_QUANTUM_PRINT_HPP__
+#define __INCLUDED_QUANTUM_PRINT_HPP__
 
-#include <singleslater.hpp>
-#include <cqlinalg.hpp>
+#include <quantum.hpp>
 #include <util/matout.hpp>
+
 
 namespace ChronusQ {
 
-  /**
-   *  \brief Forms a set of guess orbitals for a single slater
-   *  determininant in various ways
-   *
-   *  XXX: Currently only supports CORE guess
-   */ 
   template <typename T>
-  void SingleSlater<T>::formGuess() {
+  void Quantum<T>::print1PDM(std::ostream &out) {
 
-    size_t FSize = memManager.template getSize(fock[SCALAR]);
-    size_t NB    = std::sqrt(FSize);
+    size_t NB = std::sqrt(memManager.template getSize<T>(onePDM[0]));
 
-    // CORE guess (F = H)
-      
-    // Zero out the Fock
-    for(auto &F : fock) std::fill_n(F,FSize,0.);
+    prettyPrintSmart(out,"1PDM (AO) Scalar",onePDM[SCALAR],NB,NB,NB);
 
-    // Copy over the Core Hamiltonian
-    SetMatRE('N',NB,NB,1.,aoints.coreH[SCALAR],NB,fock[SCALAR],NB);
-    for(auto i = 1; i < aoints.coreH.size(); i++) 
-      SetMatIM('N',NB,NB,1.,aoints.coreH[i],NB,fock[i],NB);
+    if( onePDM.size() > 1 )
+      prettyPrintSmart(out,"1PDM (AO) MZ",onePDM[MZ],NB,NB,NB);
 
-    // Common to all guess: form new set of orbitals from
-    // initial guess at Fock.
-    getNewOrbitals(false);
-    
-  }; // SingleSlater<T>::formGuess
+    if( onePDM.size() > 2 ) {
+      prettyPrintSmart(out,"1PDM (AO) MY",onePDM[MY],NB,NB,NB);
+      prettyPrintSmart(out,"1PDM (AO) MX",onePDM[MX],NB,NB,NB);
+    }
 
-}; // namespace ChronusQ
+  }; // Quantum<T>::print1PDM
+
+};
 
 #endif
+
