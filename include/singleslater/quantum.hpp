@@ -25,6 +25,7 @@
 #define __INCLUDED_SINGLESLATER_QUANTUM_HPP__
 
 #include <singleslater.hpp>
+#include <cqlinalg/blasutil.hpp>
 #include <cqlinalg/blas3.hpp>
 #include <quantum/properties.hpp>
 

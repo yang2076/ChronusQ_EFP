@@ -515,6 +515,7 @@ namespace ChronusQ {
    *  \brief Computes a shell block of the nuclear potential matrix.
    *
    *
+   *  \param [in] nucShell nuclear shell, give the exponents of gaussian function of nuclei
    *  \param [in] pair    Shell pair data for shell1, shell2
    *  \param [in] shell1  Bra shell
    *  \param [in] shell2  Ket shell
@@ -541,7 +542,7 @@ namespace ChronusQ {
       };
       V = 0.0;
   
-      V = hRRVab(pair,shell1,shell2,shell1.contr[0].l,lA,shell2.contr[0].l,lB);
+      V = hRRVab(nucShell,pair,shell1,shell2,shell1.contr[0].l,lA,shell2.contr[0].l,lB);
         // calculate from hRRVab
       
       int iAtom;
@@ -581,6 +582,7 @@ namespace ChronusQ {
    *  \brief Computes a shell block of the spin orbit integral matrix.
    *
    *
+   *  \param [in] nucShell nuclear shell, give the exponents of gaussian function of nuclei
    *  \param [in] pair    Shell pair data for shell1, shell2
    *  \param [in] shell1  Bra shell
    *  \param [in] shell2  Ket shell
@@ -646,7 +648,7 @@ namespace ChronusQ {
             SlC += shell1.contr[0].coeff[pripair.p1]* 
               shell2.contr[0].coeff[pripair.p2]* 
               atom.atomicNumber  
-              * Slabmu(pripair,shell1,shell2,OneixAC,OneixBC,
+              * Slabmu(nucShell,pripair,shell1,shell2,OneixAC,OneixBC,
               shell1.contr[0].l,lA,shell2.contr[0].l,lB,mu,0,iAtom) ;
    
             iAtom++; 
@@ -678,6 +680,7 @@ namespace ChronusQ {
    *  \brief Computes a shell block of the pV dot p matrix.
    *
    *
+   *  \param [in] nucShell nuclear shell, give the exponents of gaussian function of nuclei
    *  \param [in] pair    Shell pair data for shell1, shell2
    *  \param [in] shell1  Bra shell
    *  \param [in] shell2  Ket shell
@@ -715,7 +718,8 @@ namespace ChronusQ {
                       shell2.contr[0].coeff[pripair.p2];
   
           pVpC += atom.atomicNumber * norm *
-                 pVpab(pripair,shell1,shell2,shell1.contr[0].l,lA,shell2.contr[0].l,lB,0,iAtom);
+                 pVpab(nucShell,pripair,shell1,shell2,shell1.contr[0].l,lA,
+                       shell2.contr[0].l,lB,0,iAtom);
           iAtom++;
         } // atoms
         pVp += pVpC;  
@@ -1628,6 +1632,7 @@ namespace ChronusQ {
    *
    *  where a,b are the angular momentum, A,B are the nuclear coordinates.
    *
+   *  \param [in] nucShell nuclear shell, give the exponents of gaussian function of nuclei
    *  \param [in] pair    Shell pair data for shell1, shell2
    *  \param [in] shell1  Bra shell
    *  \param [in] shell2  Ket shell
@@ -1639,7 +1644,8 @@ namespace ChronusQ {
    *  \returns a contracted nuclear potential integral
    *
    */ 
-  double AOIntegrals::hRRVab(libint2::ShellPair &pair, libint2::Shell &shell1,
+  double AOIntegrals::hRRVab(const std::vector<libint2::Shell> &nucShell, 
+    libint2::ShellPair &pair, libint2::Shell &shell1,
     libint2::Shell &shell2, int LA, int *lA, int LB, int *lB){
 
     int iWork,iAtom;
@@ -1647,7 +1653,7 @@ namespace ChronusQ {
     double PC[3];
     double rho;
     double squarePC=0.0;
-    bool useFiniteWidthNuclei=false;
+    bool useFiniteWidthNuclei = nucShell.size() > 0;
   
     if(LB == 0) {
       // (LA|s)
@@ -1665,19 +1671,24 @@ namespace ChronusQ {
         auto lTotal = shell1.contr[0].l + shell2.contr[0].l; 
         double *tmpFmT = new double[lTotal+1];
         if ( useFiniteWidthNuclei ) {
-  //        rho = ijSP->Zeta[iPP]*this->molecule_->nucShell(iAtom).alpha[0]/(ijSP->Zeta[iPP]+this->molecule_->nucShell(iAtom).alpha[0]);
-   //       this->computeFmTTaylor(tmpFmT,rho*squarePC,ijSP->lTotal,0);
-  std::cerr<<"no finite nuclei"<<std::endl;
+          rho = (1/pripair.one_over_gamma)* nucShell[iAtom].alpha[0]
+                       /(1/pripair.one_over_gamma + nucShell[iAtom].alpha[0]);
+
+          // or use double rho = nucShell[iAtom].alpha[0]/
+          // (1.0+nucShell[iAtom].alpha[0]*pripair.one_over_gamma)
+
+          computeFmTTaylor(tmpFmT,rho*squarePC,lTotal,0);
         }
         else if ( !useFiniteWidthNuclei ) {
           computeFmTTaylor(tmpFmT,(shell1.alpha[pripair.p1]+shell2.alpha[pripair.p2])
                      *squarePC,lTotal,0);
         }
         if (LA == 0) {
+          auto norm = shell1.contr[0].coeff[pripair.p1]* 
+                      shell2.contr[0].coeff[pripair.p2];
+          auto ssS = pow(sqrt(M_PI),3) * sqrt(pripair.one_over_gamma)*pripair.K ;
+
           if ( !useFiniteWidthNuclei ) {
-            auto norm = shell1.contr[0].coeff[pripair.p1]* 
-                        shell2.contr[0].coeff[pripair.p2];
-            auto ssS = pow(sqrt(M_PI),3) * sqrt(pripair.one_over_gamma)*pripair.K ;
             auto ssV = 2.0*sqrt(1.0/(pripair.one_over_gamma*M_PI))*norm*ssS;
   
             tmpVal += atom.atomicNumber * ssV * tmpFmT[0];
@@ -1685,24 +1696,33 @@ namespace ChronusQ {
           }
           else if ( useFiniteWidthNuclei ) {
   //          tmpVal += (static_cast<double>(mc->atomZ[iAtom]))*math.two*sqrt(rho/math.pi)*ijSP->ss[iPP]*tmpFmT[0];
-  std::cerr<<"no finite nuclei"<<std::endl;
+            auto ssV = 2.0*sqrt(rho/M_PI)*norm*ssS;
+ 
+            tmpVal += atom.atomicNumber * ssV * tmpFmT[0];
+//  std::cerr<<"no finite nuclei"<<std::endl;
           }
         } // LA == 0
-        else {
+        else {   // LA > 0, go into vertical recursion
+  
+          auto norm = shell1.contr[0].coeff[pripair.p1]* 
+                      shell2.contr[0].coeff[pripair.p2];
+          auto ssS = pow(sqrt(M_PI),3) * sqrt(pripair.one_over_gamma)*pripair.K ;
+ 
           if ( !useFiniteWidthNuclei ) {
-  
-            auto norm = shell1.contr[0].coeff[pripair.p1]* 
-                        shell2.contr[0].coeff[pripair.p2];
-            auto ssS = pow(sqrt(M_PI),3) * sqrt(pripair.one_over_gamma)*pripair.K ;
-            auto ssV = 2.0*sqrt(1.0/(pripair.one_over_gamma*M_PI))*norm*ssS;
-  
+            auto ssV = 2.0*sqrt(1.0/(pripair.one_over_gamma*M_PI))*norm*ssS;  
    
-            tmpVal += atom.atomicNumber * ssV * vRRVa0(pripair,shell1,tmpFmT,PC,0,LA,lA,iAtom);
+            tmpVal += atom.atomicNumber * ssV * vRRVa0(nucShell,pripair,shell1,
+                                                      tmpFmT,PC,0,LA,lA,iAtom);
   //std::cerr<<"actual"<<std::endl;
   
           } else if ( useFiniteWidthNuclei ) {
   //          tmpVal += mc->atomZ[iAtom]*math.two*sqrt(rho/math.pi)*ijSP->ss[iPP]*this->vRRVa0(ijSP,tmpFmT,PC,0,LA,lA,iPP,iAtom);
-  std::cerr<<"no finite nuclei"<<std::endl;
+
+            auto ssV = 2.0*sqrt(rho/M_PI)*norm*ssS;
+            tmpVal += atom.atomicNumber * ssV * vRRVa0(nucShell,pripair,shell1,
+                                                       tmpFmT,PC,0,LA,lA,iAtom);
+
+//  std::cerr<<"no finite nuclei"<<std::endl;
           }
         } // else
         delete[] tmpFmT;
@@ -1723,8 +1743,8 @@ namespace ChronusQ {
   
       lAp1[iWork]++;
       lBm1[iWork]--;
-      tmpVal = hRRVab(pair ,shell1,shell2, LA+1,lAp1, LB-1,lBm1);
-      tmpVal+= pair.AB[iWork]*hRRVab(pair, shell1, shell2, LA,lA,LB-1,lBm1);
+      tmpVal = hRRVab(nucShell,pair ,shell1,shell2, LA+1,lAp1, LB-1,lBm1);
+      tmpVal+= pair.AB[iWork]*hRRVab(nucShell,pair,shell1, shell2, LA,lA,LB-1,lBm1);
     }
   
     return tmpVal;
@@ -1747,6 +1767,7 @@ namespace ChronusQ {
    *  where a is angular momentum, Zeta=zeta_a+zeta_b, A is bra nuclear coordinate. 
    *  P = (zeta_a*A+zeta_b*B)/Zeta
    *
+   *  \param [in] nucShell nuclear shell, give the exponents of gaussian function of nuclei
    *  \param [in] pripair Primitive Shell pair data for shell1, shell2
    *  \param [in] shell1  Bra shell
    *  \param [in] FmT     table of Boys function with different m
@@ -1760,17 +1781,21 @@ namespace ChronusQ {
    *
    */ 
 
-  double AOIntegrals::vRRVa0( libint2::ShellPair::PrimPairData &pripair, libint2::Shell &shell1,
+  double AOIntegrals::vRRVa0( const std::vector<libint2::Shell> &nucShell,
+    libint2::ShellPair::PrimPairData &pripair, libint2::Shell &shell1,
     double *FmT, double *PC, int m, int LA, int *lA, int iAtom){
   
-  //std::cerr<<"we are called hahaha"<<std::endl;
     double rhoovzeta;
-    bool useFiniteWidthNuclei = false;
+    bool useFiniteWidthNuclei = nucShell.size() > 0;
+
     if(LA == 0) {
       if ( useFiniteWidthNuclei ) {
-  std::cerr<<"out here"<<std::endl;
-  //      rhoovzeta =  this->molecule_->nucShell(iAtom).alpha[0]/(this->molecule_->nucShell(iAtom).alpha[0]+ijSP->Zeta[iPP]);
-  //      return (pow(rhoovzeta,m)*FmT[m]);
+//  std::cerr<<"out here"<<std::endl;
+        rhoovzeta =  nucShell[iAtom].alpha[0] / ( nucShell[iAtom].alpha[0]
+                     +(1/pripair.one_over_gamma) );
+
+        return (pow(rhoovzeta,m)*FmT[m]);
+
       } else if ( !useFiniteWidthNuclei ) {       
         return FmT[m];  //Z*2*sqrt[zeta/pi]*[s|s]is given in hRRVab, in ssV.
       }
@@ -1786,18 +1811,17 @@ namespace ChronusQ {
     lAm1[iWork]--;
   
   if (LA >= -1) {
-  //  cout<<lAm1[0]<<";"<<lAm1[1]<<";"<<lAm1[2]<<"\t"<<lA[0]<<";"<<lA[1]<<";"<<lA[2]<<endl;
   }
     tmpVal  = (pripair.P[iWork]-shell1.O[iWork])*
-                vRRVa0(pripair,shell1,FmT,PC,m,LA-1,lAm1,iAtom);
+                vRRVa0(nucShell,pripair,shell1,FmT,PC,m,LA-1,lAm1,iAtom);
   
-    tmpVal -= PC[iWork] * vRRVa0(pripair,shell1,FmT,PC,m+1,LA-1,lAm1,iAtom);
+    tmpVal -= PC[iWork] * vRRVa0(nucShell,pripair,shell1,FmT,PC,m+1,LA-1,lAm1,iAtom);
   
     if( lAm1[iWork] >=1 ){
       lAm1[iWork]--;
       tmpVal += (lAm1[iWork]+1)*0.5*pripair.one_over_gamma *
-                (vRRVa0(pripair,shell1,FmT,PC,m,LA-2,lAm1,iAtom)
-                -vRRVa0(pripair,shell1,FmT,PC,m+1,LA-2,lAm1,iAtom));
+                (vRRVa0(nucShell,pripair,shell1,FmT,PC,m,LA-2,lAm1,iAtom)
+                -vRRVa0(nucShell,pripair,shell1,FmT,PC,m+1,LA-2,lAm1,iAtom));
     }
     return tmpVal; 
   }
@@ -1817,6 +1841,7 @@ namespace ChronusQ {
    *
    *  where a,b are the angular momentum, A,B are the nuclear coordinates.
    *
+   *  \param [in] nucShell nuclear shell, give the exponents of gaussian function of nuclei
    *  \param [in] pripair Primitive Shell pair data for shell1, shell2
    *  \param [in] shell1  Bra shell
    *  \param [in] shell2  Ket shell
@@ -1833,14 +1858,16 @@ namespace ChronusQ {
    *
    */ 
 
-  double AOIntegrals::hRRiPPVab(libint2::ShellPair::PrimPairData &pripair, libint2::Shell &shell1, 
-    libint2::Shell &shell2, int LA, int *lA, int LB, int *lB, double *C, int m, int iAtom){
+  double AOIntegrals::hRRiPPVab( const std::vector<libint2::Shell> &nucShell,
+    libint2::ShellPair::PrimPairData &pripair, libint2::Shell &shell1, 
+    libint2::Shell &shell2, int LA, int *lA, int LB, int *lB, double *C, 
+    int m, int iAtom){
   
     double tmpVal=0.0;
     double PC[3];
     double squarePC=0.0;
-    double rho;
-    bool useFiniteWidthNuclei=false;
+    double rho,rhoovzeta;
+    bool useFiniteWidthNuclei = nucShell.size() > 0 ;
     for(int k = 0 ; k < 3 ; k++ ) {
       PC[k] = pripair.P[k] - C[k];
       squarePC += PC[k]*PC[k];
@@ -1854,45 +1881,59 @@ namespace ChronusQ {
         if ( useFiniteWidthNuclei ) {
   //        rho = ijSP->Zeta[iPP]*this->molecule_->nucShell(iAtom).alpha[0]/(ijSP->Zeta[iPP]+this->molecule_->nucShell(iAtom).alpha[0]);
   //        this->computeFmTTaylor(tmpFmT,rho*squarePC,ijSP->lTotal+m,0);
+          rho = (1/pripair.one_over_gamma)* nucShell[iAtom].alpha[0]
+                /(1/pripair.one_over_gamma + nucShell[iAtom].alpha[0]);
+          computeFmTTaylor(tmpFmT,rho*squarePC,lTotal+m,0);
   
-  std::cerr<<"no finite nuclei"<<std::endl;
+//  std::cerr<<"no finite nuclei"<<std::endl;
         }
         else if ( !useFiniteWidthNuclei ) {
           computeFmTTaylor(tmpFmT,(shell1.alpha[pripair.p1]+shell2.alpha[pripair.p2])
                      *squarePC,lTotal+m,0);
         }
         if(LA == 0) {
-          if ( !useFiniteWidthNuclei ) {
   //          auto norm = shell1.contr[0].coeff[pripair.p1]* 
   //                      shell2.contr[0].coeff[pripair.p2];
-            auto ssS = pow(sqrt(M_PI),3) * sqrt(pripair.one_over_gamma)*pripair.K ;
+
+          auto ssS = pow(sqrt(M_PI),3) * sqrt(pripair.one_over_gamma)*pripair.K ;
+
+          if ( !useFiniteWidthNuclei ) {
             auto ssV = 2.0*sqrt(1.0/(pripair.one_over_gamma*M_PI))*ssS;
   
-            tmpVal += ssV * tmpFmT[m];
+            tmpVal = ssV * tmpFmT[m];
   //          tmpVal = ijSP->ssV[iPP]*tmpFmT[m];
           }
           else if ( useFiniteWidthNuclei ) {
+            auto ssV = 2.0*sqrt(rho/M_PI)*ssS;            
+            rhoovzeta = nucShell[iAtom].alpha[0] / ( nucShell[iAtom].alpha[0]+
+                        1.0/pripair.one_over_gamma );
             
   //          double  rhoovzeta =  this->molecule_->nucShell(iAtom).alpha[0]/(this->molecule_->nucShell(iAtom).alpha[0]+ijSP->Zeta[iPP]);
   //          tmpVal = math.two*sqrt(rho/math.pi)*pow(rhoovzeta,m)*ijSP->ss[iPP]*tmpFmT[m];
-  std::cerr<<"no finite nuclei"<<std::endl;
+            tmpVal = pow(rhoovzeta,m) * ssV * tmpFmT[m]; 
+//  std::cerr<<"no finite nuclei"<<std::endl;
           }
         } // LA == 0
   
         else if (LA>0) {
+
+          auto ssS = pow(sqrt(M_PI),3) * sqrt(pripair.one_over_gamma)*pripair.K ;
+
           if ( !useFiniteWidthNuclei ) {
   //          auto norm = shell1.contr[0].coeff[pripair.p1]* 
   //                      shell2.contr[0].coeff[pripair.p2];
-            auto ssS = pow(sqrt(M_PI),3) * sqrt(pripair.one_over_gamma)*pripair.K ;
             auto ssV = 2.0*sqrt(1.0/(pripair.one_over_gamma*M_PI))*ssS;
    
-            tmpVal = ssV * vRRVa0(pripair,shell1,tmpFmT,PC,m,LA,lA,iAtom);
+            tmpVal = ssV * vRRVa0(nucShell,pripair,shell1,tmpFmT,PC,m,LA,lA,iAtom);
   
   //          tmpVal = ijSP->ssV[iPP]*this->vRRVa0(ijSP,tmpFmT,PC,m,LA,lA,iPP,iAtom);
           }
           else if ( useFiniteWidthNuclei ) {
+            tmpVal = 2.0 * sqrt(rho/M_PI) * ssS * 
+                     vRRVa0(nucShell,pripair,shell1,tmpFmT,PC,m,LA,lA,iAtom);
+
   //          tmpVal = math.two*sqrt(rho/math.pi)*ijSP->ss[iPP]*this->vRRVa0(ijSP,tmpFmT,PC,m,LA,lA,iPP,iAtom);
-  std::cerr<<"no finite nuclei"<<std::endl; 
+//  std::cerr<<"no finite nuclei"<<std::endl; 
           } 
         } // else if (LA>0)
         delete[] tmpFmT;
@@ -1901,23 +1942,29 @@ namespace ChronusQ {
     else if ((LA == 0)&&(LB>0)){
   
         double *tmpFmT = new double[lTotal+m+1];
+        auto ssS = pow(sqrt(M_PI),3) * sqrt(pripair.one_over_gamma)*pripair.K ;
+
         if ( useFiniteWidthNuclei ) {
   //        rho = ijSP->Zeta[iPP]*this->molecule_->nucShell(iAtom).alpha[0]/(ijSP->Zeta[iPP]+this->molecule_->nucShell(iAtom).alpha[0]);
   //        this->computeFmTTaylor(tmpFmT,rho*squarePC,ijSP->lTotal+m,0);
   //        tmpVal =  math.two*sqrt(rho/math.pi)*ijSP->ss[iPP]*this->vRRV0b(ijSP,tmpFmT,PC,m,LB,lB,iPP,iAtom);
-  std::cerr<<"no finite nuclei"<<std::endl;  
+
+          rho = (1/pripair.one_over_gamma)* nucShell[iAtom].alpha[0]
+                /(1/pripair.one_over_gamma + nucShell[iAtom].alpha[0]);
+ 
+          computeFmTTaylor(tmpFmT,rho*squarePC,lTotal+m,0);
+          tmpVal =  2.0*sqrt(rho/M_PI)*ssS*
+                    vRRV0b(nucShell,pripair,shell2,tmpFmT,PC,m,LB,lB,iAtom);
+
+//  std::cerr<<"no finite nuclei"<<std::endl;  
         }
         else if ( !useFiniteWidthNuclei ) {
           computeFmTTaylor(tmpFmT,(shell1.alpha[pripair.p1]+shell2.alpha[pripair.p2])
                      *squarePC,lTotal+m,0);
   
-  //        auto norm = shell1.contr[0].coeff[pripair.p1]* 
-  //                    shell2.contr[0].coeff[pripair.p2];
-          auto ssS = pow(sqrt(M_PI),3) * sqrt(pripair.one_over_gamma)*pripair.K ;
           auto ssV = 2.0*sqrt(1.0/(pripair.one_over_gamma*M_PI))*ssS;
-  
-  
-          tmpVal = ssV * vRRV0b(pripair,shell2,tmpFmT,PC,m,LB,lB,iAtom); 
+    
+          tmpVal = ssV * vRRV0b(nucShell,pripair,shell2,tmpFmT,PC,m,LB,lB,iAtom); 
         }
         delete[] tmpFmT;
   
@@ -1935,9 +1982,9 @@ namespace ChronusQ {
   
       lAp1[iWork]++;
       lBm1[iWork]--;
-      tmpVal = hRRiPPVab(pripair,shell1,shell2,LA+1,lAp1,LB-1,lBm1,C,m,iAtom);
+      tmpVal = hRRiPPVab(nucShell,pripair,shell1,shell2,LA+1,lAp1,LB-1,lBm1,C,m,iAtom);
       tmpVal+= (shell1.O[iWork]-shell2.O[iWork])
-               *hRRiPPVab(pripair,shell1,shell2,LA,lA,LB-1,lBm1,C,m,iAtom);
+               *hRRiPPVab( nucShell,pripair,shell1,shell2,LA,lA,LB-1,lBm1,C,m,iAtom);
     }
     return tmpVal;
   }
@@ -1959,6 +2006,7 @@ namespace ChronusQ {
    *  where a is angular momentum, Zeta=zeta_a+zeta_b, A is bra nuclear coordinate. 
    *  P = (zeta_a*A+zeta_b*B)/Zeta
    *
+   *  \param [in] nucShell nuclear shell, give the exponents of gaussian function of nuclei
    *  \param [in] pripair Primitive Shell pair data for shell1, shell2
    *  \param [in] shell1  Bra shell
    *  \param [in] FmT     table of Boys function with different m
@@ -1972,16 +2020,22 @@ namespace ChronusQ {
    *
    */ 
 
-  double AOIntegrals::vRRV0b( libint2::ShellPair::PrimPairData &pripair, libint2::Shell &shell2,
+  double AOIntegrals::vRRV0b( const std::vector<libint2::Shell> &nucShell, 
+    libint2::ShellPair::PrimPairData &pripair, libint2::Shell &shell2,
     double *FmT, double *PC, int m, int LB, int *lB, int iAtom){
   
     double rhoovzeta;
-    bool useFiniteWidthNuclei = false;
-    if(LB == 0) {
+    bool useFiniteWidthNuclei = nucShell.size() > 0;
+
+    if( LB == 0 ) {
        if ( useFiniteWidthNuclei ) {
-  std::cerr<<"out here"<<std::endl; 
+//  std::cerr<<"out here"<<std::endl; 
   //      rhoovzeta =  this->molecule_->nucShell(iAtom).alpha[0]/(this->molecule_->nucShell(iAtom).alpha[0]+ijSP->Zeta[iPP]);
-  //cout<<"power"<<pow(rhoovzeta,m)<<endl; 
+         rhoovzeta =  nucShell[iAtom].alpha[0]/( nucShell[iAtom].alpha[0]
+                      +(1/pripair.one_over_gamma) );
+
+         return (pow(rhoovzeta,m)*FmT[m]);
+
   //     return (pow(rhoovzeta,m)*FmT[m]);
       } else if ( !useFiniteWidthNuclei ) {           
         return FmT[m];  //Z*2*sqrt[zeta/pi]*[s|s]is given in hRRVab, in ssV.
@@ -1998,15 +2052,15 @@ namespace ChronusQ {
     lBm1[iWork]--;
   
     tmpVal  = (pripair.P[iWork]-shell2.O[iWork])*
-                vRRV0b(pripair,shell2,FmT,PC,m,LB-1,lBm1,iAtom);
+                vRRV0b(nucShell,pripair,shell2,FmT,PC,m,LB-1,lBm1,iAtom);
   
-    tmpVal -= PC[iWork]*vRRV0b(pripair,shell2,FmT,PC,m+1,LB-1,lBm1,iAtom);
+    tmpVal -= PC[iWork]*vRRV0b(nucShell,pripair,shell2,FmT,PC,m+1,LB-1,lBm1,iAtom);
   
     if(lBm1[iWork] >=1){
       lBm1[iWork]--;
       tmpVal += (lBm1[iWork]+1)*0.5*pripair.one_over_gamma * 
-                (vRRV0b(pripair,shell2,FmT,PC,m,LB-2,lBm1,iAtom) 
-                -vRRV0b(pripair,shell2,FmT,PC,m+1,LB-2,lBm1,iAtom));
+                (vRRV0b(nucShell,pripair,shell2,FmT,PC,m,LB-2,lBm1,iAtom) 
+                -vRRV0b(nucShell,pripair,shell2,FmT,PC,m+1,LB-2,lBm1,iAtom));
     }
     return tmpVal; 
   }
@@ -2041,6 +2095,7 @@ namespace ChronusQ {
    *  where a,b are the angular momentum, A,B are the nuclear coordinates.
    *  halInvZeta = 1/2 * 1/Zeta
    *
+   *  \param [in] nucShell nuclear shell, give the exponents of gaussian function of nuclei
    *  \param [in] pripair primitive Shell pair data for shell1, shell2
    *  \param [in] shell1  Bra shell
    *  \param [in] shell2  Ket shell
@@ -2058,12 +2113,15 @@ namespace ChronusQ {
    *
    */ 
 
-  double AOIntegrals::Slabmu(libint2::ShellPair::PrimPairData &pripair, libint2::Shell &shell1,
-    libint2::Shell &shell2, double *OneixAC, double *OneixBC, int LA, int *lA, int LB, int *lB, 
-    int mu, int m, int iAtom){
+  double AOIntegrals::Slabmu(const std::vector<libint2::Shell> &nucShell,
+    libint2::ShellPair::PrimPairData &pripair, libint2::Shell &shell1,
+    libint2::Shell &shell2, double *OneixAC, double *OneixBC, int LA, int *lA, 
+    int LB, int *lB, int mu, int m, int iAtom){
   
     double tmpVal=0.0;
     double C[3],AC[3],BC[3],ACxBC[3];
+    
+    bool useFiniteWidthNuclei = nucShell.size() > 0;
   
     for (int k = 0 ; k < 3 ; k++) C[k] = molecule_.atoms[iAtom].coord[k]; 
   
@@ -2078,7 +2136,7 @@ namespace ChronusQ {
       ACxBC[2] = AC[0]*BC[1] - AC[1]*BC[0];
   
      // double u;
-      auto u = hRRiPPVab(pripair,shell1,shell2,LA,lA,LB,lB,C,m+1,iAtom);
+      auto u = hRRiPPVab(nucShell,pripair,shell1,shell2,LA,lA,LB,lB,C,m+1,iAtom);
       tmpVal = 4*shell1.alpha[pripair.p1]*shell2.alpha[pripair.p2]*ACxBC[mu]*u;        
   
       return tmpVal;
@@ -2098,20 +2156,22 @@ namespace ChronusQ {
   
       lAm1[iWork]--;
       tmpVal  = (pripair.P[iWork]-shell1.O[iWork]) *
-        Slabmu(pripair,shell1,shell2,OneixAC,OneixBC,LA-1,lAm1,LB,lB,mu,m,iAtom);
+        Slabmu(nucShell,pripair,shell1,shell2,OneixAC,OneixBC,
+               LA-1,lAm1,LB,lB,mu,m,iAtom);
       tmpVal -= PC[iWork]*
-        Slabmu(pripair,shell1,shell2,OneixAC,OneixBC,LA-1,lAm1,LB,lB,mu,m+1,iAtom);
+        Slabmu(nucShell,pripair,shell1,shell2,OneixAC,OneixBC,
+               LA-1,lAm1,LB,lB,mu,m+1,iAtom);
       tmpVal += 2 * shell2.alpha[pripair.p2] * OneixBC[iWork*3+mu] *
-        hRRiPPVab(pripair,shell1,shell2,LA-1,lAm1,LB,lB,C,m+1,iAtom); 
+        hRRiPPVab(nucShell,pripair,shell1,shell2,LA-1,lAm1,LB,lB,C,m+1,iAtom); 
   
       if( lAm1[iWork]  >=  1 ){
         lAm1[iWork]--;
         tmpVal += (lA[iWork]-1) * 0.5* pripair.one_over_gamma * 
           (  
-             Slabmu(pripair,shell1,shell2,OneixAC,OneixBC,LA-2,lAm1,LB,lB,mu,m,
-               iAtom) -       
-             Slabmu(pripair,shell1,shell2,OneixAC,OneixBC,LA-2,lAm1,LB,lB,mu,m+1,
-               iAtom)
+             Slabmu(nucShell,pripair,shell1,shell2,OneixAC,OneixBC,LA-2,lAm1,
+               LB,lB,mu,m,iAtom) -       
+             Slabmu(nucShell,pripair,shell1,shell2,OneixAC,OneixBC,LA-2,lAm1,
+               LB,lB,mu,m+1,iAtom)
           );
       }
   
@@ -2134,22 +2194,26 @@ namespace ChronusQ {
       lBm1[iWork]--;
   
       tmpVal  = ( pripair.P[iWork]-shell2.O[iWork]) * 
-        Slabmu(pripair,shell1,shell2,OneixAC,OneixBC,LA,lA,LB-1,lBm1,mu,m,iAtom);
+        Slabmu(nucShell,pripair,shell1,shell2,OneixAC,OneixBC,
+               LA,lA,LB-1,lBm1,mu,m,iAtom);
   
       tmpVal -= PC[iWork] * 
-        Slabmu(pripair,shell1,shell2,OneixAC,OneixBC,LA,lA,LB-1,lBm1,mu,m+1,iAtom);
+        Slabmu(nucShell,pripair,shell1,shell2,OneixAC,OneixBC,
+               LA,lA,LB-1,lBm1,mu,m+1,iAtom);
   
       if( lAm1[iWork]  >=  0 )
         tmpVal += 0.5* pripair.one_over_gamma * lA[iWork] * 
           (
-            Slabmu(pripair,shell1,shell2,OneixAC,OneixBC,LA-1,lAm1,LB-1,lBm1,mu,m,
+            Slabmu(nucShell,pripair,shell1,shell2,OneixAC,OneixBC,
+                   LA-1,lAm1,LB-1,lBm1,mu,m,
               iAtom) - 
-            Slabmu(pripair,shell1,shell2,OneixAC,OneixBC,LA-1,lAm1,LB-1,lBm1,mu,m+1,
+            Slabmu(nucShell,pripair,shell1,shell2,OneixAC,OneixBC,
+                   LA-1,lAm1,LB-1,lBm1,mu,m+1,
               iAtom)
           );
   
       tmpVal -= 2 * shell1.alpha[pripair.p1] * OneixAC[3*iWork+mu] * 
-        hRRiPPVab(pripair,shell1,shell2,LA,lA,LB-1,lBm1,C,m+1,iAtom);
+        hRRiPPVab(nucShell,pripair,shell1,shell2,LA,lA,LB-1,lBm1,C,m+1,iAtom);
   
   
   /* DBWY
@@ -2167,36 +2231,42 @@ namespace ChronusQ {
         if( mu  ==  1 and lA[2] > 0 ) {
           lAm1k[2]--;
           tmpVal += lA[2] * 
-            hRRiPPVab(pripair,shell1,shell2,LA-1,lAm1k,LB-1,lBm1,C,m+1,iAtom);
+            hRRiPPVab(nucShell,pripair,shell1,shell2,LA-1,lAm1k,
+                      LB-1,lBm1,C,m+1,iAtom);
           lAm1k[2]++;
         } else if( mu  ==  2 and lA[1] > 0 ) {
           lAm1k[1]--;
           tmpVal -= lA[1] * 
-            hRRiPPVab(pripair,shell1,shell2,LA-1,lAm1k,LB-1,lBm1,C,m+1,iAtom);
+            hRRiPPVab(nucShell,pripair,shell1,shell2,LA-1,lAm1k,
+                      LB-1,lBm1,C,m+1,iAtom);
           lAm1k[1]++;
         }
       } else if( iWork  ==  1 ) {
         if( mu  ==  2 and lA[0] > 0 ) {
           lAm1k[0]--;
           tmpVal += lA[0] * 
-            hRRiPPVab(pripair,shell1,shell2,LA-1,lAm1k,LB-1,lBm1,C,m+1,iAtom);
+            hRRiPPVab(nucShell,pripair,shell1,shell2,LA-1,lAm1k,
+                      LB-1,lBm1,C,m+1,iAtom);
           lAm1k[0]++;
         } else if( mu  ==  0 and lA[2] > 0 ) {
           lAm1k[2]--;
           tmpVal -= lA[2] * 
-            hRRiPPVab(pripair,shell1,shell2,LA-1,lAm1k,LB-1,lBm1,C,m+1,iAtom);
+            hRRiPPVab(nucShell,pripair,shell1,shell2,LA-1,lAm1k,
+                      LB-1,lBm1,C,m+1,iAtom);
           lAm1k[2]++;
         }
       } else {
         if( mu  ==  0 and lA[1] > 0 ) {
           lAm1k[1]--;
           tmpVal += lA[1] * 
-            hRRiPPVab(pripair,shell1,shell2,LA-1,lAm1k,LB-1,lBm1,C,m+1,iAtom);
+            hRRiPPVab(nucShell,pripair,shell1,shell2,LA-1,lAm1k,
+                      LB-1,lBm1,C,m+1,iAtom);
           lAm1k[1]++;
         } else if( mu  ==  1 and lA[0] > 0 ) {
           lAm1k[0]--;
           tmpVal -= lA[0] * 
-            hRRiPPVab(pripair,shell1,shell2,LA-1,lAm1k,LB-1,lBm1,C,m+1,iAtom);
+            hRRiPPVab(nucShell,pripair,shell1,shell2,LA-1,lAm1k,
+                      LB-1,lBm1,C,m+1,iAtom);
           lAm1k[0]++;
         }
       }
@@ -2205,10 +2275,10 @@ namespace ChronusQ {
         lBm1[iWork]--;
         tmpVal += (lBm1[iWork] + 1) * 0.5* pripair.one_over_gamma * 
           (
-             Slabmu(pripair,shell1,shell2,OneixAC,OneixBC,LA,lA,LB-2,lBm1,mu,m,
-               iAtom) - 
-             Slabmu(pripair,shell1,shell2,OneixAC,OneixBC,LA,lA,LB-2,lBm1,mu,m+1,
-               iAtom)
+             Slabmu(nucShell,pripair,shell1,shell2,OneixAC,OneixBC,
+                    LA,lA,LB-2,lBm1,mu,m,iAtom) - 
+             Slabmu(nucShell,pripair,shell1,shell2,OneixAC,OneixBC,
+                    LA,lA,LB-2,lBm1,mu,m+1,iAtom)
           );
       }
     }
@@ -2287,6 +2357,7 @@ namespace ChronusQ {
    *
    *  where a,b are the angular momentum, A,B are the nuclear coordinates.
    *
+   *  \param [in] nucShell nuclear shell, give the exponents of gaussian function of nuclei
    *  \param [in] pripair Primitive Shell pair data for shell1, shell2
    *  \param [in] shell1  Bra shell
    *  \param [in] shell2  Ket shell
@@ -2301,11 +2372,15 @@ namespace ChronusQ {
    *
    */ 
 
-  double AOIntegrals::pVpab(libint2::ShellPair::PrimPairData &pripair, libint2::Shell &shell1 , 
+  double AOIntegrals::pVpab(const std::vector<libint2::Shell> &nucShell,
+    libint2::ShellPair::PrimPairData &pripair, libint2::Shell &shell1 , 
     libint2::Shell &shell2, int LA, int *lA, int LB, int *lB, int m, int iAtom){
   
     double tmpVal=0.0;
     double C[3],PAPB,PABPC,PCsquare;
+
+    bool useFiniteWidthNuclei = nucShell.size() > 0;
+
     for (int k = 0 ; k < 3 ; k++) C[k] = molecule_.atoms[iAtom].coord[k];
   
     if ((LA+LB) == 0){
@@ -2319,9 +2394,9 @@ namespace ChronusQ {
       }
   
     double u,uone,utwo;
-    u = hRRiPPVab(pripair,shell1,shell2,LA,lA,LB,lB,C,m,iAtom);
-    uone = hRRiPPVab(pripair,shell1,shell2,LA,lA,LB,lB,C,m+1,iAtom);
-    utwo = hRRiPPVab(pripair,shell1,shell2,LA,lA,LB,lB,C,m+2,iAtom);
+    u = hRRiPPVab(nucShell,pripair,shell1,shell2,LA,lA,LB,lB,C,m,iAtom);
+    uone = hRRiPPVab(nucShell,pripair,shell1,shell2,LA,lA,LB,lB,C,m+1,iAtom);
+    utwo = hRRiPPVab(nucShell,pripair,shell1,shell2,LA,lA,LB,lB,C,m+2,iAtom);
   
     tmpVal = (6 * shell1.alpha[pripair.p1] * shell2.alpha[pripair.p2] * pripair.one_over_gamma 
              +4 * shell1.alpha[pripair.p1] * shell2.alpha[pripair.p2] * PAPB ) * u;
@@ -2356,37 +2431,41 @@ namespace ChronusQ {
       onei[iWork]=1;
   
       tmpVal = (pripair.P[iWork]-shell1.O[iWork]) 
-               * pVpab(pripair,shell1,shell2,LA-1,lAm1,LB,lB,m,iAtom);
+               * pVpab(nucShell,pripair,shell1,shell2,LA-1,lAm1,LB,lB,m,iAtom);
   
-      tmpVal -= PC[iWork] * pVpab(pripair,shell1,shell2,LA-1,lAm1,LB,lB,m+1,iAtom);
+      tmpVal -= PC[iWork] * 
+               pVpab(nucShell,pripair,shell1,shell2,LA-1,lAm1,LB,lB,m+1,iAtom);
   
       tmpVal -= shell2.alpha[pripair.p2] * pripair.one_over_gamma * 2 * 
                 shell2.alpha[pripair.p2] * 
-                hRRiPPVab(pripair,shell1,shell2,LA-1,lAm1,LB+1,onei,C,m,iAtom);
+                hRRiPPVab(nucShell,pripair,shell1,shell2,LA-1,lAm1,
+                LB+1,onei,C,m,iAtom);
   
       tmpVal += shell2.alpha[pripair.p2] * pripair.one_over_gamma * 
                 ( 2 * shell1.alpha[pripair.p1] * 
-                hRRiPPVab(pripair,shell1,shell2,LA,lA,LB,lB,C,m,iAtom));
+                hRRiPPVab(nucShell,pripair,shell1,shell2,LA,lA,LB,lB,C,m,iAtom));
   
       tmpVal -= shell1.alpha[pripair.p1] * pripair.one_over_gamma * 2 * 
                 shell2.alpha[pripair.p2] * 
-                hRRiPPVab(pripair,shell1,shell2,LA-1,lAm1,LB+1,onei,C,m+1,iAtom);
+                hRRiPPVab(nucShell,pripair,shell1,shell2,
+                LA-1,lAm1,LB+1,onei,C,m+1,iAtom);
   
       tmpVal -= shell2.alpha[pripair.p2] * pripair.one_over_gamma * 
                 (2 * shell1.alpha[pripair.p1] * 
-                hRRiPPVab(pripair,shell1,shell2,LA,lA,LB,lB,C,m+1,iAtom));
+                hRRiPPVab(nucShell,pripair,shell1,shell2,LA,lA,LB,lB,C,m+1,iAtom));
   
       if (lAm1[iWork] > 0) {
         lAm1[iWork]--;
         tmpVal += 0.5 * pripair.one_over_gamma * (lA[iWork]-1) * 
-                 ( pVpab(pripair,shell1,shell2,LA-2,lAm1,LB,lB,m,iAtom)
-                  -pVpab(pripair,shell1,shell2,LA-2,lAm1,LB,lB,m+1,iAtom) );
+                 ( pVpab(nucShell,pripair,shell1,shell2,LA-2,lAm1,LB,lB,m,iAtom)
+                  -pVpab(nucShell,pripair,shell1,shell2,LA-2,lAm1,LB,lB,m+1,iAtom) );
   
         tmpVal -= shell2.alpha[pripair.p2] * pripair.one_over_gamma * (lAm1[iWork]+1) * 
-                  hRRiPPVab(pripair,shell1,shell2,LA-2,lAm1,LB,lB,C,m,iAtom);
+                  hRRiPPVab(nucShell,pripair,shell1,shell2,LA-2,lAm1,LB,lB,C,m,iAtom);
   
         tmpVal += shell2.alpha[pripair.p2] * pripair.one_over_gamma * (lAm1[iWork]+1) * 
-                  hRRiPPVab(pripair,shell1,shell2,LA-2,lAm1,LB,lB,C,m+1,iAtom);
+                  hRRiPPVab(nucShell,pripair,shell1,shell2,
+                            LA-2,lAm1,LB,lB,C,m+1,iAtom);
       } //if (lAm1[iWork] > 0)
     } // if ((LB == 0)&(LA>0))
   
@@ -2411,50 +2490,57 @@ namespace ChronusQ {
       lAp1[iWork]++;
   
       tmpVal = ( pripair.P[iWork] - shell2.O[iWork] ) * 
-               pVpab(pripair,shell1,shell2,LA,lA,LB-1,lBm1,m,iAtom);
+               pVpab(nucShell,pripair,shell1,shell2,LA,lA,LB-1,lBm1,m,iAtom);
   
-      tmpVal -= PC[iWork] * pVpab(pripair,shell1,shell2,LA,lA,LB-1,lBm1,m+1,iAtom);
+      tmpVal -= PC[iWork] * pVpab(nucShell,pripair,shell1,shell2,
+                LA,lA,LB-1,lBm1,m+1,iAtom);
   
       tmpVal -= shell1.alpha[pripair.p1] * pripair.one_over_gamma * 2 * 
                 shell1.alpha[pripair.p1] * 
-                hRRiPPVab(pripair,shell1,shell2,LA+1,lAp1,LB-1,lBm1,C,m,iAtom);
+                hRRiPPVab(nucShell,pripair,shell1,shell2,
+                LA+1,lAp1,LB-1,lBm1,C,m,iAtom);
   
       tmpVal += shell1.alpha[pripair.p1] * pripair.one_over_gamma * 2 * 
                 shell2.alpha[pripair.p2] * 
-                hRRiPPVab(pripair,shell1,shell2,LA,lA,LB,lB,C,m,iAtom);
+                hRRiPPVab(nucShell,pripair,shell1,shell2,LA,lA,LB,lB,C,m,iAtom);
   
       tmpVal -= shell2.alpha[pripair.p2] * pripair.one_over_gamma * 2 * 
                 shell1.alpha[pripair.p1] * 
-                hRRiPPVab(pripair,shell1,shell2,LA+1,lAp1,LB-1,lBm1,C,m+1,iAtom);
+                hRRiPPVab(nucShell,pripair,shell1,shell2,
+                LA+1,lAp1,LB-1,lBm1,C,m+1,iAtom);
   
       tmpVal -= shell1.alpha[pripair.p1] * pripair.one_over_gamma * 2 * 
                 shell2.alpha[pripair.p2] * 
-                hRRiPPVab(pripair,shell1,shell2,LA,lA,LB,lB,C,m+1,iAtom);
+                hRRiPPVab(nucShell,pripair,shell1,shell2,LA,lA,LB,lB,C,m+1,iAtom);
   
       if (lA[iWork] > 0) {
         tmpVal += 0.5 * pripair.one_over_gamma * lA[iWork] * 
-                ( pVpab(pripair,shell1,shell2,LA-1,lAm1,LB-1,lBm1,m,iAtom)
-                 -pVpab(pripair,shell1,shell2,LA-1,lAm1,LB-1,lBm1,m+1,iAtom));
+                ( pVpab(nucShell,pripair,shell1,shell2,LA-1,lAm1,LB-1,lBm1,m,iAtom)
+                 -pVpab(nucShell,pripair,shell1,shell2,
+                        LA-1,lAm1,LB-1,lBm1,m+1,iAtom));
   
         tmpVal += shell1.alpha[pripair.p1] * pripair.one_over_gamma * lA[iWork] * 
-                  hRRiPPVab(pripair,shell1,shell2,LA-1,lAm1,LB-1,lBm1,C,m,iAtom);
+                  hRRiPPVab(nucShell,pripair,shell1,shell2,
+                  LA-1,lAm1,LB-1,lBm1,C,m,iAtom);
   
         tmpVal += shell2.alpha[pripair.p2] * pripair.one_over_gamma * lA[iWork] * 
-                  hRRiPPVab(pripair,shell1,shell2,LA-1,lAm1,LB-1,lBm1,C,m+1,iAtom);
+                  hRRiPPVab(nucShell,pripair,shell1,shell2,
+                  LA-1,lAm1,LB-1,lBm1,C,m+1,iAtom);
   
       } // if (lA[iWork] > 0)
   
       if (lBm1[iWork] > 0) {
         lBm1[iWork]--;
         tmpVal += 0.5 * pripair.one_over_gamma * (lB[iWork]-1) * 
-                  (pVpab(pripair,shell1,shell2,LA,lA,LB-2,lBm1,m,iAtom)
-                  -pVpab(pripair,shell1,shell2,LA,lA,LB-2,lBm1,m+1,iAtom));
+                  (pVpab(nucShell,pripair,shell1,shell2,LA,lA,LB-2,lBm1,m,iAtom)
+                  -pVpab(nucShell,pripair,shell1,shell2,LA,lA,LB-2,lBm1,m+1,iAtom));
   
         tmpVal -= shell1.alpha[pripair.p1] * pripair.one_over_gamma * (lB[iWork]-1) * 
-                  hRRiPPVab(pripair,shell1,shell2,LA,lA,LB-2,lBm1,C,m,iAtom);
+                  hRRiPPVab(nucShell,pripair,shell1,shell2,LA,lA,LB-2,lBm1,C,m,iAtom);
   
         tmpVal += shell1.alpha[pripair.p1] * pripair.one_over_gamma * (lB[iWork]-1) * 
-                  hRRiPPVab(pripair,shell1,shell2,LA,lA,LB-2,lBm1,C,m+1,iAtom);
+                  hRRiPPVab(nucShell,pripair,shell1,shell2,
+                  LA,lA,LB-2,lBm1,C,m+1,iAtom);
       }  // if (lBm1[iWork] > 0)
   
     } // else if ( (LA >= 0) & (LB)>0 )

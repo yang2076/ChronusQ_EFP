@@ -220,19 +220,22 @@ namespace ChronusQ {
     }
 
     // horizontal recursion of contracted nuclear potential integrals
-    double hRRVab(libint2::ShellPair&,libint2::Shell&,libint2::Shell&,
-                     int,int*,int,int*);
+    double hRRVab(const std::vector<libint2::Shell>&,libint2::ShellPair&,
+                  libint2::Shell&,libint2::Shell&,int,int*,int,int*);
 
     // Bra vertical recursion of uncontracted nuclear potential integrals
-    double vRRVa0(libint2::ShellPair::PrimPairData&,libint2::Shell&,
+    double vRRVa0(const std::vector<libint2::Shell>&,
+                  libint2::ShellPair::PrimPairData&,libint2::Shell&,
                   double*,double*,int,int,int*,int);
 
     // horizontal recursion of uncontracted nuclear potential integrals
-    double hRRiPPVab(libint2::ShellPair::PrimPairData&, libint2::Shell&,
+    double hRRiPPVab(const std::vector<libint2::Shell>&,
+      libint2::ShellPair::PrimPairData&, libint2::Shell&,
       libint2::Shell&, int,int*,int,int*,double*,int,int);
     
     // Ket vertical recursion of uncontracted nuclear potential integrals
-    double vRRV0b(libint2::ShellPair::PrimPairData&,libint2::Shell&,
+    double vRRV0b(const std::vector<libint2::Shell>&,
+                  libint2::ShellPair::PrimPairData&,libint2::Shell&,
                   double*,double*,int,int,int*,int);
 
     // spin orbit integrals
@@ -251,7 +254,8 @@ namespace ChronusQ {
     }
 
     // vertical recursion of uncontracted spin orbit integral
-    double Slabmu(libint2::ShellPair::PrimPairData&,libint2::Shell&,
+    double Slabmu(const std::vector<libint2::Shell>&, 
+      libint2::ShellPair::PrimPairData&,libint2::Shell&,
       libint2::Shell&, double*,double*,int,int*,int,int*,int,int,int);
 
     // pV dot p integrals
@@ -270,7 +274,8 @@ namespace ChronusQ {
     }
 
     // vertical recursion of uncontracted pV dot p integrals
-    double pVpab(libint2::ShellPair::PrimPairData&,libint2::Shell&,
+    double pVpab(const std::vector<libint2::Shell>&,
+      libint2::ShellPair::PrimPairData&,libint2::Shell&,
       libint2::Shell&, int,int*,int,int*,int,int); 
 
     // local one body integrals end

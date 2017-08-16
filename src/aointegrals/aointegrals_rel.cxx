@@ -69,7 +69,7 @@ namespace ChronusQ {
 
 
     // Compute V + PVP integrals
-#if 1
+#if 0
     auto _potential = OneEDriverLocal<1,true>(
                 std::bind(
                   static_cast<

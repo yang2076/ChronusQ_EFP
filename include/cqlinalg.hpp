@@ -32,6 +32,7 @@
 #include <cqlinalg/blas1.hpp>
 #include <cqlinalg/blas3.hpp>
 #include <cqlinalg/blasext.hpp>
+#include <cqlinalg/blasutil.hpp>
 
 // LAPACK
 #include <cqlinalg/eig.hpp>
