@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
   aoints.computeCoreHam();
   aoints.computeERI();
 
-  SetNumThreads(16);
+  SetNumThreads(1);
 
   ss->formGuess();
   ss->SCF();

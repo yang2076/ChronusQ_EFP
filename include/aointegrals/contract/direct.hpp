@@ -29,6 +29,7 @@
 #include <util/matout.hpp>
 #include <cqlinalg/blas1.hpp>
 #include <cqlinalg/blasext.hpp>
+#include <cqlinalg/blasutil.hpp>
 
 #include <util/threads.hpp>
 
@@ -422,7 +423,7 @@ namespace ChronusQ {
         // Scale the buffer by the degeneracy factor and store
         // in infBuffer
         std::transform(buff,buff + n1*n2*n3*n4,intBuffer_loc,
-          std::bind1st(std::multiplies<double>(),s1234_deg));
+          std::bind1st(std::multiplies<double>(),0.5*s1234_deg));
 
         size_t b1,b2,b3,b4;
         double *Xp1, *Xp2;
@@ -723,16 +724,23 @@ namespace ChronusQ {
 
       if( list[iMat].HER ) {
 
-        MatAdd('N','C',NB,NB,G(0.25),AXthreads[iTh][iMat],NB,G(0.25),
+        MatAdd('N','C',NB,NB,G(0.5),AXthreads[iTh][iMat],NB,G(0.5),
           AXthreads[iTh][iMat],NB,reinterpret_cast<G*>(intBuffer),NB);
 
-        MatAdd('N','N',NB,NB,G(1.),reinterpret_cast<G*>(intBuffer),NB,
-          (nthreads == 1) ? G(0.) : G(1.), list[iMat].AX,NB,list[iMat].AX,NB);
+        if( nthreads != 1 )
+          MatAdd('N','N',NB,NB,G(1.),reinterpret_cast<G*>(intBuffer),NB,
+            G(1.), list[iMat].AX,NB,list[iMat].AX,NB);
+        else
+          SetMat('N',NB,NB,G(1.),reinterpret_cast<G*>(intBuffer),NB,
+            list[iMat].AX,NB);
 
       } else {
 
-        MatAdd('N','N',NB,NB,G(0.25),AXthreads[iTh][iMat],NB,
-          (nthreads == 1) ? G(0.) : G(1.), list[iMat].AX,NB,list[iMat].AX,NB);
+        if( nthreads != 1 )
+          MatAdd('N','N',NB,NB,G(0.5),AXthreads[iTh][iMat],NB,
+            G(1.), list[iMat].AX,NB,list[iMat].AX,NB);
+        else 
+          Scale(NB*NB,G(0.5),list[iMat].AX,1);
 
 
       //std::transform(AXthreads[iTh][iMat], AXthreads[iTh][iMat] + NB*NB, 
