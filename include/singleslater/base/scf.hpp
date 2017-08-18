@@ -43,6 +43,7 @@ namespace ChronusQ {
     // Initialize type independent parameters
     bool isConverged = false;
     scfControls.dampParam = scfControls.dampStartParam;
+    scfControls.doIncFock = scfControls.doIncFock and (aoints.cAlg == DIRECT);
 
     printSCFHeader(std::cout);
 
@@ -67,7 +68,11 @@ namespace ChronusQ {
 
     }; // Iteration loop
 
+    // Save current state of the wave function (method specific)
+    saveCurrentState();
+
     SCFFin();
+
 
     //printSCFFooter(isConverged);
     if(not isConverged)
@@ -103,6 +108,8 @@ namespace ChronusQ {
     out << std::setw(38) << std::left << "  Maximum Number of SCF Cycles:" 
            << scfControls.maxSCFIter << std::endl;
 
+
+
     if (scfControls.doExtrap) {
       if (scfControls.doDamp) {
         out << std::setw(38)   << std::left << "  Static Damping Factor:" 
@@ -116,7 +123,7 @@ namespace ChronusQ {
         if (scfControls.diisAlg == CDIIS) out << "CDIIS";
         out << std::endl;
 
-        out << std::left << "    DIIS will track up to " 
+        out << std::left << "    * DIIS will track up to " 
             << scfControls.nKeep << " previous iterations" << std::endl;
       }
  
@@ -124,6 +131,14 @@ namespace ChronusQ {
         out << std::setw(38)   << std::left << "  SCF Algorithm:"
                <<  "Standard Roothaan-Hall" << std::endl;
     }
+
+
+    if( scfControls.doIncFock ) {
+      out << "\n  * Will Perform Incremental Fock Build -- Restarting Every "
+          << scfControls.nIncFock << " SCF Steps\n";
+         
+    }
+
 
 
 

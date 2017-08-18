@@ -53,6 +53,10 @@ namespace ChronusQ {
     std::ostream &, CQInputFile &, AOIntegrals &);
 
 
+  // Parse integral options
+  void CQIntsOptions(std::ostream&, CQInputFile&, AOIntegrals&);
+
+
   // Parse the SCF options
   void CQSCFOptions(std::ostream&, CQInputFile&,
     SingleSlaterBase &);

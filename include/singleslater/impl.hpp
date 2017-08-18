@@ -41,7 +41,9 @@
   OP_OP(double,this,other,memManager,JScalar); \
   OP_VEC_OP(T,this,other,memManager,K); \
   OP_VEC_OP(T,this,other,memManager,GD);\
-  OP_VEC_OP(T,this,other,memManager,onePDMOrtho);
+  OP_VEC_OP(T,this,other,memManager,onePDMOrtho);\
+  OP_VEC_OP(T,this,other,memManager,curOnePDM);\
+  OP_VEC_OP(T,this,other,memManager,deltaOnePDM);
 
 namespace ChronusQ {
 

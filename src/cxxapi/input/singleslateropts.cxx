@@ -43,6 +43,7 @@ namespace ChronusQ {
     std::ostream &out, CQInputFile &input, 
     AOIntegrals &aoints) {
 
+    out << "  *** Parsing QM.REFERENCE options ***\n";
 
     // Attempt to find reference
     std::string reference;
@@ -104,6 +105,9 @@ namespace ChronusQ {
       out << "  *** Auto-determination of wave function field: AUTO -> " 
           << RCflag << " ***" << std::endl;
     }
+
+    out << "\n\n";
+
 
     // Override core hamiltoninan type for X2C
     if( not refString.compare("X2C") ) 

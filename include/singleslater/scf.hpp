@@ -73,8 +73,11 @@ namespace ChronusQ {
   template <typename T>
   void SingleSlater<T>::getNewOrbitals(bool frmFock) {
 
+    bool increment = scfControls.doIncFock and 
+                     scfConv.nSCFIter % scfControls.nIncFock != 0;
+
     // Form the Fock matrix D(k) -> F(k)
-    if( frmFock ) formFock();
+    if( frmFock ) formFock(increment);
 
     // Transform AO fock into the orthonormal basis
     ao2orthoFock();

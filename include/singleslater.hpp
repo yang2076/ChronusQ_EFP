@@ -157,7 +157,7 @@ namespace ChronusQ {
 
     // Form a fock matrix (see include/singleslater/fock.hpp for docs)
     virtual void formFock(bool increment = false);
-    void formGD();
+    void formGD(bool increment = false);
 
     // Form initial guess orbitals
     // see include/singleslater/guess.hpp for docs)

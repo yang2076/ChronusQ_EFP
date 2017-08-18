@@ -74,6 +74,17 @@ namespace ChronusQ {
 
   }; // struct TwoBodyContraction
 
+  enum CONTRACTION_ALGORITHM {
+    DIRECT,
+    INCORE,
+    DENFIT
+  }; ///< 2-e Integral Contraction Algorithm
+
+  enum ORTHO_TYPE {
+    LOWDIN,
+    CHOLESKY
+  }; ///< Orthonormalization Scheme
+
   class AOIntegrals {
   public:
 
@@ -82,26 +93,11 @@ namespace ChronusQ {
 
   private:
 
-    enum CONTRACTION_ALGORITHM {
-      DIRECT,
-      INCORE,
-      DENFIT
-    }; ///< 2-e Integral Contraction Algorithm
-
-    enum ORTHO_TYPE {
-      LOWDIN,
-      CHOLESKY
-    }; ///< Orthonormalization Scheme
 
     size_t nTT_; ///< Reduced number of basis functions \f$ N_B(N_B+1)/2 \f$
     size_t nSQ_; ///< Squared basis functions \f$ N_B^2\f$
     size_t npTT_; ///< Reduced number of primitive functions \f$ N_P(N_P+1)/2 \f$
     size_t npSQ_; ///< Squared primitive functions \f$ N_P^2\f$
-
-    double threshSchwartz_; ///< Schwartz screening threshold
-
-    CONTRACTION_ALGORITHM cAlg_;      ///< Algorithm for 2-body contraction
-    ORTHO_TYPE            orthoType_; ///< Orthogonalization scheme
 
     CQMemManager &memManager_; ///< CQMemManager to allocate matricies
     Molecule     &molecule_;   ///< Molecule object for nuclear potential
@@ -284,6 +280,11 @@ namespace ChronusQ {
 
     // Control Variables
     CORE_HAMILTONIAN_TYPE coreType;
+    CONTRACTION_ALGORITHM cAlg;      ///< Algorithm for 2-body contraction
+    ORTHO_TYPE            orthoType; ///< Orthogonalization scheme
+
+    double threshSchwartz; ///< Schwartz screening threshold
+
 
 
     // Operator storage
@@ -331,10 +332,10 @@ namespace ChronusQ {
      *  \param [in] basis      The GTO basis for integral evaluation
      */ 
     AOIntegrals(CQMemManager &memManager, Molecule &mol, BasisSet &basis) :
-      threshSchwartz_(1e-14), cAlg_(DIRECT), orthoType_(LOWDIN), 
+      threshSchwartz(1e-12), cAlg(DIRECT), orthoType(LOWDIN), 
       memManager_(memManager), basisSet_(basis), molecule_(mol), 
-      schwartz(NULL), ortho1(NULL), ortho2(NULL), overlap(NULL), 
-      kinetic(NULL), potential(NULL), ERI(NULL), coreType(NON_RELATIVISTIC) {
+      schwartz(nullptr), ortho1(nullptr), ortho2(nullptr), overlap(nullptr), 
+      kinetic(nullptr), potential(nullptr), ERI(nullptr), coreType(NON_RELATIVISTIC) {
 
       nTT_  = basis.nBasis * ( basis.nBasis + 1 ) / 2;
       nSQ_  = basis.nBasis * basis.nBasis;
@@ -381,6 +382,10 @@ namespace ChronusQ {
     Molecule&     molecule()   { return molecule_;   }
 
 
+    // Print (see src/aointegrals/print.cxx for docs)
+    friend std::ostream & operator<<(std::ostream &, const AOIntegrals& );
+
+
     // Memory
 
     // Deallocation (see src/aointegrals/aointegrals.cxx for docs)
@@ -396,6 +401,7 @@ namespace ChronusQ {
     void computeAOOneE(bool); // Evaluate the 1-e ints in the CGTO basis
     void computeERI();    // Evaluate and store the ERIs in the CGTO basis
     void computeOrtho();  // Evaluate orthonormalization transformations
+    void computeSchwartz(); // Evaluate schwartz bounds over CGTOS
 
     // CH == Core Hamiltonian
     void computeCoreHam(CORE_HAMILTONIAN_TYPE); // Compute the CH
@@ -418,11 +424,25 @@ namespace ChronusQ {
      */ 
     template <typename T, typename G>
     void twoBodyContract(std::vector<TwoBodyContraction<T,G>> &contList) {
-      twoBodyContractIncore(contList);
+
+      // Sanity check of dimensions
+      assert( std::all_of(contList.begin(),contList.end(),
+              [&](TwoBodyContraction<T,G> &C) {
+                bool ret(true);
+                ret = ret and (memManager_.template getSize<T>(C.X)  == nSQ_);
+                ret = ret and (memManager_.template getSize<G>(C.AX) == nSQ_);
+                return ret;
+              }) );
+
+      if( cAlg == INCORE ) twoBodyContractIncore(contList);
+      else if( cAlg == DIRECT ) twoBodyContractDirect(contList);
     };
     
+
+    // INCORE contraction routines
     // Perform the two body contraction incore (using the rank-4 ERI tensor)
-    // see include/aointegrals/contract.hpp for docs.
+    // see include/aointegrals/contract/incore.hpp for docs.
+      
     template <typename T, typename G>
     void twoBodyContractIncore(std::vector<TwoBodyContraction<T,G>>&);
 
@@ -431,6 +451,23 @@ namespace ChronusQ {
 
     template <typename T, typename G>
     void KContractIncore(TwoBodyContraction<T,G> &);
+
+
+
+    // DIRECT contraction routines
+    // Perform the two body contraction directly
+    // see include/aointegrals/contract/direct.hpp for docs.
+    template <typename T, typename G>
+    void twoBodyContractDirect(std::vector<TwoBodyContraction<T,G>>&);
+
+    template <typename T, typename G>
+    void directScaffold(std::vector<TwoBodyContraction<T,G>>&);
+
+    template <typename T, typename G>
+    void JContractDirect(TwoBodyContraction<T,G> &);
+
+    template <typename T, typename G>
+    void KContractDirect(TwoBodyContraction<T,G> &);
 
 
     // Transformations to and from the orthonormal basis

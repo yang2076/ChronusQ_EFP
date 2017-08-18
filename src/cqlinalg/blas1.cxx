@@ -23,6 +23,10 @@
  */
 #include <cqlinalg/blas1.hpp>
 
+#ifndef _CQ_MKL
+typedef enum CBLAS_ORDER     {CblasRowMajor=101, CblasColMajor=102} CBLAS_ORDER;
+#endif
+
 namespace ChronusQ {
 
   template<>
@@ -148,6 +152,25 @@ namespace ChronusQ {
       
   }; // TwoNorm double = (dcomplex)
 
+
+
+
+
+  template<>
+  double MatNorm(char NORM, int M, int N, double *A, int LDA) {
+
+    return LAPACKE_dlange(CblasColMajor,NORM,M,N,A,LDA);
+
+  }; // MatNorm (double)
+
+
+
+  template<>
+  double MatNorm(char NORM, int M, int N, dcomplex *A, int LDA) {
+
+    return LAPACKE_zlange(CblasColMajor,NORM,M,N,A,LDA);
+
+  }; // MatNorm (complex)
 
 
 

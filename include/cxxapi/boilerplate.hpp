@@ -29,6 +29,8 @@
 #include <libint2/cxxapi.h>
 #include <aointegrals.hpp> 
 
+#include <util/threads.hpp>
+
 namespace ChronusQ {
 
   /**
@@ -50,10 +52,7 @@ namespace ChronusQ {
     generateFmTTable();
     // SS end
 
-#ifdef _OPENMP
-    // Thread pool (default serial)
-    omp_set_num_threads(1);
-#endif
+    SetNumThreads(1);
 
   }; // initialize
 

@@ -43,6 +43,8 @@
 #include <algorithm>
 #include <unistd.h>
 #include <complex>
+#include <random>
+#include <chrono>
 
 #include <chronusq_config.hpp> // Configuration header
 

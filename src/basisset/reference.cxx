@@ -79,7 +79,7 @@ namespace ChronusQ {
       std::cout << "Cannot find basis set " + basisPath_ << std::endl;
       exit(EXIT_FAILURE);
     } else 
-      std::cout << "Reading Basis Set from " + fullBasisPath << std::endl;
+      std::cout << "  *** Reading Basis Set from " + fullBasisPath << " ***" << std::endl;
   
   }; // ReferenceBasisSet::findBasisFile
   

@@ -21,27 +21,55 @@
  *    E-Mail: xsli@uw.edu
  *  
  */
-#ifndef __INCLUDED_CQLINALG_CONFIG_HPP__
-#define __INCLUDED_CQLINALG_CONFIG_HPP__
+#ifndef __INCLUDED_UTIL_THREADS_HPP__
+#define __INCLUDED_UTIL_THREADS_HPP__
 
 #include <chronusq_sys.hpp>
+#include <cqlinalg/cqlinalg_config.hpp>
 
-// Choose linear algebra headers
-#ifdef _CQ_MKL
-  #define MKL_Complex16 dcomplex // Redefine MKL complex type
-  #include <mkl.h> // MKL
-#else
-  #define lapack_complex_double dcomplex // Redefine OpenBLAS complex type
-  #include <f77blas.h>
-  #include <lapacke.h> // OpenBLAS
+namespace ChronusQ {
 
-  extern "C" {
-    int openblas_get_num_threads();
-  }
-
+  inline void SetNumThreads(size_t n) {
+#ifdef _OPENMP
+    omp_set_num_threads(n);
 #endif
+  };
 
-#include <memmanager.hpp>
-#include <Eigen/Core>
+  inline size_t GetNumThreads() {
+#ifdef _OPENMP
+    return omp_get_max_threads();
+#else
+    return 1;
+#endif
+  };
+
+  inline size_t GetThreadID() {
+#ifdef _OPENMP
+    return omp_get_thread_num();
+#else
+    return 0;
+#endif
+  };
+
+  inline void SetLAThreads(size_t n) {
+#ifdef _CQ_MKL
+    mkl_set_num_threads(n);
+#else
+    int N = n;
+    openblas_set_num_threads_(&N);
+#endif
+    Eigen::setNbThreads(n);
+  };
+
+
+  inline size_t GetLAThreads() {
+#ifdef _CQ_MKL
+    return mkl_get_max_threads();
+#else
+    return openblas_get_num_threads();
+#endif
+  };
+
+}; // namespace ChronusQ
 
 #endif

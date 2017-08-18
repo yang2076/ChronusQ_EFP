@@ -82,7 +82,7 @@ namespace ChronusQ {
      *  \param [in] BlockSize  Segregation block size
      *
      */ 
-     CQMemManager(size_t N = 0, size_t BlockSize = 256) :
+     CQMemManager(size_t N = 0, size_t BlockSize = 2048) :
        mem_backend(), N_(N), BlockSize_(BlockSize), isAllocated_(false),
        NAlloc_(0) {
        if( N_ and BlockSize_ ) allocMem();

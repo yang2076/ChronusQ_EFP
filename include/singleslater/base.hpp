@@ -63,6 +63,10 @@ namespace ChronusQ {
     double dampParam      = dampStartParam; ///< Current Damp parameter 
     double dampError      = 1e-1; ///< Energy oscillation to turn off damp
 
+    // Incremental Fock build settings
+    bool   doIncFock = true; ///< Whether to perform an incremental fock build
+    size_t nIncFock  = 20;   ///< Restart incremental fock build after n steps
+
     // Misc control
     size_t maxSCFIter = 128; ///< Maximum SCF iterations.
 

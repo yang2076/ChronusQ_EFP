@@ -23,8 +23,11 @@
  */
 #include <cqlinalg/blasext.hpp>
 
+#include <util/matout.hpp>
+
 namespace ChronusQ {
 
+  // MatAdd generic template
   template <typename _F1, typename _F2, typename _F3, typename _FScale1, 
     typename _FScale2>
   void MatAdd(char TRANSA, char TRANSB, size_t M, size_t N, _FScale1 ALPHA, 
@@ -122,5 +125,83 @@ namespace ChronusQ {
     size_t, double, double*, size_t, double*, size_t);
 
 #endif
+
+
+  // Generic IMatCopy template
+  template <typename _F, typename _FScale>
+  void IMatCopy(char TRANS, size_t M, size_t N, _FScale ALPHA, _F *A, 
+    size_t LDA, size_t LDB) {
+
+
+      assert( LDA == LDB );
+
+      if( TRANS == 'N' and ALPHA == _FScale(1.) ) return;
+
+      Eigen::Map< Eigen::Matrix<_F,
+          Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor> > AMap(A,LDA,N);
+
+      if( TRANS == 'T' )      AMap.block(0,0,M,N).transposeInPlace();
+      else if( TRANS == 'C' ) AMap.block(0,0,M,N).adjointInPlace();
+      else if( TRANS == 'R' ) 
+        AMap.block(0,0,M,N).noalias() = AMap.block(0,0,M,N).conjugate();
+
+      if( ALPHA != _FScale(1.) ) AMap.block(0,0,M,N) *= ALPHA;
+
+  }; // Generic IMatCopy template
+
+
+#ifdef _CQ_MKL
+
+  template <>
+  void IMatCopy(char TRANS, size_t M, size_t N, double ALPHA, double *A, 
+    size_t LDA, size_t LDB) {
+
+    mkl_dimatcopy('C',TRANS,M,N,ALPHA,A,LDA,LDB);
+
+  }
+
+  template <>
+  void IMatCopy(char TRANS, size_t M, size_t N, dcomplex ALPHA, dcomplex *A, 
+    size_t LDA, size_t LDB) {
+
+    mkl_zimatcopy('C',TRANS,M,N,ALPHA,A,LDA,LDB);
+
+  }
+
+#else
+
+  template void IMatCopy(char,size_t,size_t,double,double*,size_t,size_t);
+  template void IMatCopy(char,size_t,size_t,dcomplex,dcomplex*,size_t,size_t);
+
+#endif
+  
+  template void IMatCopy(char,size_t,size_t,double,dcomplex*,size_t,size_t);
+
+
+  // Generic HerMat template
+  template <typename _F>
+  void HerMat(char UPLO, size_t N, _F *A, size_t LDA) {
+
+    assert( UPLO == 'L' or UPLO == 'U' );
+
+    Eigen::Map< Eigen::Matrix<_F,
+        Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor> > AMap(A,LDA,N);
+
+    if( UPLO == 'L' )  
+      AMap.block(0,0,N,N)= 
+        AMap.block(0,0,N,N).template selfadjointView<Eigen::Lower>();
+    else
+      AMap.block(0,0,N,N) = 
+        AMap.block(0,0,N,N).template selfadjointView<Eigen::Upper>();
+
+
+    if(std::is_same<_F,dcomplex>::value)
+    for(auto i = 0; i < N; i++)
+      A[i + i*LDA] = std::real(A[i + i*LDA]);
+
+  }; // Generic HerMat template
+
+  template void HerMat(char, size_t, double*, size_t);
+  template void HerMat(char, size_t, dcomplex*, size_t);
 
 }; // namespace ChronusQ

@@ -21,33 +21,42 @@
  *    E-Mail: xsli@uw.edu
  *  
  */
-
-#include <aointegrals/contract.hpp>
-#include <aointegrals/ortho.hpp>
-
-
-// Instantiate libint2::engine
-#include <libint2/engine.impl.h>
+#include <cxxapi/options.hpp>
+#include <cerr.hpp>
 
 namespace ChronusQ {
 
-  // Explicit instantiations of 2-body contraction engines
+  /**
+   *  \brief Optionally set the control parameters for an
+   *  AOIntegrals object
+   *
+   *  \param [in] out    Output device for data / error output.
+   *  \param [in] input  Input file datastructure
+   *  \param [in] aoints AOIntegrals object 
+   *
+   *
+   */ 
+  void CQIntsOptions(std::ostream &out, CQInputFile &input, AOIntegrals &aoi) {
 
-  template void AOIntegrals::twoBodyContractIncore(
-    std::vector<TwoBodyContraction<double,double>> &list);
-  template void AOIntegrals::twoBodyContractIncore(
-    std::vector<TwoBodyContraction<dcomplex,dcomplex>> &list);
+    // Parse integral algorithm
+    std::string ALG = "DIRECT";
+    OPTOPT( ALG = input.getData<std::string>("INTS.ALG"); )
+    trim(ALG);
 
-  template void AOIntegrals::twoBodyContractDirect(
-    std::vector<TwoBodyContraction<double,double>> &list);
-  template void AOIntegrals::twoBodyContractDirect(
-    std::vector<TwoBodyContraction<dcomplex,dcomplex>> &list);
+    if( not ALG.compare("DIRECT") )
+      aoi.cAlg = CONTRACTION_ALGORITHM::DIRECT;
+    else if( not ALG.compare("INCORE") )
+      aoi.cAlg = CONTRACTION_ALGORITHM::INCORE;
+    else
+      CErr(ALG + "not a valid INTS.ALG",out);
 
-  // Explicit instantiations of orthonormal transformation functions
+    
+    // Parse Schwartz threshold
+    OPTOPT( aoi.threshSchwartz = input.getData<double>("INTS.SCHWARTZ"); )
 
-  template void AOIntegrals::Ortho1Trans(double*,double*);
-  template void AOIntegrals::Ortho1Trans(dcomplex*,dcomplex*);
-  template void AOIntegrals::Ortho1TransT(double*,double*);
-  template void AOIntegrals::Ortho1TransT(dcomplex*,dcomplex*);
+    out << aoi << std::endl;
 
-};
+  }; // CQIntsOptions
+
+
+}; // namespace ChronusQ

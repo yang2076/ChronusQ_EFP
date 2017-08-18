@@ -28,6 +28,8 @@
 
 #include <util/matout.hpp>
 
+#include <util/threads.hpp>
+
 // Debug directives
 //#define _DEBUGORTHO
 //#define _DEBUGERI
@@ -106,11 +108,7 @@ namespace ChronusQ {
     )->alpha.size();
 
     // Determine the number of OpenMP threads
-#ifdef _OPENMP
-    int nthreads = omp_get_max_threads();
-#else
-    int nthreads = 1;
-#endif
+    int nthreads = GetNumThreads();
 
     // Create a vector of libint2::Engines for possible threading
     std::vector<libint2::Engine> engines(nthreads);
@@ -150,11 +148,8 @@ namespace ChronusQ {
 
     #pragma omp parallel
     {
-#ifdef _OPENMP
-      int thread_id = omp_get_thread_num();
-#else
-      int thread_id = 0;
-#endif
+      int thread_id = GetThreadID();
+
       const auto& buf_vec = engines[thread_id].results();
       size_t n1,n2;
 
@@ -220,8 +215,6 @@ namespace ChronusQ {
    *    Nuclear potential energy matrix
    *    Core Hamiltonian (T + V)
    *    Orthonormalization matricies (Lowdin / Cholesky)
-   *
-   *  TODO: Make this function general to relativistic Hamiltonians
    *
    */ 
   void AOIntegrals::computeAOOneE(bool finiteWidthNuc ) {
@@ -371,11 +364,7 @@ namespace ChronusQ {
   void AOIntegrals::computeERI() {
 
     // Determine the number of OpenMP threads
-#ifdef _OPENMP
-    int nthreads = omp_get_max_threads();
-#else
-    int nthreads = 1;
-#endif
+    int nthreads = GetNumThreads();
     
     
     // Create a vector of libint2::Engines for possible threading
@@ -410,11 +399,8 @@ namespace ChronusQ {
 
     #pragma omp parallel
     {
-#ifdef _OPENMP
-      int thread_id = omp_get_thread_num();
-#else
-      int thread_id = 0;
-#endif
+      int thread_id = GetThreadID();
+
       // Get threads result buffer
       const auto& buf_vec = engines[thread_id].results();
 
@@ -507,7 +493,7 @@ namespace ChronusQ {
    *  over the CGTO basis.
    *
    *  Computes either the Lowdin or Cholesky transformation matricies based
-   *  on AOIntegrals::orthoType_
+   *  on AOIntegrals::orthoType
    */ 
   void AOIntegrals::computeOrtho() {
 
@@ -524,7 +510,7 @@ namespace ChronusQ {
     // Copy the overlap over to scratch space
     std::copy_n(overlap,nSQ_,SCR1);
 
-    if(orthoType_ == LOWDIN) {
+    if(orthoType == LOWDIN) {
 
       // Allocate more scratch
       double* sE   = memManager_.malloc<double>(basisSet_.nBasis);
@@ -624,7 +610,7 @@ namespace ChronusQ {
       // Free Scratch Space
       memManager_.free(sE,SCR2);
 
-    } else if(orthoType_ == CHOLESKY) {
+    } else if(orthoType == CHOLESKY) {
 
       std::cout << 
       "*** WARNING: Cholesky orthogonalization has not yet been confirmed ***" 
@@ -688,5 +674,74 @@ namespace ChronusQ {
     memManager_.free(SCR1); // Free SCR1
 
   }; // AOIntegrals::computeOrtho
+
+  /**
+   *  \brief Allocate and evaluate the Schwartz bounds over the
+   *  CGTO shell pairs.
+   */ 
+  void AOIntegrals::computeSchwartz() {
+
+    if( schwartz != nullptr ) memManager_.free(schwartz);
+
+    // Allocate the schwartz tensor
+    schwartz = memManager_.malloc<double>(basisSet_.nShell*basisSet_.nShell);
+
+    // Define the libint2 integral engine
+    libint2::Engine engine(libint2::Operator::coulomb,
+      basisSet_.maxPrim,basisSet_.maxL,0);
+
+    engine.set_precision(0.); // Don't screen prims during evaluation
+
+    const auto &buf_vec = engine.results();
+
+    auto topSch = std::chrono::high_resolution_clock::now();
+  
+    size_t n1,n2;
+    for(auto s1(0ul); s1 < basisSet_.nShell; s1++) {
+      n1 = basisSet_.shells[s1].size(); // Size shell 1
+    for(auto s2(0ul); s2 <= s1; s2++) {
+      n2 = basisSet_.shells[s2].size(); // Size shell 2
+
+
+
+      // Evaluate the shell quartet (s1 s2 | s1 s2)
+      engine.compute(
+        basisSet_.shells[s1],
+        basisSet_.shells[s2],
+        basisSet_.shells[s1],
+        basisSet_.shells[s2]
+      );
+
+      if(buf_vec[0] == nullptr) continue;
+
+      // Allocate space to hold the diagonals
+      double* diags = memManager_.malloc<double>(n1*n2);
+
+      for(auto i(0), ij(0); i < n1; i++)
+      for(auto j(0); j < n2; j++, ij++)
+        diags[i + j*n1] = buf_vec[0][ij*n1*n2 + ij];
+
+
+      schwartz[s1 + s2*basisSet_.nShell] = 
+        std::sqrt(MatNorm<double>('I',n1,n2,diags,n1));
+
+      // Free up space
+      memManager_.free(diags);
+
+    } // loop s2
+    } // loop s1
+
+    auto botSch = std::chrono::high_resolution_clock::now();
+
+    std::chrono::duration<double> durSch = botSch - topSch;
+
+    HerMat('L',basisSet_.nShell,schwartz,basisSet_.nShell);
+
+#if 0
+    prettyPrintSmart(std::cout,"Schwartz",schwartz,basisSet_.nShell,
+      basisSet_.nShell,basisSet_.nShell);
+#endif
+
+  }; // AOIntegrals::computeSchwartz
 
 }; // namespace ChronusQ

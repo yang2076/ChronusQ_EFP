@@ -29,9 +29,10 @@
 // AOIntegrals object
   
 #define AOIntegrals_COLLECTIVE_OP(OP_MEMBER, OP_OP, OP_VEC_OP) \
-    OP_MEMBER(this,other,threshSchwartz_); \
-    OP_MEMBER(this,other,cAlg_); \
-    OP_MEMBER(this,other,orthoType_); \
+    OP_MEMBER(this,other,threshSchwartz); \
+    OP_MEMBER(this,other,cAlg); \
+    OP_MEMBER(this,other,orthoType); \
+    OP_MEMBER(this,other,coreType); \
     \
     /* Copy over meta  */ \
     OP_OP(double,this,other,memManager_,schwartz); \

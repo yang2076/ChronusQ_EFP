@@ -45,7 +45,7 @@ namespace ChronusQ {
     size_t NB2 = NB*NB;
 
     // Form G[D]
-    formGD();
+    formGD(increment);
 
     // Zero out the Fock
     for(auto &F : fock) std::fill_n(F,NB2,0.);
@@ -73,7 +73,16 @@ namespace ChronusQ {
    *  Populates / overwrites GD storage (and JScalar and K storage)
    */ 
   template <typename T>
-  void SingleSlater<T>::formGD() {
+  void SingleSlater<T>::formGD(bool increment) {
+
+    // Decide list of onePDMs to use
+    oper_t_coll &contract1PDM  = increment ? deltaOnePDM : this->onePDM;
+
+
+    size_t NB = aoints.basisSet().nBasis;
+    size_t NB2 = NB*NB;
+
+#if 0
 
     std::vector<TwoBodyContraction<T,double>> jContract =
       { {this->onePDM[SCALAR], JScalar, true, COULOMB} };
@@ -92,11 +101,51 @@ namespace ChronusQ {
     // Perform K contraction
     aoints.twoBodyContract(kContract);
 
-    // Form GD: G[D] = 2.0*J[D] - K[D]
-    size_t NB = aoints.basisSet().nBasis;
-    size_t NB2 = NB*NB;
+#else
 
-    for(auto i = 0; i < GD.size(); i++)
+
+
+
+    // Possibly allocate a temporary for J matrix
+    T* JContract;
+    if(std::is_same<double,T>::value) 
+      JContract = reinterpret_cast<T*>(JScalar);
+    else {
+      JContract = this->memManager.template malloc<T>(NB2);
+    }
+
+    // Zero out J
+    if(not increment) memset(JContract,0,NB2*sizeof(T));
+
+    std::vector<TwoBodyContraction<T,T>> contract =
+      { {contract1PDM[SCALAR], JContract, true, COULOMB} };
+
+    // Determine how many (if any) exchange terms to calculate
+    for(auto i = 0; i < K.size(); i++) {
+      contract.push_back({contract1PDM[i], K[i], true, EXCHANGE});
+
+      // Zero out K[i]
+      if(not increment) memset(K[i],0,NB2*sizeof(T));
+    }
+
+    aoints.twoBodyContract(contract);
+
+    if(not std::is_same<double,T>::value) {
+      if(not increment)
+        GetMatRE('N',NB,NB,1.,JContract,NB,JScalar,NB);
+      else {
+        MatAdd('N','N',NB,NB,T(1.),JContract,NB,T(1.),
+          JScalar,NB,JContract,NB);
+        GetMatRE('N',NB,NB,1.,JContract,NB,JScalar,NB);
+      }
+      this->memManager.free(JContract);
+    }
+
+#endif
+
+    // Form GD: G[D] = 2.0*J[D] - K[D]
+
+    for(auto i = 0; i < K.size(); i++)
       MatAdd('N','N', NB, NB, T(0.), GD[i], NB, T(-1.), K[i], NB,
         GD[i], NB);
 

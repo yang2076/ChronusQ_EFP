@@ -47,11 +47,23 @@ namespace ChronusQ {
               input.getData<size_t>("SCF.MAXITER"); )
 
 
+    // Incremental Fock Options
+    OPTOPT(
+      ss.scfControls.doIncFock = input.getData<bool>("SCF.INCFOCK");
+    )
+    OPTOPT(
+      ss.scfControls.nIncFock = input.getData<size_t>("SCF.NINCFOCK");
+    )
+
+
+
     // Toggle extrapolation in its entireity
     OPTOPT(
       ss.scfControls.doExtrap = 
         input.getData<bool>("SCF.EXTRAP");
     )
+
+
 
     // Handle DIIS options
     OPTOPT(

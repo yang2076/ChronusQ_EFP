@@ -58,6 +58,36 @@ namespace ChronusQ {
   void MatAdd(char TRANSA, char TRANSB, size_t M, size_t N, _FScale1 ALPHA, 
     _F1 *A, size_t LDA, _FScale2 BETA, _F2 *B, size_t LDB, _F3 *C, size_t LDC);
 
+  /**
+   *  \brief Perform an in-place matrix operation of the type
+   *
+   *  A = alpha * OP(A)
+   *
+   *  \param [in]     TRANS  Defines op(A)
+   *  \param [in]     M      Number of rows in A
+   *  \param [in]     N      Number of cols in A
+   *  \param [in]     ALPHA  Scaling parameter
+   *  \param [in/out] A      Raw storage of A
+   *  \param [in]     LDA    Leading dimension of A on entry
+   *  \param [in]     LDB    Leading dimension of A on exit
+   */ 
+  template <typename _F, typename _FScale>
+  void IMatCopy(char TRANS, size_t M, size_t N, _FScale ALPHA, _F *A, 
+    size_t LDA, size_t LDB);
+
+  /** 
+   *  \brief Makes a square matrix Hermetian
+   *
+   *  \param [in]  UPLO  Flag to decide which triangle will be copied
+   *               UPLO == 'L'  - Copy the lower triangle to upper triangle 
+   *               UPLO == 'U'  - Copy the upper triangle to lower triangle 
+   *  \param [in]  N     Number of rows / cols in matrix A
+   *  \param [in/out] A  Raw storage to the matrix A
+   *  \param [in] LDA    Leading dimension of A
+   */
+  template <typename _F>
+  void HerMat(char UPLO, size_t N, _F *A, size_t LDA);
+
 }; // namespace ChronusQ
 
 

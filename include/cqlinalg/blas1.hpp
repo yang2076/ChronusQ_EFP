@@ -72,6 +72,18 @@ namespace ChronusQ {
    */
   template <typename _F1, typename _F2>
   _F1 TwoNorm(int N, _F2 *X, int INCX);
+
+  /**
+   *  \brief Returns the specified norm of a matrix.
+   *
+   *  Wraps LAPACK functions. See
+   *    http://www.netlib.org/lapack/lapack-3.1.1/html/dlange.f.html or
+   *    http://www.netlib.org/lapack/lapack-3.1.1/html/zlange.f.html for
+   *  parameter documentation.
+   *
+   */ 
+  template <typename _F1, typename _F2>
+  _F1 MatNorm(char NORM, int M, int N, _F2 *A, int LDA);
   
 
 }; // namespace ChronusQ
