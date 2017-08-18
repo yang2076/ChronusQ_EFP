@@ -341,7 +341,7 @@ namespace ChronusQ {
   void pop_cart_ang_list() {
     // generate angular momentum list, can only be called once. 
     int k,xx,yy,x,y,z;
-    for (  k = 0 ; k<6 ; k++ ){
+    for (  k = 0 ; k <= LIBINT2_MAX_AM ; k++ ){
       cart_ang_list.emplace_back();  //loop over possible angular momentum
       for (  xx=0 ; xx<k+1 ; xx++ ){ 
         x = k -xx ; 
@@ -463,16 +463,14 @@ std::complex <double> cart2sphCoeff(int L, int m, int lx, int ly, int lz){
 
 std::vector<std::vector<double>> car2sph_matrix;
 void pop_car2sph_matrix() {
- //populate transform matrix up to L=6
   int l[3];
   int m;
   int carsize; //cartesian size
   double scalecoeff;
 
-  for ( int L ; L<6 ; L++ ) {
-    car2sph_matrix.emplace_back();
+  for ( int L = 0 ; L <= LIBINT2_MAX_AM ; L++ ) {
     carsize = (L+1)*(L+2)/2;
-    car2sph_matrix[L].assign((2*L+1)*carsize, 0.0);
+    car2sph_matrix.emplace_back((2*L+1)*carsize, 0.0);
     if ( L==0 ){
       car2sph_matrix[L][0]=1.0;
     } 
