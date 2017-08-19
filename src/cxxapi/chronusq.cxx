@@ -339,6 +339,9 @@ int main(int argc, char *argv[]) {
   // Output CQ footer
   CQOutputFooter(std::cout);
 
+  // Reset the standard out
+  std::cout.rdbuf(coutbuf);
+
   ChronusQ::finalize();
 
   return 0;
