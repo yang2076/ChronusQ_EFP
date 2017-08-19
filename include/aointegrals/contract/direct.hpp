@@ -57,6 +57,20 @@
 namespace ChronusQ {
 
   /**
+   *  \brief Handle the fact that std::conj actually returns 
+   *  std::complex
+   */
+  template <typename T>
+  inline T SmartConj(const T&);
+ 
+  template <>
+  inline double SmartConj(const double &x) { return x; }
+  template <>
+  inline dcomplex SmartConj(const dcomplex &x) { return std::conj(x); }
+
+
+
+  /**
    *  \brief Perform various tensor contractions of the ERI tensor
    *  directly. Wraps other helper functions and provides
    *  loop structure
@@ -467,15 +481,15 @@ namespace ChronusQ {
               b1 = bf1 + bf3*NB;
               b2 = bf2 + bf3*NB;
 
-              T1 = 0.5 * std::conj(list[iMat].X[b1]);
-              T2 = 0.5 * std::conj(list[iMat].X[b2]);
+              T1 = 0.5 * SmartConj(list[iMat].X[b1]);
+              T2 = 0.5 * SmartConj(list[iMat].X[b2]);
 
             for(auto l = 0ul, bf4 = bf4_s; l < n4; l++, bf4++, ijkl++) { 
 
               // Indicies are swapped here to loop over contiguous memory
                 
               // K(1,3) += 0.5 * I * X(2,4) = 0.5 * I * CONJ(X(4,2)) (**HER**)
-              AX_loc[iMat][b1]           += 0.5 * std::conj(list[iMat].X[bf4+NB*bf2]) * intBuffer_loc[ijkl];
+              AX_loc[iMat][b1]           += 0.5 * SmartConj(list[iMat].X[bf4+NB*bf2]) * intBuffer_loc[ijkl];
 
               // K(4,2) += 0.5 * I * X(3,1) = 0.5 * I * CONJ(X(1,3)) (**HER**)
               AX_loc[iMat][bf4 + bf2*NB] += T1 * intBuffer_loc[ijkl];
@@ -484,7 +498,7 @@ namespace ChronusQ {
               AX_loc[iMat][bf4 + bf1*NB] += T2 * intBuffer_loc[ijkl];
 
               // K(2,3) += 0.5 * I * X(1,4) = 0.5 * I * CONJ(X(4,1)) (**HER**)
-              AX_loc[iMat][b2]           += 0.5 * std::conj(list[iMat].X[bf4+NB*bf1]) * intBuffer_loc[ijkl];
+              AX_loc[iMat][b2]           += 0.5 * SmartConj(list[iMat].X[bf4+NB*bf1]) * intBuffer_loc[ijkl];
 
             } // l loop
             } // ijk
