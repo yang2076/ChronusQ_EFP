@@ -145,6 +145,10 @@ namespace ChronusQ {
     const size_t NS   = basisSet_.nShell;
 
 #ifdef _SHZ_SCREEN
+    // Check whether any of the contractions are non-hermetian
+    const bool AnyNonHer = std::any_of(list.begin(),list.end(),
+      []( TwoBodyContraction<T,G> & x ) -> bool { return not x.HER; });
+
     // Compute schwartz bounds if we haven't already
     if(schwartz == nullptr) computeSchwartz();
 #endif
@@ -298,8 +302,13 @@ namespace ChronusQ {
       double shz12 = schwartz[s1 + s2*NS];
 
       double shMax12 = ShBlkNorms[0][s1 + s2*NS];
-      for(auto iMat = 0; iMat < NMat; iMat++)
+      for(auto iMat = 1; iMat < NMat; iMat++)
         shMax12 = std::max(shMax12,ShBlkNorms[iMat][s1 + s2*NS]);
+
+      // Check the opposite triangle
+      if( AnyNonHer and s1 != s2 )
+        for(auto iMat = 0; iMat < NMat; iMat++)
+          shMax12 = std::max(shMax12,ShBlkNorms[iMat][s2 + s1*NS]);
 #endif
 
 
@@ -355,6 +364,14 @@ namespace ChronusQ {
                      ShBlkNorms[iMat][s2 + s3*NS]));
         };
 
+        // Check the opposite triangle
+        if( AnyNonHer )
+          for(auto iMat = 0ul; iMat < NMat; iMat++){
+            shMax123 = std::max(shMax123,
+              std::max(ShBlkNorms[iMat][s3 + s1*NS], 
+                       ShBlkNorms[iMat][s3 + s2*NS]));
+          };
+
         shMax123 = std::max(shMax123,shMax12);
 #endif
         
@@ -390,6 +407,15 @@ namespace ChronusQ {
             std::max(ShBlkNorms[iMat][s2 + s4*NS],
                      ShBlkNorms[iMat][s3 + s4*NS])));
         };
+
+        // Check the opposite triangle
+        if( AnyNonHer )
+          for(auto iMat = 0ul; iMat < NMat; iMat++){
+            shMax = std::max(shMax,
+              std::max(ShBlkNorms[iMat][s4 + s1*NS],
+              std::max(ShBlkNorms[iMat][s4 + s2*NS],
+                       ShBlkNorms[iMat][s4 + s3*NS])));
+          };
 
         shMax = std::max(shMax,shMax123);
 
