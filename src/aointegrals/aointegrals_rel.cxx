@@ -119,6 +119,7 @@ namespace ChronusQ {
                           std::placeholders::_3),
                 uncontractedShells);
 
+  
     auto _SL = OneEDriverLocal<3,false>(
                 std::bind(
                   static_cast<
@@ -145,6 +146,7 @@ namespace ChronusQ {
                           std::placeholders::_3),
                 uncontractedShells);
 
+
 #endif
 
 
@@ -153,6 +155,7 @@ namespace ChronusQ {
 
     // Compute the mappings from primitives to CGTOs
     double * mapPrim2Cont = memManager_.malloc<double>(NP*NB);
+    
     basisSet_.makeMapPrim2Cont(_overlap[0],mapPrim2Cont,memManager_);
 
 #if X2C_DEBUG_LEVEL >= 3
@@ -191,7 +194,6 @@ namespace ChronusQ {
     // Form orthonormal transformation matrix in S
     for(auto i = 0ul; i < NP; i++)
       Scale(NP,1./std::sqrt(SS[i]),_overlap[0] + i*NP,1);
-
 
     // Transform T into the orthonormal basis
     // T -> TO

@@ -321,22 +321,52 @@ namespace ChronusQ {
 
     } // loop over shells
 
-  
+
+ 
     // Compute SUn * MAP
     double *SCR = mem.malloc<double>(nBasis*nPrimitive);
     Gemm('N','T',nPrimitive,nBasis,nPrimitive,1.,SUn,nPrimitive,
       MAP,nBasis,0.,SCR,nPrimitive);
 
-    for(auto i = 0; i < nBasis; i++)  {
-      double fact = InnerProd<double>(nPrimitive,MAP + i,nBasis,
-                                                 SCR + i*nPrimitive,1);
+    // Create the Libint2 Engine and set the precision
+    libint2::Engine engine(libint2::Operator::overlap,
+      maxPrim, maxL, 0);
+    engine.set_precision(0.);
 
-      Scale(nPrimitive,1./std::sqrt(fact),MAP + i,nBasis);
-    }
-    
+    const auto& buf_vec = engine.results();
+
+    // Loop over the shells and the basis functions,
+    // calculate the diagonals of contracted overlap integrals
+    size_t n1;
+    for(size_t s1 = 0,  Itot = 0 ; s1<nShell; s1++, Itot += n1 ) {
+    // Itot is the beginning basis function index of current shell
+
+      // Get the size of the shell
+      n1 = shells[s1].size();  
+
+      // This computes the diagonal shell block for s1
+      engine.compute(shells[s1],shells[s1]);
+
+      if( buf_vec[0] == nullptr ) continue;
+      const double* buff = buf_vec[0];
+
+      for(size_t i = 0; i < n1; i++) {
+      // i loop over the function in the current shell             
+
+        double fact = InnerProd<double>(nPrimitive,MAP + (i+Itot) ,nBasis,
+                                                   SCR + (i+Itot)*nPrimitive,1);
+        // i+I is the basis function index 
+        double alpha = buff[i + i*n1];
+        // alpha is the diagonal element of overlap of basis function i+Itot
+         
+        Scale(nPrimitive,std::sqrt(alpha)/std::sqrt(fact),
+          MAP + (i+Itot),nBasis);
+
+      } // for size_t i = 0
+    } // for size_t s1 = 0
     mem.free(SCR);
 
-  };
+  };  // BasisSet::makeMapPrim2Cont
 
 
 

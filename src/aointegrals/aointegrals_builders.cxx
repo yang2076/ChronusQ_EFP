@@ -287,7 +287,6 @@ namespace ChronusQ {
     kinetic   = _kinetic[0];
     potential = _potential[0];
 
-
     magDipole = { _L[0], _L[1], _L[2] };
 
     // Compute Orthonormalization trasformations

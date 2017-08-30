@@ -73,6 +73,12 @@ namespace ChronusQ {
   // p1: index of primitive gaussian in shell1, p2: index of primitive gaussian in shell2.
   // a1: zeta_a, a2:zeta_b, one_over_gamma: 1/(zeta_a+zeta_b) 
 
+
+    if ( ( not shell1.contr[0].pure ) and ( not shell2.contr[0].pure ) ) {  
+      // if both sides are cartesian, return cartesian gaussian integrals
+      return {S_shellpair};
+    }
+
     std::vector<std::vector<double>> S_shellpair_sph(1);
     S_shellpair_sph[0].assign(((2*shell1.contr[0].l+1)*(2*shell2.contr[0].l+1)),0.0);
     
@@ -100,7 +106,7 @@ namespace ChronusQ {
                     * cart_ang_list[shell2.contr[0].l].size(); 
                     //number of elements in each dimension
                       
-    std::array<std::vector<double>,3> L_shellpair;
+    std::vector<std::vector<double>> L_shellpair(3);
     
     int lA[3],lB[3];
     double L[3];
@@ -152,6 +158,12 @@ namespace ChronusQ {
       }
   
     } // for j
+
+
+    if ( ( not shell1.contr[0].pure ) and ( not shell2.contr[0].pure ) ) {  
+      // if both sides are cartesian, return cartesian gaussian integrals
+      return {L_shellpair};
+    }
   
   // do cartesian to spherical transform
   
@@ -190,7 +202,7 @@ namespace ChronusQ {
     int nElement = cart_ang_list[shell1.contr[0].l].size()
                     * cart_ang_list[shell2.contr[0].l].size(); 
                     //number of elements in each dimension
-    std::array<std::vector<double>,3> tmpED1;
+    std::vector<std::vector<double>> tmpED1(3);
   //  std::vector<double> tmpED1x;
   //  std::vector<double> tmpED1y;
   //  std::vector<double> tmpED1z;
@@ -218,6 +230,13 @@ namespace ChronusQ {
       }
   
     }  // for j
+
+
+    if ( ( not shell1.contr[0].pure ) and ( not shell2.contr[0].pure ) ) {  
+      // if both sides are cartesian, return cartesian gaussian integrals
+      return tmpED1;
+    }
+
     std::vector<std::vector<double>> ED1sph(3);
     int k = 0;
     for ( auto cartmatrix : tmpED1 ) {
@@ -246,7 +265,7 @@ namespace ChronusQ {
     int nElement = cart_ang_list[shell1.contr[0].l].size()
                     * cart_ang_list[shell2.contr[0].l].size(); 
                     //number of elements in each dimension
-    std::array<std::vector<double>,3> tmpED1;
+    std::vector<std::vector<double>> tmpED1(3);
   //  std::vector<double> tmpED1x;
   //  std::vector<double> tmpED1y;
   //  std::vector<double> tmpED1z;
@@ -274,6 +293,13 @@ namespace ChronusQ {
       }
   
     }  // for j
+
+
+    if ( ( not shell1.contr[0].pure ) and ( not shell2.contr[0].pure ) ) {  
+      // if both sides are cartesian, return cartesian gaussian integrals
+      return tmpED1;
+    }
+
     std::vector<std::vector<double>> ED1sph(3);
     int k = 0;
     for ( auto cartmatrix : tmpED1 ) {
@@ -303,7 +329,7 @@ namespace ChronusQ {
                                   
     int munu[2],lA[3],lB[3];
     
-    std::array<std::vector<double>,6> tmpEQ2; 
+    std::vector<std::vector<double>> tmpEQ2(6); 
   
       for(int i = 0; i < cart_ang_list[shell1.contr[0].l].size(); i++)
       for(int j = 0; j < cart_ang_list[shell2.contr[0].l].size(); j++){
@@ -354,6 +380,13 @@ namespace ChronusQ {
           tmpEQ2[p].push_back(E2[p]);
         } 
       } //for j
+
+
+    if ( ( not shell1.contr[0].pure ) and ( not shell2.contr[0].pure ) ) {  
+      // if both sides are cartesian, return cartesian gaussian integrals
+      return tmpEQ2;
+    }
+
       std::vector<std::vector<double>> EQ2sph(6);
       int kk = 0;
         for (auto cartmatrix : tmpEQ2 ){
@@ -383,7 +416,7 @@ namespace ChronusQ {
     double M2[9];
     int lA[3],lB[3];
     
-    std::array<std::vector<double>,9> tmpMQ2; 
+    std::vector<std::vector<double>> tmpMQ2(9); 
     
       for(int i = 0; i < cart_ang_list[shell1.contr[0].l].size(); i++)
       for(int j = 0; j < cart_ang_list[shell2.contr[0].l].size(); j++){
@@ -404,6 +437,13 @@ namespace ChronusQ {
           tmpMQ2[p].push_back(M2[p]);
         }
       } //for j
+
+
+    if ( ( not shell1.contr[0].pure ) and ( not shell2.contr[0].pure ) ) {  
+      // if both sides are cartesian, return cartesian gaussian integrals
+      return tmpMQ2;
+    }
+
         
       std::vector<std::vector<double>> MQ2sph(9);
       int kk = 0;
@@ -431,7 +471,7 @@ namespace ChronusQ {
     double E3[10];
     int lA[3],lB[3],alphabetagamma[3];
   
-    std::array<std::vector<double>,10> tmpEO3;
+    std::vector<std::vector<double>> tmpEO3(10);
   
       for(int i = 0; i < cart_ang_list[shell1.contr[0].l].size(); i++)
       for(int j = 0; j < cart_ang_list[shell2.contr[0].l].size(); j++){
@@ -501,6 +541,12 @@ namespace ChronusQ {
         }
       } // for j
   
+
+    if ( ( not shell1.contr[0].pure ) and ( not shell2.contr[0].pure ) ) {  
+      // if both sides are cartesian, return cartesian gaussian integrals
+      return tmpEO3;
+    }
+
       std::vector<std::vector<double>> EO3sph(10);
       int kk = 0;
       for (auto cartmatrix : tmpEO3) {
@@ -566,7 +612,12 @@ namespace ChronusQ {
       potential_shellpair.push_back(-V);
   
     } // for j
-    
+   
+    if ( ( not shell1.contr[0].pure ) and ( not shell2.contr[0].pure ) ) {  
+      // if both sides are cartesian, return cartesian gaussian integrals
+      return {potential_shellpair};
+    }
+ 
     std::vector<double> V_shellpair_sph;
   
     V_shellpair_sph.assign(((2*shell1.contr[0].l+1)*(2*shell2.contr[0].l+1)),0.0);
@@ -596,7 +647,7 @@ namespace ChronusQ {
 
     bool useFiniteWidthNuclei = nucShell.size() > 0;
   
-    std::array<std::vector<double>,3> SL_shellpair;
+    std::vector<std::vector<double>> SL_shellpair(3);
     
     int lA[3],lB[3],iAtom;
     double Sl[3],C[3],SlC;
@@ -661,6 +712,12 @@ namespace ChronusQ {
       } // for mu
   
     } // for j
+
+
+    if ( ( not shell1.contr[0].pure ) and ( not shell2.contr[0].pure ) ) {  
+      // if both sides are cartesian, return cartesian gaussian integrals
+      return SL_shellpair;
+    }
   
   // do cartesian to spherical transform
   
@@ -727,6 +784,12 @@ namespace ChronusQ {
       pVdotp_shellpair.push_back(-pVp);
   
     } // for j
+
+
+    if ( ( not shell1.contr[0].pure ) and ( not shell2.contr[0].pure ) ) {  
+      // if both sides are cartesian, return cartesian gaussian integrals
+      return {pVdotp_shellpair};
+    }
     
     std::vector<std::vector<double>> pVdotp_shellpair_sph(1);
   
