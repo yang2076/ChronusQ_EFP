@@ -41,6 +41,7 @@ namespace ChronusQ {
     for(int j = 0; j < N; j++){
       res += X[j*INCX] * Y[j*INCY];
     }
+    return res;
 #endif 
         
   }; // InnerProd real = (real,real)

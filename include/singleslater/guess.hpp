@@ -115,11 +115,11 @@ namespace ChronusQ {
 
       double magNorm = std::sqrt(TZ*TZ + TY*TY + TX*TX);
 
-      Scale(NB*NB,T(this->nO)/TS,this->onePDM[SCALAR],1);
+      Scale(NB*NB,T(this->nO)/T(TS),this->onePDM[SCALAR],1);
 
       for(auto k = 1; k < this->onePDM.size(); k++)
         if( magNorm > 1e-10 )
-          Scale(NB*NB,T(this->nOA - this->nOB)/magNorm,this->onePDM[k],1);
+          Scale(NB*NB,T(this->nOA - this->nOB)/T(magNorm),this->onePDM[k],1);
         else
           std::fill_n(this->onePDM[k],NB*NB,0.);
 
@@ -262,27 +262,20 @@ namespace ChronusQ {
 
       std::shared_ptr<SingleSlater<T>> ss;
       
-      try {
-        // Trigger error if not an HF object
-        dynamic_cast<HartreeFock<T>&>(*this);
   
-        ss = std::dynamic_pointer_cast<SingleSlater<T>> (
-               std::make_shared<HartreeFock<T>>(
-                 aointsAtom,1, ( defaultMultip == 1 )
-               )
-             );
+      ss = std::dynamic_pointer_cast<SingleSlater<T>> (
+             std::make_shared<HartreeFock<T>>(
+               aointsAtom,1, ( defaultMultip == 1 )
+             )
+           );
 
-        ss->printLevel = 0;
-        ss->scfControls.doIncFock = false;        
-        ss->scfControls.dampError = 1e-4;
-        ss->scfControls.nKeep     = 8;
+      ss->printLevel = 0;
+      ss->scfControls.doIncFock = false;        
+      ss->scfControls.dampError = 1e-4;
+      ss->scfControls.nKeep     = 8;
 
-        ss->formGuess();
-        ss->SCF();
-
-      } catch( const std::bad_cast &e ) {
-
-      }     
+      ss->formGuess();
+      ss->SCF();
 
       size_t NBbasis = basis.nBasis;
 
@@ -299,7 +292,7 @@ namespace ChronusQ {
 
     // Spin-Average the SAD density
     if( this->onePDM.size() > 1 )
-      SetMat('N',NB,NB,T(this->nOA - this->nOB) / this->nO, 
+      SetMat('N',NB,NB,T(this->nOA - this->nOB) / T(this->nO), 
         this->onePDM[SCALAR],NB,this->onePDM[MZ],NB);
 
     if( printLevel > 0 )
