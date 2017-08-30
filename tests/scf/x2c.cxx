@@ -21,30 +21,40 @@
  *    E-Mail: xsli@uw.edu
  *  
  */
-#ifndef __INCLUDED_CQLINALG_CONFIG_HPP__
-#define __INCLUDED_CQLINALG_CONFIG_HPP__
 
-#include <chronusq_sys.hpp>
+#include "scf.hpp"
 
-// Choose linear algebra headers
-#ifdef _CQ_MKL
-  #define MKL_Complex16 dcomplex // Redefine MKL complex type
-  #include <mkl.h> // MKL
-#else
-  // Redefine OpenBLAS complex type
-  #define lapack_complex_float std::complex<float> 
-  #define lapack_complex_double dcomplex 
+BOOST_AUTO_TEST_SUITE( X2C )
 
-  #include <f77blas.h>
-  #include <lapacke.h> // OpenBLAS
+// Water 6-311+G(d,p) (Spherical) test
+BOOST_FIXTURE_TEST_CASE( Water_6311pGdp_sph, SerialJob ) {
 
-  extern "C" {
-    int openblas_get_num_threads();
-  }
+  CQSCFTEST( scf/serial/x2c/water_6-311+Gdp_sph, 
+    water_6-311+Gdp_sph_x2c.bin.ref );
+ 
+};
+
+// Water 6-311+G(d,p) (Cartesian) test
+BOOST_FIXTURE_TEST_CASE( Water_6311pGdp_cart, SerialJob ) {
+
+  CQSCFTEST( scf/serial/x2c/water_6-311+Gdp_cart, 
+    water_6-311+Gdp_cart_x2c.bin.ref );
+ 
+};
+
+#ifdef _CQ_DO_PARTESTS
+
+// SMP Water 6-311+G(d,p) (Spherical) test
+BOOST_FIXTURE_TEST_CASE( PAR_Water_6311pGdp_sph, ParallelJob ) {
+
+  CQSCFTEST( scf/parallel/x2c/water_6-311+Gdp_sph, 
+    water_6-311+Gdp_sph_x2c.bin.ref );
+ 
+};
 
 #endif
 
-#include <memmanager.hpp>
-#include <Eigen/Core>
+BOOST_AUTO_TEST_SUITE_END()
 
-#endif
+
+

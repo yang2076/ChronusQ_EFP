@@ -21,30 +21,13 @@
  *    E-Mail: xsli@uw.edu
  *  
  */
-#ifndef __INCLUDED_CQLINALG_CONFIG_HPP__
-#define __INCLUDED_CQLINALG_CONFIG_HPP__
 
-#include <chronusq_sys.hpp>
+#ifndef __INCLUDED_TESTS_FUNC_HPP__
+#define __INCLUDED_TESTS_FUNC_HPP__
 
-// Choose linear algebra headers
-#ifdef _CQ_MKL
-  #define MKL_Complex16 dcomplex // Redefine MKL complex type
-  #include <mkl.h> // MKL
-#else
-  // Redefine OpenBLAS complex type
-  #define lapack_complex_float std::complex<float> 
-  #define lapack_complex_double dcomplex 
+#include <ut.hpp>
 
-  #include <f77blas.h>
-  #include <lapacke.h> // OpenBLAS
-
-  extern "C" {
-    int openblas_get_num_threads();
-  }
-
-#endif
-
-#include <memmanager.hpp>
-#include <Eigen/Core>
+#define FUNC_INPUT     TEST_ROOT "/func/input/"
+#define FUNC_REFERENCE TEST_ROOT "/func/reference/"
 
 #endif

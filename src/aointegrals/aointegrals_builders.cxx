@@ -289,9 +289,55 @@ namespace ChronusQ {
 
     magDipole = { _L[0], _L[1], _L[2] };
 
+    // FIXME: Save velocity gague integrals!
+
+
     // Compute Orthonormalization trasformations
     computeOrtho();
 
+    // Save Integrals to disk
+    if( savFile.exists() ) {
+
+      std::string potentialTag = finiteWidthNuc ? "_FINITE_WIDTH" : "";
+
+      size_t NB = basisSet_.nBasis;
+      savFile.safeWriteData("INTS/OVERLAP", overlap, {NB,NB});
+      savFile.safeWriteData("INTS/KINETIC", kinetic, {NB,NB});
+      savFile.safeWriteData("INTS/POTENTIAL" + potentialTag,
+        potential, {NB,NB});
+  
+
+      const std::array<std::string,3> dipoleList =
+        { "X","Y","Z" };
+      const std::array<std::string,6> quadrupoleList =
+        { "XX","XY","XZ","YY","YZ","ZZ" };
+      const std::array<std::string,10> octupoleList =
+        { "XXX","XXY","XXZ","XYY","XYZ","XZZ","YYY",
+          "YYZ","YZZ","ZZZ" };
+
+      // Length Gauge electric dipole
+      for(auto i = 0; i < 3; i++)
+        savFile.safeWriteData("INTS/ELEC_DIPOLE_LEN_" + 
+          dipoleList[i], lenElecDipole[i], {NB,NB} );
+
+      // Length Gauge electric quadrupole
+      for(auto i = 0; i < 6; i++)
+        savFile.safeWriteData("INTS/ELEC_QUADRUPOLE_LEN_" + 
+          quadrupoleList[i], lenElecQuadrupole[i], {NB,NB} );
+
+      // Length Gauge electric octupole
+      for(auto i = 0; i < 10; i++)
+        savFile.safeWriteData("INTS/ELEC_OCTUPOLE_LEN_" + 
+          octupoleList[i], lenElecOctupole[i], {NB,NB} );
+
+
+      // Magnetic Dipole
+      for(auto i = 0; i < 3; i++)
+        savFile.safeWriteData("INTS/MAG_DIPOLE_" + 
+          dipoleList[i], magDipole[i], {NB,NB} );
+
+      // FIXME: Write valocity gauge integrals!
+    }
 
   }; // AOIntegrals::computeAOOneE
 
@@ -331,6 +377,18 @@ namespace ChronusQ {
     }
 
 
+    // Save the Core Hamiltonian
+    if( savFile.exists() ) {
+
+      size_t NB = basisSet_.nBasis;
+      const std::array<std::string,4> spinLabel =
+        { "SCALAR", "MZ", "MY", "MX" };
+
+      for(auto i = 0; i < coreH.size(); i++)
+        savFile.safeWriteData("INTS/CORE_HAMILTONIAN_" +
+          spinLabel[i], coreH[i], {NB,NB});
+
+    }
 
 
   }; // AOIntegrals::computeCoreHam

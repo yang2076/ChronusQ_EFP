@@ -68,7 +68,7 @@ void prettyPrintSmartBase(std::ostream& out, T* A, const size_t M,
       out << std::setw(5) << std::left << j+1;
       out << std::right;
       for(size_t n = i; n < i+end; n++) {
-        T VAL = A[j*colStride + n*LDA*colStride];
+        T VAL = A[j*colStride + n*LDA];
         if(std::abs(VAL) > PRINT_SMALL) out << std::setw(printWidth) << VAL; 
         else if(std::isnan(VAL))        out << std::setw(printWidth) << "NAN";
         else if(std::isinf(VAL))        out << std::setw(printWidth) << "INF";
@@ -135,11 +135,11 @@ void prettyPrintSmart(std::ostream& out, std::string str, T* A,
   out.fill(' ');
 
   out << std::endl << "Re[" << str + "]: " << std::endl;
-  prettyPrintSmartBase(out,reinterpret_cast<double*>(A),M,N,LDA,2*colStride,
+  prettyPrintSmartBase(out,reinterpret_cast<double*>(A),M,N,2*LDA,2*colStride,
     list,printWidth);
 
   out << std::endl << "Im[" << str + "]: " << std::endl;
-  prettyPrintSmartBase(out,reinterpret_cast<double*>(A)+1,M,N,LDA,2*colStride,
+  prettyPrintSmartBase(out,reinterpret_cast<double*>(A)+1,M,N,2*LDA,2*colStride,
     list,printWidth);
 
 }; // prettyPrintSmart (T = dcomplex)
@@ -150,19 +150,20 @@ template <typename T,
           typename std::enable_if<
                      std::is_same<T,double>::value,int>::type = 0>
 void mathematicaPrint(std::ostream& out, std::string str, T* A, 
-  const size_t M, const size_t N, const size_t LDA) { 
+  const size_t M, const size_t N, const size_t LDA, 
+  const size_t colStride = 1) { 
 
   out << str << ":   \n";
 
   out << "{ \n";
   for(auto i = 0; i < M; i++){
-    out << "{  ";
+    if( N != 1) out << "{  ";
   for(auto j = 0; j < N; j++){
-    out << std::setprecision(12) << A[i + j*LDA];
+    out << std::setprecision(12) << A[colStride*i + j*LDA];
     if(j != N-1) out << ", ";
   }
-    out << "}";
-    if( i != M-1 ) out << ",\n";
+    if(N != 1) out << "}";
+    if( i != M-1 ) out << ",";
   }
   out << "\n}\n";
   
@@ -173,23 +174,24 @@ template <typename T,
           typename std::enable_if<
                      std::is_same<T,dcomplex>::value,int>::type = 0>
 void mathematicaPrint(std::ostream& out, std::string str, T* A, 
-  const size_t M, const size_t N, const size_t LDA) { 
+  const size_t M, const size_t N, const size_t LDA,
+  const size_t colStride = 1) { 
 
   out << str << ":   \n";
 
   out << "{ \n";
   for(auto i = 0; i < M; i++){
-    out << "{  ";
+    if( N != 1 ) out << "{  ";
   for(auto j = 0; j < N; j++){
     out << "Complex[";
-    out << std::setprecision(12) << std::real(A[i + j*LDA]);
+    out << std::setprecision(12) << std::real(A[colStride*i + j*LDA]);
     out << ",";
-    out << std::setprecision(12) << std::imag(A[i + j*LDA]);
+    out << std::setprecision(12) << std::imag(A[colStride*i + j*LDA]);
     out << "]";
     if(j != N-1) out << ", ";
   }
-    out << "}";
-    if( i != M-1 ) out << ",\n";
+    if( N != 1 ) out << "}";
+    if( i != M-1 ) out << ",";
   }
   out << "\n}\n";
   

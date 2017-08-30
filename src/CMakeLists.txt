@@ -32,3 +32,5 @@ add_subdirectory(singleslater)
 
 list(REVERSE CQEX_LINK)
 add_subdirectory(cxxapi)
+
+set(CQEX_LINK ${CQEX_LINK} PARENT_SCOPE)

@@ -30,6 +30,7 @@
 #include <aointegrals.hpp> 
 
 #include <util/threads.hpp>
+#include <H5Cpp.h>
 
 namespace ChronusQ {
 
@@ -53,6 +54,8 @@ namespace ChronusQ {
     // SS end
 
     SetNumThreads(1);
+
+    H5::Exception::dontPrint();
 
   }; // initialize
 

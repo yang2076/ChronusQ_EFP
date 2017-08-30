@@ -21,30 +21,46 @@
  *    E-Mail: xsli@uw.edu
  *  
  */
-#ifndef __INCLUDED_CQLINALG_CONFIG_HPP__
-#define __INCLUDED_CQLINALG_CONFIG_HPP__
 
-#include <chronusq_sys.hpp>
 
-// Choose linear algebra headers
-#ifdef _CQ_MKL
-  #define MKL_Complex16 dcomplex // Redefine MKL complex type
-  #include <mkl.h> // MKL
-#else
-  // Redefine OpenBLAS complex type
-  #define lapack_complex_float std::complex<float> 
-  #define lapack_complex_double dcomplex 
 
-  #include <f77blas.h>
-  #include <lapacke.h> // OpenBLAS
 
-  extern "C" {
-    int openblas_get_num_threads();
-  }
+/**
+ *
+ *  This file acts as a generic template for ChronusQ UTs through
+ *  the Boost.Test framework. When compiling, one must add a definition
+ *  of BOOST_TEST_MODULE in the compiler invocation
+ *
+ *  CXX -DBOOST_TEST_MODULE=ModName 
+ *
+ */
 
-#endif
 
-#include <memmanager.hpp>
-#include <Eigen/Core>
 
-#endif
+
+#include <cxxapi/boilerplate.hpp>
+
+#include <boost/test/impl/unit_test_main.ipp>
+#include <boost/test/impl/framework.ipp>
+#include <boost/test/unit_test.hpp>
+using namespace boost::unit_test;
+
+
+/**
+ *  \brief A global fixture for ChronusQ UTs through the
+ *  Boost.Test framework.
+ *
+ *  Ensures that ChronusQ::initialize and ChronusQ::finalize
+ *  only get called once throughout the test module
+ */
+struct CQConfig {
+
+  CQConfig() { ChronusQ::initialize(); }
+  ~CQConfig() { ChronusQ::finalize(); }
+
+};
+
+BOOST_GLOBAL_FIXTURE( CQConfig );
+
+
+

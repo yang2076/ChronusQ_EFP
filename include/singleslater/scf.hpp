@@ -41,23 +41,64 @@ namespace ChronusQ {
    */ 
   template <typename T>
   void SingleSlater<T>::saveCurrentState() {
-    size_t OSize = memManager.template getSize(fock[SCALAR]);
 
-    // Copy over current AO density matrix
-    for(auto i = 0; i < this->onePDM.size(); i++)
-      std::copy_n(this->onePDM[i],OSize,curOnePDM[i]);
 
-    // Copy the previous orthonormal Fock matrix for damping. It's the 
-    // previous Fock since saveCurrentState is called at the beginning 
-    // of the SCF loop. 
-    if ( scfControls.doExtrap and scfControls.doDamp) {
-        
-      // Avoid saving the guess Fock for extrapolation
-      if (scfConv.nSCFIter > 0) {
-        for(auto i = 0; i < this->fockOrtho.size(); i++)
-          std::copy_n(this->fockOrtho[i],OSize,prevFock[i]);
+    // Checkpoint if file exists
+    if( savFile.exists() ) {
+
+      size_t NB = this->aoints.basisSet().nBasis;
+      const std::array<std::string,4> spinLabel =
+        { "SCALAR", "MZ", "MY", "MX" };
+
+      // Save Matricies
+      for(auto i = 0; i < this->fock.size(); i++) {
+
+        savFile.safeWriteData("SCF/1PDM_" + spinLabel[i],
+          this->onePDM[i],{NB,NB});
+
+        savFile.safeWriteData("SCF/FOCK_" + spinLabel[i],
+          this->fock[i],{NB,NB});
+
+        savFile.safeWriteData("SCF/1PDM_ORTHO_" + spinLabel[i],
+          this->onePDMOrtho[i],{NB,NB});
+
+        savFile.safeWriteData("SCF/FOCK_ORTHO_" + spinLabel[i],
+          this->fockOrtho[i],{NB,NB});
+
       }
-   }
+
+      // Save Energies
+      savFile.safeWriteData("SCF/TOTAL_ENERGY",&this->totalEnergy,
+        {1});
+      savFile.safeWriteData("SCF/ONE_BODY_ENERGY",&this->OBEnergy,
+        {1});
+      savFile.safeWriteData("SCF/MANY_BODY_ENERGY",&this->MBEnergy,
+        {1});
+
+      
+
+    // If file doesnt exist, checkpoint important bits in core
+    } else {
+
+      size_t OSize = memManager.template getSize(fock[SCALAR]);
+
+      // Copy over current AO density matrix
+      for(auto i = 0; i < this->onePDM.size(); i++)
+        std::copy_n(this->onePDM[i],OSize,curOnePDM[i]);
+
+      // Copy the previous orthonormal Fock matrix for damping. It's the 
+      // previous Fock since saveCurrentState is called at the beginning 
+      // of the SCF loop. 
+      if ( scfControls.doExtrap and scfControls.doDamp) {
+          
+        // Avoid saving the guess Fock for extrapolation
+        if (scfConv.nSCFIter > 0) {
+          for(auto i = 0; i < this->fockOrtho.size(); i++)
+            std::copy_n(this->fockOrtho[i],OSize,prevFock[i]);
+        }
+      }
+
+    }
 
   }; // SingleSlater<T>::saveCurrentState()
 
@@ -196,9 +237,28 @@ namespace ChronusQ {
   void SingleSlater<T>::formDelta() {
 
     size_t NB = aoints.basisSet().nBasis;
-    for(auto i = 0; i < this->onePDM.size(); i++)
-      MatAdd('N','N',NB,NB,T(1.),this->onePDM[i],NB,T(-1.),
-        curOnePDM[i],NB,deltaOnePDM[i],NB);
+
+    if( not savFile.exists() )
+      for(auto i = 0; i < this->onePDM.size(); i++)
+        MatAdd('N','N',NB,NB,T(1.),this->onePDM[i],NB,T(-1.),
+          curOnePDM[i],NB,deltaOnePDM[i],NB);
+    else {
+
+      T* DENSCR = this->memManager.template malloc<T>(NB*NB);
+      const std::array<std::string,4> spinLabel =
+        { "SCALAR", "MZ", "MY", "MX" };
+
+      for(auto i = 0; i < this->onePDM.size(); i++) {
+
+        savFile.readData("/SCF/1PDM_" + spinLabel[i],DENSCR);
+
+        MatAdd('N','N',NB,NB,T(1.),this->onePDM[i],NB,T(-1.),
+          DENSCR,NB,deltaOnePDM[i],NB);
+      }
+
+      this->memManager.free(DENSCR);
+
+    }
 
   }; // SingleSlater<T>:formDelta
 

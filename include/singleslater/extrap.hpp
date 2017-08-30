@@ -70,9 +70,27 @@ namespace ChronusQ {
     double dp = scfControls.dampParam;
    
     // Damp the current orthonormal Fock matrix 
-    for(auto i = 0; i < fockOrtho.size(); i++)
-      MatAdd('N','N', NB, NB, T(1-dp), fockOrtho[i], NB, T(dp), 
-        prevFock[i], NB, fockOrtho[i], NB);
+    if( not savFile.exists() )
+      for(auto i = 0; i < fockOrtho.size(); i++)
+        MatAdd('N','N', NB, NB, T(1-dp), fockOrtho[i], NB, T(dp), 
+          prevFock[i], NB, fockOrtho[i], NB);
+    else {
+
+      T* FSCR = this->memManager.template malloc<T>(NB*NB);
+      const std::array<std::string,4> spinLabel =
+        { "SCALAR", "MZ", "MY", "MX" };
+
+      for(auto i = 0; i < fockOrtho.size(); i++) {
+
+        savFile.readData("/SCF/FOCK_ORTHO_" + spinLabel[i],FSCR);
+
+        MatAdd('N','N', NB, NB, T(1-dp), fockOrtho[i], NB, T(dp), 
+         FSCR, NB, fockOrtho[i], NB);
+
+      }
+
+      this->memManager.free(FSCR);
+    }
 
   }; // SingleSlater<T>::fockDamping
 
@@ -161,10 +179,9 @@ namespace ChronusQ {
     }
 
     // Allocate memory to store previous orthonormal Fock for damping 
-    if (scfControls.doDamp) {
+    if( scfControls.doDamp and not savFile.exists() ) 
       for(auto i = 0; i < this->fock.size(); i++) 
         prevFock.emplace_back(memManager.template malloc<T>(FSize));
-    }
 
   }; // SingleSlater<T>::allocExtrapStorage
 
@@ -189,10 +206,7 @@ namespace ChronusQ {
     }
 
     // Deallocate memory to store previous orthonormal Fock for damping 
-    if (scfControls.doDamp) {
-      for(auto i = 0; i < this->fock.size(); i++) 
-        memManager.free(prevFock[i]);
-    }
+    for( auto &F : prevFock ) memManager.free(F);
 
   }; // SingleSlater<T>::deallocExtrapStorage
 

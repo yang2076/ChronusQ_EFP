@@ -27,6 +27,8 @@
 #include <chronusq_sys.hpp>
 #include <wavefunction/base.hpp>
 
+#include <util/files.hpp>
+
 namespace ChronusQ {
 
   enum DIIS_ALG {
@@ -121,6 +123,9 @@ namespace ChronusQ {
   private:
   public:
 
+    // Save / Restart File
+    SafeFile savFile;
+       
     // Print Controls
     size_t printLevel; ///< Print Level
 

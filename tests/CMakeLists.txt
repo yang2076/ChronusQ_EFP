@@ -19,11 +19,18 @@
 # 
 # Contact the Developers:
 #   E-Mail: xsli@uw.edu
+#
 
-set(Boost_USE_STATIC_LIBS    ON)
-set(Boost_USE_MULTITHREADED  ON)
-set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost REQUIRED unit_test_framework)
+# Define global test variables
+set( TEST_ROOT ${PROJECT_SOURCE_DIR}/tests )
+set( TEST_BINARY_ROOT ${PROJECT_BINARY_DIR}/tests )
 
-include_directories(${Boost_INCLUDE_DIRS})
-list(APPEND CQ_EXT_LINK ${Boost_LIBRARIES})
+# Common UT configuration header
+configure_file(
+  "${TEST_ROOT}/ut.hpp.in"
+  "${TEST_BINARY_ROOT}/ut.hpp"
+)
+
+
+add_subdirectory(scf)
+add_subdirectory(func)

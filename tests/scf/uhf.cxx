@@ -21,30 +21,32 @@
  *    E-Mail: xsli@uw.edu
  *  
  */
-#ifndef __INCLUDED_CQLINALG_CONFIG_HPP__
-#define __INCLUDED_CQLINALG_CONFIG_HPP__
 
-#include <chronusq_sys.hpp>
+#include "scf.hpp"
 
-// Choose linear algebra headers
-#ifdef _CQ_MKL
-  #define MKL_Complex16 dcomplex // Redefine MKL complex type
-  #include <mkl.h> // MKL
-#else
-  // Redefine OpenBLAS complex type
-  #define lapack_complex_float std::complex<float> 
-  #define lapack_complex_double dcomplex 
 
-  #include <f77blas.h>
-  #include <lapacke.h> // OpenBLAS
+BOOST_AUTO_TEST_SUITE( UHF )
 
-  extern "C" {
-    int openblas_get_num_threads();
-  }
+// Li 6-31G(d) test
+BOOST_FIXTURE_TEST_CASE( Li_631Gd, SerialJob ) {
 
-#endif
+  CQSCFTEST( scf/serial/uhf/li_6-31Gd, li_6-31Gd.bin.ref );
 
-#include <memmanager.hpp>
-#include <Eigen/Core>
+};
+
+#ifdef _CQ_DO_PARTESTS
+
+// SMP Li 6-31G(d) test
+BOOST_FIXTURE_TEST_CASE( PAR_Li_631Gd, ParallelJob ) {
+
+  CQSCFTEST( scf/parallel/uhf/li_6-31Gd, li_6-31Gd.bin.ref );
+
+};
 
 #endif
+
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
+

@@ -60,7 +60,12 @@ namespace ChronusQ {
   // Parse the SCF options
   void CQSCFOptions(std::ostream&, CQInputFile&,
     SingleSlaterBase &);
+
+  std::shared_ptr<CQMemManager> CQMiscOptions(std::ostream &,
+    CQInputFile &);
 };
+
+
 
 
 #endif

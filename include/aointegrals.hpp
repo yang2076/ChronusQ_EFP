@@ -30,6 +30,8 @@
 #include <memmanager.hpp>
 #include <libint2/engine.h>
 
+#include <util/files.hpp>
+
 namespace ChronusQ {
 
   /**
@@ -285,6 +287,9 @@ namespace ChronusQ {
 
     double threshSchwartz; ///< Schwartz screening threshold
 
+
+    // Hard storage of integrals
+    SafeFile savFile;
 
 
     // Operator storage

@@ -19,11 +19,24 @@
 # 
 # Contact the Developers:
 #   E-Mail: xsli@uw.edu
+#
 
-set(Boost_USE_STATIC_LIBS    ON)
-set(Boost_USE_MULTITHREADED  ON)
-set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost REQUIRED unit_test_framework)
+# Directories for basic functionality tests
+set(FUNC_TEST_SOURCE_ROOT "${TEST_ROOT}/func" )
+set(FUNC_TEST_BINARY_ROOT "${TEST_BINARY_ROOT}/func" )
 
-include_directories(${Boost_INCLUDE_DIRS})
-list(APPEND CQ_EXT_LINK ${Boost_LIBRARIES})
+
+# Set up compilation of Functionality test exe
+add_executable(functest ../ut.cxx contract.cxx)
+
+target_compile_definitions(functest PUBLIC BOOST_TEST_MODULE=FUNC)
+target_include_directories(functest PUBLIC ${FUNC_TEST_SOURCE_ROOT} 
+  ${TEST_BINARY_ROOT})
+target_link_libraries(functest PUBLIC ${CQEX_LINK})
+
+if(CQEX_DEP)
+  add_dependencies(functest ${CQEX_DEP})
+endif()
+
+# Add the Tests
+add_test( DIRECT_CONTRACTION functest --report_level=detailed --run_test=DIRECT_CONTRACTION)

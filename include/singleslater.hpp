@@ -58,7 +58,7 @@ namespace ChronusQ {
 
   private:
   public:
-    
+
     // Operator storage
 
     // AO Fock Matrix

@@ -21,30 +21,29 @@
  *    E-Mail: xsli@uw.edu
  *  
  */
-#ifndef __INCLUDED_CQLINALG_CONFIG_HPP__
-#define __INCLUDED_CQLINALG_CONFIG_HPP__
 
-#include <chronusq_sys.hpp>
+#include "scf.hpp"
 
-// Choose linear algebra headers
-#ifdef _CQ_MKL
-  #define MKL_Complex16 dcomplex // Redefine MKL complex type
-  #include <mkl.h> // MKL
-#else
-  // Redefine OpenBLAS complex type
-  #define lapack_complex_float std::complex<float> 
-  #define lapack_complex_double dcomplex 
+BOOST_AUTO_TEST_SUITE( RHF )
 
-  #include <f77blas.h>
-  #include <lapacke.h> // OpenBLAS
+// Water 6-31G(d) test
+BOOST_FIXTURE_TEST_CASE( Water_631Gd, SerialJob ) {
 
-  extern "C" {
-    int openblas_get_num_threads();
-  }
+  CQSCFTEST( scf/serial/rhf/water_6-31Gd, water_6-31Gd.bin.ref );
+ 
+};
 
-#endif
+#ifdef _CQ_DO_PARTESTS
 
-#include <memmanager.hpp>
-#include <Eigen/Core>
+// SMP Water 6-31G(d) test
+BOOST_FIXTURE_TEST_CASE( PAR_Water_631Gd, ParallelJob ) {
+
+  CQSCFTEST( scf/parallel/rhf/water_6-31Gd, water_6-31Gd.bin.ref );
+ 
+};
 
 #endif
+
+BOOST_AUTO_TEST_SUITE_END()
+
+

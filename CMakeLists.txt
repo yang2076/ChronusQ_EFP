@@ -39,13 +39,22 @@ set(CMAKE_CXX_STANDARD 11)
 include_directories("${PROJECT_SOURCE_DIR}/include")
 include_directories("${PROJECT_BINARY_DIR}/include")
 
+# Non-trivial dependencies
 include(FindLibint)
 include(Boost)
 include(HandleLA)
+set(CQEX_LINK ${CQ_EXT_LINK} )
+
+# OpenMP
 find_package(OpenMP)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 
-set(CQEX_LINK ${CQ_EXT_LINK} )
+# HDF5
+find_package(HDF5 REQUIRED CXX)
+include_directories("${HDF5_INCLUDE_DIRS}")
+list(APPEND CQEX_LINK ${HDF5_CXX_LIBRARIES} )
+
+
 
 
 
@@ -60,4 +69,5 @@ configure_file(
 # Recurse into subdirectories
 add_subdirectory(src)
 
-
+enable_testing()
+add_subdirectory(tests)
