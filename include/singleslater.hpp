@@ -156,8 +156,8 @@ namespace ChronusQ {
     void computeEnergy();
 
     // Form a fock matrix (see include/singleslater/fock.hpp for docs)
-    virtual void formFock(bool increment = false);
-    void formGD(bool increment = false);
+    virtual void formFock(bool increment = false, double xHFX = 1.);
+    void formGD(bool increment = false, double xHFX = 1.);
 
     // Form initial guess orbitals
     // see include/singleslater/guess.hpp for docs)
@@ -210,5 +210,6 @@ namespace ChronusQ {
 
 // Include headers for specializations of SingleSlater
 #include <singleslater/hartreefock.hpp> // HF specialization
+#include <singleslater/kohnsham.hpp>    // KS specialization
 
 #endif

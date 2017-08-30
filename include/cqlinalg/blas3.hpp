@@ -32,6 +32,16 @@ namespace ChronusQ {
   void Gemm(char TRANSA, char TRANSB, int M, int N, int K, _FScale ALPHA,
     _F1 *A, int LDA, _F2 *B, int LDB, _FScale BETA, _F2 *C, int LDC);
 
+  /**
+   *  \brief Returns constant time a vector plus a vector
+   *
+   *  Wraps BLAS functions. See
+   *    http://http://www.netlib.org/lapack/lapack-3.1.1/html/dsyr2k.html
+   *  parameter documentation.
+   *    
+   */
+   void DSYR2K(char UPLO,char TRANS,int N,int K,double alpha,double *A,
+        int LDA,double *B,int LDB,double beta, double *C,int LDC);
 
 }; // namespace ChronusQ
 

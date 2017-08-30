@@ -11,6 +11,12 @@ external/openblas/src
 external/openblas/tmp
 external/openblas/bin
 external/openblas/Open*/
+external/libxc/include
+external/libxc/bin
+external/libxc/lib
+external/libxc/share
+external/libxc/src
+external/libxc/tmp
 doc
 *.*.swp
 *~

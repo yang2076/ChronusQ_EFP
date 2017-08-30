@@ -1,6 +1,32 @@
+/* 
+ *  This file is part of the Chronus Quantum (ChronusQ) software package
+ *  
+ *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *  
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *  
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *  
+ *  Contact the Developers:
+ *    E-Mail: xsli@uw.edu
+ *  
+ */
+#ifndef __INCLUDED_BASISSET_UTIL_HPP__
+#define __INCLUDED_BASISSET_UTIL_HPP__
 
 #include <libint2/shell.h>
 #include <memmanager.hpp>
+#include <basisset/basisset_def.hpp>
 
 namespace ChronusQ {
 
@@ -20,12 +46,12 @@ namespace ChronusQ {
    *  \brief Level 1 Basis Set Evaluation Function
    *  \brief Evaluates a shell set over a specified number of cartesian points.
    */ 
-  void evalShellSet(CQMemManager &,SHELL_EVAL_TYPE, std::vector<libint2::Shell> &, double *, size_t, double *);
+  void evalShellSet(CQMemManager &,SHELL_EVAL_TYPE, std::vector<libint2::Shell> &, double *, size_t, double *, bool);
 
   inline void evalShellSet(CQMemManager &memManager,SHELL_EVAL_TYPE typ, std::vector<libint2::Shell> &shells, 
-    std::vector<std::array<double,3>> &pts, double *eval){
+    std::vector<std::array<double,3>> &pts, double *eval, bool &forceCart){
 
-    evalShellSet(memManager,typ,shells,&(pts[0][0]),pts.size(),eval);
+    evalShellSet(memManager,typ,shells,&(pts[0][0]),pts.size(),eval,forceCart);
 
   }; // evalShellSet (over vector of arrays)
 
@@ -35,7 +61,8 @@ namespace ChronusQ {
    *  \brief function requires a precomputed set of distances and their x,y,z components 
    *  \brief for each point from each shell origin in the shells vector..
    */ 
-  void evalShellSet(SHELL_EVAL_TYPE, std::vector<libint2::Shell> &, double *, double *, size_t,size_t, double*);
+  void evalShellSet(SHELL_EVAL_TYPE, std::vector<libint2::Shell> &, std::vector<bool> &,double *, double *, size_t, 
+    size_t, std::vector<size_t>&, size_t, double*, double*, size_t, bool );
 
   /**
    *  \brief Level 3 Basis Set Evaluation Function
@@ -45,4 +72,14 @@ namespace ChronusQ {
    */ 
   void evalShellSet(SHELL_EVAL_TYPE,const libint2::Shell&,double,const std::array<double,3>&, double *, size_t);
 
+  /**
+   *  \brief Basis Set transformation from Cartesian to Spherical
+   *  it also provide to copy to the final storage (pointer) and requires that the transformation matrix Sp <-> Cart
+   *  is already populated.
+   */ 
+  void CarToSpDEval(SHELL_EVAL_TYPE, size_t , double *, double*, size_t, size_t, bool);
+
+  void testEval(CQMemManager &,double *, std::vector<libint2::Shell> &, bool);
 }; // namespace ChronusQ
+
+#endif

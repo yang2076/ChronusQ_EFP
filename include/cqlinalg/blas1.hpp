@@ -73,6 +73,17 @@ namespace ChronusQ {
   template <typename _F1, typename _F2>
   _F1 TwoNorm(int N, _F2 *X, int INCX);
 
+  
+  /**
+   *  \brief Returns constant time a vector plus a vector
+   *
+   *  Wraps BLAS functions. See
+   *    http://www.netlib.org/lapack/lapack-3.1.1/html/daxpy.f.html 
+   *  parameter documentation.
+   *    
+   */
+  void DaxPy(int N, double alpha, double *X, int INCX, double *Y, int INCY);
+
   /**
    *  \brief Returns the specified norm of a matrix.
    *

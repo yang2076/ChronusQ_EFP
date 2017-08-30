@@ -128,6 +128,7 @@ namespace ChronusQ {
        
     // Print Controls
     size_t printLevel; ///< Print Level
+              
 
     // SCF Variables
     SCFControls    scfControls; ///< Controls for the SCF procedure
@@ -149,7 +150,7 @@ namespace ChronusQ {
       
     // In essence, all derived classes should be able to:
     //   1. Form a Fock matrix with the ability to increment
-    virtual void formFock(bool increment = false) = 0;
+    virtual void formFock(bool increment = false, double xHFX = 1.) = 0;
 
     //   2. Form an initial Guess (which populates the Fock, Density 
     //     and energy)

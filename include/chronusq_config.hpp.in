@@ -43,4 +43,15 @@
 
 #cmakedefine _CQ_MKL
 
+
+/*
+// Add a fatal preprocessor error if less than ICC 17.0.4
+#ifdef __INTEL_COMPILER
+  #if __INTEL_COMPILER < 1704
+    #error ChronusQ MUST be compiled with ICC 17.0.4+
+  #endif
+#endif
+*/
+
+
 #endif

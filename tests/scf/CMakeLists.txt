@@ -27,7 +27,7 @@ set(SCF_TEST_BINARY_ROOT "${TEST_BINARY_ROOT}/scf" )
   
 
 # Set up compilation of SCF test exe
-add_executable(scftest ../ut.cxx rhf.cxx uhf.cxx x2c.cxx)
+add_executable(scftest ../ut.cxx rhf.cxx uhf.cxx x2chf.cxx ks.cxx rks.cxx uks.cxx)
 
 target_compile_definitions(scftest PUBLIC BOOST_TEST_MODULE=SCF)
 target_include_directories(scftest PUBLIC ${SCF_TEST_SOURCE_ROOT} 
@@ -40,13 +40,24 @@ endif()
 
 # Generate directories
 file(MAKE_DIRECTORY ${SCF_TEST_BINARY_ROOT}/serial/rhf)
+file(MAKE_DIRECTORY ${SCF_TEST_BINARY_ROOT}/serial/rks)
 file(MAKE_DIRECTORY ${SCF_TEST_BINARY_ROOT}/serial/uhf)
+file(MAKE_DIRECTORY ${SCF_TEST_BINARY_ROOT}/serial/uks)
 file(MAKE_DIRECTORY ${SCF_TEST_BINARY_ROOT}/serial/x2c)
+
 file(MAKE_DIRECTORY ${SCF_TEST_BINARY_ROOT}/parallel/rhf)
+file(MAKE_DIRECTORY ${SCF_TEST_BINARY_ROOT}/parallel/rks)
 file(MAKE_DIRECTORY ${SCF_TEST_BINARY_ROOT}/parallel/uhf)
+file(MAKE_DIRECTORY ${SCF_TEST_BINARY_ROOT}/parallel/uks)
 file(MAKE_DIRECTORY ${SCF_TEST_BINARY_ROOT}/parallel/x2c)
 
 # Add the Test
-add_test( RHF_SCF scftest --report_level=detailed --run_test=RHF)
-add_test( UHF_SCF scftest --report_level=detailed --run_test=UHF)
-add_test( X2C_SCF scftest --report_level=detailed --run_test=X2C)
+add_test( RHF_SCF   scftest --report_level=detailed --run_test=RHF   )
+add_test( UHF_SCF   scftest --report_level=detailed --run_test=UHF   )
+add_test( X2CHF_SCF scftest --report_level=detailed --run_test=X2CHF )
+add_test( RKS_SCF   scftest --report_level=detailed --run_test=RKS   )
+add_test( UKS_SCF   scftest --report_level=detailed --run_test=UKS   )
+
+
+add_test( KS_KEYWORD scftest --report_level=detailed --run_test=KS_KEYWORD )
+add_test( KS_FUNC scftest --report_level=detailed --run_test=KS_FUNC )

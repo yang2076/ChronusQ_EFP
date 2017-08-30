@@ -29,28 +29,6 @@
 
 namespace ChronusQ {
 
-  inline void SetNumThreads(size_t n) {
-#ifdef _OPENMP
-    omp_set_num_threads(n);
-#endif
-  };
-
-  inline size_t GetNumThreads() {
-#ifdef _OPENMP
-    return omp_get_max_threads();
-#else
-    return 1;
-#endif
-  };
-
-  inline size_t GetThreadID() {
-#ifdef _OPENMP
-    return omp_get_thread_num();
-#else
-    return 0;
-#endif
-  };
-
   inline void SetLAThreads(size_t n) {
 #ifdef _CQ_MKL
     mkl_set_num_threads(n);
@@ -69,6 +47,31 @@ namespace ChronusQ {
     return openblas_get_num_threads();
 #endif
   };
+
+
+  inline void SetNumThreads(size_t n) {
+#ifdef _OPENMP
+    omp_set_num_threads(n);
+#endif
+    SetLAThreads(n);
+  };
+
+  inline size_t GetNumThreads() {
+#ifdef _OPENMP
+    return omp_get_max_threads();
+#else
+    return 1;
+#endif
+  };
+
+  inline size_t GetThreadID() {
+#ifdef _OPENMP
+    return omp_get_thread_num();
+#else
+    return 0;
+#endif
+  };
+
 
 }; // namespace ChronusQ
 

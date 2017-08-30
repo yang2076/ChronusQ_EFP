@@ -11,7 +11,7 @@
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+int LDCcense for more details.
  *  
  *  You should have received a copy of the GNU General Public License along
  *  with this program; if not, write to the Free Software Foundation, Inc.,
@@ -83,6 +83,20 @@ namespace ChronusQ {
 #endif
 
   }; // GEMM (real,complex,complex)
+
+  /*
+   *  performs one of the symmetric rank 2k operations
+   *  C := alpha*A*B' + alpha*B*A' + beta*C
+   */
+  void DSYR2K(char UPLO,char TRANS,int N,int K,double ALPHA,double *A,
+    int LDA,double *B,int LDB,double BETA, double *C,int LDC){
+#ifdef _CQ_MKL
+    dsyr2k
+#else
+    dsyr2k_
+#endif
+      (&UPLO,&TRANS,&N,&K,&ALPHA,A,&LDA,B,&LDB,&BETA,C,&LDC);
+  }; // DSYR2K
 
 
 }; // namespace ChronusQ

@@ -35,4 +35,8 @@ namespace ChronusQ {
   // Instantiate copy ructors
   template SingleSlater<dcomplex>::SingleSlater( SingleSlater<double> &&, int);
 
+  template class KohnSham<double>;
+  //FIXME
+//  template class KohnSham<dcomplex>;
+
 }; // namespace ChronusQ

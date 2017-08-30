@@ -167,4 +167,6 @@ namespace ChronusQ {
 #include <singleslater/extrap.hpp>  // Extrapolate header
 #include <singleslater/print.hpp>   // Print header
 
+
+#include <singleslater/kohnsham/vxc.hpp> // VXC build
 #endif

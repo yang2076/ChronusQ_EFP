@@ -187,7 +187,12 @@ namespace ChronusQ {
     std::for_each(shells.begin(),shells.end(),
       [&](libint2::Shell &sh) {
         auto cenIt = std::find_if(centers.begin(),centers.end(),
-          [&](cart_t &cen){ return sh.O == cen; }
+          [&](cart_t &cen){ 
+            //return sh.O == cen; 
+            return std::abs(sh.O[0] - cen[0]) < 1e-5 and  
+                   std::abs(sh.O[1] - cen[1]) < 1e-5 and  
+                   std::abs(sh.O[2] - cen[2]) < 1e-5; 
+          }
         );
         mapSh2Cen.emplace_back(std::distance(centers.begin(),cenIt));
 
@@ -196,6 +201,7 @@ namespace ChronusQ {
         
       }
     );
+
 
     for(auto iAtm = 0; iAtm < centers.size(); iAtm++) {
 

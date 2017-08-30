@@ -39,13 +39,13 @@ namespace ChronusQ {
    *  Populates / overwrites fock strorage
    */ 
   template <typename T>
-  void SingleSlater<T>::formFock(bool increment) {
+  void SingleSlater<T>::formFock(bool increment, double xHFX) {
 
     size_t NB = aoints.basisSet().nBasis;
     size_t NB2 = NB*NB;
 
     // Form G[D]
-    formGD(increment);
+    formGD(increment,xHFX);
 
     // Zero out the Fock
     for(auto &F : fock) std::fill_n(F,NB2,0.);
@@ -73,38 +73,13 @@ namespace ChronusQ {
    *  Populates / overwrites GD storage (and JScalar and K storage)
    */ 
   template <typename T>
-  void SingleSlater<T>::formGD(bool increment) {
+  void SingleSlater<T>::formGD(bool increment, double xHFX) {
 
     // Decide list of onePDMs to use
     oper_t_coll &contract1PDM  = increment ? deltaOnePDM : this->onePDM;
 
-
     size_t NB = aoints.basisSet().nBasis;
     size_t NB2 = NB*NB;
-
-#if 0
-
-    std::vector<TwoBodyContraction<T,double>> jContract =
-      { {this->onePDM[SCALAR], JScalar, true, COULOMB} };
-    
-
-    std::vector<TwoBodyContraction<T,T>> kContract;
-
-    // Determine how many (if any) exchange terms to calculate
-    for(auto i = 0; i < K.size(); i++)
-      kContract.push_back({this->onePDM[i], K[i], true, EXCHANGE});
-
-
-    // Perform J contraction
-    aoints.twoBodyContract(jContract);
-
-    // Perform K contraction
-    aoints.twoBodyContract(kContract);
-
-#else
-
-
-
 
     // Possibly allocate a temporary for J matrix
     T* JContract;
@@ -121,6 +96,7 @@ namespace ChronusQ {
       { {contract1PDM[SCALAR], JContract, true, COULOMB} };
 
     // Determine how many (if any) exchange terms to calculate
+    if( std::abs(xHFX) > 1e-12 )
     for(auto i = 0; i < K.size(); i++) {
       contract.push_back({contract1PDM[i], K[i], true, EXCHANGE});
 
@@ -141,14 +117,19 @@ namespace ChronusQ {
       this->memManager.free(JContract);
     }
 
-#endif
-
     // Form GD: G[D] = 2.0*J[D] - K[D]
 
+    if( std::abs(xHFX) > 1e-12 )
     for(auto i = 0; i < K.size(); i++)
-      MatAdd('N','N', NB, NB, T(0.), GD[i], NB, T(-1.), K[i], NB,
+      MatAdd('N','N', NB, NB, T(0.), GD[i], NB, T(-xHFX), K[i], NB,
         GD[i], NB);
+    else
+    for(auto i = 0; i < fock.size(); i++)
+      memset(GD[i],0,NB2*sizeof(T));
+    
+    
 
+    // G[D] += 2*J[D]
     MatAdd('N','N', NB, NB, T(1.), GD[SCALAR], NB, T(2.), JScalar, NB,
       GD[SCALAR], NB);
       

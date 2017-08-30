@@ -30,7 +30,12 @@
 
 namespace ChronusQ {
 
-
+  /**
+   *  \breif The Hartree--Fock class.
+   *
+   *  Trivially specializes the SingleSlater class for a Hartree--Fock description of the
+   *  many-body wave function
+   */ 
   template <typename T>
   class HartreeFock : public SingleSlater<T> {
 
@@ -77,16 +82,17 @@ namespace ChronusQ {
 
     template <typename U>
     HartreeFock(const HartreeFock<U> &other, int dummy = 0) :
-      SingleSlater<T>(dynamic_cast<const SingleSlater<U>&>(other)){ };
+      SingleSlater<T>(dynamic_cast<const SingleSlater<U>&>(other,dummy)){ };
     template <typename U>
     HartreeFock(HartreeFock<U> &&other, int dummy = 0) :
-      SingleSlater<T>(dynamic_cast<SingleSlater<U>&&>(std::move(other))){ };
+      SingleSlater<T>(dynamic_cast<SingleSlater<U>&&>(std::move(other),dummy))
+      { };
     
     
-    HartreeFock(const HartreeFock<T> &other, int dummy = 0) :
-      SingleSlater<T>(dynamic_cast<const SingleSlater<T>&>(other)){ };
+    HartreeFock(const HartreeFock<T> &other) :
+      SingleSlater<T>(dynamic_cast<const SingleSlater<T>&>(other,0)){ };
     HartreeFock(HartreeFock<T> &&other, int dummy = 0) :
-      SingleSlater<T>(dynamic_cast<SingleSlater<T>&&>(std::move(other))){ };
+      SingleSlater<T>(dynamic_cast<SingleSlater<T>&&>(std::move(other),0)){ };
 
   }; // class HartreeFock
 

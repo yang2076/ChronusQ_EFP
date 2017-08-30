@@ -47,6 +47,14 @@ namespace ChronusQ {
   }; // InnerProd real = (real,real)
 
 
+  void DaxPy(int N, double alpha, double *X, int INCX, double *Y, int INCY) {
+#ifdef _CQ_MKL
+    daxpy
+#else
+    daxpy_
+#endif 
+      (&N,&alpha,X,&INCX,Y,&INCY);
+  }; // y <- alpha*x + y 
 
 
   template<>

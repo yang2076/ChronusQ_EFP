@@ -127,6 +127,10 @@ namespace ChronusQ {
   // Map atomic symbol to predefined Atom objects. Support
   // for non-standard isotopes forthcoming
   //
+  // Last values: Atomic Radius (in Ang). According Slater, J. Chem. Phys. 41, pg 3199 (1964).
+  // Note for Hydrogen is already multiplied by 2 (to prevent the scaling later on) 
+  // all noble gasses values are computed values from Reinhardt J. Chem. Phys. 47, pg 1300 (1967)
+  // after Am all set to 2.01 (Ang)
   // FIXME: Need to specify isotope label for non-default isotopes
   static std::map<std::string,Atom> atomicReference(
     {

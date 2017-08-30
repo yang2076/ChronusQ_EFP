@@ -21,7 +21,7 @@
 #   E-Mail: xsli@uw.edu
 #
 cmake_minimum_required(VERSION 3.0)
-project(ChronusQ CXX C)
+project(ChronusQ CXX C Fortran)
 set(ChronusQ_VERSION_MAJOR 0)
 set(ChronusQ_VERSION_MINOR 1)
 set(ChronusQ_VERSION_PATCH 0)
@@ -41,6 +41,7 @@ include_directories("${PROJECT_BINARY_DIR}/include")
 
 # Non-trivial dependencies
 include(FindLibint)
+include(FindLibXC)
 include(Boost)
 include(HandleLA)
 set(CQEX_LINK ${CQ_EXT_LINK} )
