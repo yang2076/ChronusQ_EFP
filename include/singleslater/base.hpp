@@ -37,6 +37,15 @@ namespace ChronusQ {
   };
 
   /**
+   *  The Single Slater guess types
+   */ 
+  enum SS_GUESS {
+    CORE,
+    SAD,
+    RANDOM
+  };
+
+  /**
    *  \brief A struct to hold the information pertaining to
    *  the control of an SCF procedure.
    *
@@ -52,6 +61,9 @@ namespace ChronusQ {
     // TODO: need to add logic to set this
     // Extrapolation flag for DIIS and damping
     bool doExtrap = true;     ///< Whether to extrapolate Fock matrix
+
+    // Guess Settings
+    SS_GUESS guess = SAD;
 
     // DIIS settings 
     DIIS_ALG diisAlg = CDIIS; ///< Type of DIIS extrapolation 
@@ -90,7 +102,6 @@ namespace ChronusQ {
   }; // SCFConvergence struct
 
 
-
   /**
    *  \brief The SingleSlaterBase class. The abstraction of information
    *  relating to the SingleSlater class which are independent of storage
@@ -110,6 +121,9 @@ namespace ChronusQ {
   private:
   public:
 
+    // Print Controls
+    size_t printLevel; ///< Print Level
+
     // SCF Variables
     SCFControls    scfControls; ///< Controls for the SCF procedure
     SCFConvergence scfConv;     ///< Current status of SCF convergence
@@ -120,8 +134,8 @@ namespace ChronusQ {
 
     SingleSlaterBase() = delete;
     SingleSlaterBase(AOIntegrals &aoi, size_t _nC, bool iCS) : 
-      WaveFunctionBase(aoi,_nC,iCS), QuantumBase(aoi.memManager(),_nC,iCS)
-      { };
+      WaveFunctionBase(aoi,_nC,iCS), QuantumBase(aoi.memManager(),_nC,iCS),
+      printLevel(1) { };
 
     
 

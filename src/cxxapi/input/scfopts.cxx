@@ -56,6 +56,18 @@ namespace ChronusQ {
     )
 
 
+    // Guess
+    OPTOPT(
+      std::string guessString = input.getData<std::string>("SCF.GUESS");
+
+      if( not guessString.compare("CORE") )
+        ss.scfControls.guess = CORE;
+      else if( not guessString.compare("SAD") )
+        ss.scfControls.guess = SAD;
+      else if( not guessString.compare("RANDOM") )
+        ss.scfControls.guess = RANDOM;
+    )
+
 
     // Toggle extrapolation in its entireity
     OPTOPT(

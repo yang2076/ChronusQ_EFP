@@ -162,6 +162,9 @@ namespace ChronusQ {
     // Form initial guess orbitals
     // see include/singleslater/guess.hpp for docs)
     void formGuess();
+    void CoreGuess();
+    void SADGuess();
+    void RandomGuess();
     
 
 

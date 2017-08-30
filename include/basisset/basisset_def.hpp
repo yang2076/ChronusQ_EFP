@@ -47,6 +47,8 @@ namespace ChronusQ {
     typedef std::array<double,3>    cart_t; ///< Cartesian point
     typedef std::vector<cart_t>  cartvec_t; ///< Cartesian vector
 
+    std::string basisName;
+
     bool forceCart;
 
     size_t nBasis;      ///< Number of CGTO basis functions
@@ -64,6 +66,7 @@ namespace ChronusQ {
         
     std::vector<size_t> mapSh2Bf;  ///< Map Shell # -> BF #
     std::vector<size_t> mapSh2Cen; ///< Map Shell # -> Cen #
+    std::vector<size_t> mapCen2BfSt; ///< Map Cen # -> Starting BF #
 
     // Disable default constructor
     BasisSet() = delete;
@@ -71,8 +74,8 @@ namespace ChronusQ {
 
     // Path / Molecule constructor.
     // See src/basisset/basisset.cxx for documentation
-    BasisSet(std::string basisName, const Molecule &mol, 
-      bool _forceCart = false);
+    BasisSet(std::string _basisName, const Molecule &mol, 
+      bool _forceCart = false, bool doPrint = true);
        
     /**
      *  Copy constructor.

@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
   BasisSet basis(std::move(CQBasisSetOptions(std::cout,input,mol)));
 
 
-  CQMemManager memManager(1e9);
+  CQMemManager memManager(2e9);
   AOIntegrals aoints(memManager,mol,basis);
   auto ss = CQSingleSlaterOptions(std::cout,input,aoints);
 

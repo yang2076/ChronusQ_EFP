@@ -105,10 +105,11 @@ namespace ChronusQ {
    *                        file
    *  \param [in] mol       Molecule for which to construct the BasisSet
    */
-  BasisSet::BasisSet(std::string basisName, const Molecule &mol,
-    bool _forceCart) {
+  BasisSet::BasisSet(std::string _basisName, const Molecule &mol,
+    bool _forceCart, bool doPrint) {
 
     forceCart = _forceCart;
+    basisName = _basisName;
 
     std::string uppercase(basisName);
 
@@ -121,7 +122,7 @@ namespace ChronusQ {
       basisName = basisKeyword[basisName];
 
     // Generate the reference basis set of that keyword
-    ReferenceBasisSet ref(basisName,_forceCart);
+    ReferenceBasisSet ref(basisName, _forceCart, doPrint);
 
     // Update appropriate shell set and coefficients for the Molecule
     // object
@@ -173,6 +174,12 @@ namespace ChronusQ {
       }
     )->alpha.size();
 
+
+    // Reset maps
+    mapSh2Cen.clear();
+    mapSh2Bf.clear();
+    mapCen2BfSt.clear();
+
     // Create basis maps
     // Maps Sh # -> BF #
     // Maps Sh # -> Center index
@@ -189,7 +196,17 @@ namespace ChronusQ {
         
       }
     );
-    
+
+    for(auto iAtm = 0; iAtm < centers.size(); iAtm++) {
+
+      auto it = std::find_if(mapSh2Cen.begin(),mapSh2Cen.end(),
+                  [&](size_t x){ return x == iAtm; });
+
+      size_t firstShell = std::distance(mapSh2Cen.begin(),it);
+      mapCen2BfSt.emplace_back(mapSh2Bf[firstShell]);
+
+    }
+
   }; // BasisSet::update
 
 

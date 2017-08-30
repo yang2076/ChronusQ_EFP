@@ -65,7 +65,7 @@ namespace ChronusQ {
    *  basis set file object. Terminates program if it cannot find the 
    *  file. 
    */
-  void ReferenceBasisSet::findBasisFile(){
+  void ReferenceBasisSet::findBasisFile(bool doPrint){
   
     // Look for basis sets in BASIS_PATH
     std::string fullBasisPath = "/" + basisPath_;
@@ -78,7 +78,7 @@ namespace ChronusQ {
     if(basisFile_.fail()){
       std::cout << "Cannot find basis set " + basisPath_ << std::endl;
       exit(EXIT_FAILURE);
-    } else 
+    } else if (doPrint)
       std::cout << "  *** Reading Basis Set from " + fullBasisPath << " ***" << std::endl;
   
   }; // ReferenceBasisSet::findBasisFile

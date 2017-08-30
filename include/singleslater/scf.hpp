@@ -74,7 +74,8 @@ namespace ChronusQ {
   void SingleSlater<T>::getNewOrbitals(bool frmFock) {
 
     bool increment = scfControls.doIncFock and 
-                     scfConv.nSCFIter % scfControls.nIncFock != 0;
+                     scfConv.nSCFIter % scfControls.nIncFock != 0 and
+                     scfControls.guess != RANDOM;
 
     // Form the Fock matrix D(k) -> F(k)
     if( frmFock ) formFock(increment);
@@ -159,16 +160,20 @@ namespace ChronusQ {
       if( scfControls.doDamp and not largeEDiff and 
           scfControls.dampParam > 0.) {
 
-        std::cout << 
-          "    *** Damping Disabled - Energy Difference Fell Below " <<
-          scfControls.dampError << " ***" << std::endl;
+        if( printLevel > 0 )
+          std::cout << 
+            "    *** Damping Disabled - Energy Difference Fell Below " <<
+            scfControls.dampError << " ***" << std::endl;
+
         scfControls.dampParam = 0.;
 
       } else if( scfControls.doDamp and largeEDiff and 
                  scfControls.dampParam <= 0.) {
 
-        std::cout << "    *** Damping Enabled Due to "<<
-          scfControls.dampError << " Oscillation in Energy ***" << std::endl;
+        if( printLevel > 0 )
+          std::cout << "    *** Damping Enabled Due to "<<
+            scfControls.dampError << " Oscillation in Energy ***" << std::endl;
+
         scfControls.dampParam = scfControls.dampStartParam;
 
       }

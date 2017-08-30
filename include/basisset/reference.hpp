@@ -61,7 +61,7 @@ namespace ChronusQ {
   
     // Functions to digest the basis set file
     // See src/basisset/reference.cxx for documentation
-    void findBasisFile();
+    void findBasisFile(bool doPrint = true);
     void parseBasisFile();
   
   public:
@@ -88,10 +88,10 @@ namespace ChronusQ {
      *  \param [in] path      Full path to basis file
      *  \param [in] forceCart Whether or not to force cartesian GTOs
      */ 
-    ReferenceBasisSet(const std::string &path, bool forceCart = false) : 
-      basisPath_(path), forceCart_(forceCart){
+    ReferenceBasisSet(const std::string &path, bool forceCart = false,
+      bool doPrint = true) : basisPath_(path), forceCart_(forceCart){
   
-      findBasisFile();
+      findBasisFile(doPrint);
       parseBasisFile();
     }
   

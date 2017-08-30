@@ -45,7 +45,7 @@ namespace ChronusQ {
     scfControls.dampParam = scfControls.dampStartParam;
     scfControls.doIncFock = scfControls.doIncFock and (aoints.cAlg == DIRECT);
 
-    printSCFHeader(std::cout);
+    if( printLevel > 0 ) printSCFHeader(std::cout);
 
     for( scfConv.nSCFIter = 0; scfConv.nSCFIter < scfControls.maxSCFIter; 
          scfConv.nSCFIter++) {
@@ -64,7 +64,7 @@ namespace ChronusQ {
       isConverged = evalConver();
 
       // Print out iteration information
-      printSCFProg(std::cout);
+      if( printLevel > 0 ) printSCFProg(std::cout);
 
     }; // Iteration loop
 
@@ -79,14 +79,15 @@ namespace ChronusQ {
       CErr(std::string("SCF Failed to converged within ") + 
         std::to_string(scfControls.maxSCFIter) + 
         std::string(" iterations"));
-    else {
+    else if( printLevel > 0 ) {
       std::cout << std::endl << "SCF Completed: E("
                 << refShortName_ << ") = " << std::fixed
                 << std::setprecision(10) << this->totalEnergy
                 << " Eh after " << scfConv.nSCFIter
                 << " SCF Iterations" << std::endl;
     }
-    std::cout << BannerEnd << std::endl;
+
+    if( printLevel > 0 ) std::cout << BannerEnd << std::endl;
     
   }; // SingleSlater<T>::SCF()
 
