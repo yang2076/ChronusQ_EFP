@@ -154,9 +154,11 @@ namespace ChronusQ {
     // (see include/singleslater/quantum.hpp for docs)
     void formDensity();
     void computeEnergy();
+    void computeMultipole(EMPerturbation &);
+    void computeSpin();
 
     // Form a fock matrix (see include/singleslater/fock.hpp for docs)
-    virtual void formFock(bool increment = false, double xHFX = 1.);
+    virtual void formFock(EMPerturbation &, bool increment = false, double xHFX = 1.);
     void formGD(bool increment = false, double xHFX = 1.);
 
     // Form initial guess orbitals
@@ -176,10 +178,10 @@ namespace ChronusQ {
     void ortho2aoDen();
 
     // Evaluate convergence
-    bool evalConver();
+    bool evalConver(EMPerturbation &);
 
     // Obtain new orbitals
-    void getNewOrbitals(bool frmFock = true);
+    void getNewOrbitals(EMPerturbation &, bool frmFock = true);
 
     // Misc procedural
     void diagOrthoFock();

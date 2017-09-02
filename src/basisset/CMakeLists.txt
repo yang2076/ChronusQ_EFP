@@ -30,3 +30,6 @@ endif()
 list(APPEND CQEX_LINK basisset)
 set(CQEX_LINK ${CQEX_LINK} PARENT_SCOPE)
 
+if(CQEX_DEP)
+  add_dependencies(basisset ${CQEX_DEP})
+endif()

@@ -32,3 +32,6 @@ endif()
 list(APPEND CQEX_LINK aointegrals)
 set(CQEX_LINK ${CQEX_LINK} PARENT_SCOPE)
 
+if(CQEX_DEP)
+  add_dependencies(aointegrals ${CQEX_DEP})
+endif()

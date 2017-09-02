@@ -42,6 +42,7 @@ BOOST_FIXTURE_TEST_CASE( Water_6311pGdp_cart, SerialJob ) {
  
 };
 
+
 #ifdef _CQ_DO_PARTESTS
 
 // SMP Water 6-311+G(d,p) (Spherical) test
@@ -51,6 +52,7 @@ BOOST_FIXTURE_TEST_CASE( PAR_Water_6311pGdp_sph, ParallelJob ) {
     water_6-311+Gdp_sph_x2c.bin.ref );
  
 };
+
 
 #endif
 

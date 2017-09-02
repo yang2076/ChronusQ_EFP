@@ -39,7 +39,7 @@ namespace ChronusQ {
    *  Populates / overwrites fock strorage
    */ 
   template <typename T>
-  void SingleSlater<T>::formFock(bool increment, double xHFX) {
+  void SingleSlater<T>::formFock(EMPerturbation &pert, bool increment, double xHFX) {
 
     size_t NB = aoints.basisSet().nBasis;
     size_t NB2 = NB*NB;
@@ -59,6 +59,16 @@ namespace ChronusQ {
     for(auto i = 0ul; i < fock.size(); i++)
       MatAdd('N','N', NB, NB, T(1.), fock[i], NB, T(1.), GD[i], NB,
         fock[i], NB);
+
+
+    if(pert.fields.size() != 0) {
+      auto dipole = pert.getAmp();
+
+      for(auto iXYZ = 0; iXYZ < 3; iXYZ++)
+        if(std::abs(dipole[iXYZ]) > 1e-10)
+          MatAdd('N','N', NB, NB, T(1.), fock[0], NB, T(-2*dipole[iXYZ]), 
+            this->aoints.lenElecDipole[iXYZ], NB, fock[0], NB);
+    };
 
 #if 0
     printFock(std::cout);
@@ -90,7 +100,8 @@ namespace ChronusQ {
     }
 
     // Zero out J
-    if(not increment) memset(JContract,0,NB2*sizeof(T));
+    if(not increment or not std::is_same<double,T>::value)
+      memset(JContract,0,NB2*sizeof(T));
 
     std::vector<TwoBodyContraction<T,T>> contract =
       { {contract1PDM[SCALAR], JContract, true, COULOMB} };

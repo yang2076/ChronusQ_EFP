@@ -27,6 +27,7 @@
 #include <chronusq_sys.hpp>
 #include <wavefunction/base.hpp>
 
+#include <fields.hpp>
 #include <util/files.hpp>
 
 namespace ChronusQ {
@@ -150,7 +151,7 @@ namespace ChronusQ {
       
     // In essence, all derived classes should be able to:
     //   1. Form a Fock matrix with the ability to increment
-    virtual void formFock(bool increment = false, double xHFX = 1.) = 0;
+    virtual void formFock(EMPerturbation &, bool increment = false, double xHFX = 1.) = 0;
 
     //   2. Form an initial Guess (which populates the Fock, Density 
     //     and energy)
@@ -158,7 +159,7 @@ namespace ChronusQ {
 
     //   3. Obtain a new set of orbitals / densities from current
     //      set of densities
-    virtual void getNewOrbitals(bool frmFock = true) = 0;
+    virtual void getNewOrbitals(EMPerturbation &, bool frmFock = true) = 0;
 
     //   4. Save the current state of the wave function
     virtual void saveCurrentState() = 0;
@@ -170,10 +171,10 @@ namespace ChronusQ {
     //   6. Evaluate SCF convergence. This function should populate the
     //      SingleSlaterBase::scfConv variable and compare it to the 
     //      SingleSlaterBase::scfControls variable to evaluate convergence
-    virtual bool evalConver() = 0;
+    virtual bool evalConver(EMPerturbation &) = 0;
 
     //   7. Print SCF header, footer and progress
-    void printSCFHeader(std::ostream &out = std::cout);
+    void printSCFHeader(std::ostream &out, EMPerturbation &);
     void printSCFProg(std::ostream &out = std::cout);
 
     //   8. Initialize and finalize the SCF environment
@@ -190,7 +191,7 @@ namespace ChronusQ {
     // Procedural Functions to be shared among all derived classes
       
     // Perform an SCF procedure (see include/singleslater/scf.hpp for docs)
-    void SCF();
+    void SCF(EMPerturbation &);
 
   }; // class SingleSlaterBase
 

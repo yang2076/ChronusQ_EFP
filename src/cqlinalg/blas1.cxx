@@ -138,6 +138,30 @@ namespace ChronusQ {
   }; // InnerProd real = (complex,complex)
 
 
+  template <>
+  void Swap(int N, double *X, int INCX, double *Y, int INCY) {
+#ifdef _CQ_MKL
+    dswap
+#else
+    dswap_
+#endif
+      (&N,X,&INCX,Y,&INCY);
+
+  }; // Swap (double)
+
+  template <>
+  void Swap(int N, dcomplex *X, int INCX, dcomplex *Y, int INCY) {
+#ifdef _CQ_MKL
+    zswap(&N,X,&INCX,Y,&INCY);
+#else
+    zswap_(&N,reinterpret_cast<double*>(X),&INCX,
+      reinterpret_cast<double*>(Y),&INCY);
+#endif
+
+  }; // Swap (complex)
+
+
+
 
   template<>
   double TwoNorm(int N, double *X, int INCX) {

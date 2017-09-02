@@ -141,7 +141,9 @@ namespace ChronusQ {
     double *dMzdX, double *dMzdY, double *dMzdZ, 
     double *dMydX, double *dMydY, double *dMydZ, 
     double *dMxdX, double *dMxdY, double *dMxdZ, 
-    double *nColl, double *gammaColl){
+    double *Mnorm, double *Kx, double *Ky, double *Kz, 
+    double *Hx, double *Hy, double *Hz,
+    bool *Msmall, double *nColl, double *gammaColl){
 
 #if VXC_DEBUG_LEVEL > 3
     prettyPrintSmart(std::cerr,"Scalar Den   ",Scalar,NPts,1, NPts);
@@ -171,7 +173,7 @@ namespace ChronusQ {
     }
 #endif
 
-    // FIXME: Generalize for 2C
+    double tmp = 0.;
     double *uPlus  = nColl;
     double *uMinus = nColl + 1;
     memset(nColl,0,2*NPts*sizeof(double));
@@ -180,53 +182,153 @@ namespace ChronusQ {
     // LDA contributions
     // U(+) = 0.5 * (SCALAR + MZ)
     // U(-) = 0.5 * (SCALAR - MZ)
+    // 2C See J. Chem. Theory Comput. 2017, 13, 2591-2603  
+    // U(+) = 0.5 * (SCALAR + |M| )
+    // U(-) = 0.5 * (SCALAR - |M| )
          
     DaxPy(NPts,0.5,Scalar,1,uPlus,2);
     DaxPy(NPts,0.5,Scalar,1,uMinus,2);
 
-    bool skypMz = false;
-    if( not this->iCS ) {
+    bool skipMz = false;
+    if( this->onePDM.size() == 2 ) {
+    // UKS
 #if VXC_DEBUG_LEVEL < 3
       double MaxDenZ = *std::max_element(Mz,Mz+NPts);
-      if (MaxDenZ < epsScreen) skypMz = true;
+      if (MaxDenZ < epsScreen) skipMz = true;
 #endif
-        if(not skypMz){
+        if(not skipMz){
           DaxPy(NPts,0.5,Mz,1,uPlus,2);
           DaxPy(NPts,-0.5,Mz,1,uMinus,2);
         }
-    }
-
 #if VXC_DEBUG_LEVEL >= 3
-    if(skypMz) std::cerr << "Skypped Mz " << std::endl;
+      if(skipMz) std::cerr << "Skypped Mz " << std::endl;
 #endif
+    }  else if ( this->onePDM.size() > 2) {
+      std::fill_n(Msmall,NPts,0.);
+    // 2C
+    // 2C See J. Chem. Theory Comput. 2017, 13, 2591-2603  
+     //Compute and store Mtot
+      for(auto iPt = 0; iPt < NPts; iPt++) {
+        tmp =  Mx[iPt] * Mx[iPt];
+        tmp += My[iPt] * My[iPt];
+        tmp += Mz[iPt] * Mz[iPt];
+        if (tmp > 1.e-24) {
 
+          Mnorm[iPt] = std::sqrt(tmp);
+          Kx[iPt]    = Mx[iPt] / Mnorm[iPt];
+          Ky[iPt]    = My[iPt] / Mnorm[iPt];
+          Kz[iPt]    = Mz[iPt] / Mnorm[iPt];
 
+        } else {
+
+          Msmall[iPt] = true; 
+          Mnorm[iPt]  = (1./3.) * (Mx[iPt] + My[iPt] + Mz[iPt]);
+          Kx[iPt]    = 1. / 3.;
+          Ky[iPt]    = 1. / 3.;
+          Kz[iPt]    = 1. / 3.;
+        }
+
+      }
+          DaxPy(NPts,0.5,Mnorm,1,uPlus,2);
+          DaxPy(NPts,-0.5,Mnorm,1,uMinus,2);
+
+    }
 
     // GGA Contributions
     // GAMMA(++) = 0.25 * (GSCALAR.GSCALAR + GMZ.GMZ) + 0.5 * GSCALAR.GMZ
     // GAMMA(+-) = 0.25 * (GSCALAR.GSCALAR - GMZ.GMZ) 
     // GAMMA(--) = 0.25 * (GSCALAR.GSCALAR + GMZ.GMZ) - 0.5 * GSCALAR.GMZ
-    if(isGGA)
-    for(auto iPt = 0; iPt < NPts; iPt++) {
-      gammaColl[3*iPt] = 0.25 *  (dndX[iPt]*dndX[iPt] + dndY[iPt]*dndY[iPt] + dndZ[iPt]*dndZ[iPt]);
-      gammaColl[3*iPt+1] = gammaColl[3*iPt]; 
-      gammaColl[3*iPt+2] = gammaColl[3*iPt];
-      if( not this->iCS ) {
-        if( not skypMz ) {
-          double inner  = 0.25 * 
-            (dMzdX[iPt]*dMzdX[iPt] + dMzdY[iPt]*dMzdY[iPt] + dMzdZ[iPt]*dMzdZ[iPt]);
-          double inner2 = 0.5  * 
-            (dMzdX[iPt]*dndX[iPt] + dMzdY[iPt]*dndY[iPt] + dMzdZ[iPt]*dndZ[iPt]);
-  
+    //2C
+    // 2C See J. Chem. Theory Comput. 2017, 13, 2591-2603  
+    // GAMMA(++) = 0.25 * (GSCALAR.GSCALAR + SUM_K GMK.GMK) + 0.5 * SING * SQRT(SUM_K (GSCALAR.GMK)^2)
+    // GAMMA(+-) = 0.25 * (GSCALAR.GSCALAR - SUM_K (GMZ.GMK) ) 
+    // GAMMA(--) = 0.25 * (GSCALAR.GSCALAR + SUM_K GMK.GMK) - 0.5 * SIGN * SQRT(SUM_K (GSCALAR.GMK)^2)
+
+    if(isGGA) {
+      // RKS part
+      for(auto iPt = 0; iPt < NPts; iPt++) {
+        gammaColl[3*iPt] = 0.25 *  (dndX[iPt]*dndX[iPt] + dndY[iPt]*dndY[iPt] + dndZ[iPt]*dndZ[iPt]);
+        gammaColl[3*iPt+1] = gammaColl[3*iPt]; 
+        gammaColl[3*iPt+2] = gammaColl[3*iPt];
+      }
+
+      if( this->onePDM.size() == 2 ) {
+      // UKS
+        for(auto iPt = 0; iPt < NPts; iPt++) {
+          if( not skipMz ) {
+            double inner  = 0.25 * 
+              (dMzdX[iPt]*dMzdX[iPt] + dMzdY[iPt]*dMzdY[iPt] + dMzdZ[iPt]*dMzdZ[iPt]);
+            double inner2 = 0.5  * 
+              (dMzdX[iPt]*dndX[iPt] + dMzdY[iPt]*dndY[iPt] + dMzdZ[iPt]*dndZ[iPt]);
+      
+            gammaColl[3*iPt]   += inner;
+            gammaColl[3*iPt+1] -= inner;
+            gammaColl[3*iPt+2] += inner;
+      
+            gammaColl[3*iPt]   += inner2;
+            gammaColl[3*iPt+2] -= inner2;
+          }
+        } // loop pts
+
+      }  else if ( this->onePDM.size() > 2) {
+      // 2C See J. Chem. Theory Comput. 2017, 13, 2591-2603  
+        double tmpnMx, tmpnMy, tmpnMz;
+        double tmpSign, inner, inner2;
+
+        for(auto iPt = 0; iPt < NPts; iPt++) {
+          double signMD = 1. ;
+          tmpnMx       = dMxdX[iPt]*dndX[iPt];
+          tmpnMx      += dMxdY[iPt]*dndY[iPt];
+          tmpnMx      += dMxdZ[iPt]*dndZ[iPt];
+          
+          tmpnMy       = dMydX[iPt]*dndX[iPt];
+          tmpnMy      += dMydY[iPt]*dndY[iPt];
+          tmpnMy      += dMydZ[iPt]*dndZ[iPt];
+          
+          tmpnMz       = dMzdX[iPt]*dndX[iPt];
+          tmpnMz      += dMzdY[iPt]*dndY[iPt];
+          tmpnMz      += dMzdZ[iPt]*dndZ[iPt];
+          
+          tmpSign   = tmpnMx * Mx[iPt];
+          tmpSign  += tmpnMy * My[iPt];
+          tmpSign  += tmpnMz * Mz[iPt];
+          if ( std::signbit(tmpSign) ) signMD = -1.;
+          //std::cerr <<"Sig " << tmpSign << " " << std::signbit(tmpSign) << " " << signMD <<std::endl;
+          inner  = 
+               (dMxdX[iPt]*dMxdX[iPt] + dMxdY[iPt]*dMxdY[iPt] + dMxdZ[iPt]*dMxdZ[iPt]);
+          inner += 
+               (dMydX[iPt]*dMydX[iPt] + dMydY[iPt]*dMydY[iPt] + dMydZ[iPt]*dMydZ[iPt]);
+          inner += 
+               (dMzdX[iPt]*dMzdX[iPt] + dMzdY[iPt]*dMzdY[iPt] + dMzdZ[iPt]*dMzdZ[iPt]);
+          inner *= 0.25;
+          
+          double DSDMnorm = 0.0;
+          if (Msmall[iPt]) {
+            DSDMnorm  = (1./3.) * (tmpnMx + tmpnMy +tmpnMz);
+            //DSDMnorm[iPt]  = std::sqrt(tmpnMx * tmpnMx + tmpnMy * tmpnMy + tmpnMz * tmpnMz);
+            Hx[iPt]        = (1./3.) * signMD ;
+            Hy[iPt]        = Hx[iPt] ;
+            Hz[iPt]        = Hx[iPt] ;
+          } else {
+            DSDMnorm  = std::sqrt(tmpnMx * tmpnMx + tmpnMy * tmpnMy + tmpnMz * tmpnMz);
+            Hx[iPt]        = (tmpnMx * signMD) / DSDMnorm;
+            Hy[iPt]        = (tmpnMy * signMD) / DSDMnorm;
+            Hz[iPt]        = (tmpnMz * signMD) / DSDMnorm;
+          }
+ 
+          inner2 = 0.5  *  DSDMnorm * signMD ;
+          
           gammaColl[3*iPt]   += inner;
           gammaColl[3*iPt+1] -= inner;
           gammaColl[3*iPt+2] += inner;
-  
+      
           gammaColl[3*iPt]   += inner2;
           gammaColl[3*iPt+2] -= inner2;
-        }
-      }
-    }
+
+
+        } // loop pts
+      } // 2C 
+    } //GGA 
 
   }; //KohnSham<T>::mkAuxVar
 
@@ -317,7 +419,7 @@ namespace ChronusQ {
 
     for(auto iPt = 0; iPt < NPts; iPt++)  
       XCEnergy += weights[iPt] * epsEval[iPt] * DenS[iPt];
-
+     // std::cerr << "XCEnergy " << XCEnergy << std::endl;
     return XCEnergy;
 
   };// KohnSham<T>::energy_vxc
@@ -474,11 +576,13 @@ namespace ChronusQ {
    *  Note. See Documentations of constructZVars.
    */  
   template <typename T>
-  void KohnSham<T>::formZ_vxc(bool isGGA, size_t NPts, size_t NBE, size_t IOff, 
+  void KohnSham<T>::formZ_vxc(DENSITY_TYPE denTyp, bool isGGA, size_t NPts, size_t NBE, size_t IOff, 
     double epsScreen, std::vector<double> &weights, double *ZrhoVar1,
     double *ZgammaVar1, double *ZgammaVar2, 
     double *DenS, double *DenZ, double *DenY, double *DenX, 
     double *GDenS, double *GDenZ, double *GDenY, double *GDenX, 
+    double *Kx, double *Ky, double *Kz, 
+    double *Hx, double *Hy, double *Hz,
     double *BasisScratch, double *ZMAT){
 
     double Fg;
@@ -489,45 +593,219 @@ namespace ChronusQ {
 
     memset(ZMAT,0,IOff*sizeof(double));
 
-    for(auto iPt = 0; iPt < NPts; iPt++) { 
+    if( this->onePDM.size() <= 2 ) {
+      for(auto iPt = 0; iPt < NPts; iPt++) { 
       // LDA part -> Eq. 15 and 16 (see constructZVars docs for the missing factor of 0.5)
-      Fg = weights[iPt] * ZrhoVar1[iPt];
+        Fg = weights[iPt] * ZrhoVar1[iPt];
 
 #if VXC_DEBUG_LEVEL < 3
-      if(std::abs(Fg) > epsScreen)
+        if(std::abs(Fg) > epsScreen)
 #endif
-        DaxPy(NBE,Fg,BasisScratch + iPt*NBE,1,ZMAT+iPt*NBE,1);
+          DaxPy(NBE,Fg,BasisScratch + iPt*NBE,1,ZMAT+iPt*NBE,1);
 
       // GGA part -> Eq. 15 and 17 (see constructZVars docs for the missing factor of 2)
-      if( isGGA ) {
-        FgX = weights[iPt] * ZgammaVar1[iPt] * GDenS[iPt];
-        if( this->onePDM.size() > 1 ) 
-          FgX += weights[iPt] * ZgammaVar2[iPt] * GDenZ[iPt];
+        if( isGGA ) {
+          FgX = weights[iPt] * ZgammaVar1[iPt] * GDenS[iPt];
+          if( this->onePDM.size() > 1 ) 
+            FgX += weights[iPt] * ZgammaVar2[iPt] * GDenZ[iPt];
 
-        FgY = weights[iPt] * ZgammaVar1[iPt] * GDenS[iPt + NPts];
-        if( this->onePDM.size() > 1 ) 
-          FgY += weights[iPt] * ZgammaVar2[iPt] * GDenZ[iPt + NPts];
+          FgY = weights[iPt] * ZgammaVar1[iPt] * GDenS[iPt + NPts];
+          if( this->onePDM.size() > 1 ) 
+            FgY += weights[iPt] * ZgammaVar2[iPt] * GDenZ[iPt + NPts];
 
-        FgZ = weights[iPt] * ZgammaVar1[iPt] * GDenS[iPt + 2*NPts];
-        if( this->onePDM.size() > 1 ) 
-          FgZ += weights[iPt] * ZgammaVar2[iPt] * GDenZ[iPt + 2*NPts];
-
-#if VXC_DEBUG_LEVEL < 3
-        if(std::abs(FgX) > epsScreen)
-#endif
-          DaxPy(NBE,FgX,BasisScratch + iPt*NBE + IOff,1,ZMAT+iPt*NBE,1);
+          FgZ = weights[iPt] * ZgammaVar1[iPt] * GDenS[iPt + 2*NPts];
+          if( this->onePDM.size() > 1 ) 
+            FgZ += weights[iPt] * ZgammaVar2[iPt] * GDenZ[iPt + 2*NPts];
 
 #if VXC_DEBUG_LEVEL < 3
-        if(std::abs(FgY) > epsScreen)
+          if(std::abs(FgX) > epsScreen)
 #endif
-          DaxPy(NBE,FgY,BasisScratch + iPt*NBE + 2*IOff,1,ZMAT+iPt*NBE,1);
+            DaxPy(NBE,FgX,BasisScratch + iPt*NBE + IOff,1,ZMAT+iPt*NBE,1);
 
 #if VXC_DEBUG_LEVEL < 3
-        if(std::abs(FgZ) > epsScreen)
+          if(std::abs(FgY) > epsScreen)
 #endif
-          DaxPy(NBE,FgZ,BasisScratch + iPt*NBE + 3*IOff,1,ZMAT+iPt*NBE,1);
+            DaxPy(NBE,FgY,BasisScratch + iPt*NBE + 2*IOff,1,ZMAT+iPt*NBE,1);
+
+#if VXC_DEBUG_LEVEL < 3
+          if(std::abs(FgZ) > epsScreen)
+#endif
+            DaxPy(NBE,FgZ,BasisScratch + iPt*NBE + 3*IOff,1,ZMAT+iPt*NBE,1);
+        }
       }
-    }
+
+    } else {
+      //2C
+      // 2C See J. Chem. Theory Comput. 2017, 13, 2591-2603  
+      if( denTyp == SCALAR) {
+        // SCALAR
+
+        for(auto iPt = 0; iPt < NPts; iPt++) { 
+      // LDA part -> Eq. 15 and 16 (see constructZVars docs for the missing factor of 0.5)
+          Fg = weights[iPt] * ZrhoVar1[iPt];
+
+#if VXC_DEBUG_LEVEL < 3
+          if(std::abs(Fg) > epsScreen)
+#endif
+            DaxPy(NBE,Fg,BasisScratch + iPt*NBE,1,ZMAT+iPt*NBE,1);
+
+        // GGA part -> Eq. 15 and 17 (see constructZVars docs for the missing factor of 2)
+          if( isGGA ) {
+            FgX  = weights[iPt] * ZgammaVar1[iPt] * GDenS[iPt];
+            FgX += weights[iPt] * ZgammaVar2[iPt] * Hx[iPt] * GDenX[iPt];
+            FgX += weights[iPt] * ZgammaVar2[iPt] * Hy[iPt] * GDenY[iPt];
+            FgX += weights[iPt] * ZgammaVar2[iPt] * Hz[iPt] * GDenZ[iPt];
+  
+            FgY  = weights[iPt] * ZgammaVar1[iPt] * GDenS[iPt + NPts];
+            FgY += weights[iPt] * ZgammaVar2[iPt] * Hx[iPt] * GDenX[iPt + NPts];
+            FgY += weights[iPt] * ZgammaVar2[iPt] * Hy[iPt] * GDenY[iPt + NPts];
+            FgY += weights[iPt] * ZgammaVar2[iPt] * Hz[iPt] * GDenZ[iPt + NPts];
+  
+            FgZ  = weights[iPt] * ZgammaVar1[iPt] * GDenS[iPt + 2*NPts];
+            FgZ += weights[iPt] * ZgammaVar2[iPt] * Hx[iPt] * GDenX[iPt + 2*NPts];
+            FgZ += weights[iPt] * ZgammaVar2[iPt] * Hy[iPt] * GDenY[iPt + 2*NPts];
+            FgZ += weights[iPt] * ZgammaVar2[iPt] * Hz[iPt] * GDenZ[iPt + 2*NPts];
+
+#if VXC_DEBUG_LEVEL < 3
+            if(std::abs(FgX) > epsScreen)
+#endif
+              DaxPy(NBE,FgX,BasisScratch + iPt*NBE + IOff,1,ZMAT+iPt*NBE,1);
+
+#if VXC_DEBUG_LEVEL < 3
+            if(std::abs(FgY) > epsScreen)
+#endif
+              DaxPy(NBE,FgY,BasisScratch + iPt*NBE + 2*IOff,1,ZMAT+iPt*NBE,1);
+
+#if VXC_DEBUG_LEVEL < 3
+            if(std::abs(FgZ) > epsScreen)
+#endif
+              DaxPy(NBE,FgZ,BasisScratch + iPt*NBE + 3*IOff,1,ZMAT+iPt*NBE,1);
+          }
+        } // loop over Pts
+
+      } else if (denTyp == MX) {
+
+        // MX
+        for(auto iPt = 0; iPt < NPts; iPt++) { 
+      // LDA part -> Eq. 15 and 16 (see constructZVars docs for the missing factor of 0.5)
+          Fg = weights[iPt] * ZrhoVar1[iPt] * Kx[iPt];
+
+#if VXC_DEBUG_LEVEL < 3
+          if(std::abs(Fg) > epsScreen)
+#endif
+            DaxPy(NBE,Fg,BasisScratch + iPt*NBE,1,ZMAT+iPt*NBE,1);
+
+        // GGA part -> Eq. 15 and 17 (see constructZVars docs for the missing factor of 2)
+          if( isGGA ) {
+            FgX  = weights[iPt] * ZgammaVar1[iPt] * Hx[iPt] * GDenS[iPt];
+            FgX += weights[iPt] * ZgammaVar2[iPt] * GDenX[iPt];
+  
+            FgY  = weights[iPt] * ZgammaVar1[iPt] * Hx[iPt] * GDenS[iPt + NPts];
+            FgY += weights[iPt] * ZgammaVar2[iPt] * GDenX[iPt + NPts];
+  
+            FgZ  = weights[iPt] * ZgammaVar1[iPt] * Hx[iPt] * GDenS[iPt + 2*NPts];
+            FgZ += weights[iPt] * ZgammaVar2[iPt] * GDenX[iPt + 2*NPts];
+
+#if VXC_DEBUG_LEVEL < 3
+            if(std::abs(FgX) > epsScreen)
+#endif
+              DaxPy(NBE,FgX,BasisScratch + iPt*NBE + IOff,1,ZMAT+iPt*NBE,1);
+
+#if VXC_DEBUG_LEVEL < 3
+            if(std::abs(FgY) > epsScreen)
+#endif
+              DaxPy(NBE,FgY,BasisScratch + iPt*NBE + 2*IOff,1,ZMAT+iPt*NBE,1);
+
+#if VXC_DEBUG_LEVEL < 3
+            if(std::abs(FgZ) > epsScreen)
+#endif
+              DaxPy(NBE,FgZ,BasisScratch + iPt*NBE + 3*IOff,1,ZMAT+iPt*NBE,1);
+          }
+        } // loop over Pts
+
+      } else if (denTyp == MY) {
+
+        // MY
+        for(auto iPt = 0; iPt < NPts; iPt++) { 
+      // LDA part -> Eq. 15 and 16 (see constructZVars docs for the missing factor of 0.5)
+          Fg = weights[iPt] * ZrhoVar1[iPt] * Ky[iPt];
+
+#if VXC_DEBUG_LEVEL < 3
+          if(std::abs(Fg) > epsScreen)
+#endif
+            DaxPy(NBE,Fg,BasisScratch + iPt*NBE,1,ZMAT+iPt*NBE,1);
+
+        // GGA part -> Eq. 15 and 17 (see constructZVars docs for the missing factor of 2)
+          if( isGGA ) {
+            FgX  = weights[iPt] * ZgammaVar1[iPt] * Hy[iPt] * GDenS[iPt];
+            FgX += weights[iPt] * ZgammaVar2[iPt] * GDenY[iPt];
+  
+            FgY  = weights[iPt] * ZgammaVar1[iPt] * Hy[iPt] * GDenS[iPt + NPts];
+            FgY += weights[iPt] * ZgammaVar2[iPt] * GDenY[iPt + NPts];
+  
+            FgZ  = weights[iPt] * ZgammaVar1[iPt] * Hy[iPt] * GDenS[iPt + 2*NPts];
+            FgZ += weights[iPt] * ZgammaVar2[iPt] * GDenY[iPt + 2*NPts];
+
+#if VXC_DEBUG_LEVEL < 3
+            if(std::abs(FgX) > epsScreen)
+#endif
+              DaxPy(NBE,FgX,BasisScratch + iPt*NBE + IOff,1,ZMAT+iPt*NBE,1);
+
+#if VXC_DEBUG_LEVEL < 3
+            if(std::abs(FgY) > epsScreen)
+#endif
+              DaxPy(NBE,FgY,BasisScratch + iPt*NBE + 2*IOff,1,ZMAT+iPt*NBE,1);
+
+#if VXC_DEBUG_LEVEL < 3
+            if(std::abs(FgZ) > epsScreen)
+#endif
+              DaxPy(NBE,FgZ,BasisScratch + iPt*NBE + 3*IOff,1,ZMAT+iPt*NBE,1);
+          }
+        } // loop over Pts
+
+      } else if (denTyp == MZ) {
+
+        // MZ
+        for(auto iPt = 0; iPt < NPts; iPt++) { 
+      // LDA part -> Eq. 15 and 16 (see constructZVars docs for the missing factor of 0.5)
+          Fg = weights[iPt] * ZrhoVar1[iPt] * Kz[iPt];
+
+#if VXC_DEBUG_LEVEL < 3
+          if(std::abs(Fg) > epsScreen)
+#endif
+            DaxPy(NBE,Fg,BasisScratch + iPt*NBE,1,ZMAT+iPt*NBE,1);
+
+        // GGA part -> Eq. 15 and 17 (see constructZVars docs for the missing factor of 2)
+          if( isGGA ) {
+            FgX  = weights[iPt] * ZgammaVar1[iPt] * Hz[iPt] * GDenS[iPt];
+            FgX += weights[iPt] * ZgammaVar2[iPt] * GDenZ[iPt];
+  
+            FgY  = weights[iPt] * ZgammaVar1[iPt] * Hz[iPt] * GDenS[iPt + NPts];
+            FgY += weights[iPt] * ZgammaVar2[iPt] * GDenZ[iPt + NPts];
+  
+            FgZ  = weights[iPt] * ZgammaVar1[iPt] * Hz[iPt] * GDenS[iPt + 2*NPts];
+            FgZ += weights[iPt] * ZgammaVar2[iPt] * GDenZ[iPt + 2*NPts];
+
+#if VXC_DEBUG_LEVEL < 3
+            if(std::abs(FgX) > epsScreen)
+#endif
+              DaxPy(NBE,FgX,BasisScratch + iPt*NBE + IOff,1,ZMAT+iPt*NBE,1);
+
+#if VXC_DEBUG_LEVEL < 3
+            if(std::abs(FgY) > epsScreen)
+#endif
+              DaxPy(NBE,FgY,BasisScratch + iPt*NBE + 2*IOff,1,ZMAT+iPt*NBE,1);
+
+#if VXC_DEBUG_LEVEL < 3
+            if(std::abs(FgZ) > epsScreen)
+#endif
+              DaxPy(NBE,FgZ,BasisScratch + iPt*NBE + 3*IOff,1,ZMAT+iPt*NBE,1);
+          }  
+        } // loop over Pts
+
+      } //MZ
+
+    } //end 2C
 
   }; // KohnSham<T>::formZ_vxc
 
@@ -611,7 +889,10 @@ namespace ChronusQ {
     double *SCRATCHNBNP  = 
       this->memManager.template malloc<double>(nthreads*NPtsMaxPerBatch*NB); 
 
-    double *DenS, *DenZ, *DenX, *DenY;
+    double *DenS, *DenZ, *DenX, *DenY, *Mnorm ;
+    double *KScratch;
+    double *HScratch;
+    bool   *Msmall;
     DenS = this->memManager.template malloc<double>(nthreads*NPtsMaxPerBatch);
 
     if( this->onePDM.size() > 1 )
@@ -620,6 +901,10 @@ namespace ChronusQ {
     if( this->onePDM.size() > 2 ) {
       DenY = this->memManager.template malloc<double>(nthreads*NPtsMaxPerBatch);
       DenX = this->memManager.template malloc<double>(nthreads*NPtsMaxPerBatch);
+
+      Mnorm    = this->memManager.template malloc<double>(nthreads*NPtsMaxPerBatch);
+      KScratch = this->memManager.template malloc<double>(3*nthreads*NPtsMaxPerBatch);
+      Msmall   = this->memManager.template malloc<bool>(nthreads*NPtsMaxPerBatch);
     }
 
     double *epsEval = this->memManager.template malloc<double>(nthreads*NPtsMaxPerBatch);
@@ -646,6 +931,7 @@ namespace ChronusQ {
       if( this->onePDM.size() > 2 ) {
         GDenY = this->memManager.template malloc<double>(3*nthreads*NPtsMaxPerBatch);
         GDenX = this->memManager.template malloc<double>(3*nthreads*NPtsMaxPerBatch);
+        HScratch = this->memManager.template malloc<double>(3*nthreads*NPtsMaxPerBatch);
       }
 
       // Gamma U-Variables
@@ -664,6 +950,19 @@ namespace ChronusQ {
  
     // ZMatrix
     double *ZMAT = this->memManager.template malloc<double>(nthreads*NPtsMaxPerBatch*NB);
+ 
+    // Decide if we need to allocate space for real part of the densities
+    // and copy over the real parts
+    std::vector<double*> Re1PDM;
+    for(auto i = 0; i < this->onePDM.size(); i++) {
+      if( std::is_same<T,double>::value )
+        Re1PDM.push_back(reinterpret_cast<double*>(this->onePDM[i]));
+      else {
+        Re1PDM.push_back(this->memManager.template malloc<double>(NB*NB));
+        GetMatRE('N',NB,NB,1.,this->onePDM[i],NB,Re1PDM.back(),NB);
+      }
+    }
+ 
 
     // ---------------------------------------------------------------------//
     // End allocating Memory
@@ -728,6 +1027,7 @@ namespace ChronusQ {
       double * U_gamma_loc   = U_gamma   + thread_id * 3*NPtsMaxPerBatch;
       double * dVU_gamma_loc = dVU_gamma + thread_id * 3*NPtsMaxPerBatch;
 
+
       double * ZrhoVar1_loc   = ZrhoVar1   + thread_id * NPtsMaxPerBatch;
       double * ZgammaVar1_loc = ZgammaVar1 + thread_id * NPtsMaxPerBatch;
       double * ZgammaVar2_loc = ZgammaVar2 + thread_id * NPtsMaxPerBatch;
@@ -738,9 +1038,15 @@ namespace ChronusQ {
 
       double *ZMAT_loc = ZMAT + thread_id * NB*NPtsMaxPerBatch;
 
+      //2C
+      double * Mnorm_loc    = Mnorm        + thread_id * NPtsMaxPerBatch;
+      double * KScratch_loc = KScratch     + 3* thread_id * NPtsMaxPerBatch;
+      bool   * Msmall_loc   = Msmall       + thread_id * NPtsMaxPerBatch;
+      double * HScratch_loc = HScratch     + 3* thread_id * NPtsMaxPerBatch;
+
       // This evaluates the V variables for all components (Scalar, MZ (UKS) and Mx, MY (2 Comp))
       evalDen((isGGA ? GRADIENT : NOGRAD), NPts, NBE, NB, subMatCut, 
-        SCRATCHNBNB_loc, SCRATCHNBNP_loc, this->onePDM[SCALAR], DenS_loc, 
+        SCRATCHNBNB_loc, SCRATCHNBNP_loc, Re1PDM[SCALAR], DenS_loc, 
         GDenS_loc, GDenS_loc + NPts, GDenS_loc + 2*NPts, BasisEval);
 
 #if VXC_DEBUG_LEVEL < 3
@@ -753,15 +1059,15 @@ namespace ChronusQ {
 
       if( this->onePDM.size() > 1 )
         evalDen((isGGA ? GRADIENT : NOGRAD), NPts, NBE, NB, subMatCut, 
-          SCRATCHNBNB_loc ,SCRATCHNBNP_loc, this->onePDM[MZ], DenZ_loc, GDenZ_loc, 
+          SCRATCHNBNB_loc ,SCRATCHNBNP_loc, Re1PDM[MZ], DenZ_loc, GDenZ_loc, 
           GDenZ_loc + NPts, GDenZ_loc + 2*NPts, BasisEval);
 
       if( this->onePDM.size() > 2 ) {
         evalDen((isGGA ? GRADIENT : NOGRAD), NPts, NBE, NB, subMatCut, 
-          SCRATCHNBNB_loc ,SCRATCHNBNP_loc, this->onePDM[MY], DenY_loc, GDenY_loc, 
+          SCRATCHNBNB_loc ,SCRATCHNBNP_loc, Re1PDM[MY], DenY_loc, GDenY_loc, 
           GDenY_loc + NPts, GDenY_loc + 2*NPts, BasisEval);
         evalDen((isGGA ? GRADIENT : NOGRAD), NPts, NBE, NB, subMatCut, 
-          SCRATCHNBNB_loc ,SCRATCHNBNP_loc, this->onePDM[MX], DenX_loc, GDenX_loc, 
+          SCRATCHNBNB_loc ,SCRATCHNBNP_loc, Re1PDM[MX], DenX_loc, GDenX_loc, 
           GDenX_loc + NPts, GDenX_loc + 2*NPts, BasisEval);
       }
 
@@ -778,7 +1084,9 @@ namespace ChronusQ {
         GDenZ_loc,GDenZ_loc + NPts,GDenZ_loc + 2*NPts,
         GDenY_loc,GDenY_loc + NPts,GDenY_loc + 2*NPts,
         GDenX_loc,GDenX_loc + NPts,GDenX_loc + 2*NPts,
-        U_n_loc,U_gamma_loc
+        Mnorm_loc, KScratch_loc, KScratch_loc + NPts, KScratch_loc + 2* NPts,
+        HScratch_loc, HScratch_loc + NPts, HScratch_loc + 2* NPts,
+        Msmall_loc,U_n_loc,U_gamma_loc
       );
 
 #if VXC_DEBUG_LEVEL >= 1
@@ -837,9 +1145,11 @@ namespace ChronusQ {
 #endif
 
       // Creating ZMAT (SCALAR) according J. Chem. Theory Comput. 2011, 7, 3097–3104 Eq. 15 
-      formZ_vxc(isGGA, NPts, NBE, IOff, epsScreen, weights, ZrhoVar1_loc, 
+      formZ_vxc(SCALAR,isGGA, NPts, NBE, IOff, epsScreen, weights, ZrhoVar1_loc, 
         ZgammaVar1_loc, ZgammaVar2_loc, DenS_loc, DenZ_loc, DenY_loc, DenX_loc, GDenS_loc, GDenZ_loc, GDenY_loc, 
-        GDenX_loc, BasisEval, ZMAT_loc);
+        GDenX_loc, KScratch_loc, KScratch_loc + NPts, KScratch_loc + 2* NPts,
+        HScratch_loc, HScratch_loc + NPts, HScratch_loc + 2* NPts,
+        BasisEval, ZMAT_loc);
 
 #if VXC_DEBUG_LEVEL >= 1
       // TIMING
@@ -852,7 +1162,7 @@ namespace ChronusQ {
       // Coarse screen on ZMat
       double MaxBasis = *std::max_element(BasisEval,BasisEval+IOff);
       double MaxZ     = *std::max_element(ZMAT_loc,ZMAT_loc+IOff);
-      evalZ = ((2 * MaxBasis * MaxZ) > epsScreen); 
+      evalZ = ( std::abs(2 * MaxBasis * MaxZ) > epsScreen); 
 #endif
 
       if (evalZ) {
@@ -873,7 +1183,7 @@ namespace ChronusQ {
 
        // Locating the submatrix in the right position given the subset of 
        // shells for the given batch.
-       IncBySubMat(NB,NB,NBE,NBE,integrateVXC[0][thread_id],NB,SCRATCHNBNB_loc,NBE,subMatCut);
+       IncBySubMat(NB,NB,NBE,NBE,integrateVXC[SCALAR][thread_id],NB,SCRATCHNBNB_loc,NBE,subMatCut);
  #if VXC_DEBUG_LEVEL >= 1
        // TIMING
        auto botIncBySubMat    = std::chrono::high_resolution_clock::now();
@@ -901,10 +1211,18 @@ namespace ChronusQ {
       durformZ_vxc += botformZ_vxc - topformZ_vxc;
 #endif
 
+#if VXC_DEBUG_LEVEL >= 3
+      // Create Numerical Overlap
+      for(auto iPt = 0; iPt < NPts; iPt++)
+        Gemm('N','C',NB,NB,1,weights[iPt],BasisEval + iPt*NB,NB, 
+          BasisEval + iPt*NB,NB, 1.,tmpS,NB);
+#endif
+
       if( this->onePDM.size() == 1 ) return;
 
 //
 //    ---------------   UKS or 2C ------------- Mz ----------------------
+//       See J. Chem. Theory Comput. 2017, 13, 2591-2603  
 //
 
       // Construct the required quantities for the formation of the Z vector (Mz)
@@ -913,14 +1231,16 @@ namespace ChronusQ {
         ZgammaVar2_loc);
 
       //Creating ZMAT (Mz) according J. Chem. Theory Comput. 2011, 7, 3097–3104 Eq. 15 
-      formZ_vxc(isGGA, NPts, NBE, IOff, epsScreen, weights, ZrhoVar1_loc, 
+      formZ_vxc(MZ,isGGA, NPts, NBE, IOff, epsScreen, weights, ZrhoVar1_loc, 
         ZgammaVar1_loc, ZgammaVar2_loc, DenS_loc, DenZ_loc, DenY_loc, DenX_loc, GDenS_loc, GDenZ_loc, GDenY_loc, 
-        GDenX_loc, BasisEval, ZMAT_loc);
+        GDenX_loc, KScratch_loc, KScratch_loc + NPts, KScratch_loc + 2* NPts,
+        HScratch_loc, HScratch_loc + NPts, HScratch_loc + 2* NPts,
+        BasisEval, ZMAT_loc);
 
 
 #if VXC_DEBUG_LEVEL < 3
       MaxZ     = *std::max_element(ZMAT_loc,ZMAT_loc+IOff);
-      evalZ =((2 * MaxBasis * MaxZ) > epsScreen); 
+      evalZ = ( std::abs(2 * MaxBasis * MaxZ) > epsScreen); 
 #endif
       // Coarse screen on ZMat
       if(evalZ) {
@@ -932,20 +1252,81 @@ namespace ChronusQ {
   
         // Locating the submatrix in the right position given the subset of 
         // shells for the given batch.
-        IncBySubMat(NB,NB,NBE,NBE,integrateVXC[1][thread_id],NB,SCRATCHNBNB_loc,NBE,subMatCut);           
+        IncBySubMat(NB,NB,NBE,NBE,integrateVXC[MZ][thread_id],NB,SCRATCHNBNB_loc,NBE,subMatCut);           
       }
  
 
-#if VXC_DEBUG_LEVEL >= 3
-      // Create Numerical Overlap
-      for(auto iPt = 0; iPt < NPts; iPt++)
-        Gemm('N','C',NB,NB,1,weights[iPt],BasisEval + iPt*NB,NB, 
-          BasisEval + iPt*NB,NB, 1.,tmpS,NB);
-#endif
+
+      if( this->onePDM.size() > 2 ) {
 
 //
-//    ---------------   TODO 2C ------------- Mx, My ----------------------
+//    ---------------  2C ------------- My ----------------------
 //
+
+        // Construct the required quantities for the formation of the Z vector (Mz)
+        // given the kernel derivatives wrt U variables. 
+        constructZVars(MY,isGGA,NPts,dVU_n_loc,dVU_gamma_loc,ZrhoVar1_loc,ZgammaVar1_loc,
+          ZgammaVar2_loc);
+
+        //Creating ZMAT (Mz) according J. Chem. Theory Comput. 2011, 7, 3097–3104 Eq. 15 
+        formZ_vxc(MY,isGGA, NPts, NBE, IOff, epsScreen, weights, ZrhoVar1_loc, 
+          ZgammaVar1_loc, ZgammaVar2_loc, DenS_loc, DenZ_loc, DenY_loc, DenX_loc, GDenS_loc, GDenZ_loc, GDenY_loc, 
+          GDenX_loc, KScratch_loc, KScratch_loc + NPts, KScratch_loc + 2* NPts,
+          HScratch_loc, HScratch_loc + NPts, HScratch_loc + 2* NPts,
+          BasisEval, ZMAT_loc);
+
+
+#if VXC_DEBUG_LEVEL < 3
+        MaxZ     = *std::max_element(ZMAT_loc,ZMAT_loc+IOff);
+        evalZ = ( std::abs(2 * MaxBasis * MaxZ) > epsScreen); 
+#endif
+        // Coarse screen on ZMat
+        if(evalZ) {
+  
+          // Creating according J. Chem. Theory Comput. 2011, 7, 3097–3104 Eq. 14 
+          // Z -> VXC (submat)
+          DSYR2K('L','N',NBE,NPts,1.,BasisEval,NBE,ZMAT_loc,NBE,0.,SCRATCHNBNB_loc,NBE);
+    
+    
+          // Locating the submatrix in the right position given the subset of 
+          // shells for the given batch.
+          IncBySubMat(NB,NB,NBE,NBE,integrateVXC[MY][thread_id],NB,SCRATCHNBNB_loc,NBE,subMatCut);           
+        }
+
+//
+//    ---------------  2C ------------- Mx ----------------------
+//
+
+        // Construct the required quantities for the formation of the Z vector (Mz)
+        // given the kernel derivatives wrt U variables. 
+        constructZVars(MX,isGGA,NPts,dVU_n_loc,dVU_gamma_loc,ZrhoVar1_loc,ZgammaVar1_loc,
+          ZgammaVar2_loc);
+
+        //Creating ZMAT (Mz) according J. Chem. Theory Comput. 2011, 7, 3097–3104 Eq. 15 
+        formZ_vxc(MX,isGGA, NPts, NBE, IOff, epsScreen, weights, ZrhoVar1_loc, 
+          ZgammaVar1_loc, ZgammaVar2_loc, DenS_loc, DenZ_loc, DenY_loc, DenX_loc, GDenS_loc, GDenZ_loc, GDenY_loc, 
+          GDenX_loc, KScratch_loc, KScratch_loc + NPts, KScratch_loc + 2* NPts,
+          HScratch_loc, HScratch_loc + NPts, HScratch_loc + 2* NPts,
+          BasisEval, ZMAT_loc);
+
+
+#if VXC_DEBUG_LEVEL < 3
+        MaxZ     = *std::max_element(ZMAT_loc,ZMAT_loc+IOff);
+        evalZ = ( std::abs(2 * MaxBasis * MaxZ) > epsScreen); 
+#endif
+        // Coarse screen on ZMat
+        if(evalZ) {
+  
+          // Creating according J. Chem. Theory Comput. 2011, 7, 3097–3104 Eq. 14 
+          // Z -> VXC (submat)
+          DSYR2K('L','N',NBE,NPts,1.,BasisEval,NBE,ZMAT_loc,NBE,0.,SCRATCHNBNB_loc,NBE);
+    
+    
+          // Locating the submatrix in the right position given the subset of 
+          // shells for the given batch.
+          IncBySubMat(NB,NB,NBE,NBE,integrateVXC[MX][thread_id],NB,SCRATCHNBNB_loc,NBE,subMatCut);           
+        }
+      } // 2C My and Mz
 
     }; // VXC integrate
 
@@ -1011,10 +1392,16 @@ namespace ChronusQ {
     std::cerr << "sum gamma        = " << 4*M_PI*sumgamma << std::endl;
     std::cerr << "EXC              = " << XCEnergy << std::endl;
     prettyPrintSmart(std::cerr,"onePDM Scalar",this->onePDM[SCALAR],NB,NB,NB);
-    prettyPrintSmart(std::cerr,"Numerical Scalar VXC ",integrateVXC[0][0],NB,NB,NB);
+    prettyPrintSmart(std::cerr,"Numerical Scalar VXC ",integrateVXC[SCALAR][0],NB,NB,NB);
     if( not this->iCS ) { 
      prettyPrintSmart(std::cerr,"onePDM Mz",this->onePDM[MZ],NB,NB,NB);
-     prettyPrintSmart(std::cerr,"Numerical Mz VXC",integrateVXC[1][0],NB,NB,NB);
+     prettyPrintSmart(std::cerr,"Numerical Mz VXC",integrateVXC[MZ][0],NB,NB,NB);
+     if( this->onePDM.size() > 2 ) {
+     prettyPrintSmart(std::cerr,"onePDM My",this->onePDM[MY],NB,NB,NB);
+     prettyPrintSmart(std::cerr,"Numerical My VXC",integrateVXC[MY][0],NB,NB,NB);
+     prettyPrintSmart(std::cerr,"onePDM Mx",this->onePDM[MX],NB,NB,NB);
+     prettyPrintSmart(std::cerr,"Numerical Mx VXC",integrateVXC[MX][0],NB,NB,NB);
+     }
     }
 #endif
 
@@ -1030,8 +1417,8 @@ namespace ChronusQ {
       if( isGGA )  this->memManager.free(GDenZ);
     }
     if( this->onePDM.size() > 2 ) {
-      this->memManager.free(DenX,DenY);
-      if( isGGA )  this->memManager.free(GDenX,GDenY);
+      this->memManager.free(DenX,DenY,Mnorm,KScratch,Msmall);
+      if( isGGA )  this->memManager.free(GDenX,GDenY,HScratch);
     }
 
     if( functionals.size() > 1 ) {
@@ -1042,6 +1429,8 @@ namespace ChronusQ {
 
     if( nthreads != 1 ) this->memManager.free(intVXC_RAW);
 
+    if( not std::is_same<T,double>::value )
+      for(auto &X : Re1PDM) this->memManager.free(X);
 
     // ----------------------------------------------------------------  //
     // End freeing the memory
@@ -1067,13 +1456,13 @@ namespace ChronusQ {
    std::cerr << "DSYR2K " << durDSYR2K.count()/d_batch << std::endl;
    std::cerr << "IncBySubMat " << durIncBySubMat.count()/d_batch << std::endl;
    std::cerr <<  std::endl << std::endl;
-   //CErr();
 #endif
 
 
   
     // Turn back on LA threads
     SetLAThreads(LAThreads);
+    //CErr();
 
   }; // KohnSham::formVXC
 

@@ -61,7 +61,41 @@ using namespace ChronusQ;
   /* Check Energy */ \
   refFile.readData("SCF/TOTAL_ENERGY",&xDummy);\
   resFile.readData("SCF/TOTAL_ENERGY",&yDummy);\
-  BOOST_CHECK((yDummy - xDummy) < 1e-10);
+  BOOST_CHECK(std::abs(yDummy - xDummy) < 9e-10);\
+  \
+  /* Check Multipoles */ \
+  std::array<double,3> xDummy3, yDummy3; \
+  refFile.readData("SCF/LEN_ELECTRIC_DIPOLE",&xDummy3[0]);\
+  resFile.readData("SCF/LEN_ELECTRIC_DIPOLE",&yDummy3[0]);\
+  for(auto i = 0; i < 3; i++)\
+    BOOST_CHECK(std::abs(yDummy3[i] - xDummy3[i]) < 9e-10);\
+  \
+  std::array<std::array<double,3>,3> xDummy33, yDummy33;\
+  refFile.readData("SCF/LEN_ELECTRIC_QUADRUPOLE",&xDummy33[0][0]);\
+  resFile.readData("SCF/LEN_ELECTRIC_QUADRUPOLE",&yDummy33[0][0]);\
+  for(auto i = 0; i < 3; i++)\
+  for(auto j = 0; j < 3; j++)\
+    BOOST_CHECK(std::abs(yDummy33[i][j] - xDummy33[i][j]) < 9e-10);\
+  \
+  std::array<std::array<std::array<double,3>,3>,3> xDummy333, yDummy333;\
+  refFile.readData("SCF/LEN_ELECTRIC_OCTUPOLE",&xDummy333[0][0][0]);\
+  resFile.readData("SCF/LEN_ELECTRIC_OCTUPOLE",&yDummy333[0][0][0]);\
+  for(auto i = 0; i < 3; i++)\
+  for(auto j = 0; j < 3; j++)\
+  for(auto k = 0; k < 3; k++)\
+    BOOST_CHECK(std::abs(yDummy333[i][j][k] - xDummy333[i][j][k]) < 9e-10);\
+  \
+  /* Check Spin */\
+  refFile.readData("SCF/S_EXPECT",&xDummy3[0]);\
+  resFile.readData("SCF/S_EXPECT",&yDummy3[0]);\
+  for(auto i = 0; i < 3; i++)\
+    BOOST_CHECK(std::abs(yDummy3[i] - xDummy3[i]) < 9e-10);\
+  \
+  refFile.readData("SCF/S_SQUARED",&xDummy);\
+  resFile.readData("SCF/S_SQUARED",&yDummy);\
+  BOOST_CHECK(std::abs(yDummy - xDummy) < 9e-10);
+  
+  
 
 #endif
 

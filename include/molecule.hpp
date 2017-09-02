@@ -25,6 +25,7 @@
 #define __INCLUDED_MOLECULE_HPP__
 
 #include <chronusq_sys.hpp>
+#include <util/typedefs.hpp>
 #include <atom.hpp>
 #include <cerr.hpp>
 
@@ -38,13 +39,6 @@ namespace ChronusQ {
    *  the overall molecular structure.
    */
   struct Molecule {
-
-    typedef std::array<double,3>    cart_t; ///< Cartesian point
-    typedef std::array<cart_t,3> cartmat_t; ///< Cartesian matrix
-
-    typedef std::vector<double>   dynvec_t; ///< Dynamic vector
-    typedef std::vector<dynvec_t> dynmat_t; ///< Dynamic matrix
-    
 
     size_t nAtoms;   ///< Number of atoms in the Molecule
     size_t multip;   ///< Spin multiplicity XXX: This implies <S^2>

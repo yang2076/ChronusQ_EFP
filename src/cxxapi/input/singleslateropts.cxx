@@ -258,8 +258,8 @@ namespace ChronusQ {
     if( nC == 2 and not RCflag.compare("REAL") )
       CErr("Real + Two-Component not valid",out);
 
-    if( nC == 2 and isKSRef )
-      CErr("Kohn-Sham + Two-Component not valid",out);
+  //if( nC == 2 and isKSRef )
+  //  CErr("Kohn-Sham + Two-Component not valid",out);
 
     // Determine Real/Complex if need be
     if(not RCflag.compare("AUTO") ) {
@@ -297,21 +297,22 @@ namespace ChronusQ {
             )
           );
     else if( not RCflag.compare("COMPLEX") )
-      if( isKSRef )
-#if 0
+      if( isKSRef and isX2CRef )
         ss = std::dynamic_pointer_cast<SingleSlaterBase>(
             std::make_shared<KohnSham<dcomplex>>(
-              aoints,nC,iCS
+              "Exact Two Component", "X2C-", funcName,funcList,aoints,nC,iCS
             )
           );
-#else
-        CErr();
-#endif
-
+      else if( isKSRef )
+        ss = std::dynamic_pointer_cast<SingleSlaterBase>(
+            std::make_shared<KohnSham<dcomplex>>(
+              funcName,funcList,aoints,nC,iCS
+            )
+          );
       else if( isX2CRef )
         ss = std::dynamic_pointer_cast<SingleSlaterBase>(
             std::make_shared<HartreeFock<dcomplex>>(
-              "Exact Two Component","X2C",aoints,nC,iCS
+              "Exact Two Component","X2C-",aoints,nC,iCS
             )
           );
       else

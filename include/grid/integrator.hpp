@@ -809,7 +809,7 @@ namespace ChronusQ {
 #endif
 
 #if INT_DEBUG_LEVEL < 3
-         if (maxWeight < epsilon) {
+         if (std::abs(maxWeight) < epsilon) {
            //std::cerr << "batch screened" << std::endl;
            return;
          }

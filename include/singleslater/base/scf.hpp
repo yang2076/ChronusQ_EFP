@@ -36,7 +36,7 @@ namespace ChronusQ {
    *  \warning SCF procedure assumes that the 1PDM and orbital (mo1/2) storage
    *  has been populated in some way.
    */ 
-  void SingleSlaterBase::SCF() {
+  void SingleSlaterBase::SCF(EMPerturbation &pert) {
 
     SCFInit();
 
@@ -45,7 +45,7 @@ namespace ChronusQ {
     scfControls.dampParam = scfControls.dampStartParam;
     scfControls.doIncFock = scfControls.doIncFock and (aoints.cAlg == DIRECT);
 
-    if( printLevel > 0 ) printSCFHeader(std::cout);
+    if( printLevel > 0 ) printSCFHeader(std::cout,pert);
 
     for( scfConv.nSCFIter = 0; scfConv.nSCFIter < scfControls.maxSCFIter; 
          scfConv.nSCFIter++) {
@@ -58,10 +58,10 @@ namespace ChronusQ {
 
       // Get new orbtials and densities from current state: 
       //   C/D(k) -> C/D(k + 1)
-      getNewOrbitals();
+      getNewOrbitals(pert);
 
       // Evaluate convergence
-      isConverged = evalConver();
+      isConverged = evalConver(pert);
 
       // Print out iteration information
       if( printLevel > 0 ) printSCFProg(std::cout);
@@ -73,6 +73,8 @@ namespace ChronusQ {
 
     SCFFin();
 
+    // Compute initial properties
+    this->computeProperties(pert);
 
     //printSCFFooter(isConverged);
     if(not isConverged)
@@ -88,11 +90,18 @@ namespace ChronusQ {
     }
 
     if( printLevel > 0 ) std::cout << BannerEnd << std::endl;
+
+    if( printLevel > 0 ) {
+      this->printMultipoles(std::cout);
+      this->printSpin(std::cout);
+    }
     
   }; // SingleSlater<T>::SCF()
 
   
-  void SingleSlaterBase::printSCFHeader(std::ostream &out) {
+  void SingleSlaterBase::printSCFHeader(std::ostream &out, 
+    EMPerturbation &pert) {
+
     out << BannerTop << std::endl;
     out << "Self Consistent Field (SCF) Settings:" << std::endl << std::endl;
 
@@ -140,6 +149,37 @@ namespace ChronusQ {
          
     }
 
+    // Field print
+    if( pert.fields.size() != 0 ) {
+
+      out << "\n\n  * SCF will be performed in the presence of an EM "
+          << "perturbation:\n\n";
+
+      for(auto &field : pert.fields) {
+
+        auto amp = field->getAmp();
+
+        out << "     * ";
+        if( field->emFieldTyp == Electric ) out << "Electric";
+        else                                out << "Magnetic";
+        
+        out << " ";
+      
+        if( amp.size() == 3 )        out << "Dipole";
+        else if ( amp.size() == 6 )  out << "Quadrupole";
+        else if ( amp.size() == 10 ) out << "Octupole";
+        
+        out << " Field: ";
+        out << "{ ";
+        for(auto i = 0; i < amp.size(); i++) {
+          out << amp[i]; if(i != amp.size() - 1) out << ", ";
+        }
+        out << " }\n";
+
+      }
+
+
+    }
 
 
 

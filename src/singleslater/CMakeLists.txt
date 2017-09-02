@@ -26,3 +26,6 @@ add_library(singleslater STATIC impl.cxx)
 list(APPEND CQEX_LINK singleslater)
 set(CQEX_LINK ${CQEX_LINK} PARENT_SCOPE)
 
+if(CQEX_DEP)
+  add_dependencies(singleslater ${CQEX_DEP})
+endif()

@@ -251,6 +251,10 @@ namespace ChronusQ {
     std::vector<std::vector<double>> cont;
   
     for(auto &atom : mol.atoms){ 
+
+      if( refShells.find(atom.atomicNumber) == refShells.end() )
+        CErr("Cannot find Z=" + std::to_string(atom.atomicNumber) + " in Basis Definition");
+
       auto &newSh  = refShells[atom.atomicNumber];
   
       auto shFront = shells.insert(shells.end(),newSh.shells.begin(),

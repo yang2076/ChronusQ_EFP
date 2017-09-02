@@ -75,6 +75,17 @@ namespace ChronusQ {
       savFile.safeWriteData("SCF/MANY_BODY_ENERGY",&this->MBEnergy,
         {1});
 
+      // Save Multipoles
+      savFile.safeWriteData("SCF/LEN_ELECTRIC_DIPOLE",&this->elecDipole[0],
+        {3});
+      savFile.safeWriteData("SCF/LEN_ELECTRIC_QUADRUPOLE",
+        &this->elecQuadrupole[0][0], {3,3});
+      savFile.safeWriteData("SCF/LEN_ELECTRIC_OCTUPOLE",
+        &this->elecOctupole[0][0][0], {3,3,3});
+
+      // Save Spin
+      savFile.safeWriteData("SCF/S_EXPECT",&this->SExpect[0],{3});
+      savFile.safeWriteData("SCF/S_SQUARED",&this->SSq,{1});
       
 
     // If file doesnt exist, checkpoint important bits in core
@@ -112,14 +123,14 @@ namespace ChronusQ {
    *  Currently implements the fixed-point SCF procedure.
    */ 
   template <typename T>
-  void SingleSlater<T>::getNewOrbitals(bool frmFock) {
+  void SingleSlater<T>::getNewOrbitals(EMPerturbation &pert, bool frmFock) {
 
     bool increment = scfControls.doIncFock and 
                      scfConv.nSCFIter % scfControls.nIncFock != 0 and
                      scfControls.guess != RANDOM;
 
     // Form the Fock matrix D(k) -> F(k)
-    if( frmFock ) formFock(increment);
+    if( frmFock ) formFock(pert,increment);
 
     // Transform AO fock into the orthonormal basis
     ao2orthoFock();
@@ -161,7 +172,7 @@ namespace ChronusQ {
    *    if *both* converged -> SCF converged.
    */ 
   template <typename T>
-  bool SingleSlater<T>::evalConver() {
+  bool SingleSlater<T>::evalConver(EMPerturbation &pert) {
 
     // Check energy convergence
       
@@ -169,7 +180,7 @@ namespace ChronusQ {
     double oldEnergy = this->totalEnergy;
 
     // Compute new energy (with new Density)
-    computeEnergy();
+    this->computeProperties(pert);
     scfConv.deltaEnergy = this->totalEnergy - oldEnergy;
 
     bool energyConv = std::abs(scfConv.deltaEnergy) < scfControls.eneConvTol;
@@ -361,8 +372,6 @@ namespace ChronusQ {
     // Allocate additional storage if doing some type of 
     // extrapolation during the SCF procedure
     if ( scfControls.doExtrap ) allocExtrapStorage();
-
-    computeEnergy();
 
   }; // SingleSlater<T>::SCFInit
 

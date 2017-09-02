@@ -82,17 +82,29 @@ namespace ChronusQ {
 
     template <typename U>
     HartreeFock(const HartreeFock<U> &other, int dummy = 0) :
-      SingleSlater<T>(dynamic_cast<const SingleSlater<U>&>(other,dummy)){ };
+      SingleSlater<T>(dynamic_cast<const SingleSlater<U>&>(other),dummy),
+      QuantumBase(dynamic_cast<const QuantumBase&>(other)),
+      WaveFunctionBase(dynamic_cast<const WaveFunctionBase&>(other))
+      { };
+
     template <typename U>
     HartreeFock(HartreeFock<U> &&other, int dummy = 0) :
-      SingleSlater<T>(dynamic_cast<SingleSlater<U>&&>(std::move(other),dummy))
+      SingleSlater<T>(dynamic_cast<SingleSlater<U>&&>(other),dummy),
+      QuantumBase(dynamic_cast<QuantumBase&&>(other)),
+      WaveFunctionBase(dynamic_cast<WaveFunctionBase&&>(other))
       { };
-    
-    
+
     HartreeFock(const HartreeFock<T> &other) :
-      SingleSlater<T>(dynamic_cast<const SingleSlater<T>&>(other,0)){ };
-    HartreeFock(HartreeFock<T> &&other, int dummy = 0) :
-      SingleSlater<T>(dynamic_cast<SingleSlater<T>&&>(std::move(other),0)){ };
+      SingleSlater<T>(dynamic_cast<const SingleSlater<T>&>(other),0),
+      QuantumBase(dynamic_cast<const QuantumBase&>(other)),
+      WaveFunctionBase(dynamic_cast<const WaveFunctionBase&>(other))
+      { }
+
+    HartreeFock(HartreeFock<T> &&other) :
+      SingleSlater<T>(dynamic_cast<SingleSlater<T>&&>(other),0),
+      QuantumBase(dynamic_cast<QuantumBase&&>(other)),
+      WaveFunctionBase(dynamic_cast<WaveFunctionBase&&>(other))
+      { }
 
   }; // class HartreeFock
 

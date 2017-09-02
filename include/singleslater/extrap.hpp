@@ -159,6 +159,11 @@ namespace ChronusQ {
   template <typename T>
   void SingleSlater<T>::allocExtrapStorage() {
 
+    diisFock.clear();
+    diisOnePDM.clear();
+    diisError.clear();
+    prevFock.clear();
+
     size_t FSize = memManager.template getSize(fock[SCALAR]);
 
     // Allocate memory to store previous orthonormal Focks and densities for DIIS

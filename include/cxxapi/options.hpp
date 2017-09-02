@@ -30,6 +30,7 @@
 #include <basisset.hpp>
 #include <aointegrals.hpp>
 #include <singleslater.hpp>
+#include <realtime.hpp>
 
 // Preprocessor directive to aid the digestion of optional 
 // input arguments
@@ -53,13 +54,18 @@ namespace ChronusQ {
     std::ostream &, CQInputFile &, AOIntegrals &);
 
 
+  // Parse RT options
+  std::shared_ptr<RealTimeBase> CQRealTimeOptions(
+    std::ostream &, CQInputFile &, std::shared_ptr<SingleSlaterBase> &
+  );
+
   // Parse integral options
   void CQIntsOptions(std::ostream&, CQInputFile&, AOIntegrals&);
 
 
   // Parse the SCF options
   void CQSCFOptions(std::ostream&, CQInputFile&,
-    SingleSlaterBase &);
+    SingleSlaterBase &, EMPerturbation &);
 
   std::shared_ptr<CQMemManager> CQMiscOptions(std::ostream &,
     CQInputFile &);

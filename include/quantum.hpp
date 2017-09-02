@@ -64,7 +64,6 @@ namespace ChronusQ {
 
     oper_t_coll onePDM;  ///< 1PDM array (Scalar + Magnetization)
 
-
     // Constructors
       
     // Disable default constructor

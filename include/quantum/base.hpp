@@ -25,8 +25,11 @@
 #define __INCLUDED_QUANTUM_BASE_HPP__
 
 #include <chronusq_sys.hpp>
+#include <util/typedefs.hpp>
 #include <memmanager.hpp>
 #include <cqlinalg/blas1.hpp>
+
+#include <fields.hpp>
 
 namespace ChronusQ {
 
@@ -54,11 +57,6 @@ namespace ChronusQ {
   class QuantumBase {
 
   protected:
-
-    typedef std::array<double,3>    cartvec_t;
-    typedef std::array<cartvec_t,3> cartmat_t;
-    typedef std::array<cartmat_t,3> cartrk3_t;
-
   private:
   public:
 
@@ -71,13 +69,13 @@ namespace ChronusQ {
     // Property storage
 
     // Length gauge electric multipoles
-    cartvec_t elecDipole;     ///< Electric Dipole in the length gauge
+    cart_t elecDipole;        ///< Electric Dipole in the length gauge
     cartmat_t elecQuadrupole; ///< Electric Quadrupole in the length gauge
     cartrk3_t elecOctupole;   ///< Electric Octupole in the length gauge
     
     // Spin expectation values
-    cartvec_t SExpect; ///< Expectation values of Sx, Sy and Sz
-    double    SSq;     ///< Expectation value of S^2
+    cart_t SExpect; ///< Expectation values of Sx, Sy and Sz
+    double    SSq;  ///< Expectation value of S^2
 
     // Energy expectation values
     double OBEnergy;   ///< 1-Body operator contribution to the energy
@@ -125,13 +123,45 @@ namespace ChronusQ {
     virtual void formDensity() = 0;
 
     /**
-     *  Function to compute the energy expectation value(s)
+     *  Function to compute the field free energy expectation value(s)
      */ 
     virtual void computeEnergy() = 0;
 
 
+    /**
+     *  Function to compute the energy expectation values including
+     *  field terms
+     */ 
+    void computeEnergy(EMPerturbation &pert){
+      computeEnergy();
+
+      double delta(0);
+      if(pert.fields.size() != 0) {
+        auto dipole = pert.getAmp();
+        delta += InnerProd<double>(3,&dipole[0],1,&elecDipole[0],1);
+      };
+
+      totalEnergy += delta; // Increment total energy
+
+    };
+
+   
+    virtual void computeMultipole(EMPerturbation &) = 0;
+    virtual void computeSpin() = 0;
+
+
+
+    inline void computeProperties(EMPerturbation &pert) {
+      computeMultipole(pert);
+      computeEnergy(pert);
+      computeSpin();
+    };
+    
+
     // Print functions
     virtual void print1PDM(std::ostream&) = 0;
+    void printMultipoles(std::ostream&);
+    void printSpin(std::ostream&);
   }; // class QuantumBase
 
 }; // namespace ChronusQ

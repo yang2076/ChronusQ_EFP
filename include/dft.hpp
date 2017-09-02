@@ -74,7 +74,7 @@ namespace ChronusQ {
     DFTFunctional(int FUNC_IDENT) { 
       xc_func_init(&functional_,FUNC_IDENT,XC_POLARIZED);
       xHFX = xc_hyb_exx_coef(&functional_);
-      std::cerr << "HYB " << xHFX << std::endl;
+      //std::cerr << "HYB " << xHFX << std::endl;
     };
 
     // TODO: Implement COPY / MOVE...

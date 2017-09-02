@@ -28,6 +28,7 @@ add_subdirectory(aointegrals)
 add_subdirectory(quantum)
 add_subdirectory(wavefunction)
 add_subdirectory(singleslater)
+add_subdirectory(realtime)
 
 
 

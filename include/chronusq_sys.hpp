@@ -43,6 +43,8 @@
 #include <algorithm>
 #include <unistd.h>
 #include <complex>
+#include <memory>
+#include <valarray>
 #include <random>
 #include <chrono>
 

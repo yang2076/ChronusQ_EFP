@@ -27,7 +27,7 @@
 namespace ChronusQ {
 
   void CQSCFOptions(std::ostream &out, CQInputFile &input,
-    SingleSlaterBase &ss) {
+    SingleSlaterBase &ss, EMPerturbation &pert) {
 
     // SCF section not required
     if( not input.containsSection("SCF") ) return;
@@ -103,6 +103,46 @@ namespace ChronusQ {
       ss.scfControls.dampError = 
         input.getData<double>("SCF.DAMPERROR");
     );
+
+
+    // SCF Field
+    auto handleField = [&]() {
+      std::string fieldStr;
+      OPTOPT(
+        fieldStr = input.getData<std::string>("SCF.FIELD");
+      )
+      if( fieldStr.empty() ) return;
+
+      std::vector<std::string> tokens;
+      split(tokens,fieldStr);
+
+      if( tokens.size() < 4 )
+        CErr(fieldStr + "is not a valid SCF Field specification");
+
+      std::string fieldTypeStr = tokens[0];
+
+      EMFieldTyp fieldType;
+      if( not fieldTypeStr.compare("ELECTRIC") )
+        fieldType = Electric;
+      else if( not fieldTypeStr.compare("MAGNETIC") )
+        CErr("Magnetic Fields NYI");
+      else
+        CErr(fieldTypeStr + "not a valid Field type");
+
+      if( tokens.size() == 4 ) { 
+
+        cart_t field = {std::stod(tokens[1]), std::stod(tokens[2]), 
+                        std::stod(tokens[3])};
+
+        pert.addField(fieldType,field);
+
+      } else
+        CErr("Non Dipole fields NYI");
+    };
+
+    handleField();
+
+
 
 
     // Handling eqivalences in the input options

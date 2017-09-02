@@ -31,7 +31,7 @@
 namespace ChronusQ {
 
 // Smallest value to print
-constexpr long double PRINT_SMALL = 1e-10;
+constexpr long double PRINT_SMALL = 1e-16;
 
 /**
  *  \brief Base routine to print out a matrix given raw storage and dimension

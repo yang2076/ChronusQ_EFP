@@ -36,7 +36,12 @@ namespace ChronusQ {
   template SingleSlater<dcomplex>::SingleSlater( SingleSlater<double> &&, int);
 
   template class KohnSham<double>;
-  //FIXME
-//  template class KohnSham<dcomplex>;
+  template class KohnSham<dcomplex>;
+
+  // Instantiate copy constructors
+  template KohnSham<dcomplex>::KohnSham(const KohnSham<double> &, int);
+
+  // Instantiate copy ructors
+  template KohnSham<dcomplex>::KohnSham( KohnSham<double> &&, int);
 
 }; // namespace ChronusQ

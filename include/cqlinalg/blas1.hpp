@@ -50,6 +50,18 @@ namespace ChronusQ {
   _F1 InnerProd(int N, _F2 *X, int INCX, _F3 *Y, int INCY);
 
   /**
+   *  \brief Swaps the states of two vectors
+   *
+   *  Wraps BLAS functions. See
+   *    http://www.netlib.org/lapack/lapack-3.1.1/html/dswap.f.html or
+   *    http://www.netlib.org/lapack/lapack-3.1.1/html/zswap.f.html for
+   *  parameter documentation.
+   *    
+   */
+  template <typename _F1>
+  void Swap(int N, _F1 *X, int INCX, _F1 *Y, int INCY);
+
+  /**
    *  \brief Scales a vector in place
    *
    *  Wraps BLAS functions. See

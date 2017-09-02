@@ -175,6 +175,26 @@ namespace ChronusQ {
 
       };
 
+      std::vector<hsize_t> getDims(const std::string &dataSet) {
+
+        std::vector<hsize_t> dims;
+        try {
+          OpenDataSet(file,obj,dataSet);
+
+          H5::DataSpace space = obj.getSpace();
+          int rank = space.getSimpleExtentNdims();
+   
+          dims.resize(rank);
+
+          space.getSimpleExtentDims(&dims[0],NULL);
+        } catch(...){ 
+          // Return empty vector 
+        }
+  
+        return dims;
+
+      }
+
   }; // class SafeFile
 
 }; // namespace ChronusQ

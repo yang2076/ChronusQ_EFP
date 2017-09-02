@@ -26,7 +26,6 @@
 #include <cxxapi/procedural.hpp>
 #include <cxxapi/boilerplate.hpp>
 
-
 #include <cerr.hpp>
 
 using namespace ChronusQ;

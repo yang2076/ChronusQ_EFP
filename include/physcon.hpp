@@ -33,6 +33,7 @@ namespace ChronusQ {
   constexpr double EVPerHartree  = 27.211396132;
   constexpr double NMPerHartree  = 45.56335;
   constexpr double SpeedOfLight  = 137.035999139;
+  constexpr double FSPerAUTime   = 2.41884326505e-2;
 
 };
 

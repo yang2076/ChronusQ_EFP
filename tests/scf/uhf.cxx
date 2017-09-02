@@ -34,12 +34,26 @@ BOOST_FIXTURE_TEST_CASE( Li_631Gd, SerialJob ) {
 
 };
 
+// O2 6-31G(d) test
+BOOST_FIXTURE_TEST_CASE( O2_631Gd, SerialJob ) {
+
+  CQSCFTEST( scf/serial/uhf/oxygen_6-31Gd, oxygen_6-31Gd.bin.ref );
+
+};
+
 #ifdef _CQ_DO_PARTESTS
 
 // SMP Li 6-31G(d) test
 BOOST_FIXTURE_TEST_CASE( PAR_Li_631Gd, ParallelJob ) {
 
   CQSCFTEST( scf/parallel/uhf/li_6-31Gd, li_6-31Gd.bin.ref );
+
+};
+
+// SMP O2 6-31G(d) test
+BOOST_FIXTURE_TEST_CASE( PAR_O2_631Gd, ParallelJob ) {
+
+  CQSCFTEST( scf/parallel/uhf/oxygen_6-31Gd, oxygen_6-31Gd.bin.ref );
 
 };
 

@@ -94,9 +94,12 @@ namespace ChronusQ {
     else if( scfControls.guess == SAD ) SADGuess();
     else if( scfControls.guess == RANDOM ) RandomGuess();
 
+
     // Common to all guess: form new set of orbitals from
     // initial guess at Fock.
-    getNewOrbitals(false);
+
+    EMPerturbation pert; // Dummy EM perturbation
+    getNewOrbitals(pert,false);
     
     // If RANDOM guess, scale the densites appropriately
     if( scfControls.guess == RANDOM ) {
@@ -167,6 +170,7 @@ namespace ChronusQ {
                 << " (SAD)\n\n";
 
     size_t NB    = aoints.basisSet().nBasis;
+    EMPerturbation pert;
 
     // Zero out the densities
     for(auto &X : this->onePDM) std::fill_n(X,NB*NB,0.);
@@ -275,7 +279,7 @@ namespace ChronusQ {
       ss->scfControls.nKeep     = 8;
 
       ss->formGuess();
-      ss->SCF();
+      ss->SCF(pert);
 
       size_t NBbasis = basis.nBasis;
 
@@ -299,7 +303,7 @@ namespace ChronusQ {
       std::cout << std::endl
                 << "  *** Forming Initial Fock Matrix from SAD Density ***\n\n";
 
-    formFock();
+    formFock(pert,false);
 
   }; // SingleSlater<T>::SADGuess
 

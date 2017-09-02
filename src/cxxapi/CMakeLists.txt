@@ -23,7 +23,7 @@
 
 set(INPUT_SRC input/parse.cxx)
 set(OPT_SRC input/molopts.cxx input/basisopts.cxx 
-  input/singleslateropts.cxx input/scfopts.cxx
+  input/singleslateropts.cxx input/scfopts.cxx input/rtopts.cxx
   input/intsopts.cxx input/miscopts.cxx procedural.cxx)
 add_library(cxxcq STATIC ${INPUT_SRC} ${OPT_SRC})
 list(INSERT CQEX_LINK 0 cxxcq)
@@ -35,4 +35,9 @@ target_link_libraries(chronusq PUBLIC ${CQEX_LINK})
 
 if(CQEX_DEP)
   add_dependencies(chronusq ${CQEX_DEP})
+  add_dependencies(cxxcq ${CQEX_DEP})
 endif()
+
+
+add_custom_target(linkexe ALL
+  ${CMAKE_COMMAND} -E create_symlink ${PROJECT_BINARY_DIR}/src/cxxapi/chronusq ${PROJECT_BINARY_DIR}/chronusq )

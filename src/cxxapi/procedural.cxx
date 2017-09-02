@@ -37,6 +37,7 @@
 #include <basisset.hpp>
 #include <aointegrals.hpp>
 #include <singleslater.hpp>
+#include <realtime.hpp>
 
 #include <cqlinalg/blasext.hpp>
 
@@ -73,6 +74,17 @@ namespace ChronusQ {
     // Parse Input File
     CQInputFile input(inFileName);
 
+
+    // Determine JOB type
+    std::string jobType;
+    
+    try {
+      jobType = input.getData<std::string>("QM.JOB");
+    } catch (...) {
+      CErr("Must Specify QM.JOB",std::cout);
+    }
+
+
     auto memManager = CQMiscOptions(std::cout,input);
 
 
@@ -88,14 +100,29 @@ namespace ChronusQ {
     ss->savFile    = rstFile;
     aoints.savFile = rstFile;
 
-    CQSCFOptions(std::cout,input,*ss);
+    // EM Perturbation for SCF
+    EMPerturbation SCFpert;
+
+    CQSCFOptions(std::cout,input,*ss,SCFpert);
     CQIntsOptions(std::cout,input,aoints);
 
-    aoints.computeCoreHam();
-    if(aoints.cAlg == INCORE) aoints.computeERI();
 
-    ss->formGuess();
-    ss->SCF();
+    if( not jobType.compare("SCF") or not jobType.compare("RT") ) {
+
+      aoints.computeCoreHam();
+
+      // If INCORE, compute and store the ERIs
+      if(aoints.cAlg == INCORE) aoints.computeERI();
+
+      ss->formGuess();
+      ss->SCF(SCFpert);
+    }
+
+    if( not jobType.compare("RT") ) {
+      auto rt = CQRealTimeOptions(std::cout,input,ss);
+      rt->savFile = rstFile;
+      rt->doPropagation();
+    }
 
     // Output CQ footer
     CQOutputFooter(std::cout);

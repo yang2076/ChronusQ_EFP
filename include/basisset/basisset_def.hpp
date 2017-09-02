@@ -25,6 +25,7 @@
 #define __INCLUDED_BASISSET_DEF_HPP__
 
 #include <chronusq_sys.hpp>
+#include <util/typedefs.hpp>
 #include <memmanager.hpp>
 #include <molecule.hpp>
 
@@ -43,9 +44,6 @@ namespace ChronusQ {
    *  package (libint2::Shell)
    */ 
   struct BasisSet {
-
-    typedef std::array<double,3>    cart_t; ///< Cartesian point
-    typedef std::vector<cart_t>  cartvec_t; ///< Cartesian vector
 
     std::string basisName;
 

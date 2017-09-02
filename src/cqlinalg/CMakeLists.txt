@@ -21,7 +21,7 @@
 #   E-Mail: xsli@uw.edu
 #
 set( CQLAPACK_SRC eig.cxx factorization.cxx solve.cxx svd.cxx )
-set( CQBLAS_SRC   blas1.cxx blas3.cxx blasext.cxx blasutil.cxx)
+set( CQBLAS_SRC   blas1.cxx blas3.cxx blasext.cxx blasutil.cxx matfunc.cxx)
               
 add_library(cqlinalg STATIC ${CQLAPACK_SRC} ${CQBLAS_SRC})
 list(APPEND CQEX_LINK cqlinalg)

@@ -33,4 +33,5 @@ configure_file(
 
 
 add_subdirectory(scf)
+add_subdirectory(rt)
 add_subdirectory(func)
