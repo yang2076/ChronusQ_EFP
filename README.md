@@ -12,7 +12,7 @@ Found a Bug? Open a GitHub issue!
 
 Information:
 -----------
-- For more information regarding installation of ChronusQ, see the wiki
+- For more information regarding installation of ChronusQ, see INSTALL
 - For more information regarding the dependencies of ChronusQ, see DEPENDS
 - For more information regarding how to cite ChronusQ, see CITE.txt
 - General inquiries? Contact xsli at uw dot edu
