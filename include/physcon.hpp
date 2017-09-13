@@ -28,7 +28,7 @@ namespace ChronusQ {
 
   // Physical Constants 
   // XXX: Could use some citations / more accurate values here
-  constexpr double AngPerBohr    = 0.5291772083000001;
+  constexpr double AngPerBohr    = 0.529177209217;
   constexpr double EBohrPerDebye = 0.393430307;
   constexpr double EVPerHartree  = 27.211396132;
   constexpr double NMPerHartree  = 45.56335;
