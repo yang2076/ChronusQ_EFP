@@ -289,8 +289,7 @@ namespace ChronusQ {
         // SCR2 = D(Y) * S * D(Y)
         Gemm('N','N',NB,NB,NB,T(1.),aoints.overlap,NB,this->onePDM[MY],NB,
           T(0.),SCR,NB);
-        Gemm('N','N',NB,NB,NB,T(1.),this->onePDM[MY],NB,SCR,NB,
-          T(0.),SCR2,NB);
+        Gemm('N','C',NB,NB,NB,T(1.),aoints.overlap,NB,SCR,NB,T(0.),SCR2,NB);
         
         this->SSq += 0.5 * this->template computeOBProperty<double,MY>(SCR2);
 
@@ -298,8 +297,7 @@ namespace ChronusQ {
         // SCR2 = D(X) * S * D(X)
         Gemm('N','N',NB,NB,NB,T(1.),aoints.overlap,NB,this->onePDM[MX],NB,
           T(0.),SCR,NB);
-        Gemm('N','N',NB,NB,NB,T(1.),this->onePDM[MX],NB,SCR,NB,
-          T(0.),SCR2,NB);
+        Gemm('N','C',NB,NB,NB,T(1.),aoints.overlap,NB,SCR,NB,T(0.),SCR2,NB);
         
         this->SSq += 0.5 * this->template computeOBProperty<double,MX>(SCR2);
 

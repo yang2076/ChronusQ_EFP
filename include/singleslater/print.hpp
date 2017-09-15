@@ -114,6 +114,93 @@ namespace ChronusQ {
 
   }; // SingleSlater<T>::printK
 
+
+  template <typename T>
+  void SingleSlater<T>::printMiscProperties(std::ostream &out) {
+
+    out << "\nCharge Analysis:\n" << bannerTop << "\n\n";
+
+    out << std::setw(20) << std::left << "  Atom";
+    out << std::setw(20) << std::right << "Mulliken Charges";
+    out << std::setw(20) << std::right << "Lowdin Charges" << std::endl;
+
+    out << std::right << bannerMid << std::endl;
+
+    Molecule & mol = aoints.molecule();
+    for(auto iAtm = 0; iAtm < mol.nAtoms; iAtm++) {
+
+      // Get symbol
+      std::map<std::string,Atom>::const_iterator it = 
+      std::find_if(atomicReference.begin(),atomicReference.end(),
+        [&](const std::pair<std::string,Atom> &st){ 
+          return (st.second.atomicNumber == mol.atoms[iAtm].atomicNumber) and
+                 (st.second.massNumber == mol.atoms[iAtm].massNumber);}
+         );
+
+      out << "  " << std::setw(18) << std::left <<
+        (it == atomicReference.end() ? "X" : it->first);
+
+      out << std::setprecision(5) << std::right;
+
+      out << std::setw(20) << mullikenCharges[iAtm];
+      out << std::setw(20) << lowdinCharges[iAtm];
+
+      out << std::endl;
+    }
+
+    out << std::endl << bannerEnd << std::endl;
+
+  }; // SingleSlater<T>::printMiscProperties
+
+  template <typename T>
+  void SingleSlater<T>::printMOInfo(std::ostream &out) {
+
+    out << std::scientific << std::setprecision(4);
+
+    out << "\n\n" << "SCF Results:\n" << BannerTop << "\n\n";
+
+    out << "Orbital Eigenenergies " << (this->nC == 1 ? "(Alpha) " : "" )
+        << "/ Eh\n" << bannerTop << "\n";
+
+    size_t NO = (this->nC == 1 ? this->nOA : this->nO);
+    for(auto i = 0ul; i < this->nC * aoints.basisSet().nBasis; i++) {
+
+      if( i == 0 )
+        out << "Occupied:\n";
+      else if( i == NO )
+        out << "\n\nVirtual:\n";
+
+      out << std::setw(13) << this->eps1[i];
+
+      if( i < NO and (i + 1) % 5 == 0 )  out << "\n";
+      else if( i >= NO and ((i - NO) + 1) % 5 == 0 ) out << "\n";
+    }
+
+     
+    out << "\n" << bannerEnd << "\n";
+
+    if( this->nC == 1 and not this->iCS ) {
+      out << "\n\nOrbital Eigenenergies (Beta) / Eh\n" << bannerTop << "\n";
+
+      for(auto i = 0ul; i < aoints.basisSet().nBasis; i++) {
+
+        if( i == 0 )
+          out << "Occupied:\n";
+        else if( i == this->nOB )
+          out << "\n\nVirtual:\n";
+
+        out << std::setw(13) << this->eps2[i];
+
+        if( i < this->nOB and (i + 1) % 5 == 0 )  out << "\n";
+        else if( i >= this->nOB and ((i - this->nOB) + 1) % 5 == 0 ) out << "\n";
+      }
+
+      out << "\n" << bannerEnd << "\n";
+    }
+
+    out << "\n" << BannerEnd << "\n\n";
+  }; // SingleSlater<T>::printMOInfo
+
 }; // namespace ChronusQ
 
 #endif

@@ -360,6 +360,81 @@ namespace ChronusQ {
 
   }; // SingleSlater<T>::ao2orthoFock
 
+  
+  template <typename T>
+  void SingleSlater<T>::ortho2aoMOs() {
+
+    size_t NB = aoints.basisSet().nBasis;
+
+    T* SCR = this->memManager.template malloc<T>(this->nC*NB*NB);
+
+    // Transform the (top half) of MO1
+    Gemm('N','N',NB,this->nC*NB,NB,T(1.),aoints.ortho1,NB,
+      this->mo1,this->nC*NB,T(0.),SCR,NB);
+    SetMat('N',NB,this->nC*NB,T(1.),SCR,NB,this->mo1,this->nC*NB);
+    
+    if( this->nC == 2 ) {
+
+      // Transform the bottom half of MO1
+      Gemm('N','N',NB,this->nC*NB,NB,T(1.),aoints.ortho1,NB,
+        this->mo1 + NB,this->nC*NB,T(0.),SCR,NB);
+      SetMat('N',NB,this->nC*NB,T(1.),SCR,NB,this->mo1 + NB,this->nC*NB);
+
+    } else if( not this->iCS ) {
+
+      // Transform MO2
+      Gemm('N','N',NB,NB,NB,T(1.),aoints.ortho1,NB,this->mo2,NB,T(0.),SCR,NB);
+      SetMat('N',NB,NB,T(1.),SCR,NB,this->mo2,NB);
+
+    }
+
+
+    this->memManager.free(SCR);
+
+#if 0
+    // Check proper orthonormalized wrt overlap
+
+    T* SCR2 = this->memManager.template malloc<T>(this->nC*this->nC*NB*NB);
+    T* SCR3 = this->memManager.template malloc<T>(this->nC*this->nC*NB*NB);
+
+
+    // MO1 inner product
+    Gemm('N','N',NB,this->nC*NB,NB,T(1.),aoints.overlap,NB,
+      this->mo1,this->nC*NB,T(0.),SCR2,this->nC*NB);
+    if(this->nC == 2)
+      Gemm('N','N',NB,this->nC*NB,NB,T(1.),aoints.overlap,NB,
+        this->mo1+NB,this->nC*NB,T(0.),SCR2+NB,this->nC*NB);
+   
+    Gemm('C','N',this->nC*NB,this->nC*NB,this->nC*NB,T(1.),this->mo1,
+      this->nC*NB,SCR2,this->nC*NB,T(0.),SCR3,this->nC*NB);
+
+    for(auto i = 0; i < this->nC*NB; i++)
+      SCR3[i*(this->nC*NB + 1)] -= 1.;
+
+
+    std::cerr << "Error in orthonormazation of MO1 = " 
+      << MatNorm<double>('F',this->nC*NB,this->nC*NB,SCR3,this->nC*NB)
+      << std::endl;
+             
+
+
+    if(this->nC == 1 and not this->iCS) {
+      Gemm('N','N',NB,NB,NB,T(1.),aoints.overlap,NB,this->mo2,NB,T(0.),SCR2,NB);
+      Gemm('C','N',NB,NB,NB,T(1.),this->mo2,NB,SCR2,NB,T(0.),SCR3,NB);
+
+      for(auto i = 0; i < this->nC*NB; i++)
+        SCR3[i*(this->nC*NB + 1)] -= 1.;
+
+      std::cerr << "Error in orthonormazation of MO2 = " 
+        << MatNorm<double>('F',NB,NB,SCR3,NB) << std::endl;
+    }
+
+    this->memManager.free(SCR2,SCR3);
+
+#endif
+
+  }; // SingleSlater<T>::ortho2aoMOs
+
 
   /**
    *  \brief Initializes the environment for the SCF caluclation.
@@ -385,6 +460,8 @@ namespace ChronusQ {
    */ 
   template <typename T>
   void SingleSlater<T>::SCFFin() {
+
+    ortho2aoMOs();
 
     // Deallocate extrapolation storage
     if ( scfControls.doExtrap ) deallocExtrapStorage();

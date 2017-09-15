@@ -93,6 +93,13 @@ namespace ChronusQ {
     oper_t_coll2 diisOnePDM;  ///< List of AO Density matrices for DIIS extrap
     oper_t_coll2 diisError;   ///< List of orthonormal [F,D] for DIIS extrap
 
+
+    // Method specific propery storage
+    std::vector<double> mullikenCharges;
+    std::vector<double> lowdinCharges;
+
+
+
     // Constructors
       
     /**
@@ -157,6 +164,17 @@ namespace ChronusQ {
     void computeMultipole(EMPerturbation &);
     void computeSpin();
 
+
+    // Method specific properties
+    void populationAnalysis();
+    void methodSpecificProperties() {
+      populationAnalysis();
+    }
+
+
+
+
+
     // Form a fock matrix (see include/singleslater/fock.hpp for docs)
     virtual void formFock(EMPerturbation &, bool increment = false, double xHFX = 1.);
     void formGD(bool increment = false, double xHFX = 1.);
@@ -176,6 +194,7 @@ namespace ChronusQ {
     // Transformation functions to and from the orthonormal basis
     void ao2orthoFock();
     void ortho2aoDen();
+    void ortho2aoMOs();
 
     // Evaluate convergence
     bool evalConver(EMPerturbation &);
@@ -197,6 +216,8 @@ namespace ChronusQ {
     void printGD(std::ostream&)       ;
     void printJ(std::ostream&)        ;
     void printK(std::ostream&)        ;
+    void printMiscProperties(std::ostream&);
+    void printMOInfo(std::ostream&); 
 
     // SCF extrapolation functions (see include/singleslater/extrap.hpp for docs)
     void allocExtrapStorage();

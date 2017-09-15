@@ -261,6 +261,7 @@ namespace ChronusQ {
                        << this->SExpect[2] << std::endl;
     out << "  <S\u00B2> = " << std::setw(10) << std::right 
                        << this->SSq << std::endl;
+    out << std::endl << bannerEnd << std::endl << std::endl;
 
   }; // QuantumBase::printSpin
 };

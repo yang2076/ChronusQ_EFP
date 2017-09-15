@@ -148,6 +148,7 @@ namespace ChronusQ {
    
     virtual void computeMultipole(EMPerturbation &) = 0;
     virtual void computeSpin() = 0;
+    virtual void methodSpecificProperties() = 0;
 
 
 
@@ -155,6 +156,7 @@ namespace ChronusQ {
       computeMultipole(pert);
       computeEnergy(pert);
       computeSpin();
+      methodSpecificProperties();
     };
     
 
@@ -162,6 +164,7 @@ namespace ChronusQ {
     virtual void print1PDM(std::ostream&) = 0;
     void printMultipoles(std::ostream&);
     void printSpin(std::ostream&);
+    virtual void printMiscProperties(std::ostream&) = 0;
   }; // class QuantumBase
 
 }; // namespace ChronusQ

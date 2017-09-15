@@ -166,6 +166,7 @@ namespace ChronusQ {
 #include <singleslater/scf.hpp>     // SCF header
 #include <singleslater/extrap.hpp>  // Extrapolate header
 #include <singleslater/print.hpp>   // Print header
+#include <singleslater/pop.hpp>     // Population analysis
 
 #include <singleslater/kohnsham/impl.hpp> // KS headers
 
