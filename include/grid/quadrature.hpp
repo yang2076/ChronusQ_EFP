@@ -69,8 +69,23 @@ namespace ChronusQ {
      *  To be specificed in all derived functions.
      */  
     virtual void generateQuadrature() {
-      weights.clear(); weights.resize(nPts);
-      pts.clear(); pts.resize(nPts);
+      weights.clear(); if(nPts) weights.resize(nPts);
+      pts.clear(); if(nPts) pts.resize(nPts);
+    };
+
+    void printQuadrature(){
+      std::cerr << std::endl;
+      std::cerr << "Start Printing Grid " << std::endl;
+      std::cerr << std::endl;
+      for(auto i = 0; i < this->nPts; i++) 
+        std::cerr << i << " "<< this->pts[i] << ", " << this->weights[i] << std::endl;
+      double sumW = 0.;
+      for(auto i = 0; i < this->nPts; i++) 
+        sumW += weights[i];
+      std::cerr << "SUM W " << sumW <<std::endl;
+      std::cerr << std::endl;
+      std::cerr << "End Printing Grid " << std::endl;
+      std::cerr << std::endl;
     };
 
   }; // struct Quadrature
@@ -95,6 +110,7 @@ namespace ChronusQ {
   // Declarations of quadrature specializations (see src/grid for details)
   QuadratureTemplate(GaussChebFst,double);
   QuadratureTemplate(GaussChebSnd,double);
+  QuadratureTemplate(GaussLegendre,double);
   QuadratureTemplate(EulerMac,double);
   QuadratureTemplate(Lebedev,cart_t);
 
