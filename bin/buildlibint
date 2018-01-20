@@ -1,10 +1,16 @@
 #!/bin/sh
 
+LIBINT2_DIR=libint-2.3.0-beta.3
+
 cd external/libint2
-echo "Unpacking Libint"
-tar xf libint-2.3.0-beta.3.tgz
-cd libint-2.3.0-beta.3
-./configure  --prefix=$PWD/.. --with-cxx=$CXX CXXFLAGS='-w -O3'
+if [ -d "$LIBINT2_DIR" ]; then
+  cd $LIBINT2_DIR
+else
+  echo "Unpacking Libint"
+  tar xf "$LIBINT2_DIR".tgz
+  cd $LIBINT2_DIR
+  ./configure  --prefix=$PWD/.. --with-cxx=$CXX CXXFLAGS='-w -O3'
+fi
 echo "Compiling Libint"
 make install -j$1
 echo "Libint Compiled!"
