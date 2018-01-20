@@ -37,7 +37,7 @@ namespace ChronusQ {
   void CQInputFile::parse() {
   
     // Check if file actually exists
-    if(not inFile_.good()) CErr("Input File Couldn't Be Found!",std::cout);
+    if(not inFile_->good()) CErr("Input File Couldn't Be Found!",std::cout);
 
 
     bool parseSection(false);
@@ -47,10 +47,10 @@ namespace ChronusQ {
     std::string dataHeader;
   
     // Loop over all lines of the file
-    while( not inFile_.eof() ) {
+    while( not inFile_->eof() ) {
   
       std::string line;
-      std::getline(inFile_,line);
+      std::getline(*inFile_,line);
   
       // Skip blank lines
       if(line.length() < 1) {

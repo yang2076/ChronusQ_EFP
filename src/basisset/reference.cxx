@@ -257,9 +257,11 @@ namespace ChronusQ {
 
       auto &newSh  = refShells[atom.atomicNumber];
   
-      auto shFront = shells.insert(shells.end(),newSh.shells.begin(),
-        newSh.shells.end());
-      auto cFront  = cont.insert(cont.end(),newSh.unNormCont.begin(),
+      std::vector<libint2::Shell>::iterator shFront = 
+        shells.insert(shells.end(),newSh.shells.begin(),
+          newSh.shells.end());
+
+      cont.insert(cont.end(),newSh.unNormCont.begin(),
         newSh.unNormCont.end());
   
   

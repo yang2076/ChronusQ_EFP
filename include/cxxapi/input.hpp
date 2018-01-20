@@ -36,7 +36,7 @@ namespace ChronusQ {
    */
   class CQInputFile {
   
-    std::ifstream inFile_;  ///< Input file
+    std::shared_ptr<std::ifstream> inFile_ = nullptr;  ///< Input file
   
     std::unordered_map<std::string,
       std::unordered_map<std::string,std::string>> dict_; 
@@ -61,8 +61,8 @@ namespace ChronusQ {
      *  Sets and parses input file from std::ofstream object
      *  \param [in] inFile  File object to parse
      */  
-    CQInputFile(std::ifstream inFile) :
-      inFile_(std::move(inFile)){ parse(); }
+    CQInputFile(std::shared_ptr<std::ifstream> inFile) :
+      inFile_(inFile){ parse(); }
   
   
   
@@ -82,7 +82,7 @@ namespace ChronusQ {
      *  \param [in] inFileName  Name of CQ input file
      */ 
     CQInputFile(std::string inFileName) :
-      CQInputFile(std::ifstream(inFileName)){ }
+      CQInputFile(std::make_shared<std::ifstream>(inFileName)){ }
   
   
   
