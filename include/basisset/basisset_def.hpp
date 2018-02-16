@@ -33,6 +33,43 @@
 
 namespace ChronusQ {
 
+
+
+
+
+
+
+  struct ShellPairData {
+
+    // List of significant shell pairs for a given shell pair
+    using libint2_shellpair_list_t = 
+      std::unordered_map<size_t,std::vector<size_t>>;
+
+    // Shell pair data from libint in the same order as 
+    // libint2_shellpair_list_t
+    using libint2_shellpair_data_t = 
+      std::vector<std::vector<std::shared_ptr<libint2::ShellPair>>>;
+
+
+    libint2_shellpair_list_t sigShellPair; ///< Significant shell pairs
+    libint2_shellpair_data_t shData;       ///< Shell pair data
+
+    /**
+     *  \brief Populate shell pair list and corresponding pair data
+     */
+    void computeShellPairs(std::vector<libint2::Shell> &shs, 
+        std::vector<size_t> &mapSh2Cen, size_t maxNPrim, size_t maxL, 
+        double shell_thresh, double ln_prec);
+
+
+  };
+
+
+
+
+
+
+
   /**
    *  \brief The BasisSet struct. Contains information pertinant
    *  for a gaussian type orbital (GTO) basis set. 
@@ -57,7 +94,8 @@ namespace ChronusQ {
 
     cartvec_t centers; ///< A list of centers that comprise the BasisSet
 
-    std::vector<libint2::Shell> shells; ///< Basis shells
+    std::vector<libint2::Shell> shells;    ///< Basis shells
+    ShellPairData               shellData; ///< Shell pair data
 
     std::vector<std::vector<double>> unNormCont;
       ///< Unnormalized basis coefficients
@@ -144,6 +182,10 @@ namespace ChronusQ {
   double polyCoeff(int, int);
 
   void cart2sph_transform( int, int, std::vector<double>&, std::vector<double>& ); 
+
+  // pre calculate shellpair data
+  std::vector<libint2::ShellPair> genShellPairs( std::vector<libint2::Shell>&, double );
+  std::vector<libint2::ShellPair> genOrderedShellPairs( std::vector<libint2::Shell>&, double );
 
 // SS end
  

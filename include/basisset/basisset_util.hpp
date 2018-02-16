@@ -80,6 +80,27 @@ namespace ChronusQ {
   void CarToSpDEval(SHELL_EVAL_TYPE, size_t , double *, double*, size_t, size_t, bool);
 
   void testEval(CQMemManager &,double *, std::vector<libint2::Shell> &, bool);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }; // namespace ChronusQ
 
 #endif

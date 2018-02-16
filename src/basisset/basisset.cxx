@@ -213,6 +213,15 @@ namespace ChronusQ {
 
     }
 
+
+
+
+    // Compute shell pair data
+    const auto max_engine_precision = std::numeric_limits<double>::epsilon();
+    const auto ln_prec = std::log(max_engine_precision);
+    shellData.computeShellPairs(shells,mapSh2Cen,maxPrim,maxL,1e-12,
+        ln_prec);
+
   }; // BasisSet::update
 
 
@@ -374,6 +383,62 @@ namespace ChronusQ {
 
   };  // BasisSet::makeMapPrim2Cont
 
+
+  void ShellPairData::computeShellPairs(std::vector<libint2::Shell> &shs, 
+      std::vector<size_t> &mapSh2Cen, size_t maxNPrim, size_t maxL, 
+      double shell_thresh, double ln_prec) {
+
+
+    // Reset the vars
+    sigShellPair.clear();
+    shData.clear();
+
+    const size_t nShell = shs.size();
+    
+    // Setup overlap engine
+    libint2::Engine engine(libint2::Operator::overlap, maxNPrim, maxL,0);
+    const auto& buf = engine.results();
+
+    for(size_t s1 = 0ul, s12 = 0ul; s1 < nShell; s1++) {
+
+      if( sigShellPair.find(s1) == sigShellPair.end() )
+        sigShellPair.insert( std::make_pair(s1, std::vector<size_t>()) );
+
+      size_t n1 = shs[s1].size();
+
+      // Compute significant list
+      for(size_t s2 = 0ul; s2 <= s1; s2++, s12++) {
+
+        bool sameCenter  = (mapSh2Cen[s1] == mapSh2Cen[s2]);
+        bool significant = sameCenter;
+
+        if( not sameCenter ) {
+
+          size_t n2 = shs[s2].size();
+          engine.compute(shs[s1],shs[s2]);
+          double norm = TwoNorm<double>(n1*n2,const_cast<double*>(buf[0]),1);
+          significant = (norm >= shell_thresh);
+
+        }
+
+        if( significant ) sigShellPair[s1].emplace_back(s2);
+
+      }
+
+      // Sort list in increasing order
+      std::sort(sigShellPair[s1].begin(), sigShellPair[s1].end());
+
+      // Compute the shell pair data
+      shData.emplace_back();
+      for(const auto& s2 : sigShellPair[s1])
+        shData.back().emplace_back(
+          std::make_shared<libint2::ShellPair>(shs[s1],shs[s2],ln_prec)
+        );
+
+
+    }
+
+  }
 
 
 
@@ -591,6 +656,56 @@ void cart2sph_transform( int l_i, int l_j, std::vector<double> &shell_element_sp
   }   
 } //cart2sph_transform   
 
+ /** 
+  *  \brief Pre calculate the shell pair data
+  *
+  *  \param [in] shells shell set for integral evaluation
+  *  \param [in] ln_prec something related with sceening
+  *
+  *  returns     A vector of libint2 shellpairs
+  */
+
+  std::vector<libint2::ShellPair> genShellPairs( std::vector<libint2::Shell> &shells, double ln_prec ) {
+
+    std::vector<libint2::ShellPair> shellpairs; 
+    for ( int s1 = 0, s12 = 0 ; s1 < shells.size() ; s1++ )
+    for ( int s2 = 0 ; s2 <= s1 ; s2++, s12++ ) {
+
+      libint2::ShellPair tmp_shellpair;
+      tmp_shellpair.init( shells[s1], shells[s2], ln_prec );   
+      shellpairs.push_back(tmp_shellpair);
+       
+    } // for ( int s2 = 0 )
+    return shellpairs;
+
+  } // genShellPairs 
+ 
+ /** 
+  *  \brief Pre calculate the shell pair data with angular momentum reordering
+  *
+  *  \param [in] shells shell set for integral evaluation
+  *  \param [in] ln_prec something related with sceening
+  *
+  *  returns     A vector of libint2 shellpairs
+  */
+  std::vector<libint2::ShellPair> genOrderedShellPairs( std::vector<libint2::Shell> &shells, double ln_prec ) {
+
+    std::vector<libint2::ShellPair> shellpairs; 
+    for ( int s1 = 0, s12 = 0 ; s1 < shells.size() ; s1++ )
+    for ( int s2 = 0 ; s2 <= s1 ; s2++, s12++) {
+      libint2::ShellPair tmp_shellpair;
+
+      if ( shells[s1].contr[0].l >= shells[s2].contr[0].l ) 
+        tmp_shellpair.init( shells[s1], shells[s2], ln_prec );   
+      else 
+        tmp_shellpair.init( shells[s2], shells[s1], ln_prec );
+      
+      shellpairs.push_back(tmp_shellpair);
+       
+    } // for ( int s2 = 0 )
+    return shellpairs;
+
+  } // genorderedShellPairs 
 
 }; // namespace ChronusQ
 

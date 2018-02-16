@@ -78,7 +78,11 @@ namespace ChronusQ {
       matMaps.emplace_back(mats[i],NB,NB);
     }
 
-
+    // pre compute all the shellpair data
+    auto pair_to_use = genShellPairs( shells,
+      std::log(std::numeric_limits<double>::lowest()) 
+    );
+    
     size_t n1,n2;
     // Loop over unique shell pairs
     for(size_t s1(0), bf1_s(0), s12(0); s1 < shells.size(); bf1_s+=n1, s1++){ 
@@ -86,10 +90,7 @@ namespace ChronusQ {
     for(size_t s2(0), bf2_s(0); s2 <= s1; bf2_s+=n2, s2++, s12++) {
       n2 = shells[s2].size(); // Size of Shell 2
 
-      libint2::ShellPair pair_to_use;
-      pair_to_use.init( shells[s1],shells[s2],-1000);
-
-      auto buff = obFunc(pair_to_use,shells[s1],shells[s2]);
+      auto buff = obFunc(pair_to_use[s12] , shells[s1],shells[s2]);
 
       assert(buff.size() == NOPER);
 

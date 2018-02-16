@@ -35,6 +35,10 @@
 
 #define _FULL_DIRECT
 //#define _SUB_TIMINGS
+//#define _REPORT_INTEGRAL_TIMINGS
+
+
+#define _PRECOMPUTE_SHELL_PAIRS
 
 #define _SHZ_SCREEN
 
@@ -144,6 +148,7 @@ namespace ChronusQ {
     const size_t NMat = list.size();
     const size_t NS   = basisSet_.nShell;
 
+
 #ifdef _SHZ_SCREEN
     // Check whether any of the contractions are non-hermetian
     const bool AnyNonHer = std::any_of(list.begin(),list.end(),
@@ -239,7 +244,8 @@ namespace ChronusQ {
       std::min(
         std::numeric_limits<double>::epsilon(),
         threshSchwartz / maxShBlk
-      ) / NP4);
+      ) / NP4
+    );
 #else
     // Set precision
     engines[0].set_precision(std::numeric_limits<double>::epsilon());
@@ -248,7 +254,6 @@ namespace ChronusQ {
 
     // Copy master thread engine to other threads
     for(size_t i = 1; i < nthreads; i++) engines[i] = engines[0];
-
 
 #ifdef _SUB_TIMINGS
     std::chrono::duration<double> durInner(0.), durCont(0.), durSymm(0.),
@@ -283,12 +288,16 @@ namespace ChronusQ {
     for(size_t s1(0ul), bf1_s(0ul), s12(0ul); s1 < NS; bf1_s+=n1, s1++) { 
       n1 = basisSet_.shells[s1].size(); // Size of Shell 1
 
-    for(size_t s2(0ul), bf2_s(0ul); s2 <= s1; bf2_s+=n2, s2++, s12++) {
+    auto sigPair12_it = basisSet_.shellData.shData.at(s1).begin();
+    for( const size_t& s2 : basisSet_.shellData.sigShellPair[s1] ) {
+      size_t bf2_s = basisSet_.mapSh2Bf[s2];
       n2 = basisSet_.shells[s2].size(); // Size of Shell 2
 
+      const auto * sigPair12 = sigPair12_it->get();
+      sigPair12_it++;
 
       // Round-Robbin work distribution
-      if( s12 % nthreads != thread_id ) continue;
+      if( (s12++) % nthreads != thread_id ) continue;
 
 
       // Cache variables for shells 1 and 2
@@ -346,9 +355,9 @@ namespace ChronusQ {
   #define S3_MAX NS - 1
 #endif
 
-
       size_t n3,n4;
-      for(size_t s3(0), bf3_s(0); s3 <= S3_MAX; s3++, bf3_s += n3) { 
+
+      for(size_t s3(0), bf3_s(0), s34(0); s3 <= S3_MAX; s3++, bf3_s += n3) { 
         n3 = basisSet_.shells[s3].size(); // Size of Shell 3
 
 #ifdef _SHZ_SCREEN
@@ -383,15 +392,17 @@ namespace ChronusQ {
         size_t s4_max =  s3;
 #endif
 
+      auto sigPair34_it = basisSet_.shellData.shData.at(s3).begin();
+      for( const size_t& s4 : basisSet_.shellData.sigShellPair[s3] ) {
 
-// If we're doing batch direct, also increment the current buffer index
-#ifdef _BATCH_DIRECT
-      for(size_t s4(0), bf4_s(0); s4 <= s4_max; s4++, bf4_s += n4,
-        intBuffCur += n1*n2*n3*n4)
-#else
-      for(size_t s4(0), bf4_s(0); s4 <= s4_max; s4++, bf4_s += n4)
-#endif
-      {
+        if (s4 > s4_max)
+          break;  // for each s3, s4 are stored in monotonically increasing
+                  // order
+
+        const auto * sigPair34 = sigPair34_it->get();
+        sigPair34_it++;
+                    
+        size_t bf4_s = basisSet_.mapSh2Bf[s4];
         n4 = basisSet_.shells[s4].size(); // Size of Shell 4
 
 #ifdef _SHZ_SCREEN
@@ -444,10 +455,14 @@ namespace ChronusQ {
           basisSet_.shells[s2],
           basisSet_.shells[s3],
           basisSet_.shells[s4]
+#ifdef _PRECOMPUTE_SHELL_PAIRS
+          ,sigPair12,sigPair34
+#endif
         );
 
         // Libint2 internal screening
         const double *buff = buf_vec[0];
+
         if(buff == nullptr) { nSkip[thread_id]++; continue; }
 
 #ifdef _BATCH_DIRECT
@@ -455,6 +470,7 @@ namespace ChronusQ {
         // Copy over buffer
         //std::copy_n(buff,n1*n2*n3*n4,intBuffCur);
         memcpy(intBuffCur,buff,n1*n2*n3*n4*sizeof(double));
+        intBuffCur += n1*n2*n3*n4;
 
 #elif defined(_FULL_DIRECT)
 
