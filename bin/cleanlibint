@@ -1,0 +1,7 @@
+#!/bin/sh
+
+
+rm -fr external/libint2/include
+rm -fr external/libint2/lib
+rm -fr external/libint2/libint*/
+rm -fr external/libint2/share
