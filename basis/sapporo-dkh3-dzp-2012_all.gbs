@@ -1,13 +1,4 @@
-!******************************************************************************
-! Element : Xe
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([7s6p4d1f]{8432211/742121/7222/2} + 1s1p1d1f)
-! Term : 1S   Valence configuration : 4s(2)4p(6)4d(10)5s(2)5p(6)
-! SCF energy : -7443.36932554 a.u.   
-! Valence Correlation energy : -0.58592816 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
+****
 Xe 0
   S    8     1.0000000
    7926419.6452620     0.0009330
@@ -89,17 +80,6 @@ Xe 0
   F    1     1.0000000
          0.6347036     1.0000000
 ****
-
-!******************************************************************************
-! Element : Eu
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic (943211111/8411111/722111/4111/3 + 1s1p1d1f1g)
-! Term : 8S   Valence configuration : 4s(2)4p(6)4d(10)4f(7)5s(2)5p(6)5d(0)6s(2)
-! SCF energy : -10839.704143 a.u.   
-! Valence Correlation energy : -0.94613 a.u.
-! Reference
-! Authors : M. Sekiya, T. Noro, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1247 (2012)
-!******************************************************************************
 Eu 0
   S    9     1.0000000
   20192578.7194126     0.0007143
@@ -203,17 +183,6 @@ Eu 0
   G    1     1.0000000
          0.5684004     1.0000000
 ****
-
-!******************************************************************************
-! Element : Cd
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([7s5p4d1f]{8432111/74212/7412/2} + 1s1p1d1f)
-! Term : 1S   Valence configuration : 4s(2)4p(6)4d(10)5s(2)
-! SCF energy : -5591.23025182 a.u.   
-! Valence Correlation energy : -0.46659529 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 Cd 0
   S    8     1.0000000
    5885857.5655600     0.0008010
@@ -293,17 +262,6 @@ Cd 0
   F    1     1.0000000
          0.2327933     1.0000000
 ****
-
-!******************************************************************************
-! Element : Tl
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([8s7p6d2f]{94332121/8432121/731111/72} + 1s1p1d1f)
-! Term : 2P   Valence configuration : 5s(2)5p(6)5d(10)6s(2)6p(1)
-! SCF energy : -20244.72895805 a.u.   
-! Valence Correlation energy : -0.3622 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 132, (2013) 1363
-!******************************************************************************
 Tl 0
   S    9     1.0000000
   29511609.0199090     0.0012880
@@ -406,17 +364,6 @@ Tl 0
   F    1     1.0000000
          0.1828077     1.0000000
 ****
-
-!******************************************************************************
-! Element : Y
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([7s6p4d1f]{8432111/741112/7421/2} + 1s1p1d1f)
-! Term : 2D   Valence configuration : 4s(2)4p(6)4d(1)5s(2)
-! SCF energy : -3382.85694117 a.u.   
-! Valence Correlation energy : -0.20586947 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 Y 0
   S    8     1.0000000
    3384571.6370730     0.0006430
@@ -497,17 +444,6 @@ Y 0
   F    1     1.0000000
          0.0362777     1.0000000
 ****
-
-!******************************************************************************
-! Element : Kr
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([6s5p3d1f]{842211/73121/522/2} + 1s1p1d1f)
-! Term : 1S   Valence configuration : 3s(2)3p(6)3d(10)4s(2)4p(6)
-! SCF energy : -2788.19190053 a.u.   
-! Valence Correlation energy : -0.63558771 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 Kr 0
   S    8     1.0000000
    2709848.0076670     0.0006010
@@ -576,17 +512,6 @@ Kr 0
   F    1     1.0000000
          1.2717000     1.0000000
 ****
-
-!******************************************************************************
-! Element : I
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([7s6p4d1f]{8432211/742121/7222/2} + 1s1p1d1f)
-! Term : 2P   Valence configuration : 4s(2)4p(6)4d(10)5s(2)5p(5)
-! SCF energy : -7112.55790403 a.u.   
-! Valence Correlation energy : -0.56265094 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 I 0
   S    8     1.0000000
    7583605.3615150     0.0009080
@@ -668,17 +593,6 @@ I 0
   F    1     1.0000000
          0.5738897     1.0000000
 ****
-
-!******************************************************************************
-! Element : Cu
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([6s4p3d1f]{842111/7312/612/2} + 1s1p1d1f)
-! Term : 2S   Valence configuration : 3s(2)3p(6)3d(10)4s(1)
-! SCF energy : -1653.14272823 a.u.   
-! Valence Correlation energy : -0.53878028 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 Cu 0
   S    8     1.0000000
    1487911.2686300     0.0005100
@@ -744,17 +658,6 @@ Cu 0
   F    1     1.0000000
          0.2840500     1.0000000
 ****
-
-!******************************************************************************
-! Element : Tc
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([7s6p4d1f]{8432111/741112/7412/2} + 1s1p1d1f)
-! Term : 6S   Valence configuration : 4s(2)4p(6)4d(5)5s(2)
-! SCF energy : -4282.96522022 a.u.   
-! Valence Correlation energy : -0.30765137 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 Tc 0
   S    8     1.0000000
    4413443.4090760     0.0007080
@@ -835,17 +738,6 @@ Tc 0
   F    1     1.0000000
          0.1166964     1.0000000
 ****
-
-!******************************************************************************
-! Element : Os
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([8s6p5d2f]{94332111/843111/74111/73} + 1s1p1d1f)
-! Term : 5D   Valence configuration : 5s(2)5p(6)6s(2)5d(6)
-! SCF energy : -17250.7340374 a.u.   
-! Valence Correlation energy : -0.32668 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 132, (2013) 1363
-!******************************************************************************
 Os 0
   S    9     1.0000000
   26884163.3255301     0.0010935
@@ -943,17 +835,6 @@ Os 0
   F    1     1.0000000
          0.1022346     1.0000000
 ****
-
-!******************************************************************************
-! Element : Ba
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([8s6p3d]{94332111/843211/742} + 1s1p1d)
-! Term : 1S   Valence configuration : 5s(2)5p(6)6s(2)
-! SCF energy : -8131.61650853 a.u.   
-! Valence Correlation energy : -0.13891 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 132, (2013) 1363
-!******************************************************************************
 Ba 0
   S    9     1.0000000
   16303876.5144320     0.0005730
@@ -1035,17 +916,6 @@ Ba 0
   D    1     1.0000000
          0.1113306     1.0000000
 ****
-
-!******************************************************************************
-! Element : Cs
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([8s6p3d]{94332111/843211/742} + 1s1p1d)
-! Term : 2S   Valence configuration : 5s(2)5p(6)6s(1)
-! SCF energy : -7783.07358952 a.u.   
-! Valence Correlation energy : -0.11001 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 132, (2013) 1363
-!******************************************************************************
 Cs 0
   S    9     1.0000000
   15825549.0462710     0.0005540
@@ -1127,17 +997,6 @@ Cs 0
   D    1     1.0000000
          0.0873221     1.0000000
 ****
-
-!******************************************************************************
-! Element : V
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([6s5p3d1f]{842111/72112/612/2} + 1s1p1d1f)
-! Term : 4F   Valence configuration : 3s(2)3p(6)3d(3)4s(2)
-! SCF energy : -948.12577795 a.u.   
-! Valence Correlation energy : -0.28742112 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 V 0
   S    8     1.0000000
     782077.1360740     0.0004400
@@ -1204,17 +1063,6 @@ V 0
   F    1     1.0000000
          0.0959947     1.0000000
 ****
-
-!******************************************************************************
-! Element : Cr
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([6s5p3d1f]{842111/72112/612/2} + 1s1p1d1f)
-! Term : 7S   Valence configuration : 3s(2)3p(6)3d(5)4s(1)
-! SCF energy : -1049.6460323 a.u.   
-! Valence Correlation energy : -0.32277074 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 Cr 0
   S    8     1.0000000
     879908.6024860     0.0004510
@@ -1281,17 +1129,6 @@ Cr 0
   F    1     1.0000000
          0.1281173     1.0000000
 ****
-
-!******************************************************************************
-! Element : Co
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([6s4p3d1f]{842111/7312/612/2} + 1s1p1d1f)
-! Term : 4F   Valence configuration : 3s(2)3p(6)3d(7)4s(2)
-! SCF energy : -1391.86212104 a.u.   
-! Valence Correlation energy : -0.41023939 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 Co 0
   S    8     1.0000000
    1221386.5364710     0.0004860
@@ -1357,17 +1194,6 @@ Co 0
   F    1     1.0000000
          0.2105333     1.0000000
 ****
-
-!******************************************************************************
-! Element : At
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([8s7p6d2f]{94332121/8432121/731111/72} + 1s1p1d1f)
-! Term : 2P   Valence configuration : 5s(2)5p(6)5d(10)6s(2)6p(5)
-! SCF energy : -22868.87519354 a.u.   
-! Valence Correlation energy : -0.42431 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 132, (2013) 1363
-!******************************************************************************
 At 0
   S    9     1.0000000
   31919053.0742860     0.0014640
@@ -1470,17 +1296,6 @@ At 0
   F    1     1.0000000
          0.3768066     1.0000000
 ****
-
-!******************************************************************************
-! Element : Ce
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic (943211111/8411111/722111/4111/3 + 1s1p1d1f1g)
-! Term : 1G   Valence configuration : 4s(2)4p(6)4d(10)4f(1)5s(2)5p(6)5d(1)6s(2)
-! SCF energy : -8856.319436 a.u.   
-! Valence Correlation energy : -0.78069 a.u.
-! Reference
-! Authors : M. Sekiya, T. Noro, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1247 (2012)
-!******************************************************************************
 Ce 0
   S    9     1.0000000
   17492272.4350353     0.0006086
@@ -1584,17 +1399,6 @@ Ce 0
   G    1     1.0000000
          0.4883717     1.0000000
 ****
-
-!******************************************************************************
-! Element : Ag
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([7s5p4d1f]{8432111/74212/7412/2} + 1s1p1d1f)
-! Term : 2S   Valence configuration : 4s(2)4p(6)4d(10)5s(1)
-! SCF energy : -5312.72226073 a.u.   
-! Valence Correlation energy : -0.43358251 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 Ag 0
   S    8     1.0000000
    5590906.2671260     0.0007800
@@ -1674,17 +1478,6 @@ Ag 0
   F    1     1.0000000
          0.2014510     1.0000000
 ****
-
-!******************************************************************************
-! Element : Pt
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([8s6p5d2f]{94332111/843111/74111/73} + 1s1p1d1f)
-! Term : 3D   Valence configuration : 5s(1)5p(6)6s(2)5d(9)
-! SCF energy : -18411.01926228 a.u.   
-! Valence Correlation energy : -0.38542 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 132, (2013) 1363
-!******************************************************************************
 Pt 0
   S    9     1.0000000
   28045882.8981856     0.0011658
@@ -1782,17 +1575,6 @@ Pt 0
   F    1     1.0000000
          0.1266792     1.0000000
 ****
-
-!******************************************************************************
-! Element : Po
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([8s7p6d2f]{94332121/8432121/731111/72} + 1s1p1d1f)
-! Term : 3P   Valence configuration : 5s(2)5p(6)5d(10)6s(2)6p(4)
-! SCF energy : -22193.11326935 a.u.   
-! Valence Correlation energy : -0.3931 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 132, (2013) 1363
-!******************************************************************************
 Po 0
   S    9     1.0000000
   31303557.9587950     0.0014180
@@ -1895,17 +1677,6 @@ Po 0
   F    1     1.0000000
          0.2519302     1.0000000
 ****
-
-!******************************************************************************
-! Element : Rb
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([7s6p2d]{8432111/741111/72} + 1s1p1d)
-! Term : 2S   Valence configuration : 4s(2)4p(6)5s(1)
-! SCF energy : -2979.06333996 a.u.   
-! Valence Correlation energy : -0.14335716 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 Rb 0
   S    8     1.0000000
    2926586.6298262     0.0006146
@@ -1973,17 +1744,6 @@ Rb 0
   D    1     1.0000000
          0.1284861     1.0000000
 ****
-
-!******************************************************************************
-! Element : Te
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([7s6p4d1f]{8432211/742121/7222/2} + 1s1p1d1f)
-! Term : 3P   Valence configuration : 4s(2)4p(6)4d(10)5s(2)5p(4)
-! SCF energy : -6790.75242198 a.u.   
-! Valence Correlation energy : -0.53904335 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 Te 0
   S    8     1.0000000
    7190375.0323370     0.0008870
@@ -2065,17 +1825,6 @@ Te 0
   F    1     1.0000000
          0.5150602     1.0000000
 ****
-
-!******************************************************************************
-! Element : Lu
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic (943211111/8411111/722111/4111/3 + 1s1p1d1f1g)
-! Term : 2D   Valence configuration : 4s(2)4p(6)4d(10)4f(14)5s(2)5p(6)5d(1)6s(2)
-! SCF energy : -14558.715395 a.u.   
-! Valence Correlation energy : -1.317 a.u.
-! Reference
-! Authors : M. Sekiya, T. Noro, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1247 (2012)
-!******************************************************************************
 Lu 0
   S    9     1.0000000
   24437746.0622003     0.0009260
@@ -2179,17 +1928,6 @@ Lu 0
   G    1     1.0000000
          0.7007125     1.0000000
 ****
-
-!******************************************************************************
-! Element : K
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([6s5p1d]{842111/72111/2} + 1s1p1d)
-! Term : 2S   Valence configuration : 3s(2)3p(6)4s(1)
-! SCF energy : -601.44968184 a.u.   
-! Valence Correlation energy : -0.18078506 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 K 0
   S    8     1.0000000
     456886.6275137     0.0004010
@@ -2241,17 +1979,6 @@ K 0
   D    1     1.0000000
          0.2016048     1.0000000
 ****
-
-!******************************************************************************
-! Element : Sc
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([6s5p3d1f]{842111/72112/621/2} + 1s1p1d1f)
-! Term : 2D   Valence configuration : 3s(2)3p(6)3d(1)4s(2)
-! SCF energy : -763.27297212 a.u.   
-! Valence Correlation energy : -0.23918702 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 Sc 0
   S    8     1.0000000
     606775.7081740     0.0004190
@@ -2318,17 +2045,6 @@ Sc 0
   F    1     1.0000000
          0.0448569     1.0000000
 ****
-
-!******************************************************************************
-! Element : Nb
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([7s6p4d1f]{8432111/741112/7412/2} + 1s1p1d1f)
-! Term : 6D   Valence configuration : 4s(2)4p(6)4d(4)5s(1)
-! SCF energy : -3817.15823657 a.u.   
-! Valence Correlation energy : -0.23982559 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 Nb 0
   S    8     1.0000000
    3880307.7051040     0.0006750
@@ -2409,17 +2125,6 @@ Nb 0
   F    1     1.0000000
          0.0766840     1.0000000
 ****
-
-!******************************************************************************
-! Element : Gd
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic (943211111/8411111/722111/4111/3 + 1s1p1d1f1g)
-! Term : 9D   Valence configuration : 4s(2)4p(6)4d(10)4f(7)5s(2)5p(6)5d(1)6s(2)
-! SCF energy : -11266.884125 a.u.   
-! Valence Correlation energy : -0.93774 a.u.
-! Reference
-! Authors : M. Sekiya, T. Noro, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1247 (2012)
-!******************************************************************************
 Gd 0
   S    9     1.0000000
   20640637.2261035     0.0007390
@@ -2523,17 +2228,6 @@ Gd 0
   G    1     1.0000000
          0.6631456     1.0000000
 ****
-
-!******************************************************************************
-! Element : W
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([8s6p5d2f]{94332111/843111/74111/73} + 1s1p1d1f)
-! Term : 5D   Valence configuration : 5s(2)5p(6)6s(2)5d(4)
-! SCF energy : -16138.79202393 a.u.   
-! Valence Correlation energy : -0.27386 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 132, (2013) 1363
-!******************************************************************************
 W 0
   S    9     1.0000000
   25962813.3644936     0.0010225
@@ -2631,17 +2325,6 @@ W 0
   F    1     1.0000000
          0.0790824     1.0000000
 ****
-
-!******************************************************************************
-! Element : Ge
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([6s5p3d1f]{842211/73121/522/2} + 1s1p1d1f)
-! Term : 3P   Valence configuration : 3s(2)3p(6)3d(10)4s(2)4p(2)
-! SCF energy : -2097.05246139 a.u.   
-! Valence Correlation energy : -0.56835125 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 Ge 0
   S    8     1.0000000
    1960268.4180110     0.0005460
@@ -2710,17 +2393,6 @@ Ge 0
   F    1     1.0000000
          0.7284250     1.0000000
 ****
-
-!******************************************************************************
-! Element : Dy
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic (943211111/8411111/722111/4111/3 + 1s1p1d1f1g)
-! Term : 5I   Valence configuration : 4s(2)4p(6)4d(10)4f(10)5s(2)5p(6)5d(0)6s(2)
-! SCF energy : -12152.507213 a.u.   
-! Valence Correlation energy : -1.04858 a.u.
-! Reference
-! Authors : M. Sekiya, T. Noro, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1247 (2012)
-!******************************************************************************
 Dy 0
   S    9     1.0000000
   21768236.6328899     0.0007873
@@ -2824,17 +2496,6 @@ Dy 0
   G    1     1.0000000
          0.5624680     1.0000000
 ****
-
-!******************************************************************************
-! Element : Sm
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic (943211111/8411111/722111/4111/3 + 1s1p1d1f1g)
-! Term : 7F   Valence configuration : 4s(2)4p(6)4d(10)4f(6)5s(2)5p(6)5d(0)6s(2)
-! SCF energy : -10422.796604 a.u.   
-! Valence Correlation energy : -0.91602 a.u.
-! Reference
-! Authors : M. Sekiya, T. Noro, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1247 (2012)
-!******************************************************************************
 Sm 0
   S    9     1.0000000
   19593979.7763498     0.0006926
@@ -2938,17 +2599,6 @@ Sm 0
   G    1     1.0000000
          0.5435984     1.0000000
 ****
-
-!******************************************************************************
-! Element : Au
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([8s6p5d2f]{94332111/843111/74111/73} + 1s1p1d1f)
-! Term : 2S   Valence configuration : 5s(1)5p(6)6s(2)5d(10)
-! SCF energy : -19009.76087851 a.u.   
-! Valence Correlation energy : -0.41623 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 132, (2013) 1363
-!******************************************************************************
 Au 0
   S    9     1.0000000
   28603171.3418030     0.0012042
@@ -3046,17 +2696,6 @@ Au 0
   F    1     1.0000000
          0.1398752     1.0000000
 ****
-
-!******************************************************************************
-! Element : Sn
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([7s6p4d1f]{8432211/742121/7222/2} + 1s1p1d1f)
-! Term : 3P   Valence configuration : 4s(2)4p(6)4d(10)5s(2)5p(2)
-! SCF energy : -6173.65097541 a.u.   
-! Valence Correlation energy : -0.4986481 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 Sn 0
   S    8     1.0000000
    6536665.0052650     0.0008420
@@ -3138,17 +2777,6 @@ Sn 0
   F    1     1.0000000
          0.4026637     1.0000000
 ****
-
-!******************************************************************************
-! Element : Rn
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([8s7p6d2f]{94332121/8432121/731111/72} + 1s1p1d1f)
-! Term : 1S   Valence configuration : 5s(2)5p(6)5d(10)6s(2)6p(6)
-! SCF energy : -23557.92942269 a.u.   
-! Valence Correlation energy : -0.43757 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 132, (2013) 1363
-!******************************************************************************
 Rn 0
   S    9     1.0000000
   31923562.9410340     0.0015220
@@ -3251,17 +2879,6 @@ Rn 0
   F    1     1.0000000
          0.4116108     1.0000000
 ****
-
-!******************************************************************************
-! Element : Ta
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([8s6p5d2f]{94332111/843111/74111/73} + 1s1p1d1f)
-! Term : 4F   Valence configuration : 5s(2)5p(6)6s(2)5d(3)
-! SCF energy : -15600.52444586 a.u.   
-! Valence Correlation energy : -0.2492 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 132, (2013) 1363
-!******************************************************************************
 Ta 0
   S    9     1.0000000
   25451025.3021203     0.0009894
@@ -3359,17 +2976,6 @@ Ta 0
   F    1     1.0000000
          0.0661436     1.0000000
 ****
-
-!******************************************************************************
-! Element : Sr
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([7s6p2d]{8432111/741111/72} + 1s1p1d)
-! Term : 1S   Valence configuration : 4s(2)4p(6)5s(2)
-! SCF energy : -3177.26013652 a.u.   
-! Valence Correlation energy : -0.17000109 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 Sr 0
   S    8     1.0000000
    3149064.9472623     0.0006292
@@ -3437,17 +3043,6 @@ Sr 0
   D    1     1.0000000
          0.1448671     1.0000000
 ****
-
-!******************************************************************************
-! Element : Fe
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([6s4p3d1f]{842111/7312/612/2} + 1s1p1d1f)
-! Term : 5D   Valence configuration : 3s(2)3p(6)3d(6)4s(2)
-! SCF energy : -1271.32798226 a.u.   
-! Valence Correlation energy : -0.37286537 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 Fe 0
   S    8     1.0000000
    1100791.5305010     0.0004740
@@ -3513,17 +3108,6 @@ Fe 0
   F    1     1.0000000
          0.1791937     1.0000000
 ****
-
-!******************************************************************************
-! Element : La
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic (943211111/8411111/722111/4111/3 + 1s1p1d1f1g)
-! Term : 2D   Valence configuration : 4s(2)4p(6)4d(10)4f(0)5s(2)5p(6)5d(1)6s(2)
-! SCF energy : -8489.256282 a.u.   
-! Valence Correlation energy : -0.77478 a.u.
-! Reference
-! Authors : M. Sekiya, T. Noro, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1247 (2012)
-!******************************************************************************
 La 0
   S    9     1.0000000
   16892440.5028300     0.0005906
@@ -3627,17 +3211,6 @@ La 0
   G    1     1.0000000
          0.6385384     1.0000000
 ****
-
-!******************************************************************************
-! Element : Nd
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic (943211111/8411111/722111/4111/3 + 1s1p1d1f1g)
-! Term : 5I   Valence configuration : 4s(2)4p(6)4d(10)4f(4)5s(2)5p(6)5d(0)6s(2)
-! SCF energy : -9619.652487 a.u.   
-! Valence Correlation energy : -0.83267 a.u.
-! Reference
-! Authors : M. Sekiya, T. Noro, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1247 (2012)
-!******************************************************************************
 Nd 0
   S    9     1.0000000
   18602870.8379457     0.0006485
@@ -3741,17 +3314,6 @@ Nd 0
   G    1     1.0000000
          0.4962129     1.0000000
 ****
-
-!******************************************************************************
-! Element : Ho
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic (943211111/8411111/722111/4111/3 + 1s1p1d1f1g)
-! Term : 4I   Valence configuration : 4s(2)4p(6)4d(10)4f(11)5s(2)5p(6)5d(0)6s(2)
-! SCF energy : -12611.530438 a.u.   
-! Valence Correlation energy : -1.16164 a.u.
-! Reference
-! Authors : M. Sekiya, T. Noro, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1247 (2012)
-!******************************************************************************
 Ho 0
   S    9     1.0000000
   22403344.0047176     0.0008119
@@ -3855,17 +3417,6 @@ Ho 0
   G    1     1.0000000
          0.5791950     1.0000000
 ****
-
-!******************************************************************************
-! Element : Pm
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic (943211111/8411111/722111/4111/3 + 1s1p1d1f1g)
-! Term : 6H   Valence configuration : 4s(2)4p(6)4d(10)4f(5)5s(2)5p(6)5d(0)6s(2)
-! SCF energy : -10016.175765 a.u.   
-! Valence Correlation energy : -0.8757 a.u.
-! Reference
-! Authors : M. Sekiya, T. Noro, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1247 (2012)
-!******************************************************************************
 Pm 0
   S    9     1.0000000
   19205342.8175591     0.0006686
@@ -3969,17 +3520,6 @@ Pm 0
   G    1     1.0000000
          0.5197023     1.0000000
 ****
-
-!******************************************************************************
-! Element : Mn
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([6s5p3d1f]{842111/72112/612/2} + 1s1p1d1f)
-! Term : 6S   Valence configuration : 3s(2)3p(6)3d(5)4s(2)
-! SCF energy : -1157.37165067 a.u.   
-! Valence Correlation energy : -0.34506159 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 Mn 0
   S    8     1.0000000
     986476.4068120     0.0004620
@@ -4046,17 +3586,6 @@ Mn 0
   F    1     1.0000000
          0.1527117     1.0000000
 ****
-
-!******************************************************************************
-! Element : Pd
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([7s5p4d1f]{8432111/74221/7412/2} + 1s1p1d1f)
-! Term : 1S   Valence configuration : 4s(2)4p(6)4d(10)
-! SCF energy : -5042.65274052 a.u.   
-! Valence Correlation energy : -0.41688288 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 Pd 0
   S    8     1.0000000
    5275691.4587920     0.0007610
@@ -4136,17 +3665,6 @@ Pd 0
   F    1     1.0000000
          0.1751982     1.0000000
 ****
-
-!******************************************************************************
-! Element : Er
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic (943211111/8411111/722111/4111/3 + 1s1p1d1f1g)
-! Term : 3H   Valence configuration : 4s(2)4p(6)4d(10)4f(12)5s(2)5p(6)5d(0)6s(2)
-! SCF energy : -13081.457386 a.u.   
-! Valence Correlation energy : -1.22612 a.u.
-! Reference
-! Authors : M. Sekiya, T. Noro, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1247 (2012)
-!******************************************************************************
 Er 0
   S    9     1.0000000
   22788080.3374425     0.0008411
@@ -4250,17 +3768,6 @@ Er 0
   G    1     1.0000000
          0.5923550     1.0000000
 ****
-
-!******************************************************************************
-! Element : Mo
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([7s6p4d1f]{8432111/741112/7412/2} + 1s1p1d1f)
-! Term : 7S   Valence configuration : 4s(2)4p(6)4d(5)5s(1)
-! SCF energy : -4046.11594756 a.u.   
-! Valence Correlation energy : -0.26832129 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 Mo 0
   S    8     1.0000000
    4135367.3425130     0.0006920
@@ -4341,17 +3848,6 @@ Mo 0
   F    1     1.0000000
          0.0963967     1.0000000
 ****
-
-!******************************************************************************
-! Element : As
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([6s5p3d1f]{842211/73121/522/2} + 1s1p1d1f)
-! Term : 4S   Valence configuration : 3s(2)3p(6)3d(10)4s(2)4p(3)
-! SCF energy : -2259.02108535 a.u.   
-! Valence Correlation energy : -0.57958173 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 As 0
   S    8     1.0000000
    2130863.4144670     0.0005600
@@ -4420,17 +3916,6 @@ As 0
   F    1     1.0000000
          0.8558352     1.0000000
 ****
-
-!******************************************************************************
-! Element : Se
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([6s5p3d1f]{842211/73121/522/2} + 1s1p1d1f)
-! Term : 3P   Valence configuration : 3s(2)3p(6)3d(10)4s(2)4p(4)
-! SCF energy : -2428.07029847 a.u.   
-! Valence Correlation energy : -0.59790524 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 Se 0
   S    8     1.0000000
    2312707.0999860     0.0005740
@@ -4499,17 +3984,6 @@ Se 0
   F    1     1.0000000
          0.9880975     1.0000000
 ****
-
-!******************************************************************************
-! Element : Re
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([8s6p5d2f]{94332111/843111/74111/73} + 1s1p1d1f)
-! Term : 6S   Valence configuration : 5s(2)5p(6)6s(2)5d(5)
-! SCF energy : -16688.87153904 a.u.   
-! Valence Correlation energy : -0.29309 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 132, (2013) 1363
-!******************************************************************************
 Re 0
   S    9     1.0000000
   26472074.8032343     0.0010567
@@ -4607,17 +4081,6 @@ Re 0
   F    1     1.0000000
          0.0920893     1.0000000
 ****
-
-!******************************************************************************
-! Element : Br
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([6s5p3d1f]{842211/73121/522/2} + 1s1p1d1f)
-! Term : 2P   Valence configuration : 3s(2)3p(6)3d(10)4s(2)4p(5)
-! SCF energy : -2604.42067134 a.u.   
-! Valence Correlation energy : -0.61678264 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 Br 0
   S    8     1.0000000
    2510168.1813580     0.0005870
@@ -4686,17 +4149,6 @@ Br 0
   F    1     1.0000000
          1.1262780     1.0000000
 ****
-
-!******************************************************************************
-! Element : Ga
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([6s5p3d1f]{842211/73121/522/2} + 1s1p1d1f)
-! Term : 2P   Valence configuration : 3s(2)3p(6)3d(10)4s(2)4p(1)
-! SCF energy : -1942.17204372 a.u.   
-! Valence Correlation energy : -0.55656092 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 Ga 0
   S    8     1.0000000
    1791310.5933210     0.0005340
@@ -4765,17 +4217,6 @@ Ga 0
   F    1     1.0000000
          0.6059677     1.0000000
 ****
-
-!******************************************************************************
-! Element : Rh
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([7s5p4d1f]{8432111/74212/7412/2} + 1s1p1d1f)
-! Term : 4F   Valence configuration : 4s(2)4p(6)4d(8)5s(1)
-! SCF energy : -4781.09609474 a.u.   
-! Valence Correlation energy : -0.36396758 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 Rh 0
   S    8     1.0000000
    4981840.2616780     0.0007430
@@ -4855,17 +4296,6 @@ Rh 0
   F    1     1.0000000
          0.1542655     1.0000000
 ****
-
-!******************************************************************************
-! Element : Ir
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([8s6p5d2f]{94332111/843111/74111/73} + 1s1p1d1f)
-! Term : 4F   Valence configuration : 5s(2)5p(6)6s(2)5d(7)
-! SCF energy : -17824.7473157 a.u.   
-! Valence Correlation energy : -0.35536 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 132, (2013) 1363
-!******************************************************************************
 Ir 0
   S    9     1.0000000
   27490077.2978761     0.0011287
@@ -4963,17 +4393,6 @@ Ir 0
   F    1     1.0000000
          0.1140792     1.0000000
 ****
-
-!******************************************************************************
-! Element : Yb
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic (943211111/8411111/722111/4111/3 + 1s1p1d1f1g)
-! Term : 1S   Valence configuration : 4s(2)4p(6)4d(10)4f(14)5s(2)5p(6)5d(0)6s(2)
-! SCF energy : -14054.918624 a.u.   
-! Valence Correlation energy : -1.33784 a.u.
-! Reference
-! Authors : M. Sekiya, T. Noro, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1247 (2012)
-!******************************************************************************
 Yb 0
   S    9     1.0000000
   23830793.0641506     0.0008976
@@ -5077,17 +4496,6 @@ Yb 0
   G    1     1.0000000
          0.6260292     1.0000000
 ****
-
-!******************************************************************************
-! Element : Hf
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([8s6p5d2f]{94332111/843111/74111/73} + 1s1p1d1f)
-! Term : 3F   Valence configuration : 5s(2)5p(6)6s(2)5d(2)
-! SCF energy : -15073.87665881 a.u.   
-! Valence Correlation energy : -0.2262 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 132, (2013) 1363
-!******************************************************************************
 Hf 0
   S    9     1.0000000
   24847347.7499539     0.0009588
@@ -5185,17 +4593,6 @@ Hf 0
   F    1     1.0000000
          0.0536517     1.0000000
 ****
-
-!******************************************************************************
-! Element : Pr
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic (943211111/8411111/722111/4111/3 + 1s1p1d1f1g)
-! Term : 4I   Valence configuration : 4s(2)4p(6)4d(10)4f(3)5s(2)5p(6)5d(0)6s(2)
-! SCF energy : -9233.059587 a.u.   
-! Valence Correlation energy : -0.79806 a.u.
-! Reference
-! Authors : M. Sekiya, T. Noro, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1247 (2012)
-!******************************************************************************
 Pr 0
   S    9     1.0000000
   18076586.2560419     0.0006278
@@ -5299,17 +4696,6 @@ Pr 0
   G    1     1.0000000
          0.4707832     1.0000000
 ****
-
-!******************************************************************************
-! Element : Tm
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic (943211111/8411111/722111/4111/3 + 1s1p1d1f1g)
-! Term : 2F   Valence configuration : 4s(2)4p(6)4d(10)4f(13)5s(2)5p(6)5d(0)6s(2)
-! SCF energy : -13562.538066 a.u.   
-! Valence Correlation energy : -1.28752 a.u.
-! Reference
-! Authors : M. Sekiya, T. Noro, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1247 (2012)
-!******************************************************************************
 Tm 0
   S    9     1.0000000
   23408016.2708670     0.0008672
@@ -5413,17 +4799,6 @@ Tm 0
   G    1     1.0000000
          0.6138507     1.0000000
 ****
-
-!******************************************************************************
-! Element : Zn
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([6s4p3d1f]{842111/7312/612/2} + 1s1p1d1f)
-! Term : 1S   Valence configuration : 3s(2)3p(6)3d(10)4s(2)
-! SCF energy : -1794.26420393 a.u.   
-! Valence Correlation energy : -0.57841981 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 Zn 0
   S    8     1.0000000
    1635811.2468920     0.0005220
@@ -5489,17 +4864,6 @@ Zn 0
   F    1     1.0000000
          0.3357286     1.0000000
 ****
-
-!******************************************************************************
-! Element : Ti
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([6s5p3d1f]{842111/72112/621/2} + 1s1p1d1f)
-! Term : 3F   Valence configuration : 3s(2)3p(6)3d(2)4s(2)
-! SCF energy : -852.73210363 a.u.   
-! Valence Correlation energy : -0.25727801 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 Ti 0
   S    8     1.0000000
     691064.7246630     0.0004300
@@ -5566,17 +4930,6 @@ Ti 0
   F    1     1.0000000
          0.0680832     1.0000000
 ****
-
-!******************************************************************************
-! Element : In
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([7s6p4d1f]{8432211/742121/7222/2} + 1s1p1d1f)
-! Term : 2P   Valence configuration : 4s(2)4p(6)4d(10)5s(2)5p(1)
-! SCF energy : -5878.14592434 a.u.   
-! Valence Correlation energy : -0.48119396 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 In 0
   S    8     1.0000000
    6217873.0083950     0.0008210
@@ -5658,17 +5011,6 @@ In 0
   F    1     1.0000000
          0.3485413     1.0000000
 ****
-
-!******************************************************************************
-! Element : Zr
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([7s6p4d1f]{8432111/741112/7421/2} + 1s1p1d1f)
-! Term : 3F   Valence configuration : 4s(2)4p(6)4d(2)5s(2)
-! SCF energy : -3596.11151516 a.u.   
-! Valence Correlation energy : -0.23239795 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 Zr 0
   S    8     1.0000000
    3629863.3458410     0.0006590
@@ -5749,17 +5091,6 @@ Zr 0
   F    1     1.0000000
          0.0557783     1.0000000
 ****
-
-!******************************************************************************
-! Element : Ru
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([7s5p4d1f]{8432111/74212/7412/2} + 1s1p1d1f)
-! Term : 5F   Valence configuration : 4s(2)4p(6)4d(7)5s(1)
-! SCF energy : -4527.89862164 a.u.   
-! Valence Correlation energy : -0.32933516 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 Ru 0
   S    8     1.0000000
    4687462.7055860     0.0007250
@@ -5839,17 +5170,6 @@ Ru 0
   F    1     1.0000000
          0.1329023     1.0000000
 ****
-
-!******************************************************************************
-! Element : Pb
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([8s7p6d2f]{94332121/8432121/731111/72} + 1s1p1d1f)
-! Term : 3P   Valence configuration : 5s(2)5p(6)5d(10)6s(2)6p(2)
-! SCF energy : -20881.20148232 a.u.   
-! Valence Correlation energy : -0.38441 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 132, (2013) 1363
-!******************************************************************************
 Pb 0
   S    9     1.0000000
   30019866.1066240     0.0013310
@@ -5952,17 +5272,6 @@ Pb 0
   F    1     1.0000000
          0.2734094     1.0000000
 ****
-
-!******************************************************************************
-! Element : Tb
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic (943211111/8411111/722111/4111/3 + 1s1p1d1f1g)
-! Term : 6H   Valence configuration : 4s(2)4p(6)4d(10)4f(9)5s(2)5p(6)5d(0)6s(2)
-! SCF energy : -11704.270157 a.u.   
-! Valence Correlation energy : -1.00461 a.u.
-! Reference
-! Authors : M. Sekiya, T. Noro, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1247 (2012)
-!******************************************************************************
 Tb 0
   S    9     1.0000000
   21239275.1673788     0.0007623
@@ -6066,17 +5375,6 @@ Tb 0
   G    1     1.0000000
          0.5968134     1.0000000
 ****
-
-!******************************************************************************
-! Element : Hg
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([8s6p5d2f]{94332111/843111/74111/73} + 1s1p1d1f)
-! Term : 1S   Valence configuration : 5s(2)5p(6)6s(2)5d(10)
-! SCF energy : -19620.99189185 a.u.   
-! Valence Correlation energy : -0.44315 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 132, (2013) 1363
-!******************************************************************************
 ****
 Hg 0
   S    9     1.0000000
@@ -6175,17 +5473,6 @@ Hg 0
   F    1     1.0000000
          0.1535281     1.0000000
 ****
-
-!******************************************************************************
-! Element : Sb
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([7s6p4d1f]{8432211/742121/7222/2} + 1s1p1d1f)
-! Term : 4S   Valence configuration : 4s(2)4p(6)4d(10)5s(2)5p(3)
-! SCF energy : -6477.85587892 a.u.   
-! Valence Correlation energy : -0.51578535 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 Sb 0
   S    8     1.0000000
    6886027.1886540     0.0008630
@@ -6267,17 +5554,6 @@ Sb 0
   F    1     1.0000000
          0.4579549     1.0000000
 ****
-
-!******************************************************************************
-! Element : Bi
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([8s7p6d2f]{94332121/8432121/731111/72} + 1s1p1d1f)
-! Term : 4S   Valence configuration : 5s(2)5p(6)5d(10)6s(2)6p(3)
-! SCF energy : -21530.63903372 a.u.   
-! Valence Correlation energy : -0.39304 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 132, (2013) 1363
-!******************************************************************************
 Bi 0
   S    9     1.0000000
   30626379.6662480     0.0013750
@@ -6380,17 +5656,6 @@ Bi 0
   F    1     1.0000000
          0.3075705     1.0000000
 ****
-
-!******************************************************************************
-! Element : Ni
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([6s4p3d1f]{842111/7312/612/2} + 1s1p1d1f)
-! Term : 3F   Valence configuration : 3s(2)3p(6)3d(8)4s(2)
-! SCF energy : -1519.08282625 a.u.   
-! Valence Correlation energy : -0.45319266 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 Ni 0
   S    8     1.0000000
    1352777.9047280     0.0004970
@@ -6456,17 +5721,6 @@ Ni 0
   F    1     1.0000000
          0.2456565     1.0000000
 ****
-
-!******************************************************************************
-! Element : Ca
-! Basis : Sapporo-DKH3-DZP-2012 = gtf relativistic ([6s5p1d]{842111/72111/2} + 1s1p1d)
-! Term : 1S   Valence configuration : 3s(2)3p(6)4s(2)
-! SCF energy : -679.62022132 a.u.   
-! Valence Correlation energy : -0.21190803 a.u.
-! Reference
-! Authors : T. Noro, M. Sekiya, T. Koga,  
-! Journal : Theoret. Chem. Acc. 131, 1124 (2012)
-!******************************************************************************
 Ca 0
   S    8     1.0000000
     528929.7746138     0.0004099
@@ -6518,4 +5772,3 @@ Ca 0
   D    1     1.0000000
          0.2570357     1.0000000
 ****
-

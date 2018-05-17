@@ -22,6 +22,7 @@
  *  
  */
 #include <cxxapi/options.hpp>
+#include <cxxapi/output.hpp>
 #include <cerr.hpp>
 
 namespace ChronusQ {
@@ -182,6 +183,22 @@ namespace ChronusQ {
 
       }
 
+      if( not funcName.compare("SVWN5") ) {
+
+        funcList.push_back(
+          std::dynamic_pointer_cast<DFTFunctional>(
+            std::make_shared<SlaterExchange>()
+          )
+        );
+
+        funcList.push_back(
+          std::dynamic_pointer_cast<DFTFunctional>(
+            std::make_shared<VWNV_G>()
+          )
+        );
+
+      }
+
       if( not funcName.compare("PBEXPBEC") ) {
 
         funcList.push_back(
@@ -281,13 +298,57 @@ namespace ChronusQ {
 
 
 
+
+    // FIXME: Should put this somewhere else
+    // Parse KS integration
+
+    IntegrationParam intParam;
+
+    if( input.containsSection("DFTINT") and isKSRef ) {
+
+      OPTOPT( intParam.epsilon = input.getData<double>("DFTINT.EPS")  );
+      OPTOPT( intParam.nAng    = input.getData<size_t>("DFTINT.NANG") );
+      OPTOPT( intParam.nRad    = input.getData<size_t>("DFTINT.NRAD") );
+      OPTOPT( intParam.nRadPerBatch    = input.getData<size_t>("DFTINT.NMACRO") );
+
+    }
+
+    if( isKSRef ) {
+
+      out << "\nDFT Integration Settings:\n" << BannerTop << "\n\n" ;
+      out << std::left;
+
+      out << "  " << std::setw(28) << "Screening Tolerance:";
+      out << intParam.epsilon << std::endl;
+
+      out << "  " << std::setw(28) << "Angular Grid:";
+      out <<  "Lebedev (" << intParam.nAng << ")" << std::endl;
+      out << "  " << std::setw(28) << "Radial Grid:";
+      out <<  "Euler-Maclaurin (" << intParam.nRad << ")" << std::endl;
+      out << "  " << std::setw(28) << "Macro Batch Size:";
+      out <<  intParam.nRadPerBatch << " Radial Points" << std::endl;
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    // Construct the SS object
     std::shared_ptr<SingleSlaterBase> ss;
 
     if( not RCflag.compare("REAL") )
       if( isKSRef )
         ss = std::dynamic_pointer_cast<SingleSlaterBase>(
             std::make_shared<KohnSham<double>>(
-              funcName,funcList,aoints,nC,iCS
+              funcName,funcList,intParam,aoints,nC,iCS
             )
           );
       else
@@ -300,13 +361,13 @@ namespace ChronusQ {
       if( isKSRef and isX2CRef )
         ss = std::dynamic_pointer_cast<SingleSlaterBase>(
             std::make_shared<KohnSham<dcomplex>>(
-              "Exact Two Component", "X2C-", funcName,funcList,aoints,nC,iCS
+              "Exact Two Component", "X2C-", funcName,funcList,intParam,aoints,nC,iCS
             )
           );
       else if( isKSRef )
         ss = std::dynamic_pointer_cast<SingleSlaterBase>(
             std::make_shared<KohnSham<dcomplex>>(
-              funcName,funcList,aoints,nC,iCS
+              funcName,funcList,intParam,aoints,nC,iCS
             )
           );
       else if( isX2CRef )
@@ -321,6 +382,16 @@ namespace ChronusQ {
               aoints,nC,iCS
             )
           );
+
+
+
+
+
+
+
+
+
+
 
     return ss;
 

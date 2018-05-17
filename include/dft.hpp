@@ -148,6 +148,14 @@ namespace ChronusQ {
 
 
 
+  class VWNV_G : public LDA {
+
+  public:
+
+    VWNV_G() : LDA(XC_LDA_C_VWN) { }
+
+  }; // class VWNV_GAUSSIAN
+
 
 
 
@@ -234,4 +242,3 @@ namespace ChronusQ {
 
 
 #endif
-

@@ -28,11 +28,11 @@ namespace ChronusQ {
 
   // Physical Constants 
   // XXX: Could use some citations / more accurate values here
-  constexpr double AngPerBohr    = 0.529177209217;
+  constexpr double AngPerBohr    = 0.52917721092;
   constexpr double EBohrPerDebye = 0.393430307;
   constexpr double EVPerHartree  = 27.211396132;
   constexpr double NMPerHartree  = 45.56335;
-  constexpr double SpeedOfLight  = 137.035999139;
+  constexpr double SpeedOfLight  = 137.035999074;
   constexpr double FSPerAUTime   = 2.41884326505e-2;
 
 };

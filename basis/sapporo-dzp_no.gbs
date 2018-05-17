@@ -1,17 +1,4 @@
-!******************************************************************************
-! Element : Rb
-! Basis : Sapporo-DZP = gtf non-relativistic ([7s6p2d]{74321(3)/741(4)/72})
-! Term : 2S   Valence configuration : 4s(2)4p(6)5s(1)
-! SCF energy : -2938.29404023 a.u.   
-! Valence Correlation energy : -0.14364639 a.u.
-! Reference
-! Authors : T. Koga, S. Yamamoto, T. Shimazaki, H. Tatewaki,  
-! Journal : Theor. Chem. Acc. 108, 41 (2002)
-! Authors : T. Noro, M. Sekiya, T. Koga,   [inner and valence shell]
-! Journal : Theor. Chem. Acc., 121, 289-295 (2008)
-! Authors : T. Noro, M. Sekiya, T. Koga,   [core correlated set]
-! Journal : Theor. Chem. Acc., 109, 85-90 (2003)
-!******************************************************************************
+****
 Rb 0
   S    7     1.0000000
     288418.4721290     0.0006160
@@ -72,19 +59,6 @@ Rb 0
          0.8292150     0.6337621
          0.3237450     0.4518311
 ****
-
-!******************************************************************************
-! Element : C
-! Basis : Sapporo-DZP = gtf non-relativistic ([3s2p1d]{621/31/2})
-! Term : 3P   Valence configuration : 2s(2)2p(2)
-! SCF energy : -37.67923928 a.u.   
-! Valence Correlation energy : -0.08057958 a.u.
-! Reference
-! Authors : H. Moriyama, H. Tatewaki,  
-! Journal : unpublished
-! Authors : T. Noro, M. Sekiya, T. Koga,   [inner and valence shell]
-! Journal : Theor. Chem. Acc., 98, 25-32 (1997)
-!******************************************************************************
 C 0
   S    6     1.0000000
       2804.4309400     0.0020266
@@ -108,19 +82,6 @@ C 0
          1.2514630     0.3572049
          0.3377940     0.7736517
 ****
-
-!******************************************************************************
-! Element : Ti
-! Basis : Sapporo-DZP = gtf non-relativistic ([6s5p3d1f]{7421(3)/721(2)2/612/2})
-! Term : 3F   Valence configuration : 3s(2)3p(6)3d(2)4s(2)
-! SCF energy : -848.38363096 a.u.   
-! Valence Correlation energy : -0.25610576 a.u.
-! Reference
-! Authors : T. Koga, H. Tatewaki, H. Matsuyama, Y. Satoh,  
-! Journal : Theor. Chem. Acc. 102, 105 (1999)
-! Authors : T. Noro, M. Sekiya, T. Koga, H. Matsuyama,   [inner shell]
-! Journal : Theor. Chem. Acc., 104, 146-152 (2000)
-!******************************************************************************
 Ti 0
   S    7     1.0000000
      97160.2033760     0.0006490
@@ -178,19 +139,6 @@ Ti 0
          0.8239660     0.5133213
          0.2008160     0.6955473
 ****
-
-!******************************************************************************
-! Element : Cr
-! Basis : Sapporo-DZP = gtf non-relativistic ([6s5p3d1f]{7421(3)/721(2)2/612/2})
-! Term : 7S   Valence configuration : 3s(2)3p(6)3d(5)4s(1)
-! SCF energy : -1043.32957091 a.u.   
-! Valence Correlation energy : -0.32118602 a.u.
-! Reference
-! Authors : T. Koga, H. Tatewaki, H. Matsuyama, Y. Satoh,  
-! Journal : Theor. Chem. Acc. 102, 105 (1999)
-! Authors : T. Noro, M. Sekiya, T. Koga, H. Matsuyama,   [inner shell]
-! Journal : Theor. Chem. Acc., 104, 146-152 (2000)
-!******************************************************************************
 Cr 0
   S    7     1.0000000
     116521.9810020     0.0006440
@@ -248,19 +196,6 @@ Cr 0
          1.5988570     0.5568399
          0.3776200     0.6630759
 ****
-
-!******************************************************************************
-! Element : Ne
-! Basis : Sapporo-DZP = gtf non-relativistic ([3s2p1d]{621/31/2})
-! Term : 1S   Valence configuration : 2s(2)2p(6)
-! SCF energy : -128.4798999 a.u.   
-! Valence Correlation energy : -0.19516134 a.u.
-! Reference
-! Authors : H. Moriyama, H. Tatewaki,  
-! Journal : unpublished
-! Authors : T. Noro, M. Sekiya, T. Koga,   [inner and valence shell]
-! Journal : Theor. Chem. Acc., 98, 25-32 (1997)
-!******************************************************************************
 Ne 0
   S    6     1.0000000
       7977.9874298     0.0020067
@@ -284,19 +219,6 @@ Ne 0
          4.5266270     0.3469261
          1.1775520     0.7868231
 ****
-
-!******************************************************************************
-! Element : Cu
-! Basis : Sapporo-DZP = gtf non-relativistic ([6s4p3d1f]{7421(3)/7312/612/2})
-! Term : 2S   Valence configuration : 3s(2)3p(6)3d(10)4s(1)
-! SCF energy : -1638.92224171 a.u.   
-! Valence Correlation energy : -0.53416859 a.u.
-! Reference
-! Authors : T. Koga, H. Tatewaki, H. Matsuyama, Y. Satoh,  
-! Journal : Theor. Chem. Acc. 102, 105 (1999)
-! Authors : T. Noro, M. Sekiya, T. Koga, H. Matsuyama,   [inner shell]
-! Journal : Theor. Chem. Acc., 104, 146-152 (2000)
-!******************************************************************************
 Cu 0
   S    7     1.0000000
     172950.3153690     0.0006330
@@ -353,19 +275,6 @@ Cu 0
          3.4349110     0.5895830
          0.8339450     0.6263890
 ****
-
-!******************************************************************************
-! Element : Te
-! Basis : Sapporo-DZP = gtf non-relativistic ([6s5p3d]{743(2)21/74321/742})
-! Term : 3P   Valence configuration : 5s(2)5p(4)
-! SCF energy : -6611.65920573 a.u.   
-! Valence Correlation energy : -0.07542583 a.u.
-! Reference
-! Authors : T. Koga, S. Yamamoto, T. Shimazaki, H. Tatewaki,  
-! Journal : Theor. Chem. Acc. 108, 41 (2002)
-! Authors : M. Sekiya, T. Noro, Y. Osanai, T. Koga,   [inner and valence shell]
-! Journal : Theor. Chem. Acc., 106, 297-300 (2001)
-!******************************************************************************
 Te 0
   S    7     1.0000000
     587168.2359685     0.0005950
@@ -432,21 +341,6 @@ Te 0
          0.3496780     0.6316737
          0.1391230     0.4508578
 ****
-
-!******************************************************************************
-! Element : Ca
-! Basis : Sapporo-DZP = gtf non-relativistic ([6s5p1d]{7421(3)/721(3)/2})
-! Term : 1S   Valence configuration : 3s(2)3p(6)4s(2)
-! SCF energy : -676.74030211 a.u.   
-! Valence Correlation energy : -0.21176169 a.u.
-! Reference
-! Authors : T. Koga, H. Tatewaki, H. Matsuyama, Y. Satoh,  
-! Journal : Theor. Chem. Acc. 102, 105 (1999)
-! Authors : T. Noro, M. Sekiya, T. Koga,   [inner and valence shell]
-! Journal : Theor. Chem. Acc., 121, 289-295 (2008)
-! Authors : M. Sekiya, T. Noro, Y. Osanai, T. Koga,   [core correlated set]
-! Journal : Theor. Chem. Acc., 106, 297-300 (2001)
-!******************************************************************************
 Ca 0
   S    7     1.0000000
      79415.2985660     0.0006570
@@ -491,19 +385,6 @@ Ca 0
          2.1995610     0.4535118
          0.7193910     0.6615537
 ****
-
-!******************************************************************************
-! Element : Zn
-! Basis : Sapporo-DZP = gtf non-relativistic ([6s4p3d1f]{7421(3)/7312/612/2})
-! Term : 1S   Valence configuration : 3s(2)3p(6)3d(10)4s(2)
-! SCF energy : -1777.80566239 a.u.   
-! Valence Correlation energy : -0.5733326 a.u.
-! Reference
-! Authors : T. Koga, H. Tatewaki, H. Matsuyama, Y. Satoh,  
-! Journal : Theor. Chem. Acc. 102, 105 (1999)
-! Authors : T. Noro, M. Sekiya, T. Koga, H. Matsuyama,   [inner shell]
-! Journal : Theor. Chem. Acc., 104, 146-152 (2000)
-!******************************************************************************
 Zn 0
   S    7     1.0000000
     185712.9179590     0.0006300
@@ -560,19 +441,6 @@ Zn 0
          4.0098280     0.5916248
          0.9847010     0.6219528
 ****
-
-!******************************************************************************
-! Element : Ga
-! Basis : Sapporo-DZP = gtf non-relativistic ([5s4p2d]{74321/7421/72})
-! Term : 2P   Valence configuration : 4s(2)4p(1)
-! SCF energy : -1923.21388852 a.u.   
-! Valence Correlation energy : -0.04485703 a.u.
-! Reference
-! Authors : T. Koga, H. Tatewaki, H. Matsuyama, Y. Satoh,  
-! Journal : Theor. Chem. Acc. 102, 105 (1999)
-! Authors : M. Sekiya, T. Noro, Y. Osanai, T. Koga,   [inner and valence shell]
-! Journal : Theor. Chem. Acc., 106, 297-300 (2001)
-!******************************************************************************
 Ga 0
   S    7     1.0000000
     198935.3716646     0.0006281
@@ -626,19 +494,6 @@ Ga 0
          0.3092450     0.4935678
          0.1071320     0.6143578
 ****
-
-!******************************************************************************
-! Element : Y
-! Basis : Sapporo-DZP = gtf non-relativistic ([7s6p4d1f]{74321(3)/741(3)2/7412/2})
-! Term : 2D   Valence configuration : 4s(2)4p(6)4d(1)5s(2)
-! SCF energy : -3331.61435888 a.u.   
-! Valence Correlation energy : -0.18016254 a.u.
-! Reference
-! Authors : T. Koga, S. Yamamoto, T. Shimazaki, H. Tatewaki,  
-! Journal : Theor. Chem. Acc. 108, 41 (2002)
-! Authors : Y. Osanai, M. Sekiya, T. Noro, T. Koga,   [inner shell]
-! Journal : Mol. Phys., 101, 65-71 (2003)
-!******************************************************************************
 Y 0
   S    7     1.0000000
     322188.8035650     0.0006120
@@ -710,19 +565,6 @@ Y 0
          0.4114350     0.4901140
          0.1067680     0.7031220
 ****
-
-!******************************************************************************
-! Element : O
-! Basis : Sapporo-DZP = gtf non-relativistic ([3s2p1d]{621/31/2})
-! Term : 3P   Valence configuration : 2s(2)2p(4)
-! SCF energy : -74.78056109 a.u.   
-! Valence Correlation energy : -0.12871788 a.u.
-! Reference
-! Authors : H. Moriyama, H. Tatewaki,  
-! Journal : unpublished
-! Authors : T. Noro, M. Sekiya, T. Koga,   [inner and valence shell]
-! Journal : Theor. Chem. Acc., 98, 25-32 (1997)
-!******************************************************************************
 O 0
   S    6     1.0000000
       5065.7590098     0.0020118
@@ -746,19 +588,6 @@ O 0
          2.6156390     0.3520390
          0.6885180     0.7812510
 ****
-
-!******************************************************************************
-! Element : He
-! Basis : Sapporo-DZP = gtf non-relativistic ([2s1p]{31/2})
-! Term : 1S   Valence configuration : 1s(2)
-! SCF energy : -2.85516048 a.u.   
-! Valence Correlation energy : -0.03444604 a.u.
-! Reference
-! Authors : H. Moriyama, H. Tatewaki,   [inner and valence shell]
-! Journal : unpublished
-! Authors : T. Noro, M. Sekiya, T. Koga,   [valence correlated set]
-! Journal : Theor. Chem. Acc., 98, 25-32 (1997)
-!******************************************************************************
 He 0
   S    3     1.0000000
         38.3549236     0.0401839
@@ -770,19 +599,6 @@ He 0
          3.3592470     0.2929458
          0.7722910     0.8117175
 ****
-
-!******************************************************************************
-! Element : Ar
-! Basis : Sapporo-DZP = gtf non-relativistic ([4s3p1d]{6321/621/3})
-! Term : 1S   Valence configuration : 3s(2)3p(6)
-! SCF energy : -526.75955702 a.u.   
-! Valence Correlation energy : -0.15723584 a.u.
-! Reference
-! Authors : H. Tatewaki, T. Koga,  
-! Journal : Theor. Chem. Acc. 96, 243 (1997)
-! Authors : M. Sekiya, T. Noro, T. Koga, H. Matsuyama,   [inner and valence shell]
-! Journal : J. Mol. Struct.(Theochem), 451, 51-60 (1998)
-!******************************************************************************
 Ar 0
   S    6     1.0000000
      28018.4811692     0.0018375
@@ -817,19 +633,6 @@ Ar 0
          1.2585010     0.4798551
          0.4155300     0.6269131
 ****
-
-!******************************************************************************
-! Element : Rh
-! Basis : Sapporo-DZP = gtf non-relativistic ([7s5p4d1f]{74321(3)/74212/7412/2})
-! Term : 4F   Valence configuration : 4s(2)4p(6)4d(8)5s(1)
-! SCF energy : -4685.78817979 a.u.   
-! Valence Correlation energy : -0.35786286 a.u.
-! Reference
-! Authors : T. Koga, S. Yamamoto, T. Shimazaki, H. Tatewaki,  
-! Journal : Theor. Chem. Acc. 108, 41 (2002)
-! Authors : Y. Osanai, M. Sekiya, T. Noro, T. Koga,   [inner shell]
-! Journal : Mol. Phys., 101, 65-71 (2003)
-!******************************************************************************
 Rh 0
   S    7     1.0000000
     434258.1127950     0.0006040
@@ -900,19 +703,6 @@ Rh 0
          1.5792410     0.5830250
          0.4471210     0.5991850
 ****
-
-!******************************************************************************
-! Element : P
-! Basis : Sapporo-DZP = gtf non-relativistic ([4s3p1d]{6321/621/3})
-! Term : 4S   Valence configuration : 3s(2)3p(3)
-! SCF energy : -340.6801364 a.u.   
-! Valence Correlation energy : -0.08428268 a.u.
-! Reference
-! Authors : H. Tatewaki, T. Koga,  
-! Journal : Theor. Chem. Acc. 96, 243 (1997)
-! Authors : M. Sekiya, T. Noro, T. Koga, H. Matsuyama,   [inner and valence shell]
-! Journal : J. Mol. Struct.(Theochem), 451, 51-60 (1998)
-!******************************************************************************
 P 0
   S    6     1.0000000
      19038.3395299     0.0018818
@@ -947,19 +737,6 @@ P 0
          0.6376220     0.4820131
          0.2128610     0.6244482
 ****
-
-!******************************************************************************
-! Element : Cl
-! Basis : Sapporo-DZP = gtf non-relativistic ([4s3p1d]{6321/621/3})
-! Term : 2P   Valence configuration : 3s(2)3p(5)
-! SCF energy : -459.43116139 a.u.   
-! Valence Correlation energy : -0.13403167 a.u.
-! Reference
-! Authors : H. Tatewaki, T. Koga,  
-! Journal : Theor. Chem. Acc. 96, 243 (1997)
-! Authors : M. Sekiya, T. Noro, T. Koga, H. Matsuyama,   [inner and valence shell]
-! Journal : J. Mol. Struct.(Theochem), 451, 51-60 (1998)
-!******************************************************************************
 Cl 0
   S    6     1.0000000
      24832.4328905     0.0018504
@@ -994,19 +771,6 @@ Cl 0
          1.0242960     0.4796799
          0.3400060     0.6266419
 ****
-
-!******************************************************************************
-! Element : Sc
-! Basis : Sapporo-DZP = gtf non-relativistic ([6s5p3d1f]{7421(3)/721(2)2/621/2})
-! Term : 2D   Valence configuration : 3s(2)3p(6)3d(1)4s(2)
-! SCF energy : -759.7156112 a.u.   
-! Valence Correlation energy : -0.22976573 a.u.
-! Reference
-! Authors : T. Koga, H. Tatewaki, H. Matsuyama, Y. Satoh,  
-! Journal : Theor. Chem. Acc. 102, 105 (1999)
-! Authors : T. Noro, M. Sekiya, T. Koga, H. Matsuyama,   [inner shell]
-! Journal : Theor. Chem. Acc., 104, 146-152 (2000)
-!******************************************************************************
 Sc 0
   S    7     1.0000000
      88064.5764670     0.0006530
@@ -1064,19 +828,6 @@ Sc 0
          0.5231390     0.4951007
          0.1321820     0.7041076
 ****
-
-!******************************************************************************
-! Element : Sb
-! Basis : Sapporo-DZP = gtf non-relativistic ([6s5p3d]{743(2)21/74321/742})
-! Term : 4S   Valence configuration : 5s(2)5p(3)
-! SCF energy : -6313.36473302 a.u.   
-! Valence Correlation energy : -0.05963157 a.u.
-! Reference
-! Authors : T. Koga, S. Yamamoto, T. Shimazaki, H. Tatewaki,  
-! Journal : Theor. Chem. Acc. 108, 41 (2002)
-! Authors : M. Sekiya, T. Noro, Y. Osanai, T. Koga,   [inner and valence shell]
-! Journal : Theor. Chem. Acc., 106, 297-300 (2001)
-!******************************************************************************
 Sb 0
   S    7     1.0000000
     563818.2540382     0.0005962
@@ -1143,21 +894,6 @@ Sb 0
          0.3106300     0.6145621
          0.1217590     0.4714420
 ****
-
-!******************************************************************************
-! Element : Sr
-! Basis : Sapporo-DZP = gtf non-relativistic ([7s6p2d]{74321(3)/741(4)/72})
-! Term : 1S   Valence configuration : 4s(2)4p(6)5s(2)
-! SCF energy : -3131.4791368 a.u.   
-! Valence Correlation energy : -0.17051419 a.u.
-! Reference
-! Authors : T. Koga, S. Yamamoto, T. Shimazaki, H. Tatewaki,  
-! Journal : Theor. Chem. Acc. 108, 41 (2002)
-! Authors : T. Noro, M. Sekiya, T. Koga,   [inner and valence shell]
-! Journal : Theor. Chem. Acc., 121, 289-295 (2008)
-! Authors : M. Sekiya, T. Noro, Y. Osanai, T. Koga,   [core correlated set]
-! Journal : Theor. Chem. Acc., 106, 297-300 (2001)
-!******************************************************************************
 Sr 0
   S    7     1.0000000
     305119.4249660     0.0006140
@@ -1218,19 +954,6 @@ Sr 0
          0.8930720     0.7538608
          0.3343500     0.3248069
 ****
-
-!******************************************************************************
-! Element : Kr
-! Basis : Sapporo-DZP = gtf non-relativistic ([5s4p2d]{74321/7421/72})
-! Term : 1S   Valence configuration : 4s(2)4p(6)
-! SCF energy : -2751.9941825 a.u.   
-! Valence Correlation energy : -0.12295794 a.u.
-! Reference
-! Authors : T. Koga, H. Tatewaki, H. Matsuyama, Y. Satoh,  
-! Journal : Theor. Chem. Acc. 102, 105 (1999)
-! Authors : M. Sekiya, T. Noro, Y. Osanai, T. Koga,   [inner and valence shell]
-! Journal : Theor. Chem. Acc., 106, 297-300 (2001)
-!******************************************************************************
 Kr 0
   S    7     1.0000000
     272273.9516544     0.0006178
@@ -1284,19 +1007,6 @@ Kr 0
          0.7537650     0.5403151
          0.2833930     0.5545651
 ****
-
-!******************************************************************************
-! Element : Mn
-! Basis : Sapporo-DZP = gtf non-relativistic ([6s5p3d1f]{7421(3)/721(2)2/612/2})
-! Term : 6S   Valence configuration : 3s(2)3p(6)3d(5)4s(2)
-! SCF energy : -1149.83602332 a.u.   
-! Valence Correlation energy : -0.34287524 a.u.
-! Reference
-! Authors : T. Koga, H. Tatewaki, H. Matsuyama, Y. Satoh,  
-! Journal : Theor. Chem. Acc. 102, 105 (1999)
-! Authors : T. Noro, M. Sekiya, T. Koga, H. Matsuyama,   [inner shell]
-! Journal : Theor. Chem. Acc., 104, 146-152 (2000)
-!******************************************************************************
 Mn 0
   S    7     1.0000000
     126987.6347050     0.0006410
@@ -1354,18 +1064,6 @@ Mn 0
          1.9077780     0.5696188
          0.4498130     0.6515858
 ****
-
-!******************************************************************************
-! Element : H
-! Basis : Sapporo-DZP = gtf non-relativistic ([2s1p]{31/3})
-! Term : 2S   Valence configuration : 1s(1)
-! SCF energy : -0.49927841 a.u.   
-! Reference
-! Authors : H. Yamamoto, O. Matsuoka,   [inner and valence shell]
-! Journal : Bull. Univ. Electro. Comm., 5, 23 (1992)
-! Authors : T. Noro, M. Sekiya, T. Koga,   [valence correlated set]
-! Journal : Theor. Chem. Acc., 109, 85-90 (2003)
-!******************************************************************************
 H 0
   S    3     1.0000000
         13.0107003     0.0334855
@@ -1378,19 +1076,6 @@ H 0
          0.8881900     0.6197488
          0.3037760     0.3731129
 ****
-
-!******************************************************************************
-! Element : Si
-! Basis : Sapporo-DZP = gtf non-relativistic ([4s3p1d]{6321/621/3})
-! Term : 3P   Valence configuration : 3s(2)3p(2)
-! SCF energy : -288.82087207 a.u.   
-! Valence Correlation energy : -0.06912831 a.u.
-! Reference
-! Authors : H. Tatewaki, T. Koga,  
-! Journal : Theor. Chem. Acc. 96, 243 (1997)
-! Authors : M. Sekiya, T. Noro, T. Koga, H. Matsuyama,   [inner and valence shell]
-! Journal : J. Mol. Struct.(Theochem), 451, 51-60 (1998)
-!******************************************************************************
 Si 0
   S    6     1.0000000
      16433.9521403     0.0019007
@@ -1425,21 +1110,6 @@ Si 0
          0.4707620     0.4801050
          0.1572220     0.6271390
 ****
-
-!******************************************************************************
-! Element : Mg
-! Basis : Sapporo-DZP = gtf non-relativistic ([5s4p1d]{621(3)/41(3)/2})
-! Term : 1S   Valence configuration : 2s(2)2p(6)3s(2)
-! SCF energy : -199.59053719 a.u.   
-! Valence Correlation energy : -0.23584657 a.u.
-! Reference
-! Authors : H. Tatewaki, T. Koga,  
-! Journal : J. Chem. Chem. 104, 8493 (1996)
-! Authors : T. Noro, M. Sekiya, T. Koga,   [inner and valence shell]
-! Journal : Theor. Chem. Acc., 121, 289-295 (2008)
-! Authors : T. Noro, M. Sekiya, T. Koga,   [core correlated set]
-! Journal : Theor. Chem. Acc., 109, 85-90 (2003)
-!******************************************************************************
 Mg 0
   S    6     1.0000000
      11805.0588820     0.0019480
@@ -1472,19 +1142,6 @@ Mg 0
          7.8449100     0.3454820
          2.1997780     0.7773161
 ****
-
-!******************************************************************************
-! Element : Co
-! Basis : Sapporo-DZP = gtf non-relativistic ([6s4p3d1f]{7421(3)/7312/612/2})
-! Term : 4F   Valence configuration : 3s(2)3p(6)3d(7)4s(2)
-! SCF energy : -1381.37854574 a.u.   
-! Valence Correlation energy : -0.4067622 a.u.
-! Reference
-! Authors : T. Koga, H. Tatewaki, H. Matsuyama, Y. Satoh,  
-! Journal : Theor. Chem. Acc. 102, 105 (1999)
-! Authors : T. Noro, M. Sekiya, T. Koga, H. Matsuyama,   [inner shell]
-! Journal : Theor. Chem. Acc., 104, 146-152 (2000)
-!******************************************************************************
 Co 0
   S    7     1.0000000
     149189.9401190     0.0006360
@@ -1541,21 +1198,6 @@ Co 0
          2.5866090     0.5818590
          0.6190520     0.6368800
 ****
-
-!******************************************************************************
-! Element : Be
-! Basis : Sapporo-DZP = gtf non-relativistic ([5s2p]{41(4)/2(2)})
-! Term : 1S   Valence configuration : 1s(2)2s(2)
-! SCF energy : -14.57107473 a.u.   
-! Valence Correlation energy : -0.07827916 a.u.
-! Reference
-! Authors : H. Moriyama, H. Tatewaki,  
-! Journal : unpublished
-! Authors : T. Noro, M. Sekiya, T. Koga,   [inner and valence shell]
-! Journal : Theor. Chem. Acc., 121, 289-295 (2008)
-! Authors : T. Noro, M. Sekiya, T. Koga,   [core correlated set]
-! Journal : Theor. Chem. Acc., 109, 85-90 (2003)
-!******************************************************************************
 Be 0
   S    5     1.0000000
       1191.4396020     0.0028080
@@ -1576,19 +1218,6 @@ Be 0
          0.4577120     0.3616052
          0.1222690     0.7399805
 ****
-
-!******************************************************************************
-! Element : Ag
-! Basis : Sapporo-DZP = gtf non-relativistic ([7s5p4d1f]{74321(3)/74212/7412/2})
-! Term : 2S   Valence configuration : 4s(2)4p(6)4d(10)5s(1)
-! SCF energy : -5197.59724959 a.u.   
-! Valence Correlation energy : -0.42467582 a.u.
-! Reference
-! Authors : T. Koga, S. Yamamoto, T. Shimazaki, H. Tatewaki,  
-! Journal : Theor. Chem. Acc. 108, 41 (2002)
-! Authors : Y. Osanai, M. Sekiya, T. Noro, T. Koga,   [inner shell]
-! Journal : Mol. Phys., 101, 65-71 (2003)
-!******************************************************************************
 Ag 0
   S    7     1.0000000
     475385.2472330     0.0006010
@@ -1659,21 +1288,6 @@ Ag 0
          1.9931810     0.6050063
          0.5803260     0.5707923
 ****
-
-!******************************************************************************
-! Element : K
-! Basis : Sapporo-DZP = gtf non-relativistic ([6s5p1d]{7421(3)/721(3)/2})
-! Term : 2S   Valence configuration : 3s(2)3p(6)4s(1)
-! SCF energy : -599.14845077 a.u.   
-! Valence Correlation energy : -0.18062156 a.u.
-! Reference
-! Authors : T. Koga, H. Tatewaki, H. Matsuyama, Y. Satoh,  
-! Journal : Theor. Chem. Acc. 102, 105 (1999)
-! Authors : T. Noro, M. Sekiya, T. Koga,   [inner and valence shell]
-! Journal : Theor. Chem. Acc., 121, 289-295 (2008)
-! Authors : T. Noro, M. Sekiya, T. Koga,   [core correlated set]
-! Journal : Theor. Chem. Acc., 109, 85-90 (2003)
-!******************************************************************************
 K 0
   S    7     1.0000000
      71110.4385300     0.0006630
@@ -1718,19 +1332,6 @@ K 0
          1.7496160     0.4611632
          0.5642080     0.6569963
 ****
-
-!******************************************************************************
-! Element : As
-! Basis : Sapporo-DZP = gtf non-relativistic ([5s4p2d]{74321/7421/72})
-! Term : 4S   Valence configuration : 4s(2)4p(3)
-! SCF energy : -2234.1867405 a.u.   
-! Valence Correlation energy : -0.06907425 a.u.
-! Reference
-! Authors : T. Koga, H. Tatewaki, H. Matsuyama, Y. Satoh,  
-! Journal : Theor. Chem. Acc. 102, 105 (1999)
-! Authors : M. Sekiya, T. Noro, Y. Osanai, T. Koga,   [inner and valence shell]
-! Journal : Theor. Chem. Acc., 106, 297-300 (2001)
-!******************************************************************************
 As 0
   S    7     1.0000000
     226850.4945166     0.0006237
@@ -1784,21 +1385,6 @@ As 0
          0.4861160     0.5191684
          0.1764080     0.5815754
 ****
-
-!******************************************************************************
-! Element : Li
-! Basis : Sapporo-DZP = gtf non-relativistic ([5s2p]{41(4)/2(2)})
-! Term : 2S   Valence configuration : 1s(2)2s(1)
-! SCF energy : -7.43172061 a.u.   
-! Valence Correlation energy : -0.03659597 a.u.
-! Reference
-! Authors : H. Moriyama, H. Tatewaki,  
-! Journal : unpublished
-! Authors : T. Noro, M. Sekiya, T. Koga,   [inner and valence shell]
-! Journal : Theor. Chem. Acc., 121, 289-295 (2008)
-! Authors : T. Noro, M. Sekiya, T. Koga,   [core correlated set]
-! Journal : Theor. Chem. Acc., 109, 85-90 (2003)
-!******************************************************************************
 Li 0
   S    4     1.0000000
        624.7190040     0.0067583
@@ -1820,19 +1406,6 @@ Li 0
          0.1276300     0.5651325
          0.0492600     0.5003054
 ****
-
-!******************************************************************************
-! Element : S
-! Basis : Sapporo-DZP = gtf non-relativistic ([4s3p1d]{6321/621/3})
-! Term : 3P   Valence configuration : 3s(2)3p(4)
-! SCF energy : -397.46041567 a.u.   
-! Valence Correlation energy : -0.1097146 a.u.
-! Reference
-! Authors : H. Tatewaki, T. Koga,  
-! Journal : Theor. Chem. Acc. 96, 243 (1997)
-! Authors : M. Sekiya, T. Noro, T. Koga, H. Matsuyama,   [inner and valence shell]
-! Journal : J. Mol. Struct.(Theochem), 451, 51-60 (1998)
-!******************************************************************************
 S 0
   S    6     1.0000000
      21839.6967749     0.0018649
@@ -1867,19 +1440,6 @@ S 0
          0.8163290     0.4803770
          0.2719720     0.6258451
 ****
-
-!******************************************************************************
-! Element : Ru
-! Basis : Sapporo-DZP = gtf non-relativistic ([7s5p4d1f]{74321(3)/74212/7412/2})
-! Term : 5F   Valence configuration : 4s(2)4p(6)4d(7)5s(1)
-! SCF energy : -4441.45000309 a.u.   
-! Valence Correlation energy : -0.32460932 a.u.
-! Reference
-! Authors : T. Koga, S. Yamamoto, T. Shimazaki, H. Tatewaki,  
-! Journal : Theor. Chem. Acc. 108, 41 (2002)
-! Authors : Y. Osanai, M. Sekiya, T. Noro, T. Koga,   [inner shell]
-! Journal : Mol. Phys., 101, 65-71 (2003)
-!******************************************************************************
 Ru 0
   S    7     1.0000000
     414397.8908360     0.0006050
@@ -1950,19 +1510,6 @@ Ru 0
          1.3802080     0.5759579
          0.3860060     0.6088549
 ****
-
-!******************************************************************************
-! Element : Sn
-! Basis : Sapporo-DZP = gtf non-relativistic ([6s5p3d]{743(2)21/74321/742})
-! Term : 3P   Valence configuration : 5s(2)5p(2)
-! SCF energy : -6022.81517782 a.u.   
-! Valence Correlation energy : -0.05192887 a.u.
-! Reference
-! Authors : T. Koga, S. Yamamoto, T. Shimazaki, H. Tatewaki,  
-! Journal : Theor. Chem. Acc. 108, 41 (2002)
-! Authors : M. Sekiya, T. Noro, Y. Osanai, T. Koga,   [inner and valence shell]
-! Journal : Theor. Chem. Acc., 106, 297-300 (2001)
-!******************************************************************************
 Sn 0
   S    7     1.0000000
     540999.4978902     0.0005974
@@ -2029,19 +1576,6 @@ Sn 0
          0.2609130     0.5949815
          0.1003750     0.4950746
 ****
-
-!******************************************************************************
-! Element : Br
-! Basis : Sapporo-DZP = gtf non-relativistic ([5s4p2d]{74321/7421/72})
-! Term : 2P   Valence configuration : 4s(2)4p(5)
-! SCF energy : -2572.3836664 a.u.   
-! Valence Correlation energy : -0.10659967 a.u.
-! Reference
-! Authors : T. Koga, H. Tatewaki, H. Matsuyama, Y. Satoh,  
-! Journal : Theor. Chem. Acc. 102, 105 (1999)
-! Authors : M. Sekiya, T. Noro, Y. Osanai, T. Koga,   [inner and valence shell]
-! Journal : Theor. Chem. Acc., 106, 297-300 (2001)
-!******************************************************************************
 Br 0
   S    7     1.0000000
     256645.2030355     0.0006197
@@ -2095,19 +1629,6 @@ Br 0
          0.6556870     0.5329701
          0.2445410     0.5632491
 ****
-
-!******************************************************************************
-! Element : Xe
-! Basis : Sapporo-DZP = gtf non-relativistic ([6s5p3d]{743(2)21/74321/742})
-! Term : 1S   Valence configuration : 5s(2)5p(6)
-! SCF energy : -7232.00438849 a.u.   
-! Valence Correlation energy : -0.1020366 a.u.
-! Reference
-! Authors : T. Koga, S. Yamamoto, T. Shimazaki, H. Tatewaki,  
-! Journal : Theor. Chem. Acc. 108, 41 (2002)
-! Authors : M. Sekiya, T. Noro, Y. Osanai, T. Koga,   [inner and valence shell]
-! Journal : Theor. Chem. Acc., 106, 297-300 (2001)
-!******************************************************************************
 Xe 0
   S    7     1.0000000
     635194.9968558     0.0005929
@@ -2174,19 +1695,6 @@ Xe 0
          0.4426500     0.6612315
          0.1793150     0.4162097
 ****
-
-!******************************************************************************
-! Element : Ge
-! Basis : Sapporo-DZP = gtf non-relativistic ([5s4p2d]{74321/7421/72})
-! Term : 3P   Valence configuration : 4s(2)4p(2)
-! SCF energy : -2075.31036984 a.u.   
-! Valence Correlation energy : -0.05858841 a.u.
-! Reference
-! Authors : T. Koga, H. Tatewaki, H. Matsuyama, Y. Satoh,  
-! Journal : Theor. Chem. Acc. 102, 105 (1999)
-! Authors : M. Sekiya, T. Noro, Y. Osanai, T. Koga,   [inner and valence shell]
-! Journal : Theor. Chem. Acc., 106, 297-300 (2001)
-!******************************************************************************
 Ge 0
   S    7     1.0000000
     212680.3963646     0.0006258
@@ -2240,19 +1748,6 @@ Ge 0
          0.3961330     0.5058027
          0.1410140     0.5979007
 ****
-
-!******************************************************************************
-! Element : I
-! Basis : Sapporo-DZP = gtf non-relativistic ([6s5p3d]{743(2)21/74321/742})
-! Term : 2P   Valence configuration : 5s(2)5p(5)
-! SCF energy : -6917.85156939 a.u.   
-! Valence Correlation energy : -0.08952461 a.u.
-! Reference
-! Authors : T. Koga, S. Yamamoto, T. Shimazaki, H. Tatewaki,  
-! Journal : Theor. Chem. Acc. 108, 41 (2002)
-! Authors : M. Sekiya, T. Noro, Y. Osanai, T. Koga,   [inner and valence shell]
-! Journal : Theor. Chem. Acc., 106, 297-300 (2001)
-!******************************************************************************
 I 0
   S    7     1.0000000
     610985.9012392     0.0005939
@@ -2319,19 +1814,6 @@ I 0
          0.3945080     0.6478831
          0.1587520     0.4316741
 ****
-
-!******************************************************************************
-! Element : N
-! Basis : Sapporo-DZP = gtf non-relativistic ([3s2p1d]{621/31/2})
-! Term : 4S   Valence configuration : 2s(2)2p(3)
-! SCF energy : -54.38411896 a.u.   
-! Valence Correlation energy : -0.09510757 a.u.
-! Reference
-! Authors : H. Moriyama, H. Tatewaki,  
-! Journal : unpublished
-! Authors : T. Noro, M. Sekiya, T. Koga,   [inner and valence shell]
-! Journal : Theor. Chem. Acc., 98, 25-32 (1997)
-!******************************************************************************
 N 0
   S    6     1.0000000
       3849.6414482     0.0020197
@@ -2355,19 +1837,6 @@ N 0
          1.8733840     0.3533060
          0.4939230     0.7800500
 ****
-
-!******************************************************************************
-! Element : Ni
-! Basis : Sapporo-DZP = gtf non-relativistic ([6s4p3d1f]{7421(3)/7312/612/2})
-! Term : 3F   Valence configuration : 3s(2)3p(6)3d(8)4s(2)
-! SCF energy : -1506.83178879 a.u.   
-! Valence Correlation energy : -0.44897556 a.u.
-! Reference
-! Authors : T. Koga, H. Tatewaki, H. Matsuyama, Y. Satoh,  
-! Journal : Theor. Chem. Acc. 102, 105 (1999)
-! Authors : T. Noro, M. Sekiya, T. Koga, H. Matsuyama,   [inner shell]
-! Journal : Theor. Chem. Acc., 104, 146-152 (2000)
-!******************************************************************************
 Ni 0
   S    7     1.0000000
     160910.5133710     0.0006340
@@ -2424,21 +1893,6 @@ Ni 0
          2.9947340     0.5864101
          0.7217600     0.6310252
 ****
-
-!******************************************************************************
-! Element : Na
-! Basis : Sapporo-DZP = gtf non-relativistic ([5s4p1d]{621(3)/41(3)/2})
-! Term : 2S   Valence configuration : 2s(2)2p(6)3s(1)
-! SCF energy : -161.83829196 a.u.   
-! Valence Correlation energy : -0.21338032 a.u.
-! Reference
-! Authors : H. Tatewaki, T. Koga,  
-! Journal : Theor. Chem. Acc. 96, 243 (1997)
-! Authors : T. Noro, M. Sekiya, T. Koga,   [inner and valence shell]
-! Journal : Theor. Chem. Acc., 121, 289-295 (2008)
-! Authors : T. Noro, M. Sekiya, T. Koga,   [core correlated set]
-! Journal : Theor. Chem. Acc., 109, 85-90 (2003)
-!******************************************************************************
 Na 0
   S    6     1.0000000
       9790.5449200     0.0019760
@@ -2471,19 +1925,6 @@ Na 0
          6.0418610     0.3474681
          1.6487710     0.7796392
 ****
-
-!******************************************************************************
-! Element : In
-! Basis : Sapporo-DZP = gtf non-relativistic ([6s5p3d]{743(2)21/74321/742})
-! Term : 2P   Valence configuration : 5s(2)5p(1)
-! SCF energy : -5740.05640539 a.u.   
-! Valence Correlation energy : -0.04081096 a.u.
-! Reference
-! Authors : T. Koga, S. Yamamoto, T. Shimazaki, H. Tatewaki,  
-! Journal : Theor. Chem. Acc. 108, 41 (2002)
-! Authors : M. Sekiya, T. Noro, Y. Osanai, T. Koga,   [inner and valence shell]
-! Journal : Theor. Chem. Acc., 106, 297-300 (2001)
-!******************************************************************************
 In 0
   S    7     1.0000000
     518633.1882297     0.0005986
@@ -2550,19 +1991,6 @@ In 0
          0.2120850     0.5726837
          0.0794390     0.5226396
 ****
-
-!******************************************************************************
-! Element : F
-! Basis : Sapporo-DZP = gtf non-relativistic ([3s2p1d]{621/31/2})
-! Term : 2P   Valence configuration : 2s(2)2p(5)
-! SCF energy : -99.36392704 a.u.   
-! Valence Correlation energy : -0.16163333 a.u.
-! Reference
-! Authors : H. Moriyama, H. Tatewaki,  
-! Journal : unpublished
-! Authors : T. Noro, M. Sekiya, T. Koga,   [inner and valence shell]
-! Journal : Theor. Chem. Acc., 98, 25-32 (1997)
-!******************************************************************************
 F 0
   S    6     1.0000000
       6441.7488125     0.0020081
@@ -2586,19 +2014,6 @@ F 0
          3.4958680     0.3496371
          0.9160300     0.7837372
 ****
-
-!******************************************************************************
-! Element : Zr
-! Basis : Sapporo-DZP = gtf non-relativistic ([7s6p4d1f]{74321(3)/741(3)2/7412/2})
-! Term : 3F   Valence configuration : 4s(2)4p(6)4d(2)5s(2)
-! SCF energy : -3538.92164199 a.u.   
-! Valence Correlation energy : -0.21554449 a.u.
-! Reference
-! Authors : T. Koga, S. Yamamoto, T. Shimazaki, H. Tatewaki,  
-! Journal : Theor. Chem. Acc. 108, 41 (2002)
-! Authors : Y. Osanai, M. Sekiya, T. Noro, T. Koga,   [inner shell]
-! Journal : Mol. Phys., 101, 65-71 (2003)
-!******************************************************************************
 Zr 0
   S    7     1.0000000
     339772.6394300     0.0006100
@@ -2670,19 +2085,6 @@ Zr 0
          0.6244670     0.5157639
          0.1637620     0.6786969
 ****
-
-!******************************************************************************
-! Element : Al
-! Basis : Sapporo-DZP = gtf non-relativistic ([4s3p1d]{6321/621/3})
-! Term : 2P   Valence configuration : 3s(2)3p(1)
-! SCF energy : -241.84781053 a.u.   
-! Valence Correlation energy : -0.05022818 a.u.
-! Reference
-! Authors : H. Tatewaki, T. Koga,  
-! Journal : Theor. Chem. Acc. 96, 243 (1997)
-! Authors : M. Sekiya, T. Noro, T. Koga, H. Matsuyama,   [inner and valence shell]
-! Journal : J. Mol. Struct.(Theochem), 451, 51-60 (1998)
-!******************************************************************************
 Al 0
   S    6     1.0000000
      14022.8007565     0.0019226
@@ -2717,19 +2119,6 @@ Al 0
          0.3252270     0.4791835
          0.1086400     0.6293193
 ****
-
-!******************************************************************************
-! Element : Se
-! Basis : Sapporo-DZP = gtf non-relativistic ([5s4p2d]{74321/7421/72})
-! Term : 3P   Valence configuration : 4s(2)4p(4)
-! SCF energy : -2399.81291188 a.u.   
-! Valence Correlation energy : -0.08873435 a.u.
-! Reference
-! Authors : T. Koga, H. Tatewaki, H. Matsuyama, Y. Satoh,  
-! Journal : Theor. Chem. Acc. 102, 105 (1999)
-! Authors : M. Sekiya, T. Noro, Y. Osanai, T. Koga,   [inner and valence shell]
-! Journal : Theor. Chem. Acc., 106, 297-300 (2001)
-!******************************************************************************
 Se 0
   S    7     1.0000000
     241498.6382409     0.0006217
@@ -2783,19 +2172,6 @@ Se 0
          0.5653420     0.5251236
          0.2082120     0.5731685
 ****
-
-!******************************************************************************
-! Element : B
-! Basis : Sapporo-DZP = gtf non-relativistic ([3s2p1d]{621/31/2})
-! Term : 2P   Valence configuration : 2s(2)2p(1)
-! SCF energy : -24.52436476 a.u.   
-! Valence Correlation energy : -0.06354638 a.u.
-! Reference
-! Authors : H. Moriyama, H. Tatewaki,  
-! Journal : unpublished
-! Authors : T. Noro, M. Sekiya, T. Koga,   [inner and valence shell]
-! Journal : Theor. Chem. Acc., 98, 25-32 (1997)
-!******************************************************************************
 B 0
   S    6     1.0000000
       1918.9014118     0.0020431
@@ -2819,19 +2195,6 @@ B 0
          0.7624910     0.3625991
          0.2128620     0.7644853
 ****
-
-!******************************************************************************
-! Element : V
-! Basis : Sapporo-DZP = gtf non-relativistic ([6s5p3d1f]{7421(3)/721(2)2/612/2})
-! Term : 4F   Valence configuration : 3s(2)3p(6)3d(3)4s(2)
-! SCF energy : -942.85955657 a.u.   
-! Valence Correlation energy : -0.28615129 a.u.
-! Reference
-! Authors : T. Koga, H. Tatewaki, H. Matsuyama, Y. Satoh,  
-! Journal : Theor. Chem. Acc. 102, 105 (1999)
-! Authors : T. Noro, M. Sekiya, T. Koga, H. Matsuyama,   [inner shell]
-! Journal : Theor. Chem. Acc., 104, 146-152 (2000)
-!******************************************************************************
 V 0
   S    7     1.0000000
     106650.1579680     0.0006460
@@ -2889,19 +2252,6 @@ V 0
          1.1973410     0.5376939
          0.2832230     0.6800778
 ****
-
-!******************************************************************************
-! Element : Fe
-! Basis : Sapporo-DZP = gtf non-relativistic ([6s4p3d1f]{7421(3)/7312/612/2})
-! Term : 5D   Valence configuration : 3s(2)3p(6)3d(6)4s(2)
-! SCF energy : -1262.41058549 a.u.   
-! Valence Correlation energy : -0.37725814 a.u.
-! Reference
-! Authors : T. Koga, H. Tatewaki, H. Matsuyama, Y. Satoh,  
-! Journal : Theor. Chem. Acc. 102, 105 (1999)
-! Authors : T. Noro, M. Sekiya, T. Koga, H. Matsuyama,   [inner shell]
-! Journal : Theor. Chem. Acc., 104, 146-152 (2000)
-!******************************************************************************
 Fe 0
   S    7     1.0000000
     137853.7493220     0.0006380
@@ -2958,19 +2308,6 @@ Fe 0
          3.6655870     0.3798609
          0.8029380     0.8165407
 ****
-
-!******************************************************************************
-! Element : Pd
-! Basis : Sapporo-DZP = gtf non-relativistic ([7s5p4d1f]{74321(3)/74221/7412/2})
-! Term : 1S   Valence configuration : 4s(2)4p(6)4d(10)
-! SCF energy : -4937.8230426 a.u.   
-! Valence Correlation energy : -0.41109462 a.u.
-! Reference
-! Authors : T. Koga, S. Yamamoto, T. Shimazaki, H. Tatewaki,  
-! Journal : Theor. Chem. Acc. 108, 41 (2002)
-! Authors : Y. Osanai, M. Sekiya, T. Noro, T. Koga,   [inner shell]
-! Journal : Mol. Phys., 101, 65-71 (2003)
-!******************************************************************************
 Pd 0
   S    7     1.0000000
     454415.1326110     0.0006030
@@ -3041,19 +2378,6 @@ Pd 0
          1.7697590     0.5951168
          0.5064270     0.5847348
 ****
-
-!******************************************************************************
-! Element : Tc
-! Basis : Sapporo-DZP = gtf non-relativistic ([7s6p4d1f]{74321(3)/741(3)2/7412/2})
-! Term : 6S   Valence configuration : 4s(2)4p(6)4d(5)5s(2)
-! SCF energy : -4204.70345606 a.u.   
-! Valence Correlation energy : -0.30357867 a.u.
-! Reference
-! Authors : T. Koga, S. Yamamoto, T. Shimazaki, H. Tatewaki,  
-! Journal : Theor. Chem. Acc. 108, 41 (2002)
-! Authors : Y. Osanai, M. Sekiya, T. Noro, T. Koga,   [inner shell]
-! Journal : Mol. Phys., 101, 65-71 (2003)
-!******************************************************************************
 Tc 0
   S    7     1.0000000
     395174.3686530     0.0006060
@@ -3125,19 +2449,6 @@ Tc 0
          1.2348890     0.5517867
          0.3402700     0.6353196
 ****
-
-!******************************************************************************
-! Element : Nb
-! Basis : Sapporo-DZP = gtf non-relativistic ([7s6p4d1f]{74321(3)/741(3)2/7412/2})
-! Term : 6D   Valence configuration : 4s(2)4p(6)4d(4)5s(1)
-! SCF energy : -3753.52065388 a.u.   
-! Valence Correlation energy : -0.23871253 a.u.
-! Reference
-! Authors : T. Koga, S. Yamamoto, T. Shimazaki, H. Tatewaki,  
-! Journal : Theor. Chem. Acc. 108, 41 (2002)
-! Authors : Y. Osanai, M. Sekiya, T. Noro, T. Koga,   [inner shell]
-! Journal : Mol. Phys., 101, 65-71 (2003)
-!******************************************************************************
 Nb 0
   S    7     1.0000000
     357699.0464980     0.0006090
@@ -3209,19 +2520,6 @@ Nb 0
          0.8416510     0.5350945
          0.2245280     0.6577276
 ****
-
-!******************************************************************************
-! Element : Cd
-! Basis : Sapporo-DZP = gtf non-relativistic ([7s5p4d1f]{74321(3)/74212/7412/2})
-! Term : 1S   Valence configuration : 4s(2)4p(6)4d(10)5s(2)
-! SCF energy : -5465.02942537 a.u.   
-! Valence Correlation energy : -0.45579221 a.u.
-! Reference
-! Authors : T. Koga, S. Yamamoto, T. Shimazaki, H. Tatewaki,  
-! Journal : Theor. Chem. Acc. 108, 41 (2002)
-! Authors : Y. Osanai, M. Sekiya, T. Noro, T. Koga,   [inner shell]
-! Journal : Mol. Phys., 101, 65-71 (2003)
-!******************************************************************************
 Cd 0
   S    7     1.0000000
     496798.3727430     0.0006000
@@ -3292,19 +2590,6 @@ Cd 0
          2.2672590     0.6040721
          0.6695230     0.5685471
 ****
-
-!******************************************************************************
-! Element : Mo
-! Basis : Sapporo-DZP = gtf non-relativistic ([7s6p4d1f]{74321(3)/741(3)2/7412/2})
-! Term : 7S   Valence configuration : 4s(2)4p(6)4d(5)5s(1)
-! SCF energy : -3975.46841289 a.u.   
-! Valence Correlation energy : -0.26610706 a.u.
-! Reference
-! Authors : T. Koga, S. Yamamoto, T. Shimazaki, H. Tatewaki,  
-! Journal : Theor. Chem. Acc. 108, 41 (2002)
-! Authors : Y. Osanai, M. Sekiya, T. Noro, T. Koga,   [inner shell]
-! Journal : Mol. Phys., 101, 65-71 (2003)
-!******************************************************************************
 Mo 0
   S    7     1.0000000
     376188.2918800     0.0006070
@@ -3376,4 +2661,3 @@ Mo 0
          1.0373960     0.5485039
          0.2815330     0.6416758
 ****
-

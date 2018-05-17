@@ -581,6 +581,10 @@ namespace ChronusQ {
 #endif
 
     size_t n1, n2;
+    std::array<double,4> Ql={0.,2.,10.,28.};
+
+    if( basisSet_.maxL > 3 ) CErr("Boettger scaling for L > 3 NYI");
+
     for(auto s1(0ul), i(0ul); s1 < basisSet_.nShell; s1++, i+=n1) {
       n1 = basisSet_.shells[s1].size();
       
@@ -601,19 +605,18 @@ namespace ChronusQ {
         molecule_.atoms[basisSet_.mapSh2Cen[s2]].atomicNumber;
     
       dcomplex fudgeFactor = std::sqrt(
-        L1 * (L1+1) * (2*L1+1) *
-        L2 * (L2+1) * (2*L2+1) / 9. /
+        Ql[L1] * Ql[L2] /
         Z1 / Z2
       );
 
-      MatAdd('N','N',n1,n2,dcomplex(1.),HUnZ + i + j*NB,NB,
-        -fudgeFactor,HUnZ + i + j*NB,NB, HUnZ + i + j*NB,NB);
+      MatAdd('N','N',n1,n2,dcomplex(-1.),HUnZ + i + j*NB,NB,
+        fudgeFactor,HUnZ + i + j*NB,NB, HUnZ + i + j*NB,NB);
 
-      MatAdd('N','N',n1,n2,dcomplex(1.),HUnY + i + j*NB,NB,
-        -fudgeFactor,HUnY + i + j*NB,NB, HUnY + i + j*NB,NB);
+      MatAdd('N','N',n1,n2,dcomplex(-1.),HUnY + i + j*NB,NB,
+        fudgeFactor,HUnY + i + j*NB,NB, HUnY + i + j*NB,NB);
 
-      MatAdd('N','N',n1,n2,dcomplex(1.),HUnX + i + j*NB,NB,
-        -fudgeFactor,HUnX + i + j*NB,NB, HUnX + i + j*NB,NB);
+      MatAdd('N','N',n1,n2,dcomplex(-1.),HUnX + i + j*NB,NB,
+        fudgeFactor,HUnX + i + j*NB,NB, HUnX + i + j*NB,NB);
 
     } // loop s2
     } // loop s1

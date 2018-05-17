@@ -168,7 +168,7 @@ namespace ChronusQ {
 
 
       // Orthonormalize the AO Fock matrix
-      // F(k) -> FO(l)
+      // F(k) -> FO(k)
       propagator_.ao2orthoFock();
 
 
