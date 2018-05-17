@@ -145,6 +145,18 @@ namespace ChronusQ {
 
 
 
+
+
+    // Printing Options
+    OPTOPT( ss.scfControls.printMOCoeffs = 
+      input.getData<bool>("SCF.PRINTMOS") );
+
+
+
+
+
+
+
     // Handling eqivalences in the input options
 
 

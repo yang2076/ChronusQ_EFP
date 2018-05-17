@@ -85,6 +85,11 @@ namespace ChronusQ {
     // Misc control
     size_t maxSCFIter = 128; ///< Maximum SCF iterations.
 
+
+
+    // Printing
+    bool printMOCoeffs = false;
+
   }; // SCFControls struct
 
   /**
