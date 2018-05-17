@@ -27,6 +27,10 @@ set(ChronusQ_VERSION_MINOR 1)
 set(ChronusQ_VERSION_PATCH 0)
 
 
+# Options
+option(ENABLE_COVERAGE "Enable coverage and profiling" OFF)
+
+
 # Append local cmake directory to find CMAKE Modules
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
@@ -55,7 +59,12 @@ find_package(HDF5 REQUIRED CXX)
 include_directories("${HDF5_INCLUDE_DIRS}")
 list(APPEND CQEX_LINK ${HDF5_CXX_LIBRARIES} )
 
-
+# Compiling with coverage report
+if(ENABLE_COVERAGE)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
+endif()
 
 
 
