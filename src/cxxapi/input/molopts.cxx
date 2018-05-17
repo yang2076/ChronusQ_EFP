@@ -71,22 +71,32 @@ namespace ChronusQ {
 
       if( tokens.size() == 0 ) continue;
 
-      if( std::any_of(tokens[0].begin(),tokens[0].end(),
-        [&](char a) {return std::isdigit(a,loc); }) ){
+      std::string atmSymb = tokens[0];
+
+      bool hasDig = std::any_of(atmSymb.begin(),atmSymb.end(),
+        [&](char a) {return std::isdigit(a,loc); });
+      bool hasAlpha = std::any_of(atmSymb.begin(),atmSymb.end(),
+        [&](char a) {return std::isalpha(a,loc); });
+
+      
+      bool isAtNum   = hasDig   and not hasAlpha;
+      bool isComIso  = hasAlpha and not hasDig  ;
+      bool isSpecIso = hasDig   and     hasAlpha;
 
 
+
+      if( isAtNum ) {
 
         auto it = 
         std::find_if(atomicReference.begin(),atomicReference.end(),
           [&](std::pair<std::string,Atom> st){ 
-            return st.second.atomicNumber == std::stoi(tokens[0]);}
+            return st.second.atomicNumber == std::stoi(atmSymb);}
            );
 
-        atoms.emplace_back((it == atomicReference.end() ? "X" : it->first));
+        atoms.emplace_back((it == atomicReference.end() ? "X" : defaultIsotope[it->first]));
 
         
-      } else
-        atoms.emplace_back(tokens[0]);
+      } else atoms.emplace_back(isComIso ? defaultIsotope[atmSymb] : atmSymb);
       
       // Convert to Bohr
       atoms.back().coord[0] = std::stod(tokens[1]) / AngPerBohr;

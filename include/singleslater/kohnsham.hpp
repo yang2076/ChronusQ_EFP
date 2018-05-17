@@ -83,10 +83,11 @@ namespace ChronusQ {
     template <typename... Args>
     KohnSham(std::string funcName, 
       std::vector<std::shared_ptr<DFTFunctional>> funclist,
+      IntegrationParam ip, 
       AOIntegrals &aoi, Args... args) : 
       SingleSlater<T>(aoi,args...), WaveFunctionBase(aoi,args...),
       QuantumBase(aoi.memManager(),args...), isGGA_(false),
-      functionals(std::move(funclist)) { 
+      functionals(std::move(funclist)),intParam(ip) { 
 
       // Append HF tags to reference names
       if(this->nC == 1) {
@@ -118,10 +119,11 @@ namespace ChronusQ {
     template <typename... Args>
     KohnSham(std::string rL, std::string rS, std::string funcName, 
       std::vector<std::shared_ptr<DFTFunctional>> funclist,
+      IntegrationParam ip, 
       AOIntegrals &aoi, Args... args) : 
       SingleSlater<T>(aoi,args...), WaveFunctionBase(aoi,args...),
       QuantumBase(aoi.memManager(),args...), isGGA_(false),
-      functionals(std::move(funclist)) { 
+      functionals(std::move(funclist)),intParam(ip) { 
 
       this->refLongName_  += rL + " " + funcName;
       this->refShortName_ += rS + funcName;

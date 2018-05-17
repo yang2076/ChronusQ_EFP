@@ -42,6 +42,58 @@ BOOST_FIXTURE_TEST_CASE( Water_6311pGdp_x2c_b3lyp_cart, SerialJob ) {
  
 };
 
+
+
+// Hg SAPPORO DZP DKH_2012 SP SLATER
+BOOST_FIXTURE_TEST_CASE( Hg_SAP_DZP_DKH3_2012_SP_SLATER , SerialJob ) {
+
+  CQSCFTEST( scf/serial/x2c/hg_sap_dz_dkh3_2012_sp_slater, 
+    hg_sap_dz_dkh3_2012_sp_slater.bin.ref );
+ 
+};
+
+// Zn SAPPORO DZP DKH_2012 SP SLATER
+BOOST_FIXTURE_TEST_CASE( Zn_SAP_DZP_DKH3_2012_SP_SLATER , SerialJob ) {
+
+  CQSCFTEST( scf/serial/x2c/zn_sap_dz_dkh3_2012_sp_slater, 
+    zn_sap_dz_dkh3_2012_sp_slater.bin.ref );
+ 
+};
+
+// Cd SAPPORO DZP DKH_2012 SP SLATER
+BOOST_FIXTURE_TEST_CASE( Cd_SAP_DZP_DKH3_2012_SP_SLATER , SerialJob ) {
+
+  CQSCFTEST( scf/serial/x2c/cd_sap_dz_dkh3_2012_sp_slater, 
+    cd_sap_dz_dkh3_2012_sp_slater.bin.ref );
+ 
+};
+
+
+
+// Hg SAPPORO DZP DKH_2012 SP B3LYP
+BOOST_FIXTURE_TEST_CASE( Hg_SAP_DZP_DKH3_2012_SP_B3LYP , SerialJob ) {
+
+  CQSCFTEST( scf/serial/x2c/hg_sap_dz_dkh3_2012_sp_b3lyp, 
+    hg_sap_dz_dkh3_2012_sp_b3lyp.bin.ref );
+ 
+};
+
+// Zn SAPPORO DZP DKH_2012 SP B3LYP
+BOOST_FIXTURE_TEST_CASE( Zn_SAP_DZP_DKH3_2012_SP_B3LYP , SerialJob ) {
+
+  CQSCFTEST( scf/serial/x2c/zn_sap_dz_dkh3_2012_sp_b3lyp, 
+    zn_sap_dz_dkh3_2012_sp_b3lyp.bin.ref );
+ 
+};
+
+// Cd SAPPORO DZP DKH_2012 SP B3LYP
+BOOST_FIXTURE_TEST_CASE( Cd_SAP_DZP_DKH3_2012_SP_B3LYP , SerialJob ) {
+
+  CQSCFTEST( scf/serial/x2c/cd_sap_dz_dkh3_2012_sp_b3lyp, 
+    cd_sap_dz_dkh3_2012_sp_b3lyp.bin.ref );
+ 
+};
+
 #ifdef _CQ_DO_PARTESTS
 
 // SMP X2C Water 6-311+G(d,p) B3LYP (Spherical) test
@@ -51,6 +103,25 @@ BOOST_FIXTURE_TEST_CASE( PAR_Water_6311pGdp_x2c_b3lyp_sph, ParallelJob ) {
     water_6-311+Gdp_sph_x2c_b3lyp.bin.ref );
  
 };
+
+
+/*
+// SMP Hg SAPPORO DZP DKH_2012 SP SLATER
+BOOST_FIXTURE_TEST_CASE( PAR_Hg_SAP_DZP_DKH3_2012_SP_SLATER , ParallelJob ) {
+
+  CQSCFTEST( scf/parallel/x2c/hg_sap_dz_dkh3_2012_sp_slater, 
+    hg_sap_dz_dkh3_2012_sp_slater.bin.ref );
+ 
+};
+
+// SMP Hg SAPPORO DZP DKH_2012 SP B3LYP
+BOOST_FIXTURE_TEST_CASE( PAR_Hg_SAP_DZP_DKH3_2012_SP_B3LYP , ParallelJob ) {
+
+  CQSCFTEST( scf/parallel/x2c/hg_sap_dz_dkh3_2012_sp_b3lyp, 
+    hg_sap_dz_dkh3_2012_sp_b3lyp.bin.ref );
+ 
+};
+*/
 
 #endif
 
