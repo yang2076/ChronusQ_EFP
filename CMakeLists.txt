@@ -61,9 +61,15 @@ list(APPEND CQEX_LINK ${HDF5_CXX_LIBRARIES} )
 
 # Compiling with coverage report
 if(ENABLE_COVERAGE)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage")
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
+
+  if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
+    message(STATUS "ENABLE_COVERAGE Only Compatible with GNU Compilers!")
+  else()
+    message(STATUS "Enabling Coverage and Profiling -- Warning! May impede performance")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
+  endif()
 endif()
 
 
