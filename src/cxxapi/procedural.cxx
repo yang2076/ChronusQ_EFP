@@ -75,6 +75,21 @@ namespace ChronusQ {
     CQInputFile input(inFileName);
 
 
+
+    // Dump contents of input file into output file
+    std::cout << "\n\n\n";
+    std::cout << "Input File:\n" << BannerTop << std::endl;
+    std::ifstream inStream(inFileName);
+    std::istreambuf_iterator<char> begin_src(inStream);
+    std::istreambuf_iterator<char> end_src;
+    std::ostreambuf_iterator<char> begin_dest(std::cout);
+    std::copy(begin_src,end_src,begin_dest);
+    inStream.close();
+    std::cout << BannerEnd << "\n\n\n" << std::endl;
+
+
+
+
     // Determine JOB type
     std::string jobType;
     
