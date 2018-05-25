@@ -145,7 +145,7 @@ namespace ChronusQ {
       inline void update() {
 
         // Compute the total number of 
-        nTotalE = std::accumulate(atoms.begin(),atoms.end(),charge,
+        nTotalE = std::accumulate(atoms.begin(),atoms.end(),-charge,
                     [&](int c, const Atom &a){ return a.atomicNumber + c; }
                   );
 
