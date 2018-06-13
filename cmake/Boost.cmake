@@ -20,7 +20,13 @@
 # Contact the Developers:
 #   E-Mail: xsli@uw.edu
 
-set(Boost_USE_STATIC_LIBS    ON)
+if( NOT FORCE_SHARED_BOOST )
+  message(STATUS "ChronusQ will require static libraries to be installed: use FORCE_SHARED_BOOST=ON to toggle")
+  set(Boost_USE_STATIC_LIBS    ON)
+else()
+  message(STATUS "ChronusQ will allow linkage to shared Boost libraries")
+endif()
+
 set(Boost_USE_MULTITHREADED  ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(Boost REQUIRED unit_test_framework system)

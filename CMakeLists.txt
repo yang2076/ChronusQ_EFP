@@ -28,7 +28,8 @@ set(ChronusQ_VERSION_PATCH 0)
 
 
 # Options
-option(ENABLE_COVERAGE "Enable coverage and profiling" OFF)
+option(ENABLE_COVERAGE    "Enable coverage and profiling"   OFF)
+option(FORCE_SHARED_BOOST "Force link to shared Boost Libs" OFF)
 
 
 # Append local cmake directory to find CMAKE Modules
