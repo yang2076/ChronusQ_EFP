@@ -45,10 +45,10 @@ inline H5::CompType H5PredType() {
     H5::CompType complexType(sizeof(complex_t));
 
     complexType.insertMember(
-      "RE",HOFFSET(complex_t,re),H5::PredType::NATIVE_DOUBLE
+      "r",HOFFSET(complex_t,re),H5::PredType::NATIVE_DOUBLE
     );
     complexType.insertMember(
-      "IM",HOFFSET(complex_t,im),H5::PredType::NATIVE_DOUBLE
+      "i",HOFFSET(complex_t,im),H5::PredType::NATIVE_DOUBLE
     );
     return complexType;
   }
