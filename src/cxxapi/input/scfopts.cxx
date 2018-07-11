@@ -66,6 +66,12 @@ namespace ChronusQ {
         ss.scfControls.guess = SAD;
       else if( not guessString.compare("RANDOM") )
         ss.scfControls.guess = RANDOM;
+      else if( not guessString.compare("READMO") )
+        ss.scfControls.guess = READMO;
+      else if( not guessString.compare("READDEN") )
+        ss.scfControls.guess = READDEN;
+      else
+        CErr("Unrecognized entry for SCF.GUESS");
     )
 
 
@@ -74,8 +80,6 @@ namespace ChronusQ {
       ss.scfControls.doExtrap = 
         input.getData<bool>("SCF.EXTRAP");
     )
-
-
 
     // Handle DIIS options
     OPTOPT(

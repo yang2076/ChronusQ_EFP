@@ -185,6 +185,8 @@ namespace ChronusQ {
     void CoreGuess();
     void SADGuess();
     void RandomGuess();
+    void ReadGuessMO();
+    void ReadGuess1PDM();
     
 
 

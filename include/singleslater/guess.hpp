@@ -89,15 +89,20 @@ namespace ChronusQ {
       std::cout << "  *** Forming Initial Guess Density for SCF Procedure ***"
                 << std::endl << std::endl;
 
-    if( aoints.molecule().nAtoms == 1  or scfControls.guess == CORE)
+    if( aoints.molecule().nAtoms == 1  and scfControls.guess == SAD){
+      std::cout << " * WARNING: SAD guess does not make sense for an atom." << "\n";
+      std::cout << "Running CORE guess instead." << "\n";
       CoreGuess();
+    }else if( scfControls.guess == CORE ) CoreGuess();
     else if( scfControls.guess == SAD ) SADGuess();
     else if( scfControls.guess == RANDOM ) RandomGuess();
+    else if( scfControls.guess == READMO ) ReadGuessMO(); 
+    else if( scfControls.guess == READDEN ) ReadGuess1PDM(); 
+    else CErr("Unknown choice for SCF.GUESS",std::cout);
 
 
     // Common to all guess: form new set of orbitals from
     // initial guess at Fock.
-
     EMPerturbation pert; // Dummy EM perturbation
     getNewOrbitals(pert,false);
     
@@ -336,6 +341,370 @@ namespace ChronusQ {
     }
 
   }
+
+  /**
+   *  \brief Reads in 1PDM from bin file. 
+   *
+   **/
+  template <typename T>
+  void SingleSlater<T>::ReadGuess1PDM() {
+
+    if( printLevel > 0 )
+      std::cout << "    * Reading in guess density from file "
+        << savFile.fName() << "\n";
+
+    size_t t_hash = std::type_index(typeid(T)).hash_code();
+    size_t d_hash = std::type_index(typeid(double)).hash_code();
+    size_t c_hash = std::type_index(typeid(dcomplex)).hash_code();
+
+    size_t savHash;
+    try{
+      savFile.readData("/SCF/FIELD_TYPE", &savHash);
+    } catch (...) {
+      CErr("Cannot find /SCF/FIELD_TYPE on rstFile!",std::cout);
+    }
+
+
+
+    if( t_hash != savHash ) {
+  
+      bool t_is_double  = t_hash == d_hash;
+      bool t_is_complex = t_hash == c_hash;
+  
+      bool s_is_double  = savHash == d_hash;
+      bool s_is_complex = savHash == c_hash;
+
+      std::string t_field = t_is_double ? "REAL" : "COMPLEX";
+      std::string s_field = s_is_double ? "REAL" : "COMPLEX";
+
+      std::string message = "/SCF/FIELD_TYPE on disk (" + s_field +
+        ") is incompatible with current FIELD_TYPE (" + t_field + ")";
+
+      CErr(message,std::cout);
+    }
+
+
+ 
+    // dimension of 1PDM 
+    auto NB = aoints.basisSet().nBasis;
+    auto NB2 = NB*NB;
+
+
+    auto DSdims = savFile.getDims( "SCF/1PDM_SCALAR" );
+    auto DZdims = savFile.getDims( "SCF/1PDM_MZ" );
+    auto DYdims = savFile.getDims( "SCF/1PDM_MY" );
+    auto DXdims = savFile.getDims( "SCF/1PDM_MX" );
+
+    bool hasDS = DSdims.size() != 0;
+    bool hasDZ = DZdims.size() != 0;
+    bool hasDY = DYdims.size() != 0;
+    bool hasDX = DXdims.size() != 0;
+
+    bool r2DS = DSdims.size() == 2;
+    bool r2DZ = DZdims.size() == 2;
+    bool r2DY = DYdims.size() == 2;
+    bool r2DX = DXdims.size() == 2;
+
+
+    // Errors in 1PDM SCALAR
+    if( not hasDS )
+      CErr("SCF/1PDM_SCALAR does not exist in " + savFile.fName(), std::cout); 
+
+    else if( not r2DS ) 
+      CErr("SCF/1PDM_SCALAR not saved as a rank-2 tensor in " + 
+          savFile.fName(), std::cout); 
+
+    else if( DSdims[0] != NB or DSdims[1] != NB ) {
+
+      std::cout << "    * Incompatible SCF/1PDM_SCALAR:";
+      std::cout << "  Recieved (" << DSdims[0] << "," << DSdims[1] << ")"
+        << " :"; 
+      std::cout << "  Expected (" << NB << "," << NB << ")"; 
+      CErr("Wrong dimension of 1PDM SCALAR!",std::cout);
+
+    }
+
+    // Read in 1PDM SCALAR
+    std::cout << "    * Found SCF/1PDM_SCALAR !" << std::endl;
+    savFile.readData("/SCF/1PDM_SCALAR",this->onePDM[SCALAR]); 
+
+
+    // Oddities in Restricted
+    if( this->nC == 1 and this->iCS ) {
+
+      if( hasDZ )
+        std::cout << "    * WARNING: Reading in SCF/1PDM_SCALAR as "
+          << "restricted guess but " << savFile.fName() 
+          << " contains SCF/1PDM_MZ" << std::endl;
+
+      if( hasDY )
+        std::cout << "    * WARNING: Reading in SCF/1PDM_SCALAR as "
+          << "restricted guess but " << savFile.fName() 
+          << " contains SCF/1PDM_MY" << std::endl;
+
+      if( hasDX )
+        std::cout << "    * WARNING: Reading in SCF/1PDM_SCALAR as "
+          << "restricted guess but " << savFile.fName() 
+          << " contains SCF/1PDM_MX" << std::endl;
+
+    }
+
+
+    // MZ
+    if( this->nC == 2 or not this->iCS ) {
+
+      if( not hasDZ ) {
+
+        std::cout <<  "    * WARNING: SCF/1PDM_MZ does not exist in "
+          << savFile.fName() << " -- Zeroing out SCF/1PDM_MZ" << std::endl;
+
+        std::fill_n(this->onePDM[MZ],NB2,0.);
+
+
+      } else if( not r2DZ ) 
+        CErr("SCF/1PDM_MZ not saved as a rank-2 tensor in " + 
+            savFile.fName(), std::cout); 
+
+      else if( DZdims[0] != NB or DZdims[1] != NB ) {
+
+        std::cout << "    * Incompatible SCF/1PDM_MZ:";
+        std::cout << "  Recieved (" << DZdims[0] << "," << DZdims[1] << ")"
+          << " :"; 
+        std::cout << "  Expected (" << NB << "," << NB << ")"; 
+        CErr("Wrong dimension of 1PDM MZ!",std::cout);
+
+      } else {
+
+        std::cout << "    * Found SCF/1PDM_MZ !" << std::endl;
+        savFile.readData("SCF/1PDM_MZ",this->onePDM[MZ]); 
+
+      }
+
+      // Oddities in Unrestricted
+      if( this->nC == 2 ) {
+
+        if( hasDY )
+          std::cout << "    * WARNING: Reading in SCF/1PDM_MZ as "
+            << "unrestricted guess but " << savFile.fName() 
+            << " contains SCF/1PDM_MY" << std::endl;
+
+        if( hasDX )
+          std::cout << "    * WARNING: Reading in SCF/1PDM_MZ as "
+            << "unrestricted guess but " << savFile.fName() 
+            << " contains SCF/1PDM_MX" << std::endl;
+
+      }
+
+    }
+
+
+    if( this->nC == 2 ) {
+
+      if( not hasDY ) {
+
+        std::cout <<  "    * WARNING: SCF/1PDM_MY does not exist in "
+          << savFile.fName() << " -- Zeroing out SCF/1PDM_MY" << std::endl;
+
+        std::fill_n(this->onePDM[MY],NB2,0.);
+
+
+      } else if( not r2DY ) 
+        CErr("SCF/1PDM_MY not saved as a rank-2 tensor in " + 
+            savFile.fName(), std::cout); 
+
+      else if( DYdims[0] != NB or DYdims[1] != NB ) {
+
+        std::cout << "    * Incompatible SCF/1PDM_MY:";
+        std::cout << "  Recieved (" << DYdims[0] << "," << DYdims[1] << ")"
+          << " :"; 
+        std::cout << "  Expected (" << NB << "," << NB << ")"; 
+        CErr("Wrong dimension of 1PDM MY!",std::cout);
+
+      } else {
+
+        std::cout << "    * Found SCF/1PDM_MY !" << std::endl;
+        savFile.readData("SCF/1PDM_MY",this->onePDM[MY]); 
+
+      }
+
+
+      if( not hasDX ) {
+
+        std::cout <<  "    * WARNING: SCF/1PDM_MX does not exist in "
+          << savFile.fName() << " -- Zeroing out SCF/1PDM_MX" << std::endl;
+
+        std::fill_n(this->onePDM[MX],NB2,0.);
+
+
+      } else if( not r2DX ) 
+        CErr("SCF/1PDM_MX not saved as a rank-2 tensor in " + 
+            savFile.fName(), std::cout); 
+
+      else if( DXdims[0] != NB or DXdims[1] != NB ) {
+
+        std::cout << "    * Incompatible SCF/1PDM_MX:";
+        std::cout << "  Recieved (" << DXdims[0] << "," << DXdims[1] << ")"
+          << " :"; 
+        std::cout << "  Expected (" << NB << "," << NB << ")"; 
+        CErr("Wrong dimension of 1PDM MX!",std::cout);
+
+      } else {
+
+        std::cout << "    * Found SCF/1PDM_MX !" << std::endl;
+        savFile.readData("SCF/1PDM_MX",this->onePDM[MX]); 
+
+      }
+
+
+    }
+
+
+
+
+    std::cout << "\n" << std::endl;
+    if( printLevel > 0 )
+      std::cout << std::endl
+                << "  *** Forming Initial Fock Matrix from Guess Density ***\n\n";
+
+    std::cout << "\n" << std::endl;
+    EMPerturbation pert;
+    formFock(pert,false);
+
+  } // SingleSlater<T>::ReadGuess1PDM()
+
+
+
+  /**
+   *  \brief Reads in MOs from bin file. 
+   *
+   **/
+  template <typename T>
+  void SingleSlater<T>::ReadGuessMO() {
+
+    if( printLevel > 0 )
+      std::cout << "    * Reading in guess orbitals from file "
+        << savFile.fName() << "\n";
+ 
+    size_t t_hash = std::type_index(typeid(T)).hash_code();
+    size_t d_hash = std::type_index(typeid(double)).hash_code();
+    size_t c_hash = std::type_index(typeid(dcomplex)).hash_code();
+
+    size_t savHash; 
+
+    try{
+      savFile.readData("/SCF/FIELD_TYPE", &savHash);
+    } catch (...) {
+      CErr("Cannot find /SCF/FIELD_TYPE on rstFile!",std::cout);
+    }
+
+
+    if( t_hash != savHash ) {
+  
+      bool t_is_double  = t_hash == d_hash;
+      bool t_is_complex = t_hash == c_hash;
+  
+      bool s_is_double  = savHash == d_hash;
+      bool s_is_complex = savHash == c_hash;
+
+      std::string t_field = t_is_double ? "REAL" : "COMPLEX";
+      std::string s_field = s_is_double ? "REAL" : "COMPLEX";
+
+      std::string message = "/SCF/FIELD_TYPE on disk (" + s_field +
+        ") is incompatible with current FIELD_TYPE (" + t_field + ")";
+
+      CErr(message,std::cout);
+    }
+
+    // dimension of mo1 and mo2
+    auto NB = this->nC * aoints.basisSet().nBasis;
+    auto NB2 = NB*NB;
+
+    auto MO1dims = savFile.getDims( "SCF/MO1" );
+    auto MO2dims = savFile.getDims( "SCF/MO2" );
+
+
+    // Find errors in MO1
+    if( MO1dims.size() == 0 ) 
+      CErr("SCF/MO1 does not exist in " + savFile.fName(), std::cout); 
+
+    if( MO1dims.size() != 2 ) 
+      CErr("SCF/MO1 not saved as a rank-2 tensor in " + savFile.fName(), 
+          std::cout); 
+
+    if( MO1dims[0] != NB or MO1dims[1] != NB ) {
+
+      std::cout << "    * Incompatible SCF/MO1:";
+      std::cout << "  Recieved (" << MO1dims[0] << "," << MO1dims[1] << ")"
+        << " :"; 
+      std::cout << "  Expected (" << NB << "," << NB << ")"; 
+      CErr("Wrong number of MO coefficients!",std::cout);
+
+    }
+
+
+
+    // MO2 + RHF is odd, print warning 
+    if( MO2dims.size() != 0 and this->nC == 1 and this->iCS )
+      std::cout << "    * WARNING: Reading in SCF/MO1 as restricted guess "
+                << "but " << savFile.fName() << " contains SCF/MO2"
+                << std::endl;
+
+
+    // Read in MO1
+    std::cout << "    * Found SCF/MO1 !" << std::endl;
+    savFile.readData("SCF/MO1",this->mo1); 
+
+
+
+
+
+    // Unrestricted calculations
+    if( this->nC == 1 and not this->iCS ) {
+
+      if( MO2dims.size() == 0 )
+        std::cout << "    * WARNING: SCF/MO2 does not exist in "
+          << savFile.fName() << " -- Copying SCF/MO1 -> SCF/MO2 " << std::endl;
+
+      if( MO2dims.size() > 2  ) 
+
+        CErr("SCF/MO2 not saved as a rank-2 tensor in " + savFile.fName(), 
+            std::cout); 
+
+      else if( MO2dims[0] != NB or MO2dims[1] != NB ) {
+
+        std::cout << "    * Incompatible SCF/MO2:";
+        std::cout << "  Recieved (" << MO2dims[0] << "," << MO2dims[1] << ")"
+          << " :"; 
+        std::cout << "  Expected (" << NB << "," << NB << ")"; 
+        CErr("Wrong number of MO coefficients!",std::cout);
+
+      }
+
+
+      // Read in MO2
+      if( MO2dims.size() == 0 )
+        std::copy_n(this->mo1, NB2, this->mo2);
+      else {
+        std::cout << "    * Found SCF/MO2 !" << std::endl;
+        savFile.readData("SCF/MO2",this->mo2); 
+      }
+
+    }
+
+
+    // Form density from MOs
+    formDensity();
+
+    std::cout << "\n" << std::endl;
+    if( printLevel > 0 )
+      std::cout << std::endl
+                << "  *** Forming Initial Fock Matrix from Guess Density ***\n\n";
+
+    std::cout << "\n" << std::endl;
+    EMPerturbation pert;
+    formFock(pert,false);
+
+  } // SingleSlater<T>::ReadGuessMO()
 
 }; // namespace ChronusQ
 

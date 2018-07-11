@@ -45,7 +45,9 @@ namespace ChronusQ {
   enum SS_GUESS {
     CORE,
     SAD,
-    RANDOM
+    RANDOM,
+    READMO,
+    READDEN
   };
 
   /**
@@ -135,7 +137,6 @@ namespace ChronusQ {
     // Print Controls
     size_t printLevel; ///< Print Level
               
-
     // SCF Variables
     SCFControls    scfControls; ///< Controls for the SCF procedure
     SCFConvergence scfConv;     ///< Current status of SCF convergence

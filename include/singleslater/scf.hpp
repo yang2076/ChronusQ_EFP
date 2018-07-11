@@ -47,6 +47,15 @@ namespace ChronusQ {
     if( savFile.exists() ) {
 
       size_t NB = this->aoints.basisSet().nBasis;
+      size_t NBC = this->nC * NB;
+
+      auto t_type_indx = std::type_index(typeid(T));
+      size_t t_hash = t_type_indx.hash_code();
+
+      // Save Field type
+      savFile.safeWriteData("SCF/FIELD_TYPE",&t_hash,{1});
+
+
       const std::array<std::string,4> spinLabel =
         { "SCALAR", "MZ", "MY", "MX" };
 
@@ -66,6 +75,11 @@ namespace ChronusQ {
           this->fockOrtho[i],{NB,NB});
 
       }
+
+      // Save MOs
+      savFile.safeWriteData("SCF/MO1", this->mo1, {NBC,NBC});
+      if( this->nC == 1 and not this->iCS )
+        savFile.safeWriteData("SCF/MO2", this->mo2, {NBC,NBC});
 
       // Save Energies
       savFile.safeWriteData("SCF/TOTAL_ENERGY",&this->totalEnergy,
@@ -154,6 +168,8 @@ namespace ChronusQ {
 
     // Transform the orthonormal density to the AO basis
     ortho2aoDen();
+
+    ortho2aoMOs();
 
   }; // SingleSlater<T>::getNewOrbitals
 
@@ -460,8 +476,6 @@ namespace ChronusQ {
    */ 
   template <typename T>
   void SingleSlater<T>::SCFFin() {
-
-    ortho2aoMOs();
 
     // Deallocate extrapolation storage
     if ( scfControls.doExtrap ) deallocExtrapStorage();

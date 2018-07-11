@@ -26,6 +26,7 @@
 
 #include <chronusq_sys.hpp>
 #include <cxxapi/input.hpp>
+#include <cerr.hpp>
 
 #include <H5Cpp.h>
 
@@ -35,6 +36,10 @@ inline H5::CompType H5PredType() {
   if( std::is_same<double,T>::value )
     return H5::CompType(
       H5::DataType(H5::PredType::NATIVE_DOUBLE).getId()
+    );
+  else if( std::is_same<size_t,T>::value ) 
+    return H5::CompType(
+      H5::DataType(H5::PredType::NATIVE_UINT64).getId()
     );
   else if( std::is_same<dcomplex,T>::value ) {
     typedef struct {
@@ -52,6 +57,7 @@ inline H5::CompType H5PredType() {
     );
     return complexType;
   }
+  else ChronusQ::CErr();
 
 };
 
@@ -94,6 +100,7 @@ namespace ChronusQ {
       // Member functions
 
       inline bool exists() const { return exists_; }
+      inline std::string fName() const{ return fName_; }
       inline void setFile(const std::string &name) { fName_ = name; }
 
       inline void createFile() {
@@ -138,6 +145,18 @@ namespace ChronusQ {
         OpenDataSet(file,obj,dataSet);
         obj.read(data,H5PredType<T>());
       };
+
+      size_t sizeOfData(const std::string &dataSet) {
+
+        size_t datSize;
+        OpenDataSet(file,obj,dataSet);
+
+        H5::DataSpace space = obj.getSpace();
+        datSize = space.getSelectNpoints();
+  
+        return datSize;
+        
+      }; //sizeOfData
 
       template <typename T>
       void writeData(const std::string &dataSet, T* data) {
@@ -194,6 +213,28 @@ namespace ChronusQ {
         return dims;
 
       }
+
+
+      H5T_class_t getTypeClass(const std::string &dataSet) {
+
+        H5T_class_t type;
+
+        try {
+
+          OpenDataSet(file,obj,dataSet);
+
+          type = obj.getTypeClass();
+
+        } catch(...){ 
+          // Return empty vector 
+        }
+
+
+        return type;
+
+      }
+
+
 
   }; // class SafeFile
 

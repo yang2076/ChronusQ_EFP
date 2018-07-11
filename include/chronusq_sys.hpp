@@ -47,6 +47,7 @@
 #include <valarray>
 #include <random>
 #include <chrono>
+#include <typeindex>
 
 #include <chronusq_config.hpp> // Configuration header
 

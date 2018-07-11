@@ -49,12 +49,6 @@ namespace ChronusQ {
     std::string outFileName, std::string rstFileName,
     std::string scrFileName) {
 
-    // Create the restart and scratch files
-    SafeFile rstFile(rstFileName);
-    //SafeFile scrFile(scrFileName);
-
-    rstFile.createFile();
-
 
     // Redirect output to output file if not STDOUT
     std::shared_ptr<std::ofstream> outfile;
@@ -112,14 +106,25 @@ namespace ChronusQ {
     auto ss = CQSingleSlaterOptions(std::cout,input,aoints);
 
 
-    ss->savFile    = rstFile;
-    aoints.savFile = rstFile;
-
     // EM Perturbation for SCF
     EMPerturbation SCFpert;
 
     CQSCFOptions(std::cout,input,*ss,SCFpert);
     CQIntsOptions(std::cout,input,aoints);
+
+    bool rstExists = false;
+    if( ss->scfControls.guess == READMO or ss->scfControls.guess == READDEN) 
+      rstExists = true;
+
+    // Create the restart and scratch files
+    SafeFile rstFile(rstFileName, rstExists);
+    //SafeFile scrFile(scrFileName);
+
+    if( not rstExists ) rstFile.createFile();
+
+
+    ss->savFile    = rstFile;
+    aoints.savFile = rstFile;
 
 
     if( not jobType.compare("SCF") or not jobType.compare("RT") ) {
