@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ namespace ChronusQ {
   void SetMat(char TRANS, size_t M, size_t N, _FScale ALPHA, _F1 *A, size_t LDA,
     _F2 *B, size_t LDB) {
 
-    SetMat(TRANS,M,N,ALPHA,A,LDA,1,B,LDB,1);
+    SetMat(TRANS,M,N,_F1(ALPHA),A,LDA,1,B,LDB,1);
 
   }
 

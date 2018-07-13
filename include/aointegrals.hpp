@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -29,8 +29,9 @@
 #include <basisset/basisset_def.hpp>
 #include <memmanager.hpp>
 #include <libint2/engine.h>
-
+#include <aointegrals/inhouseaointegral.hpp>
 #include <util/files.hpp>
+#include <fields.hpp>
 
 namespace ChronusQ {
 
@@ -55,20 +56,30 @@ namespace ChronusQ {
 
   enum CORE_HAMILTONIAN_TYPE {
     NON_RELATIVISTIC,
-    EXACT_2C
+    RELATIVISTIC_X2C_SPIN_FREE,
+    RELATIVISTIC_X2C_1E,
+    RELATIVISTIC_X2C_2E,
+    RELATIVISTIC_4C
   };
 
+  struct OneETerms {
+    bool finiteWidthNuc;
+    bool coreH; //overlap, kinetic, potential
+    bool relativistic; //spin-orbit, scalar relativity
+  };
 
   /**
    *  The TwoBodyContraction struct. Stores information
    *  pertinant for a two body operator contraction with
    *  a one body (2 index) operator. z.B. The density matrix.
    */ 
-  template <typename T, typename G>
+  template <typename T>
   struct TwoBodyContraction {
 
+    bool eval;
+
     T*  X;  ///< 1-Body (2 index) operator to contraction
-    G*  AX; ///< 1-Body (2 index) storage for the contraction
+    T*  AX; ///< 1-Body (2 index) storage for the contraction
 
     bool HER; ///< Whether or not X is hermetian
     
@@ -87,17 +98,21 @@ namespace ChronusQ {
     CHOLESKY
   }; ///< Orthonormalization Scheme
 
-  class AOIntegrals {
-  public:
-
-    typedef double* oper_t; ///< Storage of an operator
-    typedef std::vector<oper_t> oper_t_coll; ///< A collection of operators
-
-  private:
 
 
-    size_t nTT_; ///< Reduced number of basis functions \f$ N_B(N_B+1)/2 \f$
-    size_t nSQ_; ///< Squared basis functions \f$ N_B^2\f$
+
+
+  /**
+   *  \brief Abstract Base class for AOIntegrals
+   *
+   *  Stores type independent members and interfaces for templated the
+   *  AOIntegrals class
+   *
+   */
+  struct AOIntegralsBase { 
+
+    size_t nTT_;  ///< Reduced number of basis functions \f$ N_B(N_B+1)/2 \f$
+    size_t nSQ_;  ///< Squared basis functions \f$ N_B^2\f$
     size_t npTT_; ///< Reduced number of primitive functions \f$ N_P(N_P+1)/2 \f$
     size_t npSQ_; ///< Squared primitive functions \f$ N_P^2\f$
 
@@ -105,206 +120,94 @@ namespace ChronusQ {
     Molecule     &molecule_;   ///< Molecule object for nuclear potential
     BasisSet     &basisSet_;   ///< BasisSet for the GTO basis defintion
 
+    // Control Variables
+    CONTRACTION_ALGORITHM contrAlg = DIRECT;///< Alg for 2-body contraction
+
+    double threshSchwartz = 1e-12; ///< Schwartz screening threshold
+
+    
+    SafeFile savFile; ///< Hard storage of integrals
+
+    // Default copy and move ctors
+    AOIntegralsBase( const AOIntegralsBase & ) = default;
+    AOIntegralsBase( AOIntegralsBase && )      = default;
+
+    // Remove default ctor
+    AOIntegralsBase() = delete;
+
+    /**
+     * \brief Constructor.
+     *
+     *  \param [in] memManager Memory manager for matrix allocation
+     *  \param [in] mol        Molecule object for molecular specification
+     *  \param [in] basis      The GTO basis for integral evaluation
+     */
+    AOIntegralsBase(CQMemManager &mem, Molecule &mol, BasisSet &basis) :
+      memManager_(mem), molecule_(mol), basisSet_(basis) {
+
+      nTT_  = basis.nBasis * ( basis.nBasis + 1 ) / 2;
+      nSQ_  = basis.nBasis * basis.nBasis;
+      npTT_ = basis.nPrimitive * ( basis.nPrimitive + 1 ) / 2;
+      npSQ_ = basis.nPrimitive * basis.nPrimitive;
+
+    }
+
+    // Getters
+    CQMemManager& memManager() { return memManager_; }
+    BasisSet&     basisSet()   { return basisSet_;   }
+    Molecule&     molecule()   { return molecule_;   }
+
+    // Interfaces
+    virtual void computeAOOneE(EMPerturbation&,OneETerms&) = 0; 
+    virtual void computeERI(EMPerturbation&) = 0;    
+
+    // Print (see src/aointegrals/print.cxx for docs)
+    template <typename G> 
+      friend std::ostream & operator<<(std::ostream &, const AOIntegralsBase& );
+
+  };
+
+
+
+
+
+
+
+  /**
+   *  \brief Templated class to handle the evaluation and storage of 
+   *  integral matrices representing quantum mechanical operators in
+   *  a finite basis set.
+   *
+   *  Templated over storage type (IntsT) to allow for a seamless
+   *  interface to both GTO and GIAO basis sets.
+   */
+  template <typename IntsT>
+  class AOIntegrals : public AOIntegralsBase {
+
+  private:
+
+    typedef IntsT* oper_t; ///< Storage of an operator
+    typedef std::vector<oper_t> oper_t_coll; ///< A collection of operators
+
     // General wrapper for 1-e integrals
-    // See src/aointegrals/aointegrals_builders.cxx for documentation
-    oper_t_coll OneEDriver(libint2::Operator, std::vector<libint2::Shell>&);
+    // See src/aointegrals/aointegrals_onee_drivers.cxx for documentation
+    std::vector<IntsT*> OneEDriverLibint(libint2::Operator,std::vector<libint2::Shell>&);
 
-    // 1-e builder for in-house integral code
+    // 1-e builders for in-house integral code
     template <size_t NOPER, bool SYMM, typename F>
-    oper_t_coll OneEDriverLocal(const F&, std::vector<libint2::Shell>&);
-
-    // local one body integrals
-
-    // Overlap integrals
-      
-    // overlap integral of a shell pair  
-    std::vector<std::vector<double>> computeOverlapS(libint2::ShellPair&,
-                                         libint2::Shell&,libint2::Shell&);
-
-    // horizontal recursion of contracted overlap integral 
-    double hRRSab(libint2::ShellPair&, libint2::Shell&,libint2::Shell&,
-                  int,int*,int,int*);
-
-    // horizontal recursion of uncontracted overlap integral
-    double hRRiPPSab(libint2::ShellPair::PrimPairData&,libint2::Shell&,libint2::Shell&,
-                  int,int*,int,int*);
-
-    // vertical recursion of uncontracted overlap integral
-    double vRRSa0(libint2::ShellPair::PrimPairData&,libint2::Shell&,int,int*);
-
-    // angular momentum integrals
-
-    // angular momentum integrals of a shell pair
-    std::vector<std::vector<double>> computeAngularL(libint2::ShellPair&,
-                                        libint2::Shell&,libint2::Shell&);
-
-    // vertical recursion of uncontracted angular momentum integral
-    double Labmu(libint2::ShellPair::PrimPairData&,libint2::Shell&,libint2::Shell&,
-                 double*,double*,int,int*,int,int*,int);
-
-    // momentum integrals
-
-    // electric dipole (velocity gauge) integrals of a shell pair
-    std::vector<std::vector<double>> computeEDipoleE1_vel(libint2::ShellPair&,
-                      libint2::Shell&, libint2::Shell&);
-
-    // contracted momentum integral
-    double Momentummu(libint2::ShellPair&,libint2::Shell&,libint2::Shell&,
-                      int,int*,int,int*,int);
-
-    // electric dipole integrals
-
-    // electric dipole (length gauge) integrals of a shell pair
-    std::vector<std::vector<double>> computeDipoleE1(libint2::ShellPair&,
-                                         libint2::Shell&,libint2::Shell&);
-
-    // contracted electric dipole integrals
-    double DipoleE1(libint2::ShellPair&,libint2::Shell&,libint2::Shell&,
-                    int,int*,int,int*,int);
-
-    // electric quadrupole integrals
-
-    // electric quadrupole integrals of a shell pair
-    std::vector<std::vector<double>> computeEQuadrupoleE2_vel(libint2::ShellPair&,
-                                                  libint2::Shell&,libint2::Shell&); 
-
-    // contracted electric quadrupole integrals of a shell pair
-    double QuadrupoleE2_vel( libint2::ShellPair&,libint2::Shell&,libint2::Shell&,
-                             int,int*,int,int*,int,int );
-
-    // magnetic dipole integrals
-
-    // contracted magnetic dipole integral
-    double MDipoleM1( libint2::ShellPair&,libint2::Shell&,libint2::Shell&,
-                      int,int*,int,int*,int );
-  
-    // magnetic quadrupole integrals
-
-    // contracted magnetic quadrupole integrals 
-    double QuadrupoleM2_vel( libint2::ShellPair&,libint2::Shell&,libint2::Shell&,
-                             int,int*,int,int*,int,int );
-
-    // magnetic quadrupole integrals of a shell pair
-    std::vector<std::vector<double>> computeMQuadrupoleM2_vel( libint2::ShellPair&,
-                                                  libint2::Shell&,libint2::Shell&);
-
-    // electric octupole integrals
-
-    // electric octupole integrals of a shell pair
-    std::vector<std::vector<double>> computeEOctupoleE3_vel( libint2::ShellPair&,
-                                                 libint2::Shell&,libint2::Shell&);
-
-    // contracted electric octupole integral
-    double OctupoleE3_vel( libint2::ShellPair&,libint2::Shell&,libint2::Shell&,
-                           int,int*,int,int*,int,int,int );
-
-
-    // Taylor intrapolation of Boys function
-    void computeFmTTaylor(double*,double,int,int);
-
-    // nuclear potential integrals
-
-    // contracted nuclear potential integrals of a shell pair
-    std::vector<std::vector<double>> computePotentialV(
-      const std::vector<libint2::Shell> &, libint2::ShellPair&, 
-      libint2::Shell&,libint2::Shell&); 
-
-    inline std::vector<std::vector<double>> computePotentialV(
-      libint2::ShellPair& pair, libint2::Shell &s1, libint2::Shell &s2) {
-    
-      std::vector<libint2::Shell> dummy;
-      return computePotentialV(dummy,pair,s1,s2);
-
-    }
-
-    // horizontal recursion of contracted nuclear potential integrals
-    double hRRVab(const std::vector<libint2::Shell>&,libint2::ShellPair&,
-                  libint2::Shell&,libint2::Shell&,int,int*,int,int*);
-
-    // Bra vertical recursion of uncontracted nuclear potential integrals
-    double vRRVa0(const std::vector<libint2::Shell>&,
-                  libint2::ShellPair::PrimPairData&,libint2::Shell&,
-                  double*,double*,int,int,int*,int);
-
-    // horizontal recursion of uncontracted nuclear potential integrals
-    double hRRiPPVab(const std::vector<libint2::Shell>&,
-      libint2::ShellPair::PrimPairData&, libint2::Shell&,
-      libint2::Shell&, int,int*,int,int*,double*,int,int);
-    
-    // Ket vertical recursion of uncontracted nuclear potential integrals
-    double vRRV0b(const std::vector<libint2::Shell>&,
-                  libint2::ShellPair::PrimPairData&,libint2::Shell&,
-                  double*,double*,int,int,int*,int);
-
-    // spin orbit integrals
-
-    // spin orbit integrals of a shell pair
-    std::vector<std::vector<double>> computeSL(
-      const std::vector<libint2::Shell>&, libint2::ShellPair&,
-      libint2::Shell&,libint2::Shell&);
-
-    inline std::vector<std::vector<double>> computeSL(libint2::ShellPair &pair,
-      libint2::Shell &s1, libint2::Shell &s2) {
-
-      std::vector<libint2::Shell> dummy;
-      return computeSL(dummy,pair,s1,s2);
-
-    }
-
-    // vertical recursion of uncontracted spin orbit integral
-    double Slabmu(const std::vector<libint2::Shell>&, 
-      libint2::ShellPair::PrimPairData&,libint2::Shell&,
-      libint2::Shell&, double*,double*,int,int*,int,int*,int,int,int);
-
-    // pV dot p integrals
-
-    // pV dot p integrals of a shell pair
-    std::vector<std::vector<double>> computepVdotp(
-      const std::vector<libint2::Shell>&, libint2::ShellPair&,
-      libint2::Shell&,libint2::Shell&);
-
-    inline std::vector<std::vector<double>> computepVdotp(
-      libint2::ShellPair &pair, libint2::Shell &s1, libint2::Shell &s2) {
-
-      std::vector<libint2::Shell> dummy;
-      return computepVdotp(dummy,pair,s1,s2);
-
-    }
-
-    // vertical recursion of uncontracted pV dot p integrals
-    double pVpab(const std::vector<libint2::Shell>&,
-      libint2::ShellPair::PrimPairData&,libint2::Shell&,
-      libint2::Shell&, int,int*,int,int*,int,int); 
-
-    // local one body integrals end
+    std::vector<IntsT*> OneEDriverLocal(const F&,std::vector<libint2::Shell>&);
+    template <size_t NOPER, bool SYMM, typename F>
+    std::vector<IntsT*> OneEDriverLocalGTO(const F&,std::vector<libint2::Shell>&);
+    template <size_t NOPER, bool SYMM, typename F>
+    std::vector<IntsT*> OneEDriverLocalGIAO(const F&,std::vector<libint2::Shell>&);
 
     public:
 
-    // Control Variables
-    CORE_HAMILTONIAN_TYPE coreType;
-    CONTRACTION_ALGORITHM cAlg;      ///< Algorithm for 2-body contraction
-    ORTHO_TYPE            orthoType; ///< Orthogonalization scheme
+    double* schwartz = nullptr; ///< Schwartz bounds for the ERIs
 
-    double threshSchwartz; ///< Schwartz screening threshold
-
-
-    // Hard storage of integrals
-    SafeFile savFile;
-
-
-    // Operator storage
-      
-    // Meta data relating to screening, orthonormalization, etc
-      
-    oper_t schwartz; ///< Schwartz bounds for the ERIs
-    oper_t ortho1;   ///< Orthogonalization matrix which S -> I
-    oper_t ortho2;   ///< Inverse of ortho1
-
-    // 1-e integrals
-    
-    oper_t overlap;   ///< Overlap matrix 
-    oper_t kinetic;   ///< Kinetic matrix 
-    oper_t potential; ///< Nuclear potential matrix 
+    oper_t overlap   = nullptr;   ///< Overlap matrix 
+    oper_t kinetic   = nullptr;   ///< Kinetic matrix 
+    oper_t potential = nullptr; ///< Nuclear potential matrix 
 
     oper_t_coll lenElecDipole;     ///< Electric Dipole matrix     (length)
     oper_t_coll lenElecQuadrupole; ///< Electric Quadrupole matrix (length)
@@ -317,12 +220,12 @@ namespace ChronusQ {
     oper_t_coll magDipole;     ///< Electric Dipole matrix     (length)
     oper_t_coll magQuadrupole; ///< Electric Quadrupole matrix (length)
 
-    oper_t_coll coreH; ///< Core Hamiltonian (scalar and magnetization)
-    
-    
+    // Relativistic integrals
+    oper_t       PVdotP = nullptr;
+    oper_t_coll  PVcrossP;  
+
     // 2-e Storage
-      
-    oper_t ERI;    ///< Electron-Electron repulsion integrals (4 index) 
+    oper_t ERI = nullptr;    ///< Electron-Electron repulsion integrals (4 index) 
 
     // Constructors
     
@@ -337,17 +240,7 @@ namespace ChronusQ {
      *  \param [in] basis      The GTO basis for integral evaluation
      */ 
     AOIntegrals(CQMemManager &memManager, Molecule &mol, BasisSet &basis) :
-      threshSchwartz(1e-12), cAlg(DIRECT), orthoType(LOWDIN), 
-      memManager_(memManager), basisSet_(basis), molecule_(mol), 
-      schwartz(nullptr), ortho1(nullptr), ortho2(nullptr), overlap(nullptr), 
-      kinetic(nullptr), potential(nullptr), ERI(nullptr), coreType(NON_RELATIVISTIC) {
-
-      nTT_  = basis.nBasis * ( basis.nBasis + 1 ) / 2;
-      nSQ_  = basis.nBasis * basis.nBasis;
-      npTT_ = basis.nPrimitive * ( basis.nPrimitive + 1 ) / 2;
-      npSQ_ = basis.nPrimitive * basis.nPrimitive;
-
-    };
+      AOIntegralsBase(memManager,mol,basis){ }
 
     // See src/aointegrals/aointegrals.cxx for documentation 
     // onf the following constructors
@@ -369,7 +262,6 @@ namespace ChronusQ {
      */ 
     AOIntegrals& operator=(AOIntegrals &&) = default;
 
-
     /**
      *  Destructor.
      *
@@ -381,41 +273,23 @@ namespace ChronusQ {
     // Member functions
 
 
-    // Getters
-    CQMemManager& memManager() { return memManager_; }
-    BasisSet&     basisSet()   { return basisSet_;   }
-    Molecule&     molecule()   { return molecule_;   }
-
-
-    // Print (see src/aointegrals/print.cxx for docs)
-    friend std::ostream & operator<<(std::ostream &, const AOIntegrals& );
-
-
     // Memory
 
     // Deallocation (see src/aointegrals/aointegrals.cxx for docs)
     void dealloc();
 
-
-
-
-
     // Integral evaluation
-    // (see src/aointegrals/aointegrals_builders.cxx for docs)
+    // (see src/aointegrals/aointegrals_onee/twoe_drivers.cxx for docs)
 
-    void computeAOOneE(bool); // Evaluate the 1-e ints in the CGTO basis
-    void computeERI();    // Evaluate and store the ERIs in the CGTO basis
-    void computeOrtho();  // Evaluate orthonormalization transformations
-    void computeSchwartz(); // Evaluate schwartz bounds over CGTOS
+    void computeAOOneE(EMPerturbation&,OneETerms&);     // Evaluate the 1-e ints (general)
+    void computeAOOneEGTO(OneETerms&);                  // Evaluate the 1-e ints in the CGTO basis
+    void computeAOOneEGIAO(EMPerturbation&,OneETerms&); // Evaluate the 1-e ints in the GIAO basis
 
-    // CH == Core Hamiltonian
-    void computeCoreHam(CORE_HAMILTONIAN_TYPE); // Compute the CH
-    void computeNRCH(double*); // Non-relativistic CH
-    void computeX2CCH(std::vector<double*>&); // X2C CH (aointegrals_rel.cxx)
-    void compute4CCH(std::vector<libint2::Shell>&, double *); // 4C CH
+    void computeERI(EMPerturbation&);                   // Evaluate ERIs (general)
+    void computeERIGTO();                               // Evaluate ERIs in the CGTO basis
+    void computeERIGIAO(EMPerturbation&);               // Evaluate ERIs in the GIAO basis
+    void computeSchwartz();                             // Evaluate schwartz bounds (currently implemented for CGTOs 
 
-    // Allow for delayed evaluation of CH
-    inline void computeCoreHam() { computeCoreHam(coreType); }
 
     // Integral contraction
 
@@ -427,61 +301,101 @@ namespace ChronusQ {
      *
      *  \param [in/ont] contList List of one body operators for contraction.
      */ 
-    template <typename T, typename G>
-    void twoBodyContract(std::vector<TwoBodyContraction<T,G>> &contList) {
+    template <typename TT>
+    void twoBodyContract(
+        MPI_Comm comm,
+        const bool screen,
+        std::vector<TwoBodyContraction<TT>> &contList, 
+        EMPerturbation &pert) {
 
-      // Sanity check of dimensions
-      assert( std::all_of(contList.begin(),contList.end(),
-              [&](TwoBodyContraction<T,G> &C) {
-                bool ret(true);
-                ret = ret and (memManager_.template getSize<T>(C.X)  == nSQ_);
-                ret = ret and (memManager_.template getSize<G>(C.AX) == nSQ_);
-                return ret;
-              }) );
+      if( contrAlg == INCORE ) twoBodyContractIncore(comm,contList);
+      else if( contrAlg == DIRECT ) 
+        twoBodyContractDirect(comm,screen,contList,pert);
 
-      if( cAlg == INCORE ) twoBodyContractIncore(contList);
-      else if( cAlg == DIRECT ) twoBodyContractDirect(contList);
+    };
+    template <typename TT>
+    void twoBodyContract(
+        MPI_Comm comm,
+        const bool screen,
+        std::vector<TwoBodyContraction<TT>> &contList) { 
+
+      EMPerturbation pert;
+      twoBodyContract(comm,screen,contList,pert);
+
+
     };
     
+    template <typename TT>
+    inline void twoBodyContract(
+        MPI_Comm comm, 
+        std::vector<TwoBodyContraction<TT>> &contList, 
+        EMPerturbation &pert) {
+
+      twoBodyContract(comm,true,contList,pert);
+
+    }
+
+    template <typename TT>
+    inline void twoBodyContract(
+        MPI_Comm comm, 
+        std::vector<TwoBodyContraction<TT>> &contList) { 
+
+      twoBodyContract(comm,true,contList);
+
+    }
 
     // INCORE contraction routines
     // Perform the two body contraction incore (using the rank-4 ERI tensor)
     // see include/aointegrals/contract/incore.hpp for docs.
       
-    template <typename T, typename G>
-    void twoBodyContractIncore(std::vector<TwoBodyContraction<T,G>>&);
+    template <typename TT>
+    void twoBodyContractIncore(MPI_Comm, std::vector<TwoBodyContraction<TT>>&);
 
-    template <typename T, typename G>
-    void JContractIncore(TwoBodyContraction<T,G> &);
+    template <typename TT>
+    void JContractIncore(MPI_Comm, TwoBodyContraction<TT> &);
 
-    template <typename T, typename G>
-    void KContractIncore(TwoBodyContraction<T,G> &);
+    template <typename TT>
+    void KContractIncore(MPI_Comm, TwoBodyContraction<TT> &);
 
 
 
     // DIRECT contraction routines
     // Perform the two body contraction directly
     // see include/aointegrals/contract/direct.hpp for docs.
-    template <typename T, typename G>
-    void twoBodyContractDirect(std::vector<TwoBodyContraction<T,G>>&);
-
-    template <typename T, typename G>
-    void directScaffold(std::vector<TwoBodyContraction<T,G>>&);
-
-    template <typename T, typename G>
-    void JContractDirect(TwoBodyContraction<T,G> &);
-
-    template <typename T, typename G>
-    void KContractDirect(TwoBodyContraction<T,G> &);
-
-
-    // Transformations to and from the orthonormal basis
-    // see include/aointegrals/ortho.hpp for docs
       
-    template <typename T> void Ortho1Trans(T* A, T* TransA); 
-    template <typename T> void Ortho2Trans(T* A, T* TransA); 
-    template <typename T> void Ortho1TransT(T* A, T* TransA);
-    template <typename T> void Ortho2TransT(T* A, T* TransA);
+    template <typename TT>
+    void twoBodyContractDirect(
+        MPI_Comm,
+        const bool,
+        std::vector<TwoBodyContraction<TT>>&, 
+        EMPerturbation &pert);
+
+    template <typename TT>
+    void directScaffold(
+        MPI_Comm,
+        const bool,
+        std::vector<TwoBodyContraction<TT>>&);
+
+    template <typename TT>
+    void directScaffold(
+        MPI_Comm,
+        const bool,
+        std::vector<TwoBodyContraction<TT>>&, 
+        EMPerturbation &pert);
+
+    template <typename TT>
+    void JContractDirect(
+        MPI_Comm,
+        const bool,
+        TwoBodyContraction<TT> &);
+
+    template <typename TT>
+    void KContractDirect(
+        MPI_Comm,
+        const bool,
+        TwoBodyContraction<TT> &);
+
+
     
   }; // class AOIntegrals
 

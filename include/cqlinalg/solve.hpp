@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ namespace ChronusQ {
    *  parameter documentation.
    */ 
   template <typename _F>
-  int LinSolve(int N, int NRHS, _F *A, int LDA, _F *B, 
+  inline int LinSolve(int N, int NRHS, _F *A, int LDA, _F *B, 
     int LDB, CQMemManager &mem) {
 
     int* iPIV = mem.malloc<int>(N);
@@ -80,13 +80,73 @@ namespace ChronusQ {
    *  parameter documentation.
    */ 
   template <typename _F>
-  int LinSolve(int N, int NRHS, _F *A, int LDA, _F *B, 
+  inline int LinSolve(int N, int NRHS, _F *A, int LDA, _F *B, 
     int LDB) {
 
     std::vector<int> iPIV(N,0);
     return LinSolve(N,NRHS,A,LDA,B,LDB,&iPIV[0]);
 
   };
+
+
+  /**
+   *
+   *  \brief Solves a triagular linear system OP(A)X = aB or X OP(A) = aB. 
+   *  Smart wrapper around DTRSM and ZTRSM depending on context
+   *   
+   *  See http://www.netlib.org/lapack/lapack-3.1.1/html/dtrsm.f.html or
+   *      http://www.netlib.org/lapack/lapack-3.1.1/html/ztrsm.f.html for
+   *  parameter documentation.
+   *
+   */
+  template <typename _F>
+  void TriLinSolve(char SIDE, char UPLO, char TRANS, char DIAG, int M, int N, 
+    _F ALPHA, _F *A, int LDA, _F *B, int LDB);
+
+
+
+
+#ifdef CQ_ENABLE_MPI
+
+
+  template <typename _F>
+  inline CB_INT LinSolve(const CB_INT N, const CB_INT NRHS, _F *A, 
+    const CB_INT IA, const CB_INT JA, const CXXBLACS::ScaLAPACK_Desc_t DESCA, 
+    _F *B, const CB_INT IB, const CB_INT JB,
+    const CXXBLACS::ScaLAPACK_Desc_t DESCB, CB_INT *IPIV) {
+
+    return CXXBLACS::PGESV(N,NRHS,A,IA,JA,DESCA,IPIV,B,IB,JB,DESCB);
+
+  }
+
+  template <typename _F>
+  inline CB_INT LinSolve(const CB_INT N, const CB_INT NRHS, _F *A, 
+    const CB_INT IA, const CB_INT JA, const CXXBLACS::ScaLAPACK_Desc_t DESCA, 
+    _F *B, const CB_INT IB, const CB_INT JB,
+    const CXXBLACS::ScaLAPACK_Desc_t DESCB, CQMemManager &mem) {
+
+    CB_INT* iPIV = mem.malloc<CB_INT>(DESCA[8] + DESCA[4]); // LLD + MB
+
+    CB_INT INFO = LinSolve(N,NRHS,A,IA,JA,DESCA,B,IB,JB,DESCB,iPIV);
+
+    mem.free(iPIV);
+
+    return INFO;
+  }
+
+  template <typename _F>
+  inline CB_INT LinSolve(const CB_INT N, const CB_INT NRHS, _F *A, 
+    const CB_INT IA, const CB_INT JA, const CXXBLACS::ScaLAPACK_Desc_t DESCA, 
+    _F *B, const CB_INT IB, const CB_INT JB,
+    const CXXBLACS::ScaLAPACK_Desc_t DESCB) {
+
+    std::vector<CB_INT> iPIV(DESCA[8] + DESCA[4],0); // LLD + MB
+    return LinSolve(N,NRHS,A,IA,JA,DESCA,B,IB,JB,DESCB,&iPIV[0]);
+
+  }
+
+
+#endif
 
 }; // namespace ChronusQ
 

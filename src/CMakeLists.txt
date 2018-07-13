@@ -1,7 +1,7 @@
 #
 # This file is part of the Chronus Quantum (ChronusQ) software package
 # 
-# Copyright (C) 2014-2017 Li Research Group (University of Washington)
+# Copyright (C) 2014-2018 Li Research Group (University of Washington)
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,6 +29,8 @@ add_subdirectory(quantum)
 add_subdirectory(wavefunction)
 add_subdirectory(singleslater)
 add_subdirectory(realtime)
+add_subdirectory(itersolver)
+add_subdirectory(response)
 
 
 

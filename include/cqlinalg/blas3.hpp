@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -31,6 +31,29 @@ namespace ChronusQ {
   template <typename _F1, typename _F2, typename _FScale>
   void Gemm(char TRANSA, char TRANSB, int M, int N, int K, _FScale ALPHA,
     _F1 *A, int LDA, _F2 *B, int LDB, _FScale BETA, _F2 *C, int LDC);
+
+#ifdef CQ_ENABLE_MPI
+
+  template <typename _F>
+  void Gemm(char TRANSA, char TRANSB, CB_INT M, CB_INT N, CB_INT K, _F ALPHA,
+    _F *A, CB_INT IA, CB_INT JA, CXXBLACS::ScaLAPACK_Desc_t DESCA, 
+    _F *B, CB_INT IB, CB_INT JB, CXXBLACS::ScaLAPACK_Desc_t DESCB, 
+    _F BETA, _F *C, CB_INT IC, CB_INT JC, CXXBLACS::ScaLAPACK_Desc_t DESCC) {
+
+    CXXBLACS::PGEMM(TRANSA,TRANSB,M,N,K,ALPHA,A,IA,JA,DESCA,B,IB,JB,DESCB,
+      BETA,C,IC,JC,DESCC);
+
+  }
+
+#endif
+
+
+  template <typename _F, typename _FScale>
+  void Trmm(char SIDE, char UPLO, char TRANSA, char DIAG, int M, int N, 
+    _FScale ALPHA, _F *A, int LDA, _F *B, int LDB);
+
+
+
 
   /**
    *  \brief Returns constant time a vector plus a vector

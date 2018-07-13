@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@
 #include <cxxapi/boilerplate.hpp>
 
 #include <util/threads.hpp>
+#include <util/mpi.hpp>
 
 #include <memmanager.hpp>
 #include <cerr.hpp>
@@ -112,83 +113,96 @@ void HerMatLoc(char UPLO, size_t N, T *A) {
 
 };
 
-// Set up the integrals/memory for a direct contraction test
-#define CONTRACT_BUILD(FIELD,HER,TYPE) \
-  CQInputFile input(FUNC_INPUT "contract_ref.inp");\
-  \
-  auto memManager = CQMiscOptions(std::cout,input); \
-  \
-  Molecule mol(std::move(CQMoleculeOptions(std::cout,input))); \
-  BasisSet basis(std::move(CQBasisSetOptions(std::cout,input,mol))); \
-  AOIntegrals aoints(*memManager,mol,basis); \
-  \
-  size_t NB = basis.nBasis; \
-  FIELD *SX  = memManager->malloc<FIELD>(NB*NB); \
-  FIELD *SX2 = memManager->malloc<FIELD>(NB*NB); \
-  FIELD *Rand = memManager->malloc<FIELD>(NB*NB); \
-  std::vector<TwoBodyContraction<FIELD,FIELD>> cont = \
-    { { Rand, SX, (HER == HERMETIAN), TYPE  } };\
-  std::fill_n(SX,NB*NB,0.);\
-  \
+
+template <typename FIELD, HER_MAT HER>
+void CONTRACT_TEST(TWOBODY_CONTRACTION_TYPE type, std::string storage) {
+
+#ifdef _CQ_GENERATE_TESTS
+  bool exists = false;
+#else
+  bool exists = true;
+#endif
 
 
+  // Reference File
+  SafeFile refFile(FUNC_REFERENCE "contract.hdf5", exists); 
 
 
+  // Input file for the constructions of Basis sets and Molecules
+  CQInputFile input(FUNC_INPUT "contract_ref.inp");
+  
+  // Memory
+  auto memManager = CQMiscOptions(std::cout,input); 
+  
+  // Molecule and BasisSet
+  Molecule mol(std::move(CQMoleculeOptions(std::cout,input))); 
+  BasisSet basis(std::move(CQBasisSetOptions(std::cout,input,mol))); 
+
+  // AOIntegrals object
+  AOIntegrals<double> aoints(*memManager,mol,basis); 
+  
+  // Scratch memory
+  size_t NB = basis.nBasis; 
+  FIELD *SX  = memManager->malloc<FIELD>(NB*NB); 
+  FIELD *SX2 = memManager->malloc<FIELD>(NB*NB); 
+  FIELD *Rand = memManager->malloc<FIELD>(NB*NB); 
+
+  // Set up direct contraction
+  std::vector<TwoBodyContraction<FIELD>> cont = 
+    { { true, Rand, SX, (HER == HERMETIAN), type  } };
+  std::fill_n(SX,NB*NB,0.); // zero out scratch space
+  
+  EMPerturbation pert; // Dummy perturbation
 
 #ifdef _CQ_GENERATE_TESTS
 
+  // Compute ERI tensor
+  aoints.computeERI(pert); 
 
-// If we're generating the tests, generate the random matricies
-// and perform the contraction incore
-#define CONTRACT_TEST(FIELD,HER,TYPE,STORAGE) \
-  /* Get the reference File */ \
-  SafeFile refFile(FUNC_REFERENCE "contract.hdf5"); \
-  \
-  CONTRACT_BUILD(FIELD,HER,TYPE) \
-  \
-  aoints.computeERI(); \
-  \
-  std::random_device r; \
-  std::default_random_engine e(r());\
-  std::uniform_real_distribution<> dis(-50,68); \
-  \
-  for(auto i = 0; i < NB; i++)\
-  for(auto j = 0; j < NB; j++)\
-    Rand[j + i*NB] = RAND_NUMBER<FIELD>(e,dis);\
-  \
-  HerMatLoc<FIELD,HER>('U',NB,Rand); \
-  refFile.safeWriteData(STORAGE "/X",Rand,{NB,NB});\
-  \
-  aoints.twoBodyContractIncore(cont);\
-  refFile.safeWriteData(STORAGE "/AX",SX,{NB,NB});\
-  memManager->free(SX,SX2,Rand);
+  // Generate random "X" matrix
+  std::random_device r; 
+  std::default_random_engine e(r());
+  std::uniform_real_distribution<> dis(-50,68); 
+  
+  for(auto i = 0; i < NB; i++)
+  for(auto j = 0; j < NB; j++)
+    Rand[j + i*NB] = RAND_NUMBER<FIELD>(e,dis);
+  
+  // Optionally symmetrize X
+  HerMatLoc<FIELD,HER>('U',NB,Rand); 
 
+  // Write X to disk
+  refFile.safeWriteData(storage + "/X",Rand,{NB,NB});
+  
+  // Perform incore ERI contraction and write result to disk
+  aoints.twoBodyContractIncore(MPI_COMM_WORLD,cont);
+  refFile.safeWriteData(storage + "/AX",SX,{NB,NB});
 
 #else
 
+  // Read in X and G[X] from disk
+  refFile.readData(storage + "/X",Rand);
+  refFile.readData(storage + "/AX",SX2);
+  
+  // Form G[X] directly
+  aoints.twoBodyContractDirect(MPI_COMM_WORLD,true,cont,pert);
+  
+  // Compare with reference result
+  double maxDiff(0.);
+  for(auto i = 0; i < NB*NB; i++) 
+    maxDiff = std::max(maxDiff,std::abs(SX[i] - SX2[i]));
+  
+  BOOST_CHECK(maxDiff < 1e-10);
 
-// If we're not generating the tests, read the reference data off
-// disk and perform / compare the contraction incore
-#define CONTRACT_TEST(FIELD,HER,TYPE,STORAGE) \
-  SafeFile refFile(FUNC_REFERENCE "contract.hdf5",true);\
-  \
-  CONTRACT_BUILD(FIELD,HER,TYPE) \
-  \
-  refFile.readData(STORAGE "/X",Rand);\
-  refFile.readData(STORAGE "/AX",SX2);\
-  \
-  aoints.twoBodyContractDirect(cont);\
-  \
-  double maxDiff(0.);\
-  for(auto i = 0; i < NB*NB; i++) \
-    maxDiff = std::max(maxDiff,std::abs(SX[i] - SX2[i]));\
-  \
-  BOOST_CHECK(maxDiff < 1e-10);\
+#endif
+
   memManager->free(SX,SX2,Rand);
 
 
+}
 
-#endif
+
+
 
 
 // Direct contract test suite
@@ -202,28 +216,28 @@ BOOST_AUTO_TEST_SUITE( REAL_DIRECT_CONTRACTION )
 // Real Hermetian "J" contraction test
 BOOST_FIXTURE_TEST_CASE( HER_J_CONTRACT, SerialJob ) {
 
-  CONTRACT_TEST(double,HERMETIAN,COULOMB,"CONTRACTION/HER/REAL/J");
+  CONTRACT_TEST<double,HERMETIAN>(COULOMB,"CONTRACTION/HER/REAL/J");
 
 }
 
 // Real Non-Hermetian "J" contraction test
 BOOST_FIXTURE_TEST_CASE( NONHER_J_CONTRACT, SerialJob ) {
 
-  CONTRACT_TEST(double,NONHERMETIAN,COULOMB,"CONTRACTION/NONHER/REAL/J");
+  CONTRACT_TEST<double,NONHERMETIAN>(COULOMB,"CONTRACTION/NONHER/REAL/J");
 
 }
 
 // Real Hermetian "K" contraction test
 BOOST_FIXTURE_TEST_CASE( HER_K_CONTRACT, SerialJob ) {
 
-  CONTRACT_TEST(double,HERMETIAN,EXCHANGE,"CONTRACTION/HER/REAL/K");
+  CONTRACT_TEST<double,HERMETIAN>(EXCHANGE,"CONTRACTION/HER/REAL/K");
 
 }
 
 // Real Non-Hermetian "K" contraction test
 BOOST_FIXTURE_TEST_CASE( NONHER_K_CONTRACT, SerialJob ) {
 
-  CONTRACT_TEST(double,NONHERMETIAN,COULOMB,"CONTRACTION/NONHER/REAL/K");
+  CONTRACT_TEST<double,NONHERMETIAN>(COULOMB,"CONTRACTION/NONHER/REAL/K");
 
 }
 
@@ -233,28 +247,28 @@ BOOST_FIXTURE_TEST_CASE( NONHER_K_CONTRACT, SerialJob ) {
 // Parallel Real Hermetian "J" contraction test
 BOOST_FIXTURE_TEST_CASE( PAR_HER_J_CONTRACT, ParallelJob ) {
 
-  CONTRACT_TEST(double,HERMETIAN,COULOMB,"CONTRACTION/HER/REAL/J");
+  CONTRACT_TEST<double,HERMETIAN>(COULOMB,"CONTRACTION/HER/REAL/J");
 
 }
 
 // Parallel Real Non-Hermetian "J" contraction test
 BOOST_FIXTURE_TEST_CASE( PAR_NONHER_J_CONTRACT, ParallelJob ) {
 
-  CONTRACT_TEST(double,NONHERMETIAN,COULOMB,"CONTRACTION/NONHER/REAL/J");
+  CONTRACT_TEST<double,NONHERMETIAN>(COULOMB,"CONTRACTION/NONHER/REAL/J");
 
 }
 
 // Parallel Real Hermetian "K" contraction test
 BOOST_FIXTURE_TEST_CASE( PAR_HER_K_CONTRACT, ParallelJob ) {
 
-  CONTRACT_TEST(double,HERMETIAN,EXCHANGE,"CONTRACTION/HER/REAL/K");
+  CONTRACT_TEST<double,HERMETIAN>(EXCHANGE,"CONTRACTION/HER/REAL/K");
 
 }
 
 // Parallel Real Non-Hermetian "K" contraction test
 BOOST_FIXTURE_TEST_CASE( PAR_NONHER_K_CONTRACT, ParallelJob ) {
 
-  CONTRACT_TEST(double,NONHERMETIAN,COULOMB,"CONTRACTION/NONHER/REAL/K");
+  CONTRACT_TEST<double,NONHERMETIAN>(COULOMB,"CONTRACTION/NONHER/REAL/K");
 
 }
 
@@ -271,14 +285,14 @@ BOOST_AUTO_TEST_SUITE( COMPLEX_DIRECT_CONTRACTION )
 // Complex Hermetian "J" contraction test
 BOOST_FIXTURE_TEST_CASE( HER_J_CONTRACT, SerialJob ) {
 
-  CONTRACT_TEST(dcomplex,HERMETIAN,COULOMB,"CONTRACTION/HER/COMPLEX/J");
+  CONTRACT_TEST<dcomplex,HERMETIAN>(COULOMB,"CONTRACTION/HER/COMPLEX/J");
 
 }
 
 // Complex Non-Hermetian "J" contraction test
 BOOST_FIXTURE_TEST_CASE( NONHER_J_CONTRACT, SerialJob ) {
 
-  CONTRACT_TEST(dcomplex,NONHERMETIAN,COULOMB,"CONTRACTION/NONHER/COMPLEX/J");
+  CONTRACT_TEST<dcomplex,NONHERMETIAN>(COULOMB,"CONTRACTION/NONHER/COMPLEX/J");
 
 }
 
@@ -286,14 +300,14 @@ BOOST_FIXTURE_TEST_CASE( NONHER_J_CONTRACT, SerialJob ) {
 // Complex Hermetian "K" contraction test
 BOOST_FIXTURE_TEST_CASE( HER_K_CONTRACT, SerialJob ) {
 
-  CONTRACT_TEST(dcomplex,HERMETIAN,EXCHANGE,"CONTRACTION/HER/COMPLEX/K");
+  CONTRACT_TEST<dcomplex,HERMETIAN>(EXCHANGE,"CONTRACTION/HER/COMPLEX/K");
 
 }
 
 // Complex Non-Hermetian "K" contraction test
 BOOST_FIXTURE_TEST_CASE( NONHER_K_CONTRACT, SerialJob ) {
 
-  CONTRACT_TEST(dcomplex,HERMETIAN,EXCHANGE,"CONTRACTION/NONHER/COMPLEX/K");
+  CONTRACT_TEST<dcomplex,HERMETIAN>(EXCHANGE,"CONTRACTION/NONHER/COMPLEX/K");
 
 }
 
@@ -305,14 +319,14 @@ BOOST_FIXTURE_TEST_CASE( NONHER_K_CONTRACT, SerialJob ) {
 // Parallel Complex Hermetian "J" contraction test
 BOOST_FIXTURE_TEST_CASE( PAR_HER_J_CONTRACT, ParallelJob ) {
 
-  CONTRACT_TEST(dcomplex,HERMETIAN,COULOMB,"CONTRACTION/HER/COMPLEX/J");
+  CONTRACT_TEST<dcomplex,HERMETIAN>(COULOMB,"CONTRACTION/HER/COMPLEX/J");
 
 }
 
 // Parallel Complex Non-Hermetian "J" contraction test
 BOOST_FIXTURE_TEST_CASE( PAR_NONHER_J_CONTRACT, ParallelJob ) {
 
-  CONTRACT_TEST(dcomplex,NONHERMETIAN,COULOMB,"CONTRACTION/NONHER/COMPLEX/J");
+  CONTRACT_TEST<dcomplex,NONHERMETIAN>(COULOMB,"CONTRACTION/NONHER/COMPLEX/J");
 
 }
 
@@ -320,14 +334,14 @@ BOOST_FIXTURE_TEST_CASE( PAR_NONHER_J_CONTRACT, ParallelJob ) {
 // Parallel Complex Hermetian "K" contraction test
 BOOST_FIXTURE_TEST_CASE( PAR_HER_K_CONTRACT, ParallelJob ) {
 
-  CONTRACT_TEST(dcomplex,HERMETIAN,EXCHANGE,"CONTRACTION/HER/COMPLEX/K");
+  CONTRACT_TEST<dcomplex,HERMETIAN>(EXCHANGE,"CONTRACTION/HER/COMPLEX/K");
 
 }
 
 // Parallel Complex Non-Hermetian "K" contraction test
 BOOST_FIXTURE_TEST_CASE( PAR_NONHER_K_CONTRACT, ParallelJob ) {
 
-  CONTRACT_TEST(dcomplex,HERMETIAN,EXCHANGE,"CONTRACTION/NONHER/COMPLEX/K");
+  CONTRACT_TEST<dcomplex,HERMETIAN>(EXCHANGE,"CONTRACTION/NONHER/COMPLEX/K");
 
 }
 

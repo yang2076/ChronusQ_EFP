@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -30,14 +30,14 @@ BOOST_AUTO_TEST_SUITE( UHF )
 // Li 6-31G(d) test
 BOOST_FIXTURE_TEST_CASE( Li_631Gd, SerialJob ) {
 
-  CQSCFTEST( scf/serial/uhf/li_6-31Gd, li_6-31Gd.bin.ref );
+  CQSCFTEST( "scf/serial/uhf/li_6-31Gd", "li_6-31Gd.bin.ref" );
 
 };
 
 // O2 6-31G(d) test
 BOOST_FIXTURE_TEST_CASE( O2_631Gd, SerialJob ) {
 
-  CQSCFTEST( scf/serial/uhf/oxygen_6-31Gd, oxygen_6-31Gd.bin.ref );
+  CQSCFTEST( "scf/serial/uhf/oxygen_6-31Gd", "oxygen_6-31Gd.bin.ref" );
 
 };
 
@@ -46,14 +46,14 @@ BOOST_FIXTURE_TEST_CASE( O2_631Gd, SerialJob ) {
 // SMP Li 6-31G(d) test
 BOOST_FIXTURE_TEST_CASE( PAR_Li_631Gd, ParallelJob ) {
 
-  CQSCFTEST( scf/parallel/uhf/li_6-31Gd, li_6-31Gd.bin.ref );
+  CQSCFTEST( "scf/parallel/uhf/li_6-31Gd", "li_6-31Gd.bin.ref" );
 
 };
 
 // SMP O2 6-31G(d) test
 BOOST_FIXTURE_TEST_CASE( PAR_O2_631Gd, ParallelJob ) {
 
-  CQSCFTEST( scf/parallel/uhf/oxygen_6-31Gd, oxygen_6-31Gd.bin.ref );
+  CQSCFTEST( "scf/parallel/uhf/oxygen_6-31Gd", "oxygen_6-31Gd.bin.ref" );
 
 };
 

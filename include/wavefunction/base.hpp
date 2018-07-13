@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -43,7 +43,6 @@ namespace ChronusQ {
   public:
     // Member data
 
-    AOIntegrals &aoints; ///< AOIntegrals for the evaluation of GTO integrals
 
     size_t nO;  ///< Total number of occupied orbitals
     size_t nV;  ///< Total number of virtual orbitals
@@ -69,27 +68,8 @@ namespace ChronusQ {
      *  \param [in] _nC  Number of spin components (1 and 2 are supported)
      *  \param [in] iCS  Whether or not to treat as closed shell
      */ 
-    WaveFunctionBase(AOIntegrals &aoi, size_t _nC, bool iCS) : 
-      QuantumBase(aoi.memManager(),_nC,iCS), aoints(aoi) {
-
-      // Compute meta data
-
-      nO = aoints.molecule().nTotalE;
-      nV = 2*aoints.basisSet().nBasis - nO;
-
-      if( iCS ) {
-        nOA = nO / 2; nOB = nO / 2;
-        nVA = nV / 2; nVB = nV / 2;
-      } else {
-        size_t nSingleE = aoints.molecule().multip - 1;
-        nOB = (nO - nSingleE) / 2;
-        nOA = nOB + nSingleE;
-        nVA = aoints.basisSet().nBasis - nOA;
-        nVB = aoints.basisSet().nBasis - nOB;
-      }
-
-    }; // WaveFunctionBase ctor
-
+    WaveFunctionBase(MPI_Comm c, CQMemManager &mem, size_t _nC, bool iCS) : 
+      QuantumBase(c, mem,_nC,iCS) { }; // WaveFunctionBase ctor 
 
     // Print Functions
     virtual void printMO(std::ostream&)  = 0;

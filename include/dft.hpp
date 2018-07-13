@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -91,6 +91,23 @@ namespace ChronusQ {
       xc_gga_exc_vxc(&this->functional_,N,rho,sigma,eps,vrho,vsigma);
 
     };
+
+
+    void evalEXC_VXC_FXC(size_t N, double *rho, double *eps, double *vxc, double *fxc) {
+
+      evalEXC_VXC(N,rho,eps,vxc);
+      xc_lda_fxc(&this->functional_,N,rho,fxc);
+
+    }
+
+    void evalEXC_VXC_FXC(size_t N, double *rho, double *sigma, double *eps, double *vrho, 
+      double * vsigma, double *v2rho2, double *v2rhosigma, double *v2sigma2) {
+
+      evalEXC_VXC(N,rho,sigma,eps,vrho,vsigma);
+      xc_gga_fxc(&this->functional_,N,rho,sigma,v2rho2,v2rhosigma,v2sigma2);
+
+    };
+
 
 /*
     virtual void evalFXC(size_t N, double *rho, double *fxc) = 0;

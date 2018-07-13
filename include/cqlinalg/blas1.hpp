@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -91,10 +91,12 @@ namespace ChronusQ {
    *
    *  Wraps BLAS functions. See
    *    http://www.netlib.org/lapack/lapack-3.1.1/html/daxpy.f.html 
+   *    http://www.netlib.org/lapack/lapack-3.1.1/html/zaxpy.f.html 
    *  parameter documentation.
    *    
    */
-  void DaxPy(int N, double alpha, double *X, int INCX, double *Y, int INCY);
+  template <typename _F, typename _ShiftF>
+  void AXPY(int N, _ShiftF alpha, _F *X, int INCX, _F *Y, int INCY);
 
   /**
    *  \brief Returns the specified norm of a matrix.
@@ -109,6 +111,19 @@ namespace ChronusQ {
   _F1 MatNorm(char NORM, int M, int N, _F2 *A, int LDA);
   
 
+
+  /**
+   *  \brief Normalizes a vector and returns the norm
+   */
+  template <typename _F>
+  inline double Normalize(int N, _F *X, int INCX) {
+
+    double norm = TwoNorm<double>(N,X,INCX);
+    Scale(N,_F(1.)/norm,X,INCX);
+
+    return norm;
+
+  }
 }; // namespace ChronusQ
 
 

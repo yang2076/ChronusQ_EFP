@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -29,40 +29,40 @@ BOOST_AUTO_TEST_SUITE( X2CHF )
 // Water 6-311+G(d,p) (Spherical) test
 BOOST_FIXTURE_TEST_CASE( Water_6311pGdp_sph, SerialJob ) {
 
-  CQSCFTEST( scf/serial/x2c/water_6-311+Gdp_sph, 
-    water_6-311+Gdp_sph_x2c.bin.ref );
+  CQSCFTEST( "scf/serial/x2c/water_6-311+Gdp_sph", 
+    "water_6-311+Gdp_sph_x2c.bin.ref",1e-6 );
  
 };
 
 // Water 6-311+G(d,p) (Cartesian) test
 BOOST_FIXTURE_TEST_CASE( Water_6311pGdp_cart, SerialJob ) {
 
-  CQSCFTEST( scf/serial/x2c/water_6-311+Gdp_cart, 
-    water_6-311+Gdp_cart_x2c.bin.ref );
+  CQSCFTEST( "scf/serial/x2c/water_6-311+Gdp_cart", 
+    "water_6-311+Gdp_cart_x2c.bin.ref",1e-6 );
  
 };
 
 // Hg SAPPORO DZP DKH_2012 SP
 BOOST_FIXTURE_TEST_CASE( Hg_SAP_DZP_DKH3_2012_SP , SerialJob ) {
 
-  CQSCFTEST( scf/serial/x2c/hg_sap_dz_dkh3_2012_sp, 
-    hg_sap_dz_dkh3_2012_sp.bin.ref );
+  CQSCFTEST( "scf/serial/x2c/hg_sap_dz_dkh3_2012_sp", 
+    "hg_sap_dz_dkh3_2012_sp.bin.ref",1e-6 );
  
 };
 
 // Zn SAPPORO DZP DKH_2012 SP
 BOOST_FIXTURE_TEST_CASE( Zn_SAP_DZP_DKH3_2012_SP , SerialJob ) {
 
-  CQSCFTEST( scf/serial/x2c/zn_sap_dz_dkh3_2012_sp, 
-    zn_sap_dz_dkh3_2012_sp.bin.ref );
+  CQSCFTEST( "scf/serial/x2c/zn_sap_dz_dkh3_2012_sp", 
+    "zn_sap_dz_dkh3_2012_sp.bin.ref",1e-6 );
  
 };
 
 // Cd SAPPORO DZP DKH_2012 SP
 BOOST_FIXTURE_TEST_CASE( Cd_SAP_DZP_DKH3_2012_SP , SerialJob ) {
 
-  CQSCFTEST( scf/serial/x2c/cd_sap_dz_dkh3_2012_sp, 
-    cd_sap_dz_dkh3_2012_sp.bin.ref );
+  CQSCFTEST( "scf/serial/x2c/cd_sap_dz_dkh3_2012_sp", 
+    "cd_sap_dz_dkh3_2012_sp.bin.ref",1e-6 );
  
 };
 
@@ -71,8 +71,8 @@ BOOST_FIXTURE_TEST_CASE( Cd_SAP_DZP_DKH3_2012_SP , SerialJob ) {
 // SMP Water 6-311+G(d,p) (Spherical) test
 BOOST_FIXTURE_TEST_CASE( PAR_Water_6311pGdp_sph, ParallelJob ) {
 
-  CQSCFTEST( scf/parallel/x2c/water_6-311+Gdp_sph, 
-    water_6-311+Gdp_sph_x2c.bin.ref );
+  CQSCFTEST( "scf/parallel/x2c/water_6-311+Gdp_sph", 
+    "water_6-311+Gdp_sph_x2c.bin.ref",1e-6 );
  
 };
 

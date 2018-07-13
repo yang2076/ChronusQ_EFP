@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -28,30 +28,30 @@
 
 namespace ChronusQ {
 
-  template <typename T>
-  void SingleSlater<T>::populationAnalysis() {
+  template <typename MatsT, typename IntsT>
+  void SingleSlater<MatsT,IntsT>::populationAnalysis() {
 
-    const size_t NB = aoints.basisSet().nBasis;
-    T* SCR  = this->memManager.template malloc<T>(NB*NB);
-    T* SCR2 = this->memManager.template malloc<T>(NB*NB);
+    const size_t NB = this->aoints.basisSet().nBasis;
+    MatsT* SCR  = this->memManager.template malloc<MatsT>(NB*NB);
+    MatsT* SCR2 = this->memManager.template malloc<MatsT>(NB*NB);
 
     // Mulliken population analysis
     mullikenCharges.clear();
 
-    Gemm('N','N',NB,NB,NB,T(1.),aoints.overlap,NB,this->onePDM[SCALAR],NB,
-      T(0.),SCR,NB);
+    Gemm('N','N',NB,NB,NB,MatsT(1.),this->aoints.overlap,NB,this->onePDM[SCALAR],NB,
+      MatsT(0.),SCR,NB);
 
-    for(auto iAtm = 0; iAtm < aoints.molecule().nAtoms; iAtm++) {
+    for(auto iAtm = 0; iAtm < this->aoints.molecule().nAtoms; iAtm++) {
 
       size_t iEnd;
-      if( iAtm == aoints.molecule().nAtoms-1 )
+      if( iAtm == this->aoints.molecule().nAtoms-1 )
         iEnd = NB;
       else
-        iEnd = aoints.basisSet().mapCen2BfSt[iAtm+1];
+        iEnd = this->aoints.basisSet().mapCen2BfSt[iAtm+1];
 
-      size_t iSt = aoints.basisSet().mapCen2BfSt[iAtm];
+      size_t iSt = this->aoints.basisSet().mapCen2BfSt[iAtm];
 
-      mullikenCharges.emplace_back(aoints.molecule().atoms[iAtm].atomicNumber);
+      mullikenCharges.emplace_back(this->aoints.molecule().atoms[iAtm].atomicNumber);
       for(auto i = iSt; i < iEnd; i++)
         mullikenCharges.back() -= std::real(SCR[i*(NB+1)]);
     } 
@@ -61,22 +61,22 @@ namespace ChronusQ {
     lowdinCharges.clear();
 
 /*
-    Gemm('N','N',NB,NB,NB,T(1.),aoints.ortho1,NB,this->onePDM[SCALAR],NB,
+    Gemm('N','N',NB,NB,NB,T(1.),this->aoints.ortho1,NB,this->onePDM[SCALAR],NB,
       T(0.),SCR2,NB);
-    Gemm('N','C',NB,NB,NB,T(1.),aoints.ortho1,NB,SCR2,NB,T(0.),SCR,NB);
+    Gemm('N','C',NB,NB,NB,T(1.),this->aoints.ortho1,NB,SCR2,NB,T(0.),SCR,NB);
 */
 
-    for(auto iAtm = 0; iAtm < aoints.molecule().nAtoms; iAtm++) {
+    for(auto iAtm = 0; iAtm < this->aoints.molecule().nAtoms; iAtm++) {
 
       size_t iEnd;
-      if( iAtm == aoints.molecule().nAtoms-1 )
+      if( iAtm == this->aoints.molecule().nAtoms-1 )
         iEnd = NB;
       else
-        iEnd = aoints.basisSet().mapCen2BfSt[iAtm+1];
+        iEnd = this->aoints.basisSet().mapCen2BfSt[iAtm+1];
 
-      size_t iSt = aoints.basisSet().mapCen2BfSt[iAtm];
+      size_t iSt = this->aoints.basisSet().mapCen2BfSt[iAtm];
 
-      lowdinCharges.emplace_back(aoints.molecule().atoms[iAtm].atomicNumber);
+      lowdinCharges.emplace_back(this->aoints.molecule().atoms[iAtm].atomicNumber);
       for(auto i = iSt; i < iEnd; i++)
         lowdinCharges.back() -= std::real(this->onePDMOrtho[SCALAR][i*(NB+1)]);
     } 

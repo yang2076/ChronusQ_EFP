@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 #include <chronusq_sys.hpp>
 #include <libint2/cxxapi.h>
 //#include <cxxapi/boilerplate.hpp>
+#include <util/mpi.hpp>
 
 #define __CERR_RUNTIMEERR__ // Throw a runtime error on CErr
 
@@ -43,14 +44,18 @@ namespace ChronusQ {
 
     time_t currentTime;
     time(&currentTime); 
-    libint2::finalize();
 
+    if(MPIRank() == 0)
     out << msg << std::endl << "Job terminated: " << ctime(&currentTime)
         << std::endl;
 
 #ifdef __CERR_RUNTIMEERR__
     throw std::runtime_error("FATAL");
 #else
+    libint2::finalize();
+  #ifdef CQ_ENABLE_MPI
+    MPI_Finalize();
+  #endif
     exit(EXIT_FAILURE);
 #endif
   };

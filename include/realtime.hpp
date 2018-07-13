@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -130,14 +130,14 @@ namespace ChronusQ {
   };
 
 
-  template <template <typename> class _SSTyp, typename T>
+  template <template <typename, typename> class _SSTyp, typename IntsT>
   class RealTime : public RealTimeBase {
    
     typedef dcomplex*                 oper_t;
     typedef std::vector<oper_t>       oper_t_coll;
 
-    _SSTyp<T>        &reference_;  ///< Initial conditions
-    _SSTyp<dcomplex>  propagator_; ///< Object for time propagation
+    SingleSlaterBase         *reference_ = nullptr;  ///< Initial conditions
+    _SSTyp<dcomplex,IntsT>    propagator_; ///< Object for time propagation
 
     oper_t_coll DOSav;
     oper_t_coll UH;
@@ -160,9 +160,10 @@ namespace ChronusQ {
      *  CQMemManager and makes a copy of the reference into a complex
      *  SingleSlater object for the propagation.
      */ 
-    RealTime(_SSTyp<T> &reference) : 
+    template <typename RefMatsT>
+    RealTime(_SSTyp<RefMatsT,IntsT> &reference) : 
       RealTimeBase(reference.memManager),
-      reference_(reference), propagator_(reference) { 
+      reference_(&reference), propagator_(reference) { 
 
       alloc(); 
 

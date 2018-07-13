@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -24,7 +24,34 @@
 #include <cxxapi/options.hpp>
 #include <cerr.hpp>
 
+#include <aointegrals/print.hpp>
+
 namespace ChronusQ {
+
+  /**
+   *
+   *  Check valid keywords in the section.
+   *
+  */
+  void CQINTS_VALID( std::ostream &out, CQInputFile &input ) {
+
+    // Allowed keywords
+    std::vector<std::string> allowedKeywords = {
+      "ALG",
+      "SCHWARTZ"
+    };
+
+    // Specified keywords
+    std::vector<std::string> intsKeywords = input.getDataInSection("INTS");
+
+    // Make sure all of basisKeywords in allowedKeywords
+    for( auto &keyword : intsKeywords ) {
+      auto ipos = std::find(allowedKeywords.begin(),allowedKeywords.end(),keyword);
+      if( ipos == allowedKeywords.end() ) 
+        CErr("Keyword INTS." + keyword + " is not recognized",std::cout);// Error
+    }
+    // Check for disallowed combinations (if any)
+  }
 
   /**
    *  \brief Optionally set the control parameters for an
@@ -36,7 +63,23 @@ namespace ChronusQ {
    *
    *
    */ 
-  void CQIntsOptions(std::ostream &out, CQInputFile &input, AOIntegrals &aoi) {
+  std::shared_ptr<AOIntegralsBase> CQIntsOptions(std::ostream &out, 
+    CQInputFile &input, CQMemManager &mem, Molecule &mol, BasisSet &basis) {
+
+
+
+    std::shared_ptr<AOIntegralsBase> aoi = nullptr;
+
+    if(basis.basisType == REAL_GTO)
+      aoi = std::dynamic_pointer_cast<AOIntegralsBase>(
+          std::make_shared<AOIntegrals<double>>(mem,mol,basis)
+        );
+    else if(basis.basisType == COMPLEX_GIAO)
+      aoi = std::dynamic_pointer_cast<AOIntegralsBase>(
+          std::make_shared<AOIntegrals<dcomplex>>(mem,mol,basis)
+        );
+
+
 
     // Parse integral algorithm
     std::string ALG = "DIRECT";
@@ -44,17 +87,20 @@ namespace ChronusQ {
     trim(ALG);
 
     if( not ALG.compare("DIRECT") )
-      aoi.cAlg = CONTRACTION_ALGORITHM::DIRECT;
+      aoi->contrAlg = CONTRACTION_ALGORITHM::DIRECT;
     else if( not ALG.compare("INCORE") )
-      aoi.cAlg = CONTRACTION_ALGORITHM::INCORE;
+      aoi->contrAlg = CONTRACTION_ALGORITHM::INCORE;
     else
       CErr(ALG + "not a valid INTS.ALG",out);
 
-    
     // Parse Schwartz threshold
-    OPTOPT( aoi.threshSchwartz = input.getData<double>("INTS.SCHWARTZ"); )
+    OPTOPT( aoi->threshSchwartz = input.getData<double>("INTS.SCHWARTZ"); )
 
-    out << aoi << std::endl;
+
+    // Print
+    out <<  *aoi << std::endl;
+
+    return aoi;
 
   }; // CQIntsOptions
 

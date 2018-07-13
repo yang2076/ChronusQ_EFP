@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -22,8 +22,11 @@
  *  
  */
 #include <cqlinalg/blasext.hpp>
+#include <cerr.hpp>
 
 #include <util/matout.hpp>
+
+//#include <cblas.h>
 
 namespace ChronusQ {
 
@@ -133,16 +136,37 @@ namespace ChronusQ {
     size_t LDA, size_t LDB) {
 
 
-      assert( LDA == LDB );
+      //assert( LDA == LDB );
 
       if( TRANS == 'N' and ALPHA == _FScale(1.) ) return;
 
       Eigen::Map< Eigen::Matrix<_F,
           Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor> > AMap(A,LDA,N);
 
-      if( TRANS == 'T' )      AMap.block(0,0,M,N).transposeInPlace();
-      else if( TRANS == 'C' ) AMap.block(0,0,M,N).adjointInPlace();
-      else if( TRANS == 'R' ) 
+
+      
+      if( N == M  and LDA == LDB) {
+        if( TRANS == 'T' ) AMap.block(0,0,M,N).transposeInPlace();
+        if( TRANS == 'C' ) AMap.block(0,0,M,N).adjointInPlace();
+      } else {
+
+        if ( LDB < N ) CErr();
+
+        Eigen::Matrix<_F,
+            Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor> ANew(LDB,M);
+
+        if( TRANS == 'T' ) ANew = AMap.block(0,0,M,N).transpose();
+        if( TRANS == 'C' ) ANew = AMap.block(0,0,M,N).adjoint();
+
+        
+        Eigen::Map< Eigen::Matrix<_F,
+            Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor> > AMap1(A,LDB,M);
+      
+        AMap1 = ANew;
+
+      }
+
+      if( TRANS == 'R' ) 
         AMap.block(0,0,M,N).noalias() = AMap.block(0,0,M,N).conjugate();
 
       if( ALPHA != _FScale(1.) ) AMap.block(0,0,M,N) *= ALPHA;
@@ -173,9 +197,49 @@ namespace ChronusQ {
   template void IMatCopy(char,size_t,size_t,double,double*,size_t,size_t);
   template void IMatCopy(char,size_t,size_t,dcomplex,dcomplex*,size_t,size_t);
 
+/*
+  template <>
+  void IMatCopy(char TRANS, size_t M, size_t N, double ALPHA, double *A, 
+    size_t LDA, size_t LDB) {
+
+    char ORDER = 'c';
+
+    int iM = M; int iN = N; int iLDA = LDA; int iLDB = LDB; 
+
+    std::cerr << "IMATCOPY\n" << std::endl;
+
+    CBLAS_TRANSPOSE iT = CblasNoTrans;
+    if( TRANS == 'T' ) iT = CblasTrans;
+    if( TRANS == 'C' ) iT = CblasConjTrans;
+    if( TRANS == 'R' ) iT = CblasConjNoTrans;
+
+//  dimatcopy_(&ORDER,&TRANS,&iM,&iN,&ALPHA,A,&iLDA,&iLDB);
+    cblas_dimatcopy(CblasColMajor,iT,iM,iN,ALPHA,A,iLDA,iLDB);
+
+  }
+
+  template <>
+  void IMatCopy(char TRANS, size_t M, size_t N, dcomplex ALPHA, dcomplex *A, 
+    size_t LDA, size_t LDB) {
+
+    char ORDER = 'C';
+
+    int iM = M; int iN = N; int iLDA = LDA; int iLDB = LDB; 
+
+    zimatcopy_(&ORDER,&TRANS,&iM,&iN,reinterpret_cast<double*>(&ALPHA),
+      reinterpret_cast<double*>(A),&iLDA,&iLDB);
+
+  }
+*/
 #endif
   
-  template void IMatCopy(char,size_t,size_t,double,dcomplex*,size_t,size_t);
+  template <>
+  void IMatCopy(char TRANS, size_t M, size_t N, double ALPHA, dcomplex *A, 
+    size_t LDA, size_t LDB) {
+
+    IMatCopy(TRANS,M,N,dcomplex(ALPHA),A,LDA,LDB); 
+
+  }
 
 
   // Generic HerMat template

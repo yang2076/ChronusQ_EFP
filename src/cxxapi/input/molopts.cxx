@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -22,10 +22,38 @@
  *  
  */
 #include <physcon.hpp>
+#include <chronusq_sys.hpp>
 #include <cxxapi/options.hpp>
+#include <cxxapi/procedural.hpp>
 #include <cerr.hpp>
 
 namespace ChronusQ {
+
+  /**
+   *
+   *  Check valid keywords in the section.
+   *
+  */
+  void CQMOLECULE_VALID( std::ostream &out, CQInputFile &input ) {
+
+    // Allowed keywords
+    std::vector<std::string> allowedKeywords = {
+      "CHARGE",
+      "MULT",
+      "GEOM"
+    };
+
+    // Specified keywords
+    std::vector<std::string> moleculeKeywords = input.getDataInSection("MOLECULE");
+
+    // Make sure all of basisKeywords in allowedKeywords
+    for( auto &keyword : moleculeKeywords ) {
+      auto ipos = std::find(allowedKeywords.begin(),allowedKeywords.end(),keyword);
+      if( ipos == allowedKeywords.end() ) 
+        CErr("Keyword MOLECULE." + keyword + " is not recognized",std::cout);// Error
+    }
+    // Check for disallowed combinations (if any)
+  }
 
   /**
    *  Construct a Molecule object using the input file.

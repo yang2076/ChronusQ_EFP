@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -66,8 +66,8 @@ namespace ChronusQ {
    *  \param [out] VRhoSCR    Pointer for multiple functional eval. See VRhoEval
    *  \param [out] VgammaSCR  Pointer for multiple functional eval. See VgammaEval
    */  
-  template <typename T>
-  void KohnSham<T>::loadVXCder(size_t NPts, double *Den, double *Gamma,
+  template <typename MatsT, typename IntsT>
+  void KohnSham<MatsT,IntsT>::loadVXCder(size_t NPts, double *Den, double *Gamma,
     double *epsEval, double*VRhoEval, double *VgammaEval, double *EpsSCR, 
     double *VRhoSCR, double *VgammaSCR) { 
 
@@ -115,7 +115,7 @@ namespace ChronusQ {
       prettyPrintSmart(std::cerr,"VgammaEval   ",VgammaEval,NPts,3,NPts);
 #endif
 
-  }; // KohnSham<T>::loadVXCder
+  }; // KohnSham<T,MatsT,IntsT>::loadVXCder
 
 
 
@@ -133,8 +133,8 @@ namespace ChronusQ {
    *  \param [out] gammaColl            U variable for Gdensity (++,+-,--) for NPts
    *
    */  
-  template <typename T>
-  void KohnSham<T>::mkAuxVar(bool isGGA, 
+  template <typename MatsT, typename IntsT>
+  void KohnSham<MatsT,IntsT>::mkAuxVar(bool isGGA, 
     double epsScreen, size_t NPts,
     double *Scalar, double *Mz, double *My, double *Mx,
     double *dndX, double *dndY, double *dndZ, 
@@ -186,8 +186,8 @@ namespace ChronusQ {
     // U(+) = 0.5 * (SCALAR + |M| )
     // U(-) = 0.5 * (SCALAR - |M| )
          
-    DaxPy(NPts,0.5,Scalar,1,uPlus,2);
-    DaxPy(NPts,0.5,Scalar,1,uMinus,2);
+    AXPY(NPts,0.5,Scalar,1,uPlus,2);
+    AXPY(NPts,0.5,Scalar,1,uMinus,2);
 
     bool skipMz = false;
     if( this->onePDM.size() == 2 ) {
@@ -197,8 +197,8 @@ namespace ChronusQ {
       if (MaxDenZ < epsScreen) skipMz = true;
 #endif
         if(not skipMz){
-          DaxPy(NPts,0.5,Mz,1,uPlus,2);
-          DaxPy(NPts,-0.5,Mz,1,uMinus,2);
+          AXPY(NPts,0.5,Mz,1,uPlus,2);
+          AXPY(NPts,-0.5,Mz,1,uMinus,2);
         }
 #if VXC_DEBUG_LEVEL >= 3
       if(skipMz) std::cerr << "Skypped Mz " << std::endl;
@@ -229,8 +229,8 @@ namespace ChronusQ {
         }
 
       }
-          DaxPy(NPts,0.5,Mnorm,1,uPlus,2);
-          DaxPy(NPts,-0.5,Mnorm,1,uMinus,2);
+          AXPY(NPts,0.5,Mnorm,1,uPlus,2);
+          AXPY(NPts,-0.5,Mnorm,1,uMinus,2);
 
     }
 
@@ -330,7 +330,7 @@ namespace ChronusQ {
       } // 2C 
     } //GGA 
 
-  }; //KohnSham<T>::mkAuxVar
+  }; //KohnSham<MatsT,IntsT>::mkAuxVar
 
 
   /**
@@ -353,8 +353,8 @@ namespace ChronusQ {
    *  \param [out] GDenZ      Pointer to the V variable - Gradient Z comp of SCALAR/Mk
    *  \param [in]  BasisScr   Pointer to Basis set evaluated over batch of points.
    */  
-  template <typename T>
-  void KohnSham<T>::evalDen(SHELL_EVAL_TYPE typ, size_t NPts,size_t NBE, size_t NB, 
+  template <typename MatsT, typename IntsT>
+  void KohnSham<MatsT,IntsT>::evalDen(SHELL_EVAL_TYPE typ, size_t NPts,size_t NBE, size_t NB, 
     std::vector<std::pair<size_t,size_t>> &subMatCut, double *SCR1,
     double *SCR2, double *DENMAT, double *Den, double *GDenX, double *GDenY, double *GDenZ,
     double *BasisScr){
@@ -402,7 +402,7 @@ namespace ChronusQ {
         GDenZ[iPt] *= 2.0;
       }
     }
-  }; // //KohnSham<T>::evalDen
+  }; // //KohnSham<MatsT,IntsT>::evalDen
 
   /**
    *  \brief Evaluate the EXC energy 
@@ -412,8 +412,8 @@ namespace ChronusQ {
    *  \param [in] epsEval  Pointer to the energy per unit particle. 
    *  \param [in] DenS     Pointer to the scalar density.
    */  
-  template <typename T>
-  double KohnSham<T>::energy_vxc(size_t NPts, std::vector<double> &weights, double *epsEval, double *DenS){
+  template <typename MatsT, typename IntsT>
+  double KohnSham<MatsT,IntsT>::energy_vxc(size_t NPts, std::vector<double> &weights, double *epsEval, double *DenS){
 
     double XCEnergy = 0.0;
 
@@ -422,7 +422,7 @@ namespace ChronusQ {
      // std::cerr << "XCEnergy " << XCEnergy << std::endl;
     return XCEnergy;
 
-  };// KohnSham<T>::energy_vxc
+  };// KohnSham<MatsT,IntsT>::energy_vxc
 
 
   
@@ -467,8 +467,8 @@ namespace ChronusQ {
    *                        contribution to ZMAT 
    *  
    */  
-  template <typename T>
-  void KohnSham<T>::constructZVars(DENSITY_TYPE denTyp, bool isGGA, size_t NPts, 
+  template <typename MatsT, typename IntsT>
+  void KohnSham<MatsT,IntsT>::constructZVars(DENSITY_TYPE denTyp, bool isGGA, size_t NPts, 
     double *VrhoEval, double *VgammaEval, double *ZrhoVar1, 
     double *ZgammaVar1, double *ZgammaVar2) {
 
@@ -484,14 +484,14 @@ namespace ChronusQ {
     if( denTyp == SCALAR) {
       // (DE/DN+ DN+/DSCALAR + DE/DN- DN-/DSCALAR )
       // Where DN+/DSCALAR = DN+/DSCALAR = 0.5
-      DaxPy(NPts,0.5,VrhoEval,2,ZrhoVar1,1);
-      DaxPy(NPts,0.5 ,VrhoEval+1,2,ZrhoVar1,1);
+      AXPY(NPts,0.5,VrhoEval,2,ZrhoVar1,1);
+      AXPY(NPts,0.5 ,VrhoEval+1,2,ZrhoVar1,1);
     } else {
       // (DE/DN+ DN+/DMk + DE/DN- DN-/DMk )
       // Where DN+/DMk =  0.5
       // Where DN-/DMk = -0.5 (only for UKS) 
-      DaxPy(NPts,0.5,VrhoEval,2,ZrhoVar1,1);
-      DaxPy(NPts,-0.5,VrhoEval+1,2,ZrhoVar1,1);
+      AXPY(NPts,0.5,VrhoEval,2,ZrhoVar1,1);
+      AXPY(NPts,-0.5,VrhoEval+1,2,ZrhoVar1,1);
     }
 
 
@@ -508,13 +508,13 @@ namespace ChronusQ {
       //   The Del SCAL and Del Mz will be assembled later in formZ_vxc
       //   NOTE we are building 2 * Z. So 0.5 ---> 1.
 
-      DaxPy(NPts,1.,VgammaEval,3  ,ZgammaVar1,1);
-      DaxPy(NPts,1.,VgammaEval+1,3,ZgammaVar1,1);
-      DaxPy(NPts,1.,VgammaEval+2,3,ZgammaVar1,1);
+      AXPY(NPts,1.,VgammaEval,3  ,ZgammaVar1,1);
+      AXPY(NPts,1.,VgammaEval+1,3,ZgammaVar1,1);
+      AXPY(NPts,1.,VgammaEval+2,3,ZgammaVar1,1);
 
       if( this->onePDM.size() > 1 ) {
-        DaxPy(NPts,1.,VgammaEval,3   ,ZgammaVar2,1);
-        DaxPy(NPts,-1.,VgammaEval+2,3,ZgammaVar2,1);
+        AXPY(NPts,1.,VgammaEval,3   ,ZgammaVar2,1);
+        AXPY(NPts,-1.,VgammaEval+2,3,ZgammaVar2,1);
       }
     } else {
 
@@ -528,15 +528,15 @@ namespace ChronusQ {
       //   The Del SCAL and Del Mz will be assembled later in formZ_vxc
       //   NOTE we are building 2 * Z. So 0.5 ---> 1.
 
-      DaxPy(NPts,1.,VgammaEval,3  ,ZgammaVar2,1);
-      DaxPy(NPts,-1.,VgammaEval+1,3,ZgammaVar2,1);
-      DaxPy(NPts,1.,VgammaEval+2,3,ZgammaVar2,1);
+      AXPY(NPts,1.,VgammaEval,3  ,ZgammaVar2,1);
+      AXPY(NPts,-1.,VgammaEval+1,3,ZgammaVar2,1);
+      AXPY(NPts,1.,VgammaEval+2,3,ZgammaVar2,1);
 
-      DaxPy(NPts,1.,VgammaEval,3   ,ZgammaVar1,1);
-      DaxPy(NPts,-1.,VgammaEval+2,3,ZgammaVar1,1);
+      AXPY(NPts,1.,VgammaEval,3   ,ZgammaVar1,1);
+      AXPY(NPts,-1.,VgammaEval+2,3,ZgammaVar1,1);
     }
 
-  }; //KohnSham<T>::constructZVars
+  }; //KohnSham<MatsT,IntsT>::constructZVars
 
 
   /**
@@ -575,8 +575,8 @@ namespace ChronusQ {
    *   
    *  Note. See Documentations of constructZVars.
    */  
-  template <typename T>
-  void KohnSham<T>::formZ_vxc(DENSITY_TYPE denTyp, bool isGGA, size_t NPts, size_t NBE, size_t IOff, 
+  template <typename MatsT, typename IntsT>
+  void KohnSham<MatsT,IntsT>::formZ_vxc(DENSITY_TYPE denTyp, bool isGGA, size_t NPts, size_t NBE, size_t IOff, 
     double epsScreen, std::vector<double> &weights, double *ZrhoVar1,
     double *ZgammaVar1, double *ZgammaVar2, 
     double *DenS, double *DenZ, double *DenY, double *DenX, 
@@ -601,7 +601,7 @@ namespace ChronusQ {
 #if VXC_DEBUG_LEVEL < 3
         if(std::abs(Fg) > epsScreen)
 #endif
-          DaxPy(NBE,Fg,BasisScratch + iPt*NBE,1,ZMAT+iPt*NBE,1);
+          AXPY(NBE,Fg,BasisScratch + iPt*NBE,1,ZMAT+iPt*NBE,1);
 
       // GGA part -> Eq. 15 and 17 (see constructZVars docs for the missing factor of 2)
         if( isGGA ) {
@@ -620,17 +620,17 @@ namespace ChronusQ {
 #if VXC_DEBUG_LEVEL < 3
           if(std::abs(FgX) > epsScreen)
 #endif
-            DaxPy(NBE,FgX,BasisScratch + iPt*NBE + IOff,1,ZMAT+iPt*NBE,1);
+            AXPY(NBE,FgX,BasisScratch + iPt*NBE + IOff,1,ZMAT+iPt*NBE,1);
 
 #if VXC_DEBUG_LEVEL < 3
           if(std::abs(FgY) > epsScreen)
 #endif
-            DaxPy(NBE,FgY,BasisScratch + iPt*NBE + 2*IOff,1,ZMAT+iPt*NBE,1);
+            AXPY(NBE,FgY,BasisScratch + iPt*NBE + 2*IOff,1,ZMAT+iPt*NBE,1);
 
 #if VXC_DEBUG_LEVEL < 3
           if(std::abs(FgZ) > epsScreen)
 #endif
-            DaxPy(NBE,FgZ,BasisScratch + iPt*NBE + 3*IOff,1,ZMAT+iPt*NBE,1);
+            AXPY(NBE,FgZ,BasisScratch + iPt*NBE + 3*IOff,1,ZMAT+iPt*NBE,1);
         }
       }
 
@@ -647,7 +647,7 @@ namespace ChronusQ {
 #if VXC_DEBUG_LEVEL < 3
           if(std::abs(Fg) > epsScreen)
 #endif
-            DaxPy(NBE,Fg,BasisScratch + iPt*NBE,1,ZMAT+iPt*NBE,1);
+            AXPY(NBE,Fg,BasisScratch + iPt*NBE,1,ZMAT+iPt*NBE,1);
 
         // GGA part -> Eq. 15 and 17 (see constructZVars docs for the missing factor of 2)
           if( isGGA ) {
@@ -669,17 +669,17 @@ namespace ChronusQ {
 #if VXC_DEBUG_LEVEL < 3
             if(std::abs(FgX) > epsScreen)
 #endif
-              DaxPy(NBE,FgX,BasisScratch + iPt*NBE + IOff,1,ZMAT+iPt*NBE,1);
+              AXPY(NBE,FgX,BasisScratch + iPt*NBE + IOff,1,ZMAT+iPt*NBE,1);
 
 #if VXC_DEBUG_LEVEL < 3
             if(std::abs(FgY) > epsScreen)
 #endif
-              DaxPy(NBE,FgY,BasisScratch + iPt*NBE + 2*IOff,1,ZMAT+iPt*NBE,1);
+              AXPY(NBE,FgY,BasisScratch + iPt*NBE + 2*IOff,1,ZMAT+iPt*NBE,1);
 
 #if VXC_DEBUG_LEVEL < 3
             if(std::abs(FgZ) > epsScreen)
 #endif
-              DaxPy(NBE,FgZ,BasisScratch + iPt*NBE + 3*IOff,1,ZMAT+iPt*NBE,1);
+              AXPY(NBE,FgZ,BasisScratch + iPt*NBE + 3*IOff,1,ZMAT+iPt*NBE,1);
           }
         } // loop over Pts
 
@@ -693,7 +693,7 @@ namespace ChronusQ {
 #if VXC_DEBUG_LEVEL < 3
           if(std::abs(Fg) > epsScreen)
 #endif
-            DaxPy(NBE,Fg,BasisScratch + iPt*NBE,1,ZMAT+iPt*NBE,1);
+            AXPY(NBE,Fg,BasisScratch + iPt*NBE,1,ZMAT+iPt*NBE,1);
 
         // GGA part -> Eq. 15 and 17 (see constructZVars docs for the missing factor of 2)
           if( isGGA ) {
@@ -709,17 +709,17 @@ namespace ChronusQ {
 #if VXC_DEBUG_LEVEL < 3
             if(std::abs(FgX) > epsScreen)
 #endif
-              DaxPy(NBE,FgX,BasisScratch + iPt*NBE + IOff,1,ZMAT+iPt*NBE,1);
+              AXPY(NBE,FgX,BasisScratch + iPt*NBE + IOff,1,ZMAT+iPt*NBE,1);
 
 #if VXC_DEBUG_LEVEL < 3
             if(std::abs(FgY) > epsScreen)
 #endif
-              DaxPy(NBE,FgY,BasisScratch + iPt*NBE + 2*IOff,1,ZMAT+iPt*NBE,1);
+              AXPY(NBE,FgY,BasisScratch + iPt*NBE + 2*IOff,1,ZMAT+iPt*NBE,1);
 
 #if VXC_DEBUG_LEVEL < 3
             if(std::abs(FgZ) > epsScreen)
 #endif
-              DaxPy(NBE,FgZ,BasisScratch + iPt*NBE + 3*IOff,1,ZMAT+iPt*NBE,1);
+              AXPY(NBE,FgZ,BasisScratch + iPt*NBE + 3*IOff,1,ZMAT+iPt*NBE,1);
           }
         } // loop over Pts
 
@@ -733,7 +733,7 @@ namespace ChronusQ {
 #if VXC_DEBUG_LEVEL < 3
           if(std::abs(Fg) > epsScreen)
 #endif
-            DaxPy(NBE,Fg,BasisScratch + iPt*NBE,1,ZMAT+iPt*NBE,1);
+            AXPY(NBE,Fg,BasisScratch + iPt*NBE,1,ZMAT+iPt*NBE,1);
 
         // GGA part -> Eq. 15 and 17 (see constructZVars docs for the missing factor of 2)
           if( isGGA ) {
@@ -749,17 +749,17 @@ namespace ChronusQ {
 #if VXC_DEBUG_LEVEL < 3
             if(std::abs(FgX) > epsScreen)
 #endif
-              DaxPy(NBE,FgX,BasisScratch + iPt*NBE + IOff,1,ZMAT+iPt*NBE,1);
+              AXPY(NBE,FgX,BasisScratch + iPt*NBE + IOff,1,ZMAT+iPt*NBE,1);
 
 #if VXC_DEBUG_LEVEL < 3
             if(std::abs(FgY) > epsScreen)
 #endif
-              DaxPy(NBE,FgY,BasisScratch + iPt*NBE + 2*IOff,1,ZMAT+iPt*NBE,1);
+              AXPY(NBE,FgY,BasisScratch + iPt*NBE + 2*IOff,1,ZMAT+iPt*NBE,1);
 
 #if VXC_DEBUG_LEVEL < 3
             if(std::abs(FgZ) > epsScreen)
 #endif
-              DaxPy(NBE,FgZ,BasisScratch + iPt*NBE + 3*IOff,1,ZMAT+iPt*NBE,1);
+              AXPY(NBE,FgZ,BasisScratch + iPt*NBE + 3*IOff,1,ZMAT+iPt*NBE,1);
           }
         } // loop over Pts
 
@@ -773,7 +773,7 @@ namespace ChronusQ {
 #if VXC_DEBUG_LEVEL < 3
           if(std::abs(Fg) > epsScreen)
 #endif
-            DaxPy(NBE,Fg,BasisScratch + iPt*NBE,1,ZMAT+iPt*NBE,1);
+            AXPY(NBE,Fg,BasisScratch + iPt*NBE,1,ZMAT+iPt*NBE,1);
 
         // GGA part -> Eq. 15 and 17 (see constructZVars docs for the missing factor of 2)
           if( isGGA ) {
@@ -789,17 +789,17 @@ namespace ChronusQ {
 #if VXC_DEBUG_LEVEL < 3
             if(std::abs(FgX) > epsScreen)
 #endif
-              DaxPy(NBE,FgX,BasisScratch + iPt*NBE + IOff,1,ZMAT+iPt*NBE,1);
+              AXPY(NBE,FgX,BasisScratch + iPt*NBE + IOff,1,ZMAT+iPt*NBE,1);
 
 #if VXC_DEBUG_LEVEL < 3
             if(std::abs(FgY) > epsScreen)
 #endif
-              DaxPy(NBE,FgY,BasisScratch + iPt*NBE + 2*IOff,1,ZMAT+iPt*NBE,1);
+              AXPY(NBE,FgY,BasisScratch + iPt*NBE + 2*IOff,1,ZMAT+iPt*NBE,1);
 
 #if VXC_DEBUG_LEVEL < 3
             if(std::abs(FgZ) > epsScreen)
 #endif
-              DaxPy(NBE,FgZ,BasisScratch + iPt*NBE + 3*IOff,1,ZMAT+iPt*NBE,1);
+              AXPY(NBE,FgZ,BasisScratch + iPt*NBE + 3*IOff,1,ZMAT+iPt*NBE,1);
           }  
         } // loop over Pts
 
@@ -807,7 +807,7 @@ namespace ChronusQ {
 
     } //end 2C
 
-  }; // KohnSham<T>::formZ_vxc
+  }; // KohnSham<MatsT,IntsT>::formZ_vxc
 
 
   /**
@@ -821,8 +821,8 @@ namespace ChronusQ {
    *  This function is integrated by the BeckeIntegrator
    *  object.
    */  
-  template <typename T>
-  void KohnSham<T>::formVXC() {
+  template <typename MatsT, typename IntsT>
+  void KohnSham<MatsT,IntsT>::formVXC() {
 #if VXC_DEBUG_LEVEL >= 1
     // TIMING 
     auto topMem = std::chrono::high_resolution_clock::now();
@@ -830,639 +830,764 @@ namespace ChronusQ {
 
     assert( intParam.nRad % intParam.nRadPerBatch == 0 );
 
-    // Define several useful quantities for later on
-    size_t NPtsMaxPerBatch = intParam.nRadPerBatch * intParam.nAng;
 
-    bool isGGA = std::any_of(functionals.begin(),functionals.end(),
-                   [](std::shared_ptr<DFTFunctional> &x) {return x->isGGA(); }); 
 
+
+    // Parallelism
 
     size_t nthreads = GetNumThreads();
     size_t LAThreads = GetLAThreads();
+    size_t mpiRank   = MPIRank(this->comm);
+    size_t mpiSize   = MPISize(this->comm);
 
-    // Turn off LA threads
-    SetLAThreads(1);
+    // MPI Communicator for numerical integration
+    // *** Assumes that MPI will be done only across atoms in integration
 
-    BasisSet &basis = this->aoints.basisSet();
-    size_t NB = basis.nBasis;
-    // Clean up all VXC components for a the evaluation for a new batch of points
+    size_t nAtoms = this->aoints.molecule().nAtoms;
+    int color = ((mpiSize < nAtoms) or 
+                 (mpiRank < nAtoms)) ? 1 : MPI_UNDEFINED;
+                                                            
+                  
+    MPI_Comm intComm = MPICommSplit(this->comm,color,mpiRank);
 
-    std::vector<std::vector<double*>> integrateVXC;
-    double* intVXC_RAW = nullptr;
 
-    if( nthreads != 1 )
-      intVXC_RAW = this->memManager.template malloc<double>(VXC.size() * nthreads * NB*NB);
 
-    for(auto k = 0; k < VXC.size(); k++) {
-      if( nthreads != 1 ) {
+
+
+
+
+#ifdef CQ_ENABLE_MPI
+    if( intComm != MPI_COMM_NULL ) 
+#endif
+    {
+  
+  
+  
+  
+  
+  
+      // Define several useful quantities for later on
+      size_t NPtsMaxPerBatch = intParam.nRadPerBatch * intParam.nAng;
+  
+      bool isGGA = std::any_of(functionals.begin(),functionals.end(),
+                     [](std::shared_ptr<DFTFunctional> &x) {
+                       return x->isGGA(); 
+                     }); 
+  
+      // Turn off LA threads
+      SetLAThreads(1);
+  
+      BasisSet &basis = this->aoints.basisSet();
+      size_t NB     = basis.nBasis;
+      size_t NB2    = NB*NB;
+      size_t NTNB2  = nthreads * NB2;
+      size_t NTNPPB = nthreads*NPtsMaxPerBatch;
+
+      // Clean up all VXC components for a the evaluation for a new 
+      // batch of points
+  
+      std::vector<std::vector<double*>> integrateVXC;
+      double* intVXC_RAW = (nthreads == 1) ? nullptr :
+        this->memManager.template malloc<double>(VXC.size() * NTNB2);
+  
+      for(auto k = 0; k < VXC.size(); k++) {
         integrateVXC.emplace_back();
-        for(auto ith = 0; ith < nthreads; ith++)
-          integrateVXC.back().emplace_back(intVXC_RAW + (ith + k*nthreads) * NB*NB);
-      } else {
-        integrateVXC.emplace_back();
-        integrateVXC.back().emplace_back(VXC[k]);
+
+        if( nthreads != 1 ) 
+          for(auto ith = 0; ith < nthreads; ith++)
+            integrateVXC.back().emplace_back(
+              intVXC_RAW + (ith + k*nthreads) * NB2
+            );
+
+        else 
+          integrateVXC.back().emplace_back(VXC[k]);
+
       }
-    }
-    
-    for(auto &X : integrateVXC) for(auto &Y : X) std::fill_n(Y,NB*NB,0.);
-
-    std::vector<double> integrateXCEnergy(nthreads,0.);
-
-    // Start Debug quantities
+      
+      for(auto &X : integrateVXC) for(auto &Y : X) std::fill_n(Y,NB2,0.);
+  
+      std::vector<double> integrateXCEnergy(nthreads,0.);
+  
+      // Start Debug quantities
 #if VXC_DEBUG_LEVEL >= 3
-    double *tmpS      = this->memManager.template malloc<double>(NB*NB); // tmp VXC submat
-    std::fill_n(tmpS,basis.nBasis*basis.nBasis,0.);
+      // tmp VXC submat
+      double *tmpS      = this->memManager.template malloc<double>(NB2); 
+      std::fill_n(tmpS,basis.nBasis*basis.nBasis,0.);
 #endif
 
 #if VXC_DEBUG_LEVEL >= 2
-    double sumrho   = 0.;
-    double sumspin  = 0.;
-    double sumgamma = 0.;
-    // END Debug quantities
+      double sumrho   = 0.;
+      double sumspin  = 0.;
+      double sumgamma = 0.;
 #endif
+      // END Debug quantities
  
-    //Allocating Memory
-    // ---------------------------------------------------------------------//
+      // Allocating Memory
+      // ----------------------------------------------------------//
     
-    XCEnergy = 0.;
-    double *SCRATCHNBNB  = this->memManager.template malloc<double>(nthreads*NB*NB); 
-    double *SCRATCHNBNP  = 
-      this->memManager.template malloc<double>(nthreads*NPtsMaxPerBatch*NB); 
+      XCEnergy = 0.;
+      double *SCRATCHNBNB = 
+        this->memManager.template malloc<double>(NTNB2); 
+      double *SCRATCHNBNP = 
+        this->memManager.template malloc<double>(NTNPPB*NB); 
 
-    double *DenS, *DenZ, *DenX, *DenY, *Mnorm ;
-    double *KScratch;
-    double *HScratch;
-    bool   *Msmall;
-    DenS = this->memManager.template malloc<double>(nthreads*NPtsMaxPerBatch);
-
-    if( this->onePDM.size() > 1 )
-      DenZ = this->memManager.template malloc<double>(nthreads*NPtsMaxPerBatch);
-
-    if( this->onePDM.size() > 2 ) {
-      DenY = this->memManager.template malloc<double>(nthreads*NPtsMaxPerBatch);
-      DenX = this->memManager.template malloc<double>(nthreads*NPtsMaxPerBatch);
-
-      Mnorm    = this->memManager.template malloc<double>(nthreads*NPtsMaxPerBatch);
-      KScratch = this->memManager.template malloc<double>(3*nthreads*NPtsMaxPerBatch);
-      Msmall   = this->memManager.template malloc<bool>(nthreads*NPtsMaxPerBatch);
-    }
-
-    double *epsEval = this->memManager.template malloc<double>(nthreads*NPtsMaxPerBatch);
-
-    // Density U-Variables
-    double *U_n   = 
-      this->memManager.template malloc<double>(2*nthreads*NPtsMaxPerBatch); 
-    double *dVU_n = 
-      this->memManager.template malloc<double>(2*nthreads*NPtsMaxPerBatch); 
-
-    double *ZrhoVar1, *ZgammaVar1, *ZgammaVar2;
-
-    ZrhoVar1 = this->memManager.template malloc<double>(nthreads*NPtsMaxPerBatch);
-    
-    double *GDenS, *GDenZ, *GDenX, *GDenY, *U_gamma, *dVU_gamma;
-    if( isGGA ) {
-      GDenS = this->memManager.template malloc<double>(3*nthreads*NPtsMaxPerBatch);
-      ZgammaVar1 = this->memManager.template malloc<double>(nthreads*NPtsMaxPerBatch);
-      ZgammaVar2 = this->memManager.template malloc<double>(nthreads*NPtsMaxPerBatch);
+      double *DenS, *DenZ, *DenX, *DenY, *Mnorm ;
+      double *KScratch;
+      double *HScratch;
+      bool   *Msmall;
+      DenS = this->memManager.template malloc<double>(NTNPPB);
 
       if( this->onePDM.size() > 1 )
-        GDenZ = this->memManager.template malloc<double>(3*nthreads*NPtsMaxPerBatch);
+        DenZ = this->memManager.template malloc<double>(NTNPPB);
 
       if( this->onePDM.size() > 2 ) {
-        GDenY = this->memManager.template malloc<double>(3*nthreads*NPtsMaxPerBatch);
-        GDenX = this->memManager.template malloc<double>(3*nthreads*NPtsMaxPerBatch);
-        HScratch = this->memManager.template malloc<double>(3*nthreads*NPtsMaxPerBatch);
+        DenY = this->memManager.template malloc<double>(NTNPPB);
+        DenX = this->memManager.template malloc<double>(NTNPPB);
+
+        Mnorm    = this->memManager.template malloc<double>(NTNPPB);
+        KScratch = this->memManager.template malloc<double>(3*NTNPPB);
+        Msmall   = this->memManager.template malloc<bool>(NTNPPB);
       }
 
-      // Gamma U-Variables
-      U_gamma = this->memManager.template malloc<double>(3*nthreads*NPtsMaxPerBatch); 
-      dVU_gamma = this->memManager.template malloc<double>(3*nthreads*NPtsMaxPerBatch); 
-    }
+      double *epsEval = this->memManager.template malloc<double>(NTNPPB);
 
-    double *epsSCR, *dVU_n_SCR, *dVU_gamma_SCR;
-    if( functionals.size() > 1 ) {
-      epsSCR    = this->memManager.template malloc<double>(nthreads*NPtsMaxPerBatch);
-      dVU_n_SCR    = this->memManager.template malloc<double>(2*nthreads*NPtsMaxPerBatch);
-      if(isGGA) 
-        dVU_gamma_SCR = 
-          this->memManager.template malloc<double>(3*nthreads*NPtsMaxPerBatch);
-    }
- 
-    // ZMatrix
-    double *ZMAT = this->memManager.template malloc<double>(nthreads*NPtsMaxPerBatch*NB);
- 
-    // Decide if we need to allocate space for real part of the densities
-    // and copy over the real parts
-    std::vector<double*> Re1PDM;
-    for(auto i = 0; i < this->onePDM.size(); i++) {
-      if( std::is_same<T,double>::value )
-        Re1PDM.push_back(reinterpret_cast<double*>(this->onePDM[i]));
-      else {
-        Re1PDM.push_back(this->memManager.template malloc<double>(NB*NB));
-        GetMatRE('N',NB,NB,1.,this->onePDM[i],NB,Re1PDM.back(),NB);
+      // Density U-Variables
+      double *U_n   = 
+        this->memManager.template malloc<double>(2*NTNPPB); 
+      double *dVU_n = 
+        this->memManager.template malloc<double>(2*NTNPPB); 
+
+      double *ZrhoVar1, *ZgammaVar1, *ZgammaVar2;
+
+      ZrhoVar1 = this->memManager.template malloc<double>(NTNPPB);
+      
+      double *GDenS, *GDenZ, *GDenX, *GDenY, *U_gamma, *dVU_gamma;
+      if( isGGA ) {
+        GDenS = this->memManager.template malloc<double>(3*NTNPPB);
+        ZgammaVar1 = this->memManager.template malloc<double>(NTNPPB);
+        ZgammaVar2 = this->memManager.template malloc<double>(NTNPPB);
+
+        if( this->onePDM.size() > 1 )
+          GDenZ = this->memManager.template malloc<double>(3*NTNPPB);
+
+        if( this->onePDM.size() > 2 ) {
+          GDenY = this->memManager.template malloc<double>(3*NTNPPB);
+          GDenX = this->memManager.template malloc<double>(3*NTNPPB);
+          HScratch = this->memManager.template malloc<double>(3*NTNPPB);
+        }
+
+        // Gamma U-Variables
+        U_gamma = this->memManager.template malloc<double>(3*NTNPPB); 
+        dVU_gamma = this->memManager.template malloc<double>(3*NTNPPB); 
       }
-    }
+
+      double *epsSCR, *dVU_n_SCR, *dVU_gamma_SCR;
+      if( functionals.size() > 1 ) {
+        epsSCR    = this->memManager.template malloc<double>(NTNPPB);
+        dVU_n_SCR    = this->memManager.template malloc<double>(2*NTNPPB);
+        if(isGGA) 
+          dVU_gamma_SCR = 
+            this->memManager.template malloc<double>(3*NTNPPB);
+      }
+ 
+      // ZMatrix
+      double *ZMAT = this->memManager.template malloc<double>(NTNPPB*NB);
+ 
+      // Decide if we need to allocate space for real part of the 
+      // densities and copy over the real parts
+      std::vector<double*> Re1PDM;
+      for(auto i = 0; i < this->onePDM.size(); i++) {
+        if( std::is_same<MatsT,double>::value )
+          Re1PDM.push_back(reinterpret_cast<double*>(this->onePDM[i]));
+        else {
+          Re1PDM.push_back(this->memManager.template malloc<double>(NB2));
+          GetMatRE('N',NB,NB,1.,this->onePDM[i],NB,Re1PDM.back(),NB);
+        }
+      }
  
 
-    // ---------------------------------------------------------------------//
-    // End allocating Memory
+      // -------------------------------------------------------------//
+      // End allocating Memory
 
 #if VXC_DEBUG_LEVEL >= 1
-    // TIMING
-    auto botMem = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> durevalDen(0.)  ;
-    std::chrono::duration<double> durmkAuxVar(0.) ;
-    std::chrono::duration<double> durloadVXCder(0.) ;
-    std::chrono::duration<double> durenergy_vxc(0.) ;
-    std::chrono::duration<double> durconstructZVars(0.) ;
-    std::chrono::duration<double> durformZ_vxc(0.) ;
-    std::chrono::duration<double> durDSYR2K(0.) ;
-    std::chrono::duration<double> durIncBySubMat(0.) ;
+      // TIMING
+      auto botMem = std::chrono::high_resolution_clock::now();
+      std::chrono::duration<double> durevalDen(0.)  ;
+      std::chrono::duration<double> durmkAuxVar(0.) ;
+      std::chrono::duration<double> durloadVXCder(0.) ;
+      std::chrono::duration<double> durenergy_vxc(0.) ;
+      std::chrono::duration<double> durconstructZVars(0.) ;
+      std::chrono::duration<double> durformZ_vxc(0.) ;
+      std::chrono::duration<double> durDSYR2K(0.) ;
+      std::chrono::duration<double> durIncBySubMat(0.) ;
 #endif
 
-    auto vxcbuild = [&](size_t &res, std::vector<cart_t> &batch, 
-      std::vector<double> &weights, size_t NBE, double *BasisEval, 
-      std::vector<size_t> &batchEvalShells, 
-      std::vector<std::pair<size_t,size_t>> &subMatCut) {
+      auto vxcbuild = [&](size_t &res, std::vector<cart_t> &batch, 
+        std::vector<double> &weights, size_t NBE, double *BasisEval, 
+        std::vector<size_t> &batchEvalShells, 
+        std::vector<std::pair<size_t,size_t>> &subMatCut) {
 
 #if VXC_DEBUG_LEVEL > 3
-      prettyPrintSmart(std::cerr,"BASIS SCR",BasisEval,NBE,4*batch.size(),NBE);
+        prettyPrintSmart(std::cerr,"BASIS SCR",BasisEval,NBE,
+          4*batch.size(),NBE);
 #endif
 
 
-      // intParam.epsilon / ntotalpts (NANG * NRAD * NATOMS)
-      double epsScreen = intParam.epsilon / this->aoints.molecule().nAtoms /
-        intParam.nAng / intParam.nRad;
+        // intParam.epsilon / ntotalpts (NANG * NRAD * NATOMS)
+        double epsScreen = intParam.epsilon / nAtoms /
+          intParam.nAng / intParam.nRad;
 
-      epsScreen = std::max(epsScreen,std::numeric_limits<double>::epsilon());
+        epsScreen = std::max(epsScreen,
+                             std::numeric_limits<double>::epsilon());
 
-      size_t NPts = batch.size();
-      size_t IOff = NBE*NPts;
+        size_t NPts = batch.size();
+        size_t IOff = NBE*NPts;
 
-      size_t thread_id = GetThreadID();
+        size_t thread_id = GetThreadID();
+        size_t TIDNPPB   = thread_id * NPtsMaxPerBatch;
 
 #if VXC_DEBUG_LEVEL >= 1
-      // TIMING
-      auto topevalDen = std::chrono::high_resolution_clock::now();
+        // TIMING
+        auto topevalDen = std::chrono::high_resolution_clock::now();
 #endif
 
-      // Setup local pointers
-      double * SCRATCHNBNB_loc = SCRATCHNBNB + thread_id * NB*NB;
-      double * SCRATCHNBNP_loc = SCRATCHNBNP + thread_id * NB*NPtsMaxPerBatch;
+        // Setup local pointers
+        double * SCRATCHNBNB_loc = SCRATCHNBNB + thread_id * NB2;
+        double * SCRATCHNBNP_loc = SCRATCHNBNP + thread_id * NB*NPtsMaxPerBatch;
 
-      double * DenS_loc = DenS + thread_id * NPtsMaxPerBatch;
-      double * DenZ_loc = DenZ + thread_id * NPtsMaxPerBatch;
-      double * DenY_loc = DenY + thread_id * NPtsMaxPerBatch;
-      double * DenX_loc = DenX + thread_id * NPtsMaxPerBatch;
+        double * DenS_loc = DenS + TIDNPPB;
+        double * DenZ_loc = DenZ + TIDNPPB;
+        double * DenY_loc = DenY + TIDNPPB;
+        double * DenX_loc = DenX + TIDNPPB;
 
-      double * GDenS_loc = GDenS + thread_id * 3*NPtsMaxPerBatch;
-      double * GDenZ_loc = GDenZ + thread_id * 3*NPtsMaxPerBatch;
-      double * GDenY_loc = GDenY + thread_id * 3*NPtsMaxPerBatch;
-      double * GDenX_loc = GDenX + thread_id * 3*NPtsMaxPerBatch;
-      
+        double * GDenS_loc = GDenS + 3*TIDNPPB;
+        double * GDenZ_loc = GDenZ + 3*TIDNPPB;
+        double * GDenY_loc = GDenY + 3*TIDNPPB;
+        double * GDenX_loc = GDenX + 3*TIDNPPB;
+        
 
-      double * epsEval_loc   = epsEval   + thread_id * NPtsMaxPerBatch;
-      double * U_n_loc       = U_n       + thread_id * 2*NPtsMaxPerBatch;
-      double * dVU_n_loc     = dVU_n     + thread_id * 2*NPtsMaxPerBatch;
-      double * U_gamma_loc   = U_gamma   + thread_id * 3*NPtsMaxPerBatch;
-      double * dVU_gamma_loc = dVU_gamma + thread_id * 3*NPtsMaxPerBatch;
+        double * epsEval_loc   = epsEval   +  TIDNPPB;
+        double * U_n_loc       = U_n       + 2*TIDNPPB;
+        double * dVU_n_loc     = dVU_n     + 2*TIDNPPB;
+        double * U_gamma_loc   = U_gamma   + 3*TIDNPPB;
+        double * dVU_gamma_loc = dVU_gamma + 3*TIDNPPB;
 
 
-      double * ZrhoVar1_loc   = ZrhoVar1   + thread_id * NPtsMaxPerBatch;
-      double * ZgammaVar1_loc = ZgammaVar1 + thread_id * NPtsMaxPerBatch;
-      double * ZgammaVar2_loc = ZgammaVar2 + thread_id * NPtsMaxPerBatch;
+        double * ZrhoVar1_loc   = ZrhoVar1   + TIDNPPB;
+        double * ZgammaVar1_loc = ZgammaVar1 + TIDNPPB;
+        double * ZgammaVar2_loc = ZgammaVar2 + TIDNPPB;
 
-      double * epsSCR_loc        = epsSCR        + thread_id * NPtsMaxPerBatch;
-      double * dVU_n_SCR_loc     = dVU_n_SCR     + thread_id * 2*NPtsMaxPerBatch;
-      double * dVU_gamma_SCR_loc = dVU_gamma_SCR + thread_id * 3*NPtsMaxPerBatch;
+        double * epsSCR_loc        = epsSCR        +   TIDNPPB;
+        double * dVU_n_SCR_loc     = dVU_n_SCR     + 2*TIDNPPB;
+        double * dVU_gamma_SCR_loc = dVU_gamma_SCR + 3*TIDNPPB;
 
-      double *ZMAT_loc = ZMAT + thread_id * NB*NPtsMaxPerBatch;
+        double *ZMAT_loc = ZMAT + NB * TIDNPPB;
 
-      //2C
-      double * Mnorm_loc    = Mnorm        + thread_id * NPtsMaxPerBatch;
-      double * KScratch_loc = KScratch     + 3* thread_id * NPtsMaxPerBatch;
-      bool   * Msmall_loc   = Msmall       + thread_id * NPtsMaxPerBatch;
-      double * HScratch_loc = HScratch     + 3* thread_id * NPtsMaxPerBatch;
+        //2C
+        double * Mnorm_loc    = Mnorm        +   TIDNPPB;
+        double * KScratch_loc = KScratch     + 3*TIDNPPB;
+        bool   * Msmall_loc   = Msmall       +   TIDNPPB;
+        double * HScratch_loc = HScratch     + 3*TIDNPPB;
 
-      // This evaluates the V variables for all components (Scalar, MZ (UKS) and Mx, MY (2 Comp))
-      evalDen((isGGA ? GRADIENT : NOGRAD), NPts, NBE, NB, subMatCut, 
-        SCRATCHNBNB_loc, SCRATCHNBNP_loc, Re1PDM[SCALAR], DenS_loc, 
-        GDenS_loc, GDenS_loc + NPts, GDenS_loc + 2*NPts, BasisEval);
+        // This evaluates the V variables for all components 
+        // (Scalar, MZ (UKS) and Mx, MY (2 Comp))
+        evalDen((isGGA ? GRADIENT : NOGRAD), NPts, NBE, NB, subMatCut, 
+          SCRATCHNBNB_loc, SCRATCHNBNP_loc, Re1PDM[SCALAR], DenS_loc, 
+          GDenS_loc, GDenS_loc + NPts, GDenS_loc + 2*NPts, BasisEval);
 
 #if VXC_DEBUG_LEVEL < 3
-      // Coarse screen on Density
-      double MaxDenS_loc = *std::max_element(DenS_loc,DenS_loc+NPts);
-      if (MaxDenS_loc < epsScreen) {
-        return;
+        // Coarse screen on Density
+        double MaxDenS_loc = *std::max_element(DenS_loc,DenS_loc+NPts);
+        if (MaxDenS_loc < epsScreen) { return; }
+#endif
+
+        if( this->onePDM.size() > 1 )
+          evalDen((isGGA ? GRADIENT : NOGRAD), NPts, NBE, NB, subMatCut, 
+            SCRATCHNBNB_loc ,SCRATCHNBNP_loc, Re1PDM[MZ], DenZ_loc, 
+            GDenZ_loc, GDenZ_loc + NPts, GDenZ_loc + 2*NPts, BasisEval);
+
+        if( this->onePDM.size() > 2 ) {
+          evalDen((isGGA ? GRADIENT : NOGRAD), NPts, NBE, NB, subMatCut, 
+            SCRATCHNBNB_loc ,SCRATCHNBNP_loc, Re1PDM[MY], DenY_loc, 
+            GDenY_loc, GDenY_loc + NPts, GDenY_loc + 2*NPts, BasisEval);
+          evalDen((isGGA ? GRADIENT : NOGRAD), NPts, NBE, NB, subMatCut, 
+            SCRATCHNBNB_loc ,SCRATCHNBNP_loc, Re1PDM[MX], DenX_loc, 
+            GDenX_loc, GDenX_loc + NPts, GDenX_loc + 2*NPts, BasisEval);
         }
-#endif
-
-      if( this->onePDM.size() > 1 )
-        evalDen((isGGA ? GRADIENT : NOGRAD), NPts, NBE, NB, subMatCut, 
-          SCRATCHNBNB_loc ,SCRATCHNBNP_loc, Re1PDM[MZ], DenZ_loc, GDenZ_loc, 
-          GDenZ_loc + NPts, GDenZ_loc + 2*NPts, BasisEval);
-
-      if( this->onePDM.size() > 2 ) {
-        evalDen((isGGA ? GRADIENT : NOGRAD), NPts, NBE, NB, subMatCut, 
-          SCRATCHNBNB_loc ,SCRATCHNBNP_loc, Re1PDM[MY], DenY_loc, GDenY_loc, 
-          GDenY_loc + NPts, GDenY_loc + 2*NPts, BasisEval);
-        evalDen((isGGA ? GRADIENT : NOGRAD), NPts, NBE, NB, subMatCut, 
-          SCRATCHNBNB_loc ,SCRATCHNBNP_loc, Re1PDM[MX], DenX_loc, GDenX_loc, 
-          GDenX_loc + NPts, GDenX_loc + 2*NPts, BasisEval);
-      }
 
 #if VXC_DEBUG_LEVEL >= 1
-      // TIMING
-      auto botevalDen  = std::chrono::high_resolution_clock::now();
-      auto topmkAuxVar = std::chrono::high_resolution_clock::now();
+        // TIMING
+        auto botevalDen  = std::chrono::high_resolution_clock::now();
+        auto topmkAuxVar = std::chrono::high_resolution_clock::now();
 #endif
 
-      // V -> U variables for evaluating the kernel derivatives.
-      mkAuxVar(isGGA,epsScreen,NPts,
-        DenS_loc,DenZ_loc,DenY_loc,DenX_loc,
-        GDenS_loc,GDenS_loc + NPts,GDenS_loc + 2*NPts,
-        GDenZ_loc,GDenZ_loc + NPts,GDenZ_loc + 2*NPts,
-        GDenY_loc,GDenY_loc + NPts,GDenY_loc + 2*NPts,
-        GDenX_loc,GDenX_loc + NPts,GDenX_loc + 2*NPts,
-        Mnorm_loc, KScratch_loc, KScratch_loc + NPts, KScratch_loc + 2* NPts,
-        HScratch_loc, HScratch_loc + NPts, HScratch_loc + 2* NPts,
-        Msmall_loc,U_n_loc,U_gamma_loc
-      );
+        // V -> U variables for evaluating the kernel derivatives.
+        mkAuxVar(isGGA,epsScreen,NPts,
+          DenS_loc,DenZ_loc,DenY_loc,DenX_loc,
+          GDenS_loc,GDenS_loc + NPts,GDenS_loc + 2*NPts,
+          GDenZ_loc,GDenZ_loc + NPts,GDenZ_loc + 2*NPts,
+          GDenY_loc,GDenY_loc + NPts,GDenY_loc + 2*NPts,
+          GDenX_loc,GDenX_loc + NPts,GDenX_loc + 2*NPts,
+          Mnorm_loc, 
+          KScratch_loc, KScratch_loc + NPts, KScratch_loc + 2* NPts,
+          HScratch_loc, HScratch_loc + NPts, HScratch_loc + 2* NPts,
+          Msmall_loc,U_n_loc,U_gamma_loc
+        );
 
 #if VXC_DEBUG_LEVEL >= 1
-      // TIMING
-      auto botmkAuxVar = std::chrono::high_resolution_clock::now();
+        // TIMING
+        auto botmkAuxVar = std::chrono::high_resolution_clock::now();
 #endif
 
 
 #if VXC_DEBUG_LEVEL >= 2
-      assert(nthreads == 1);
-      // Debug int
-      for(auto iPt = 0; iPt < NPts; iPt++) { 
-        sumrho  += weights[iPt] * (U_n[2*iPt] + U_n[2*iPt + 1]);
-        sumspin += weights[iPt] * (U_n[2*iPt] - U_n[2*iPt + 1]);
-        if(isGGA) 
-          sumgamma += weights[iPt] * 
-            ( U_gamma[3*iPt] + U_gamma[3*iPt+1] + U_gamma[3*iPt+2]);
-      };
-      // end debug
+        assert(nthreads == 1);
+        // Debug int
+        for(auto iPt = 0; iPt < NPts; iPt++) { 
+          sumrho  += weights[iPt] * (U_n[2*iPt] + U_n[2*iPt + 1]);
+          sumspin += weights[iPt] * (U_n[2*iPt] - U_n[2*iPt + 1]);
+          if(isGGA) 
+            sumgamma += weights[iPt] * 
+              ( U_gamma[3*iPt] + U_gamma[3*iPt+1] + U_gamma[3*iPt+2]);
+        };
+        // end debug
 #endif
       
 #if VXC_DEBUG_LEVEL >= 1
-      // TIMING
-      auto toploadVXCder = std::chrono::high_resolution_clock::now();
+        // TIMING
+        auto toploadVXCder = std::chrono::high_resolution_clock::now();
 #endif
 
-      // Get DFT Energy derivatives wrt U variables
-      loadVXCder(NPts, U_n_loc, U_gamma_loc, epsEval_loc, dVU_n_loc, dVU_gamma_loc, epsSCR_loc, 
-        dVU_n_SCR_loc, dVU_gamma_SCR_loc); 
-
+        // Get DFT Energy derivatives wrt U variables
+        loadVXCder(NPts, U_n_loc, U_gamma_loc, epsEval_loc, dVU_n_loc, 
+          dVU_gamma_loc, epsSCR_loc, dVU_n_SCR_loc, dVU_gamma_SCR_loc); 
+  
 #if VXC_DEBUG_LEVEL >= 1
-      // TIMING
-      auto botloadVXCder = std::chrono::high_resolution_clock::now();
-      auto topenergy_vxc = std::chrono::high_resolution_clock::now();
+        // TIMING
+        auto botloadVXCder = std::chrono::high_resolution_clock::now();
+        auto topenergy_vxc = std::chrono::high_resolution_clock::now();
 #endif
 
-      // Compute for the current batch the XC energy and increment the total XC energy.
-      integrateXCEnergy[thread_id] += energy_vxc(NPts, weights, epsEval_loc, DenS_loc);
+        // Compute for the current batch the XC energy and increment the 
+        // total XC energy.
+        integrateXCEnergy[thread_id] += 
+          energy_vxc(NPts, weights, epsEval_loc, DenS_loc);
 
 #if VXC_DEBUG_LEVEL >= 1
-      // TIMING
-      auto botenergy_vxc     = std::chrono::high_resolution_clock::now();
-      auto topconstructZVars = std::chrono::high_resolution_clock::now();
+        // TIMING
+        auto botenergy_vxc     = 
+          std::chrono::high_resolution_clock::now();
+        auto topconstructZVars = 
+          std::chrono::high_resolution_clock::now();
 #endif
    
-      // Construct the required quantities for the formation of the Z vector (SCALAR)
-      // given the kernel derivatives wrt U variables. 
+        // Construct the required quantities for the formation of the Z 
+        // vector (SCALAR) given the kernel derivatives wrt U variables. 
 
-      constructZVars(SCALAR,isGGA,NPts,dVU_n_loc,dVU_gamma_loc,ZrhoVar1_loc,
-        ZgammaVar1_loc, ZgammaVar2_loc);
-
-#if VXC_DEBUG_LEVEL >= 1
-      // TIMING
-      auto botconstructZVars     = std::chrono::high_resolution_clock::now();
-      auto topformZ_vxc = std::chrono::high_resolution_clock::now();
-#endif
-
-      // Creating ZMAT (SCALAR) according J. Chem. Theory Comput. 2011, 7, 3097–3104 Eq. 15 
-      formZ_vxc(SCALAR,isGGA, NPts, NBE, IOff, epsScreen, weights, ZrhoVar1_loc, 
-        ZgammaVar1_loc, ZgammaVar2_loc, DenS_loc, DenZ_loc, DenY_loc, DenX_loc, GDenS_loc, GDenZ_loc, GDenY_loc, 
-        GDenX_loc, KScratch_loc, KScratch_loc + NPts, KScratch_loc + 2* NPts,
-        HScratch_loc, HScratch_loc + NPts, HScratch_loc + 2* NPts,
-        BasisEval, ZMAT_loc);
+        constructZVars(SCALAR,isGGA,NPts,dVU_n_loc,dVU_gamma_loc,
+          ZrhoVar1_loc, ZgammaVar1_loc, ZgammaVar2_loc);
 
 #if VXC_DEBUG_LEVEL >= 1
-      // TIMING
-      auto botformZ_vxc = std::chrono::high_resolution_clock::now();
+        // TIMING
+        auto botconstructZVars = 
+          std::chrono::high_resolution_clock::now();
+        auto topformZ_vxc      = 
+          std::chrono::high_resolution_clock::now();
 #endif
 
-      bool evalZ = true;
+        // Creating ZMAT (SCALAR) according to 
+        //   J. Chem. Theory Comput. 2011, 7, 3097–3104 Eq. 15 
+        formZ_vxc(SCALAR,isGGA, NPts, NBE, IOff, epsScreen, weights, 
+          ZrhoVar1_loc, ZgammaVar1_loc, ZgammaVar2_loc, DenS_loc, 
+          DenZ_loc, DenY_loc, DenX_loc, GDenS_loc, GDenZ_loc, GDenY_loc, 
+          GDenX_loc, KScratch_loc, KScratch_loc + NPts, 
+          KScratch_loc + 2* NPts, HScratch_loc, HScratch_loc + NPts, 
+          HScratch_loc + 2* NPts, BasisEval, ZMAT_loc);
+
+#if VXC_DEBUG_LEVEL >= 1
+        // TIMING
+        auto botformZ_vxc = std::chrono::high_resolution_clock::now();
+#endif
+
+        bool evalZ = true;
 
 #if VXC_DEBUG_LEVEL < 3
-      // Coarse screen on ZMat
-      double MaxBasis = *std::max_element(BasisEval,BasisEval+IOff);
-      double MaxZ     = *std::max_element(ZMAT_loc,ZMAT_loc+IOff);
-      evalZ = ( std::abs(2 * MaxBasis * MaxZ) > epsScreen); 
+        // Coarse screen on ZMat
+        double MaxBasis = *std::max_element(BasisEval,BasisEval+IOff);
+        double MaxZ     = *std::max_element(ZMAT_loc,ZMAT_loc+IOff);
+        evalZ = ( std::abs(2 * MaxBasis * MaxZ) > epsScreen); 
 #endif
 
-      if (evalZ) {
+        if (evalZ) {
 
  #if VXC_DEBUG_LEVEL >= 1
-     auto topDSYR2K    = std::chrono::high_resolution_clock::now();
+          auto topDSYR2K    = std::chrono::high_resolution_clock::now();
  #endif
-       // Creating according J. Chem. Theory Comput. 2011, 7, 3097–3104 Eq. 14 
-       // Z -> VXC (submat - SCALAR)
-       DSYR2K('L','N',NBE,NPts,1.,BasisEval,NBE,ZMAT_loc,NBE,0.,SCRATCHNBNB_loc,NBE);
+          // Creating according to 
+          //   J. Chem. Theory Comput. 2011, 7, 3097–3104 Eq. 14 
+          //
+          // Z -> VXC (submat - SCALAR)
+          DSYR2K('L','N',NBE,NPts,1.,BasisEval,NBE,ZMAT_loc,NBE,0.,
+            SCRATCHNBNB_loc,NBE);
 
  #if VXC_DEBUG_LEVEL >= 1
-       // TIMING
-       auto botDSYR2K         = std::chrono::high_resolution_clock::now();
-       durDSYR2K += botDSYR2K - topDSYR2K;
-       auto topIncBySubMat    = std::chrono::high_resolution_clock::now();
+          // TIMING
+          auto botDSYR2K      = std::chrono::high_resolution_clock::now();
+          durDSYR2K += botDSYR2K - topDSYR2K;
+          auto topIncBySubMat = std::chrono::high_resolution_clock::now();
  #endif
 
-       // Locating the submatrix in the right position given the subset of 
-       // shells for the given batch.
-       IncBySubMat(NB,NB,NBE,NBE,integrateVXC[SCALAR][thread_id],NB,SCRATCHNBNB_loc,NBE,subMatCut);
+          // Locating the submatrix in the right position given the 
+          // subset of shells for the given batch.
+          IncBySubMat(NB,NB,NBE,NBE,integrateVXC[SCALAR][thread_id],NB,
+            SCRATCHNBNB_loc,NBE,subMatCut);
+
  #if VXC_DEBUG_LEVEL >= 1
-       // TIMING
-       auto botIncBySubMat    = std::chrono::high_resolution_clock::now();
-       durIncBySubMat += botIncBySubMat - topIncBySubMat;
+          // TIMING
+          auto botIncBySubMat = std::chrono::high_resolution_clock::now();
+          durIncBySubMat += botIncBySubMat - topIncBySubMat;
  #endif
-     }
+        }
 
 
 
 #if VXC_DEBUG_LEVEL > 3
-      prettyPrintSmart(std::cerr,"Basis   ",BasisEval,NBE,NPts,NBE);
-      prettyPrintSmart(std::cerr,"BasisX  ",BasisEval+NBE*NPts,NBE,NPts,NBE);
-      prettyPrintSmart(std::cerr,"BasisY  ",BasisEval+2*NBE*NPts,NBE,NPts,NBE);
-      prettyPrintSmart(std::cerr,"BasisZ  ",BasisEval+3*NBE*NPts,NBE,NPts,NBE);
-      prettyPrintSmart(std::cerr,"ZMAT  ",ZMAT_loc,NBE,NPts,NBE);
+        prettyPrintSmart(std::cerr,"Basis   ",BasisEval,NBE,NPts,NBE);
+        prettyPrintSmart(std::cerr,"BasisX  ",BasisEval+NBE*NPts,NBE,
+          NPts,NBE);
+        prettyPrintSmart(std::cerr,"BasisY  ",BasisEval+2*NBE*NPts,
+          NBE,NPts,NBE);
+        prettyPrintSmart(std::cerr,"BasisZ  ",BasisEval+3*NBE*NPts,
+          NBE,NPts,NBE);
+        prettyPrintSmart(std::cerr,"ZMAT  ",ZMAT_loc,NBE,NPts,NBE);
 #endif
+
+#if VXC_DEBUG_LEVEL >= 1
+        // TIMING
+        durevalDen += botevalDen - topevalDen;
+        durmkAuxVar += botmkAuxVar - topmkAuxVar;
+        durloadVXCder += botloadVXCder - toploadVXCder;
+        durenergy_vxc += botenergy_vxc - topenergy_vxc;
+        durconstructZVars += botconstructZVars - topconstructZVars;
+        durformZ_vxc += botformZ_vxc - topformZ_vxc;
+#endif
+
+#if VXC_DEBUG_LEVEL >= 3
+        // Create Numerical Overlap
+        for(auto iPt = 0; iPt < NPts; iPt++)
+          Gemm('N','C',NB,NB,1,weights[iPt],BasisEval + iPt*NB,NB, 
+            BasisEval + iPt*NB,NB, 1.,tmpS,NB);
+#endif
+
+        if( this->onePDM.size() == 1 ) return;
+
+        //
+        // ---------------   UKS or 2C ------------- Mz ---------------
+        //    See J. Chem. Theory Comput. 2017, 13, 2591-2603  
+        //
+
+        // Construct the required quantities for the formation of 
+        // the Z vector (Mz) given the kernel derivatives wrt U 
+        // variables.
+        constructZVars(MZ,isGGA,NPts,dVU_n_loc,dVU_gamma_loc,ZrhoVar1_loc,
+          ZgammaVar1_loc, ZgammaVar2_loc);
+
+        // Creating ZMAT (Mz) according to 
+        //   J. Chem. Theory Comput. 2011, 7, 3097–3104 Eq. 15 
+        formZ_vxc(MZ,isGGA, NPts, NBE, IOff, epsScreen, weights, 
+          ZrhoVar1_loc, ZgammaVar1_loc, ZgammaVar2_loc, DenS_loc, 
+          DenZ_loc, DenY_loc, DenX_loc, GDenS_loc, GDenZ_loc, GDenY_loc, 
+          GDenX_loc, KScratch_loc, KScratch_loc + NPts, 
+          KScratch_loc + 2* NPts, HScratch_loc, HScratch_loc + NPts, 
+          HScratch_loc + 2* NPts, BasisEval, ZMAT_loc);
+
+
+#if VXC_DEBUG_LEVEL < 3
+        MaxZ     = *std::max_element(ZMAT_loc,ZMAT_loc+IOff);
+        evalZ = ( std::abs(2 * MaxBasis * MaxZ) > epsScreen); 
+#endif
+        // Coarse screen on ZMat
+        if(evalZ) {
+  
+          // Creating according to 
+          //   J. Chem. Theory Comput. 2011, 7, 3097–3104 Eq. 14 
+          //
+          // Z -> VXC (submat)
+          DSYR2K('L','N',NBE,NPts,1.,BasisEval,NBE,ZMAT_loc,NBE,0.,
+            SCRATCHNBNB_loc,NBE);
+    
+    
+          // Locating the submatrix in the right position given 
+          // the subset of shells for the given batch.
+          IncBySubMat(NB,NB,NBE,NBE,integrateVXC[MZ][thread_id],NB,
+            SCRATCHNBNB_loc,NBE,subMatCut);           
+
+        }
+ 
+
+
+        if( this->onePDM.size() <= 2 ) return;
+
+        //
+        // ---------------  2C ------------- My ----------------------
+        //
+
+        // Construct the required quantities for the formation of the 
+        // Z vector (Mz) given the kernel derivatives wrt U variables. 
+        constructZVars(MY,isGGA,NPts,dVU_n_loc,dVU_gamma_loc,ZrhoVar1_loc,
+          ZgammaVar1_loc, ZgammaVar2_loc);
+
+        // Creating ZMAT (My) according to 
+        //   J. Chem. Theory Comput. 2011, 7, 3097–3104 Eq. 15 
+        formZ_vxc(MY,isGGA, NPts, NBE, IOff, epsScreen, weights, 
+          ZrhoVar1_loc, ZgammaVar1_loc, ZgammaVar2_loc, DenS_loc, 
+          DenZ_loc, DenY_loc, DenX_loc, GDenS_loc, GDenZ_loc, GDenY_loc, 
+          GDenX_loc, KScratch_loc, KScratch_loc + NPts, 
+          KScratch_loc + 2* NPts, HScratch_loc, HScratch_loc + NPts, 
+          HScratch_loc + 2* NPts, BasisEval, ZMAT_loc);
+
+
+#if VXC_DEBUG_LEVEL < 3
+        MaxZ     = *std::max_element(ZMAT_loc,ZMAT_loc+IOff);
+        evalZ = ( std::abs(2 * MaxBasis * MaxZ) > epsScreen); 
+#endif
+        // Coarse screen on ZMat
+        if(evalZ) {
+  
+          // Creating according to 
+          //   J. Chem. Theory Comput. 2011, 7, 3097–3104 Eq. 14 
+          //
+          // Z -> VXC (submat)
+          DSYR2K('L','N',NBE,NPts,1.,BasisEval,NBE,ZMAT_loc,NBE,0.,
+            SCRATCHNBNB_loc,NBE);
+    
+    
+          // Locating the submatrix in the right position given the 
+          // subset of shells for the given batch.
+          IncBySubMat(NB,NB,NBE,NBE,integrateVXC[MY][thread_id],NB,
+            SCRATCHNBNB_loc,NBE,subMatCut);           
+
+        }
+
+        //
+        // ---------------  2C ------------- Mx ----------------------
+        //
+
+        // Construct the required quantities for the formation of the 
+        // Z vector (Mx) given the kernel derivatives wrt U variables. 
+        constructZVars(MX,isGGA,NPts,dVU_n_loc,dVU_gamma_loc,ZrhoVar1_loc,
+          ZgammaVar1_loc, ZgammaVar2_loc);
+
+        // Creating ZMAT (Mz) according to 
+        //   J. Chem. Theory Comput. 2011, 7, 3097–3104 Eq. 15 
+        formZ_vxc(MX,isGGA, NPts, NBE, IOff, epsScreen, weights, 
+          ZrhoVar1_loc, ZgammaVar1_loc, ZgammaVar2_loc, DenS_loc, 
+          DenZ_loc, DenY_loc, DenX_loc, GDenS_loc, GDenZ_loc, GDenY_loc, 
+          GDenX_loc, KScratch_loc, KScratch_loc + NPts, 
+          KScratch_loc + 2* NPts, HScratch_loc, HScratch_loc + NPts, 
+          HScratch_loc + 2* NPts, BasisEval, ZMAT_loc);
+
+
+#if VXC_DEBUG_LEVEL < 3
+        MaxZ     = *std::max_element(ZMAT_loc,ZMAT_loc+IOff);
+        evalZ = ( std::abs(2 * MaxBasis * MaxZ) > epsScreen); 
+#endif
+        // Coarse screen on ZMat
+        if(evalZ) {
+  
+          // Creating according to 
+          //   J. Chem. Theory Comput. 2011, 7, 3097–3104 Eq. 14 
+          //
+          // Z -> VXC (submat)
+          DSYR2K('L','N',NBE,NPts,1.,BasisEval,NBE,ZMAT_loc,NBE,0.,
+            SCRATCHNBNB_loc,NBE);
+    
+    
+          // Locating the submatrix in the right position given the 
+          // subset of shells for the given batch.
+          IncBySubMat(NB,NB,NBE,NBE,integrateVXC[MX][thread_id],NB,
+            SCRATCHNBNB_loc,NBE,subMatCut);           
+        }
+
+      }; // VXC integrate
+
+
+      // Create the BeckeIntegrator object
+      BeckeIntegrator<EulerMac> 
+        integrator(intComm,this->memManager,this->aoints.molecule(),basis,
+        EulerMac(intParam.nRad), intParam.nAng, intParam.nRadPerBatch,
+          (isGGA ? GRADIENT : NOGRAD), intParam.epsilon);
+
+      // Integrate the VXC
+      integrator.integrate<size_t>(vxcbuild);
+
+
+#if VXC_DEBUG_LEVEL >= 1
+      // TIMING
+      auto toptransform    = std::chrono::high_resolution_clock::now();
+#endif
+
+      // Finishing up the VXC
+      // factor in the 4 pi (Lebedev) and built the upper triagolar part
+      // since we create only the lower triangular. For all components
+      for(auto k = 0; k < VXC.size(); k++) {
+        if( nthreads == 1 )
+          Scale(NB2,4*M_PI,VXC[k],1);
+        else
+          for(auto ithread = 0; ithread < nthreads; ithread++)
+            MatAdd('N','N',NB,NB,((ithread == 0) ? 0. : 1.),VXC[k],NB,
+              4*M_PI,integrateVXC[k][ithread],NB, VXC[k],NB);
+        
+        HerMat('L',NB,VXC[k],NB);
+      }
+
+      for(auto &X : integrateXCEnergy)
+        XCEnergy += 4*M_PI*X;
+
+
+
+// Combine MPI results
+#ifdef CQ_ENABLE_MPI
+
+      double* mpiScr;
+      if( mpiRank == 0 ) mpiScr = this->memManager.template malloc<double>(NB*NB);
+
+      for(auto &V : VXC) {
+
+        mxx::reduce(V,NB*NB,mpiScr,0,std::plus<double>(),intComm);
+
+        if( mpiRank == 0 ) std::copy_n(mpiScr,NB*NB,V);
+
+      }
+
+      if( mpiRank == 0 ) this->memManager.free(mpiScr);
+
+      XCEnergy = mxx::reduce(XCEnergy,0,std::plus<double>(),intComm);
+
+#endif
+
+#if VXC_DEBUG_LEVEL >= 1
+      // TIMING
+      auto bottransform = std::chrono::high_resolution_clock::now();
+#endif
+
+#if VXC_DEBUG_LEVEL >= 3
+      // DebugPrint
+      std::cerr << std::endl;
+      Scale(NB2,4*M_PI,tmpS,1);
+      prettyPrintSmart(std::cerr,"Analytic  Overlap",
+        this->aoints.overlap,NB,NB,NB);
+      prettyPrintSmart(std::cerr,"Numeric  Overlap",tmpS,NB,NB,NB);
+      std::cerr << std::endl;
+      std::cerr << std::endl;
+      for(auto i = 0; i < NB2; i++)
+        tmpS[i] = std::abs(tmpS[i] - this->aoints.overlap[i]);
+      std::cerr << "MAX DIFF OVERLAP = " << 
+        *std::max_element(tmpS,tmpS+NB2) << std::endl;
+#endif
+
+
+
+#if VXC_DEBUG_LEVEL >= 2
+      // DEBUG
+      std::cerr << std::scientific << "\n";
+      std::cerr << "N     electrons      = " << 4*M_PI*sumrho << "\n";
+      std::cerr << "N unp electrons      = " << 4*M_PI*sumspin << "\n";
+      std::cerr << "sum gamma        = " << 4*M_PI*sumgamma << "\n";
+      std::cerr << "EXC              = " << XCEnergy << "\n";
+
+      prettyPrintSmart(std::cerr,"onePDM Scalar",this->onePDM[SCALAR],
+        NB,NB,NB);
+      prettyPrintSmart(std::cerr,"Numerical Scalar VXC ",
+        integrateVXC[SCALAR][0],NB,NB,NB);
+
+      if( not this->iCS or this->nC > 1 ) { 
+        prettyPrintSmart(std::cerr,"onePDM Mz",this->onePDM[MZ],
+          NB,NB,NB);
+        prettyPrintSmart(std::cerr,"Numerical Mz VXC",
+          integrateVXC[MZ][0],NB,NB,NB);
+
+        if( this->onePDM.size() > 2 ) {
+          prettyPrintSmart(std::cerr,"onePDM My",this->onePDM[MY],
+            NB,NB,NB);
+          prettyPrintSmart(std::cerr,"Numerical My VXC",
+            integrateVXC[MY][0],NB,NB,NB);
+
+          prettyPrintSmart(std::cerr,"onePDM Mx",this->onePDM[MX],
+            NB,NB,NB);
+          prettyPrintSmart(std::cerr,"Numerical Mx VXC",
+            integrateVXC[MX][0],NB,NB,NB);
+        }
+      }
+#endif
+
+      // Freeing the memory
+      // ------------------------------------------------------------ //
+      this->memManager.free(SCRATCHNBNB,SCRATCHNBNP,DenS,epsEval,U_n,
+        dVU_n, ZrhoVar1,ZMAT);
+      if( isGGA )  
+        this->memManager.free(ZgammaVar1,ZgammaVar2,GDenS,U_gamma,
+          dVU_gamma);
+
+      if( this->onePDM.size() > 1 ) {
+        this->memManager.free(DenZ);
+        if( isGGA )  this->memManager.free(GDenZ);
+      }
+
+      if( this->onePDM.size() > 2 ) {
+        this->memManager.free(DenX,DenY,Mnorm,KScratch,Msmall);
+        if( isGGA )  this->memManager.free(GDenX,GDenY,HScratch);
+      }
+
+      if( functionals.size() > 1 ) {
+        this->memManager.free(epsSCR,dVU_n_SCR);
+        if( isGGA ) this->memManager.free(dVU_gamma_SCR);
+      }
+
+
+      if( nthreads != 1 ) this->memManager.free(intVXC_RAW);
+
+      if( not std::is_same<MatsT,double>::value )
+        for(auto &X : Re1PDM) this->memManager.free(X);
+
+      // ------------------------------------------------------------- //
+      // End freeing the memory
+
 
 #if VXC_DEBUG_LEVEL >= 1
      // TIMING
-      durevalDen += botevalDen - topevalDen;
-      durmkAuxVar += botmkAuxVar - topmkAuxVar;
-      durloadVXCder += botloadVXCder - toploadVXCder;
-      durenergy_vxc += botenergy_vxc - topenergy_vxc;
-      durconstructZVars += botconstructZVars - topconstructZVars;
-      durformZ_vxc += botformZ_vxc - topformZ_vxc;
-#endif
+     double d_batch = this->aoints.molecule().nAtoms * 
+                        intParam.nRad / intParam.nRadPerBatch;
 
-#if VXC_DEBUG_LEVEL >= 3
-      // Create Numerical Overlap
-      for(auto iPt = 0; iPt < NPts; iPt++)
-        Gemm('N','C',NB,NB,1,weights[iPt],BasisEval + iPt*NB,NB, 
-          BasisEval + iPt*NB,NB, 1.,tmpS,NB);
-#endif
+     std::chrono::duration<double> durMem = botMem - topMem;
+     std::chrono::duration<double> durtransform = 
+       bottransform - toptransform;
 
-      if( this->onePDM.size() == 1 ) return;
-
-//
-//    ---------------   UKS or 2C ------------- Mz ----------------------
-//       See J. Chem. Theory Comput. 2017, 13, 2591-2603  
-//
-
-      // Construct the required quantities for the formation of the Z vector (Mz)
-      // given the kernel derivatives wrt U variables. 
-      constructZVars(MZ,isGGA,NPts,dVU_n_loc,dVU_gamma_loc,ZrhoVar1_loc,ZgammaVar1_loc,
-        ZgammaVar2_loc);
-
-      //Creating ZMAT (Mz) according J. Chem. Theory Comput. 2011, 7, 3097–3104 Eq. 15 
-      formZ_vxc(MZ,isGGA, NPts, NBE, IOff, epsScreen, weights, ZrhoVar1_loc, 
-        ZgammaVar1_loc, ZgammaVar2_loc, DenS_loc, DenZ_loc, DenY_loc, DenX_loc, GDenS_loc, GDenZ_loc, GDenY_loc, 
-        GDenX_loc, KScratch_loc, KScratch_loc + NPts, KScratch_loc + 2* NPts,
-        HScratch_loc, HScratch_loc + NPts, HScratch_loc + 2* NPts,
-        BasisEval, ZMAT_loc);
-
-
-#if VXC_DEBUG_LEVEL < 3
-      MaxZ     = *std::max_element(ZMAT_loc,ZMAT_loc+IOff);
-      evalZ = ( std::abs(2 * MaxBasis * MaxZ) > epsScreen); 
-#endif
-      // Coarse screen on ZMat
-      if(evalZ) {
-
-        // Creating according J. Chem. Theory Comput. 2011, 7, 3097–3104 Eq. 14 
-        // Z -> VXC (submat)
-        DSYR2K('L','N',NBE,NPts,1.,BasisEval,NBE,ZMAT_loc,NBE,0.,SCRATCHNBNB_loc,NBE);
-  
-  
-        // Locating the submatrix in the right position given the subset of 
-        // shells for the given batch.
-        IncBySubMat(NB,NB,NBE,NBE,integrateVXC[MZ][thread_id],NB,SCRATCHNBNB_loc,NBE,subMatCut);           
-      }
- 
-
-
-      if( this->onePDM.size() > 2 ) {
-
-//
-//    ---------------  2C ------------- My ----------------------
-//
-
-        // Construct the required quantities for the formation of the Z vector (Mz)
-        // given the kernel derivatives wrt U variables. 
-        constructZVars(MY,isGGA,NPts,dVU_n_loc,dVU_gamma_loc,ZrhoVar1_loc,ZgammaVar1_loc,
-          ZgammaVar2_loc);
-
-        //Creating ZMAT (Mz) according J. Chem. Theory Comput. 2011, 7, 3097–3104 Eq. 15 
-        formZ_vxc(MY,isGGA, NPts, NBE, IOff, epsScreen, weights, ZrhoVar1_loc, 
-          ZgammaVar1_loc, ZgammaVar2_loc, DenS_loc, DenZ_loc, DenY_loc, DenX_loc, GDenS_loc, GDenZ_loc, GDenY_loc, 
-          GDenX_loc, KScratch_loc, KScratch_loc + NPts, KScratch_loc + 2* NPts,
-          HScratch_loc, HScratch_loc + NPts, HScratch_loc + 2* NPts,
-          BasisEval, ZMAT_loc);
-
-
-#if VXC_DEBUG_LEVEL < 3
-        MaxZ     = *std::max_element(ZMAT_loc,ZMAT_loc+IOff);
-        evalZ = ( std::abs(2 * MaxBasis * MaxZ) > epsScreen); 
-#endif
-        // Coarse screen on ZMat
-        if(evalZ) {
-  
-          // Creating according J. Chem. Theory Comput. 2011, 7, 3097–3104 Eq. 14 
-          // Z -> VXC (submat)
-          DSYR2K('L','N',NBE,NPts,1.,BasisEval,NBE,ZMAT_loc,NBE,0.,SCRATCHNBNB_loc,NBE);
-    
-    
-          // Locating the submatrix in the right position given the subset of 
-          // shells for the given batch.
-          IncBySubMat(NB,NB,NBE,NBE,integrateVXC[MY][thread_id],NB,SCRATCHNBNB_loc,NBE,subMatCut);           
-        }
-
-//
-//    ---------------  2C ------------- Mx ----------------------
-//
-
-        // Construct the required quantities for the formation of the Z vector (Mz)
-        // given the kernel derivatives wrt U variables. 
-        constructZVars(MX,isGGA,NPts,dVU_n_loc,dVU_gamma_loc,ZrhoVar1_loc,ZgammaVar1_loc,
-          ZgammaVar2_loc);
-
-        //Creating ZMAT (Mz) according J. Chem. Theory Comput. 2011, 7, 3097–3104 Eq. 15 
-        formZ_vxc(MX,isGGA, NPts, NBE, IOff, epsScreen, weights, ZrhoVar1_loc, 
-          ZgammaVar1_loc, ZgammaVar2_loc, DenS_loc, DenZ_loc, DenY_loc, DenX_loc, GDenS_loc, GDenZ_loc, GDenY_loc, 
-          GDenX_loc, KScratch_loc, KScratch_loc + NPts, KScratch_loc + 2* NPts,
-          HScratch_loc, HScratch_loc + NPts, HScratch_loc + 2* NPts,
-          BasisEval, ZMAT_loc);
-
-
-#if VXC_DEBUG_LEVEL < 3
-        MaxZ     = *std::max_element(ZMAT_loc,ZMAT_loc+IOff);
-        evalZ = ( std::abs(2 * MaxBasis * MaxZ) > epsScreen); 
-#endif
-        // Coarse screen on ZMat
-        if(evalZ) {
-  
-          // Creating according J. Chem. Theory Comput. 2011, 7, 3097–3104 Eq. 14 
-          // Z -> VXC (submat)
-          DSYR2K('L','N',NBE,NPts,1.,BasisEval,NBE,ZMAT_loc,NBE,0.,SCRATCHNBNB_loc,NBE);
-    
-    
-          // Locating the submatrix in the right position given the subset of 
-          // shells for the given batch.
-          IncBySubMat(NB,NB,NBE,NBE,integrateVXC[MX][thread_id],NB,SCRATCHNBNB_loc,NBE,subMatCut);           
-        }
-      } // 2C My and Mz
-
-    }; // VXC integrate
-
-
-    // Create the BeckeIntegrator object
-    BeckeIntegrator<EulerMac> 
-      integrator(this->memManager,this->aoints.molecule(),basis,
-      EulerMac(intParam.nRad), intParam.nAng, intParam.nRadPerBatch,
-        (isGGA ? GRADIENT : NOGRAD), intParam.epsilon);
-
-    // Integrate the VXC
-    integrator.integrate<size_t>(vxcbuild);
-
-#if VXC_DEBUG_LEVEL >= 1
-    // TIMING
-    auto toptransform    = std::chrono::high_resolution_clock::now();
-#endif
-
-    // Finishing up the VXC
-    // factor in the 4 pi (Lebedev) and built the upper triagolar part
-    // since we create only the lower triangular. For all components
-    for(auto k = 0; k < VXC.size(); k++) {
-      if( nthreads == 1 )
-        Scale(NB*NB,4*M_PI,VXC[k],1);
-      else
-        for(auto ithread = 0; ithread < nthreads; ithread++)
-          MatAdd('N','N',NB,NB,((ithread == 0) ? 0. : 1.),VXC[k],NB,
-            4*M_PI,integrateVXC[k][ithread],NB, VXC[k],NB);
-      
-      HerMat('L',NB,VXC[k],NB);
-    }
-
-    for(auto &X : integrateXCEnergy)
-      XCEnergy += 4*M_PI*X;
-
-#if VXC_DEBUG_LEVEL >= 1
-    // TIMING
-    auto bottransform         = std::chrono::high_resolution_clock::now();
-#endif
-
-#if VXC_DEBUG_LEVEL >= 3
-    // DebugPrint
-    std::cerr << std::endl;
-    Scale(NB*NB,4*M_PI,tmpS,1);
-    prettyPrintSmart(std::cerr,"Analytic  Overlap",this->aoints.overlap,NB,NB,
-      NB);
-    prettyPrintSmart(std::cerr,"Numeric  Overlap",tmpS,NB,NB,NB);
-    std::cerr << std::endl;
-    std::cerr << std::endl;
-    for(auto i = 0; i < NB*NB; i++)
-      tmpS[i] = std::abs(tmpS[i] - this->aoints.overlap[i]);
-    std::cerr << "MAX DIFF OVERLAP = " << 
-      *std::max_element(tmpS,tmpS+NB*NB) << std::endl;
-#endif
-
-
-
-#if VXC_DEBUG_LEVEL >= 2
-    // DEBUG
-    std::cerr << std::scientific << std::endl;
-    std::cerr << "N     electrons      = " << 4*M_PI*sumrho << std::endl;
-    std::cerr << "N unp electrons      = " << 4*M_PI*sumspin << std::endl;
-    std::cerr << "sum gamma        = " << 4*M_PI*sumgamma << std::endl;
-    std::cerr << "EXC              = " << XCEnergy << std::endl;
-    prettyPrintSmart(std::cerr,"onePDM Scalar",this->onePDM[SCALAR],NB,NB,NB);
-    prettyPrintSmart(std::cerr,"Numerical Scalar VXC ",integrateVXC[SCALAR][0],NB,NB,NB);
-    if( not this->iCS ) { 
-     prettyPrintSmart(std::cerr,"onePDM Mz",this->onePDM[MZ],NB,NB,NB);
-     prettyPrintSmart(std::cerr,"Numerical Mz VXC",integrateVXC[MZ][0],NB,NB,NB);
-     if( this->onePDM.size() > 2 ) {
-     prettyPrintSmart(std::cerr,"onePDM My",this->onePDM[MY],NB,NB,NB);
-     prettyPrintSmart(std::cerr,"Numerical My VXC",integrateVXC[MY][0],NB,NB,NB);
-     prettyPrintSmart(std::cerr,"onePDM Mx",this->onePDM[MX],NB,NB,NB);
-     prettyPrintSmart(std::cerr,"Numerical Mx VXC",integrateVXC[MX][0],NB,NB,NB);
-     }
-    }
-#endif
-
-    // Freeing the memory
-    // ----------------------------------------------------------------  //
-    this->memManager.free(SCRATCHNBNB,SCRATCHNBNP,DenS,epsEval,U_n,dVU_n,
-      ZrhoVar1,ZMAT);
-    if( isGGA )  
-      this->memManager.free(ZgammaVar1,ZgammaVar2,GDenS,U_gamma,dVU_gamma);
-
-    if( this->onePDM.size() > 1 ) {
-      this->memManager.free(DenZ);
-      if( isGGA )  this->memManager.free(GDenZ);
-    }
-    if( this->onePDM.size() > 2 ) {
-      this->memManager.free(DenX,DenY,Mnorm,KScratch,Msmall);
-      if( isGGA )  this->memManager.free(GDenX,GDenY,HScratch);
-    }
-
-    if( functionals.size() > 1 ) {
-      this->memManager.free(epsSCR,dVU_n_SCR);
-      if( isGGA ) this->memManager.free(dVU_gamma_SCR);
-    }
-
-
-    if( nthreads != 1 ) this->memManager.free(intVXC_RAW);
-
-    if( not std::is_same<T,double>::value )
-      for(auto &X : Re1PDM) this->memManager.free(X);
-
-    // ----------------------------------------------------------------  //
-    // End freeing the memory
-
-
-#if VXC_DEBUG_LEVEL >= 1
-   // TIMING
-   double d_batch = this->aoints.molecule().nAtoms * 
-                      intParam.nRad / intParam.nRadPerBatch;
-
-   std::chrono::duration<double> durMem = botMem - topMem;
-   std::cerr << std::scientific << std::endl;
-   std::cerr << "Mem " << durMem.count()/d_batch << std::endl;
-   std::chrono::duration<double> durtransform = bottransform - toptransform;
-   std::cerr << "transform " << durtransform.count()/d_batch << std::endl;
-   std::cerr << "evalDen " << durevalDen.count()/d_batch << std::endl;
-   std::cerr << "mkAuxVar " << durmkAuxVar.count()/d_batch << std::endl;
-   std::cerr << "loadVXCder " << durloadVXCder.count()/d_batch << std::endl;
-   std::cerr << "energy_vxc " << durenergy_vxc.count()/d_batch << std::endl;
-   std::cerr << "constructZVars " << durconstructZVars.count()/d_batch 
-             << std::endl;
-   std::cerr << "formZ_vxc " << durformZ_vxc.count()/d_batch << std::endl;
-   std::cerr << "DSYR2K " << durDSYR2K.count()/d_batch << std::endl;
-   std::cerr << "IncBySubMat " << durIncBySubMat.count()/d_batch << std::endl;
-   std::cerr <<  std::endl << std::endl;
+     std::cerr << std::scientific << "\n";
+     std::cerr << "Mem " << durMem.count()/d_batch << "\n";
+     std::cerr << "transform " << durtransform.count()/d_batch << "\n";
+     std::cerr << "evalDen " << durevalDen.count()/d_batch << "\n";
+     std::cerr << "mkAuxVar " << durmkAuxVar.count()/d_batch << "\n";
+     std::cerr << "loadVXCder " << durloadVXCder.count()/d_batch << "\n";
+     std::cerr << "energy_vxc " << durenergy_vxc.count()/d_batch << "\n";
+     std::cerr << "constructZVars " << durconstructZVars.count()/d_batch 
+               << "\n";
+     std::cerr << "formZ_vxc " << durformZ_vxc.count()/d_batch << "\n";
+     std::cerr << "DSYR2K " << durDSYR2K.count()/d_batch << "\n";
+     std::cerr << "IncBySubMat " << durIncBySubMat.count()/d_batch;
+     std::cerr <<  "\n\n\n";
 #endif
 
 
   
-    // Turn back on LA threads
-    SetLAThreads(LAThreads);
-    //CErr();
+      // Turn back on LA threads
+      SetLAThreads(LAThreads);
+
+      MPICommFree(intComm); // Free communicator
+
+    } // Valid intComm
+
+    MPI_Barrier(this->comm); // Syncronize the MPI processes
 
   }; // KohnSham::formVXC
 

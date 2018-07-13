@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -31,7 +31,8 @@ namespace ChronusQ {
 
 
   enum FieldGauge {
-    Length
+    Length,
+    Velocity
   };
 
   enum EMFieldTyp {
@@ -42,11 +43,12 @@ namespace ChronusQ {
 
   struct EMFieldBase {
 
+    size_t     size;
     EMFieldTyp emFieldTyp;
     FieldGauge fieldGauge;
 
-    EMFieldBase(EMFieldTyp em = Electric, FieldGauge fg = Length):
-      fieldGauge(fg), emFieldTyp(em){ };
+    EMFieldBase(EMFieldTyp em = Electric, FieldGauge fg = Length,
+        size_t sz = 3): fieldGauge(fg), emFieldTyp(em), size(sz) { };
 
     virtual std::valarray<double> getAmp() = 0;
 
@@ -64,7 +66,7 @@ namespace ChronusQ {
    *  ect...
    */ 
   template <typename _VecTyp>
-  struct EMField : public EMFieldBase {
+  struct EMField : virtual public EMFieldBase {
 
     _VecTyp ampVec;
 
@@ -73,10 +75,10 @@ namespace ChronusQ {
     EMField( EMField&& )      = default;
 
     EMField(EMFieldTyp em, FieldGauge fg,
-      const _VecTyp &x): ampVec(x), EMFieldBase{em,fg}{ };
+      const _VecTyp &x): ampVec(x), EMFieldBase{em,fg, x.size()}{ };
 
     EMField(EMFieldTyp em, const _VecTyp &x): 
-      ampVec(x), EMFieldBase{em,Length}{ };
+      ampVec(x), EMFieldBase{em,Length, x.size()}{ };
 
     EMField(const _VecTyp &x): EMField(Electric,Length,x){ };
 
@@ -86,9 +88,18 @@ namespace ChronusQ {
 
   };
 
+
+  // Useful aliases
   using DipoleField     = EMField<std::array<double,3>>;
   using QuadrupoleField = EMField<std::array<double,6>>;
   using OctupoleField   = EMField<std::array<double,10>>;
+
+
+
+
+
+
+
 
   /**
    *  \brief Cast a templated EMField shared_ptr to
@@ -145,28 +156,52 @@ namespace ChronusQ {
 
 
 
-    /**
-     *  \brief Obtain the tensorial field amplitude 
-     *  as the sum of all the field contributions.
-     *
-     *  FIXME: This function only works if all fields in perturbation
-     *  are of the same type (i.e. electric dipole, etc).
-     *
-     *  \param [in]
-     */ 
-    std::valarray<double> getAmp(){
+    template <size_t N>
+    inline std::array<double, N> getNAmp(EMFieldTyp TYPE) {
 
-      assert(fields.size() != 0);
+      std::array<double, N> amp = {0., 0., 0.};
 
-      std::valarray<double> amp = fields[0]->getAmp();
-      for(auto i = 1; i < fields.size(); i++)
-        amp += fields[i]->getAmp();
+
+      for(auto &field : fields) {
+
+        if( field->emFieldTyp == TYPE  and field->size == N ) {
+
+          auto tmp_amp = field->getAmp();
+
+          for( auto k = 0; k < N; k++) amp[k] += tmp_amp[k];
+
+        }
+
+      }
 
       return amp;
 
     }
+
+
+    inline std::array<double, 3> getDipoleAmp(EMFieldTyp TYPE) {
+
+      return getNAmp<3>( TYPE );
+
+    };
     
-  }; // struct TDEMPerturbation
+  }; // struct EMPerturbation
+
+
+
+  // Helper functions
+  inline bool pert_has_type( const EMPerturbation &pert, 
+      const EMFieldTyp typ ) {
+
+    return std::any_of(pert.fields.begin(), pert.fields.end(),
+        [&](std::shared_ptr<EMFieldBase> x) {
+          return x->emFieldTyp == typ;
+        });
+
+  }
+
+
+  // Instantiations of Amplitude getters
 
 };
 

@@ -1,7 +1,7 @@
 #
 # This file is part of the Chronus Quantum (ChronusQ) software package
 # 
-# Copyright (C) 2014-2017 Li Research Group (University of Washington)
+# Copyright (C) 2014-2018 Li Research Group (University of Washington)
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,14 +23,24 @@
 cmake_minimum_required(VERSION 3.0)
 project(ChronusQ CXX C Fortran)
 set(ChronusQ_VERSION_MAJOR 0)
-set(ChronusQ_VERSION_MINOR 1)
+set(ChronusQ_VERSION_MINOR 2)
 set(ChronusQ_VERSION_PATCH 0)
 
 
 # Options
-option(ENABLE_COVERAGE    "Enable coverage and profiling"   OFF)
-option(FORCE_SHARED_BOOST "Force link to shared Boost Libs" OFF)
+option(CQ_ENABLE_MPI       "Enable MPI parallelism"          OFF)
+#option(CQ_ENABLE_SCALAPACK "Enable ScaLAPACK"                OFF)
+#option(CQ_ENABLE_CXXBLACS  "Enable CXXBLACS"                 OFF)
+option(ENABLE_COVERAGE     "Enable coverage and profiling"   OFF)
+option(FORCE_SHARED_BOOST  "Force link to shared Boost Libs" OFF)
+option(CQ_LINALG_USESYSTEM "Use System defaults for LA libs" OFF)
+option(FORCE_SHARED_BOOST  "Force link to shared Boost Libs" OFF)
 
+
+# Add specified paths to CMAKE_PREFIX_PATH
+if( MPI_PREFIX )
+  set( CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${MPI_PREFIX} )
+endif()
 
 # Append local cmake directory to find CMAKE Modules
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
@@ -40,25 +50,78 @@ set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 11)
 
+# Intel C++11
+if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
+  set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11" )
+endif()
+
+
+
+# Parallelism
+
+message( "\n\n" )
+message( "ChronusQ Parallelism Settings" )
+
+# OpenMP
+message( "" )
+find_package(OpenMP)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+
+if( MPI_PREFIX )
+  # MPI_PREFIX paths to CMAKE_PREFIX_PATH
+  message( "" )
+  message( STATUS "Adding ${MPI_PREFIX} to CMAKE_PREFIX_PATH" )
+  set( CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${MPI_PREFIX} )
+endif()
+
+# MPI
+if(CQ_ENABLE_MPI)
+  include(HandleMPI)
+endif()
+
+
+message( "\n\n" )
+
+
+
+
+
+
+
+
+
+# FLAGS
+include(HandleCXXFlags)
+
+
 # Define include directories
 include_directories("${PROJECT_SOURCE_DIR}/include")
 include_directories("${PROJECT_BINARY_DIR}/include")
 
+# Linear Algebra
+include(HandleLA)
+
+
+
 # Non-trivial dependencies
+message( "ChronusQ Dependencies" )
+
+
 include(FindLibint)
 include(FindLibXC)
 include(Boost)
-include(HandleLA)
-set(CQEX_LINK ${CQ_EXT_LINK} )
 
-# OpenMP
-find_package(OpenMP)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+set(CQEX_LINK ${CQ_EXT_LINK} )
 
 # HDF5
 find_package(HDF5 REQUIRED CXX)
 include_directories("${HDF5_INCLUDE_DIRS}")
 list(APPEND CQEX_LINK ${HDF5_CXX_LIBRARIES} )
+
+message( "\n\n" )
+
+
+
 
 # Compiling with coverage report
 if(ENABLE_COVERAGE)

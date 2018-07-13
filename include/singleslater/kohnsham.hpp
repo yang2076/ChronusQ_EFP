@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@
 #include <singleslater.hpp>
 #include <basisset/basisset_util.hpp>
 #include <cqlinalg/blasext.hpp>
+#include <util/time.hpp>
 #include <dft.hpp>
 
 // KS_DEBUG_LEVEL == 1 - Timing
@@ -57,18 +58,22 @@ namespace ChronusQ {
    *  Specializes the SingleSlater class for a Kohn--Sham description of the
    *  many-body wave function
    */ 
-  template <typename T>
-  class KohnSham : public SingleSlater<T> {
+  template <typename MatsT, typename IntsT>
+  class KohnSham : public SingleSlater<MatsT,IntsT>,
+    public std::enable_shared_from_this<KohnSham<MatsT,IntsT>> {
 
 
   protected:
 
     // Useful typedefs
-    typedef double*                   oper_t;
+    typedef MatsT*                   oper_t;
     typedef std::vector<oper_t>       oper_t_coll;
     typedef std::vector<oper_t_coll>  oper_t_coll2;
 
   public:
+
+    std::shared_ptr<KohnSham<MatsT,IntsT>> getPtr(){ return this->shared_from_this(); }
+
 
     std::vector<std::shared_ptr<DFTFunctional>> functionals; ///< XC kernels
     IntegrationParam intParam; ///< Numerical integration controls
@@ -76,18 +81,21 @@ namespace ChronusQ {
     bool isGGA_; ///< Whether or not the XC kernel is within the GGA
     double XCEnergy; ///< Exchange-correlation energy
 
-    oper_t_coll VXC; ///< VXC terms
+    std::vector<double*> VXC; ///< VXC terms
+
+    // Current Timings
+    double VXCDur;
 
     // Inherit ctors from SingleSlater<T>
 
     template <typename... Args>
-    KohnSham(std::string funcName, 
+    KohnSham(std::string funcName,
       std::vector<std::shared_ptr<DFTFunctional>> funclist,
-      IntegrationParam ip, 
-      AOIntegrals &aoi, Args... args) : 
-      SingleSlater<T>(aoi,args...), WaveFunctionBase(aoi,args...),
-      QuantumBase(aoi.memManager(),args...), isGGA_(false),
-      functionals(std::move(funclist)),intParam(ip) { 
+      MPI_Comm c, IntegrationParam ip, 
+      AOIntegrals<IntsT> &aoi, Args... args) : 
+      SingleSlater<MatsT,IntsT>(c, aoi,args...), WaveFunctionBase(c, aoi.memManager(),args...),
+      QuantumBase(c, aoi.memManager(),args...), isGGA_(false),
+      functionals(std::move(funclist)),intParam(ip){ 
 
       // Append HF tags to reference names
       if(this->nC == 1) {
@@ -106,7 +114,7 @@ namespace ChronusQ {
       for(auto i = 0; i < this->onePDM.size(); i++)
         VXC.emplace_back(
           this->memManager.template malloc<double>(
-            this->memManager.template getSize<T>(this->onePDM[i])
+            this->memManager.template getSize<MatsT>(this->onePDM[i])
           )
         );
 
@@ -114,15 +122,13 @@ namespace ChronusQ {
     }; // KohnSham constructor
 
 
-
-
     template <typename... Args>
-    KohnSham(std::string rL, std::string rS, std::string funcName, 
+    KohnSham(std::string rL, std::string rS, std::string funcName,
       std::vector<std::shared_ptr<DFTFunctional>> funclist,
-      IntegrationParam ip, 
-      AOIntegrals &aoi, Args... args) : 
-      SingleSlater<T>(aoi,args...), WaveFunctionBase(aoi,args...),
-      QuantumBase(aoi.memManager(),args...), isGGA_(false),
+      MPI_Comm c, IntegrationParam ip, 
+      AOIntegrals<IntsT> &aoi, Args... args) : 
+      SingleSlater<MatsT,IntsT>(c, aoi,args...), WaveFunctionBase(c, aoi.memManager(),args...),
+      QuantumBase(c, aoi.memManager(),args...), isGGA_(false),
       functionals(std::move(funclist)),intParam(ip) { 
 
       this->refLongName_  += rL + " " + funcName;
@@ -131,7 +137,7 @@ namespace ChronusQ {
       for(auto i = 0; i < this->onePDM.size(); i++)
         VXC.emplace_back(
           this->memManager.template malloc<double>(
-            this->memManager.template getSize<T>(this->onePDM[i])
+            this->memManager.template getSize<MatsT>(this->onePDM[i])
           )
         );
 
@@ -141,12 +147,12 @@ namespace ChronusQ {
 
     // Copy and Move ctors
       
-    template <typename U>
-    KohnSham(const KohnSham<U> &other, int dummy = 0); 
-    template <typename U>
-    KohnSham(KohnSham<U> &&other, int dummy = 0);
-    KohnSham(const KohnSham<T> &other);
-    KohnSham(KohnSham<T> &&other);
+    template <typename MatsU> 
+      KohnSham(const KohnSham<MatsU,IntsT> &other, int dummy = 0); 
+    template <typename MatsU> 
+      KohnSham(KohnSham<MatsU,IntsT> &&other, int dummy = 0);
+    KohnSham(const KohnSham<MatsT,IntsT> &other);
+    KohnSham(KohnSham<MatsT,IntsT> &&other);
 
 
     /**
@@ -156,43 +162,19 @@ namespace ChronusQ {
      */  
     virtual void formFock(EMPerturbation &pert, bool increment = false, double HFX = 0.) {
 
-      // FIXME: Add preprocesor
-#if KS_DEBUG_LEVEL > 0
-      std::chrono::duration<double> durHF(0.) ;
-      std::chrono::duration<double> durXC(0.) ;
-      std::chrono::duration<double> duraddXC(0.) ;
-      auto topHFpart = std::chrono::high_resolution_clock::now();
-#endif
+      SingleSlater<MatsT,IntsT>::formFock(pert,increment,functionals.back()->xHFX);
 
-      SingleSlater<T>::formFock(pert,increment,functionals.back()->xHFX);
-
-#if KS_DEBUG_LEVEL > 0
-      auto botHFpart = std::chrono::high_resolution_clock::now();
-      auto topXCpart = std::chrono::high_resolution_clock::now();
-#endif
-
+      auto VXCStart = tick();
       formVXC();
+      VXCDur = tock(VXCStart);
 
-#if KS_DEBUG_LEVEL > 0
-      auto botXCpart = std::chrono::high_resolution_clock::now();
-      auto topaddXCpart = std::chrono::high_resolution_clock::now();
-#endif
+      ROOT_ONLY(this->comm);
 
       // Add VXC in Fock matrix
       size_t NB = this->aoints.basisSet().nBasis;
-      for(auto i = 0ul; i < this->fock.size(); i++)
-        MatAdd('N','N', NB, NB, T(1.), this->fock[i], NB, T(1.), VXC[i], NB,
-          this->fock[i], NB);
-
-#if KS_DEBUG_LEVEL > 0
-      auto botaddXCpart = std::chrono::high_resolution_clock::now();
-      durHF = botHFpart - topHFpart;
-      durXC = botXCpart - topXCpart;
-      duraddXC = botaddXCpart - topaddXCpart;
-      std::cerr << "HF FormFock " << durHF.count() << std::endl;
-      std::cerr << "XC FormFock " << durXC.count() << std::endl;
-      std::cerr << "addXC FormFock " << duraddXC.count() << std::endl;
-#endif
+      for(auto i = 0ul; i < this->fockMatrix.size(); i++)
+        MatAdd('N','N', NB, NB, MatsT(1.), this->fockMatrix[i], NB, MatsT(1.), VXC[i], NB,
+          this->fockMatrix[i], NB);
 
     }; // formFock
 
@@ -203,15 +185,35 @@ namespace ChronusQ {
      */  
     virtual void computeEnergy() {
 
-      SingleSlater<T>::computeEnergy();
+      SingleSlater<MatsT,IntsT>::computeEnergy();
       // Add EXC in the total energy
       this->totalEnergy += XCEnergy;
         
     }; // computeEnergy
 
+
+
+    virtual void printFockTimings(std::ostream &out) {
+  
+      out << "    Fock Timings:\n";
+      out << "      Wall time G[D] = " << std::setw(8)
+          << std::setprecision(5)  << std::scientific
+          << this->GDDur << " s\n";
+      out << "      Wall time VXC  = " << std::setw(8)
+          << std::setprecision(5)  << std::scientific
+          << VXCDur << " s\n\n";
+  
+  
+    }; // SingleSlater<T>::printFockTimings
+
+
+
+
+
     // KS specific functions
     // See include/singleslater/kohnsham/vxc.hpp for docs.
 
+    // VXC
     void formVXC(); 
 
     void evalDen(SHELL_EVAL_TYPE typ, size_t NPts,size_t NBE, size_t NB, 
@@ -248,6 +250,40 @@ namespace ChronusQ {
       double *VrhoEval, double *VsigmaEval, double *ZrhoVar1, 
       double *ZsigmaVar1, double *ZsigmaVar2);
 
+    // FXC Terms
+      
+    void loadFXCder(size_t NPts, double *Den, double *sigma, double *EpsEval, double *VRhoEval, 
+      double *V2RhoEval, double *VsigmaEval, double *V2sigmaEval, double *V2RhosigmaEval, 
+      double *EpsSCR, double *VRhoSCR, double *VsigmaSCR, double *V2RhoEvalSCR, double *V2sigmaEvalSCR,
+      double *V2RhosigmaEvalSCR); 
+
+    template <typename U>
+    void constructZVarsFXC(DENSITY_TYPE denTyp, bool isGGA, size_t NPts, 
+      double* GDenS, double* GDenZ, double* GDenY, double* GDenX,
+      U* TS, U* TZ, U* TY, U* TX,
+      U* GTS, U* GTZ, U* GTY, U* GTX,
+      double *VrhoEval, double *VsigmaEval, 
+      double *V2rhoEval, double *V2sigmaEval, double *V2RhosigmaEval, 
+      U *ZrhoVar1, U *ZgammaVar1, U *ZgammaVar2, U *ZgammaVar3, U *ZgammaVar4);
+
+    template <typename U>
+    void formZ_fxc(DENSITY_TYPE denType, bool isGGA, size_t NPts, size_t NBE, size_t IOff,
+      double epsScreen, std::vector<double> &weights,
+      U *ZrhoVar1, U *ZgammaVar1, U *ZgammaVar2, U *ZgammaVar3, U *ZgammaVar4,
+      double* GDenS, double* GDenZ, double* GDenY, double* GDenX, U* GTS, U* GTZ, U* GTY, U* GTX,
+      double *BasisScr, U* ZMAT);
+
+
+
+    template <typename U>
+    void formFXC(MPI_Comm c,  std::vector<TwoBodyContraction<U>> &cList );
+
+
+
+
+
+    MatsT* getNRCoeffs();
+    std::pair<double,MatsT*> getStab();
 
   }; // class KohnSham
 

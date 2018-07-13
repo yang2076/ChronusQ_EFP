@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -43,9 +43,22 @@ namespace ChronusQ {
     // Initialize type independent parameters
     bool isConverged = false;
     scfControls.dampParam = scfControls.dampStartParam;
-    scfControls.doIncFock = scfControls.doIncFock and (aoints.cAlg == DIRECT);
 
-    if( printLevel > 0 ) printSCFHeader(std::cout,pert);
+//XSLIC
+//    scfControls.doIncFock = scfControls.doIncFock and (this->aoints.cAlg == DIRECT);
+    scfControls.doIncFock = false;
+                 
+    if( scfControls.scfAlg == _NEWTON_RAPHSON_SCF )
+      scfControls.doExtrap = false;
+
+    // Compute initial properties
+    this->computeProperties(pert);
+
+
+    if( printLevel > 0 and MPIRank(comm) == 0 ) {
+      printSCFHeader(std::cout,pert);
+      printSCFProg(std::cout,false);
+    }
 
     for( scfConv.nSCFIter = 0; scfConv.nSCFIter < scfControls.maxSCFIter; 
          scfConv.nSCFIter++) {
@@ -64,7 +77,7 @@ namespace ChronusQ {
       isConverged = evalConver(pert);
 
       // Print out iteration information
-      if( printLevel > 0 ) printSCFProg(std::cout);
+      if( printLevel > 0 and (MPIRank(comm) == 0)) printSCFProg(std::cout);
 
     }; // Iteration loop
 
@@ -98,7 +111,7 @@ namespace ChronusQ {
       this->printMiscProperties(std::cout);
     }
     
-  }; // SingleSlater<T>::SCF()
+  }; // SingleSlaterBase::SCF()
 
   
   void SingleSlaterBase::printSCFHeader(std::ostream &out, 
@@ -121,6 +134,13 @@ namespace ChronusQ {
            << scfControls.maxSCFIter << std::endl;
 
 
+    out << std::setw(38)   << std::left << "  SCF Algorithm:";
+    if( scfControls.scfAlg == _CONVENTIONAL_SCF )
+      out << "Conventional SCF";
+    else if( scfControls.scfAlg == _NEWTON_RAPHSON_SCF )
+      out << "Newton-Raphson (2nd Order)";
+    out << "\n";
+
 
     if (scfControls.doExtrap) {
       if (scfControls.doDamp) {
@@ -139,9 +159,6 @@ namespace ChronusQ {
             << scfControls.nKeep << " previous iterations" << std::endl;
       }
  
-    } else {
-        out << std::setw(38)   << std::left << "  SCF Algorithm:"
-               <<  "Standard Roothaan-Hall" << std::endl;
     }
 
 
@@ -167,9 +184,9 @@ namespace ChronusQ {
         
         out << " ";
       
-        if( amp.size() == 3 )        out << "Dipole";
-        else if ( amp.size() == 6 )  out << "Quadrupole";
-        else if ( amp.size() == 10 ) out << "Octupole";
+        if( field->size == 3 )        out << "Dipole";
+        else if ( field->size == 6 )  out << "Quadrupole";
+        else if ( field->size == 10 ) out << "Octupole";
         
         out << " Field: ";
         out << "{ ";
@@ -209,23 +226,29 @@ namespace ChronusQ {
    *  \brief Print the current convergence information of the SCF
    *  procedure
    */ 
-  void SingleSlaterBase::printSCFProg(std::ostream &out) {
+  void SingleSlaterBase::printSCFProg(std::ostream &out,
+    bool printDiff) {
 
     // SCF Iteration
-    out << "  SCFIt: " <<std::setw(6) << std::left << scfConv.nSCFIter + 1;
+    out << "  SCFIt: " <<std::setw(6) << std::left;
+
+    if( printDiff ) out << scfConv.nSCFIter + 1;
+    else            out << 0;
 
     // Current Total Energy
     out << std::setw(18) << std::fixed << std::setprecision(10)
                          << std::left << this->totalEnergy;
 
-    out << std::scientific << std::setprecision(7);
-    // Current Change in Energy
-    out << std::setw(14) << std::right << scfConv.deltaEnergy;
-    out << "   ";
-    out << std::setw(13) << std::right << scfConv.RMSDenScalar;
-    if(not iCS or nC > 1) {
+    if( printDiff ) {
+      out << std::scientific << std::setprecision(7);
+      // Current Change in Energy
+      out << std::setw(14) << std::right << scfConv.deltaEnergy;
       out << "   ";
-      out << std::setw(13) << std::right << scfConv.RMSDenMag;
+      out << std::setw(13) << std::right << scfConv.RMSDenScalar;
+      if(not iCS or nC > 1) {
+        out << "   ";
+        out << std::setw(13) << std::right << scfConv.RMSDenMag;
+      }
     }
   
     out << std::endl;

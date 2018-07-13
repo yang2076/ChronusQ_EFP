@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -53,9 +53,12 @@
 
 
 #ifdef _OPENMP
-  #include<omp.h>
+  #include <omp.h>
 #endif
 
+#ifdef CQ_ENABLE_MPI
+  #include <mxx/collective.hpp>
+#endif
 
 // Standard typedefs
 typedef std::complex<double> dcomplex;

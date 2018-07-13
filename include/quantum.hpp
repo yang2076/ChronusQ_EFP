@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -40,12 +40,12 @@ namespace ChronusQ {
    *  QuantumBase.
    *
    */
-  template <typename T>
+  template <typename MatsT>
   class Quantum : virtual public QuantumBase {
   protected:
 
     // Useful typedefs
-    typedef T*                   oper_t;
+    typedef MatsT*               oper_t;
     typedef std::vector<oper_t>  oper_t_coll;
     
 
@@ -78,8 +78,9 @@ namespace ChronusQ {
      *                    (only used when _nC == 1)
      *  \param [in] N     Dimension of the density matricies to be allocated
      */ 
-    Quantum(CQMemManager &mem, size_t _nC = 1, bool _iCS = true, 
-      size_t N = 0, bool doAlloc = true): QuantumBase(mem,_nC,_iCS) {
+    Quantum(MPI_Comm c, CQMemManager &mem, size_t _nC = 1, 
+      bool _iCS = true, size_t N = 0, bool doAlloc = true): 
+      QuantumBase(c,mem,_nC,_iCS) {
 
         // Allocate densities
         if( N != 0 and doAlloc ) alloc(N);
@@ -91,8 +92,8 @@ namespace ChronusQ {
     // on the following constructors
 
     // Different type
-    template <typename U> Quantum(const Quantum<U> &, int dummy = 0);
-    template <typename U> Quantum(Quantum<U> &&     , int dummy = 0);
+    template <typename MatsU> Quantum(const Quantum<MatsU> &, int dummy = 0);
+    template <typename MatsU> Quantum(Quantum<MatsU> &&     , int dummy = 0);
 
     // Same type
     Quantum(const Quantum &);
@@ -123,7 +124,7 @@ namespace ChronusQ {
     template <typename RetTyp, DENSITY_TYPE DenTyp, typename Op>
     inline RetTyp computeOBProperty(const Op &op) {
       return OperatorSpinCombine<RetTyp,DenTyp>(op);
-    }; // Quantum<T>::computeOBProperty (single operator)
+    }; // Quantum<MatsT>::computeOBProperty (single operator)
 
     /**
      *  \brief Computes set of a 1-body properties through a traces with the
@@ -139,7 +140,7 @@ namespace ChronusQ {
       for(auto &op : opv) 
         results.emplace_back(computeOBProperty<RetTyp,DenTyp>(op));
       return results;
-    }; // Quantum<T>::computeOBProperty (many operators)
+    }; // Quantum<MatsT>::computeOBProperty (many operators)
 
     // Print functions
     void print1PDM(std::ostream&);

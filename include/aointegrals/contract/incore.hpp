@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -26,8 +26,10 @@
 
 
 #include <aointegrals.hpp>
+#include <util/matout.hpp>
 #include <util/threads.hpp>
 #include <cqlinalg/blas3.hpp>
+#include <cqlinalg/blasext.hpp>
 
 // Use stupid but bullet proof incore contraction for debug
 //#define _BULLET_PROOF_INCORE
@@ -49,9 +51,12 @@ namespace ChronusQ {
    *    matricies to be contracted with. See TwoBodyContraction
    *    for details
    */ 
-  template <typename T, typename G>
-  void AOIntegrals::twoBodyContractIncore(
-    std::vector<TwoBodyContraction<T,G>> &list) {
+  template <typename IntsT>
+  template <typename TT>
+  void AOIntegrals<IntsT>::twoBodyContractIncore(
+    MPI_Comm comm, std::vector<TwoBodyContraction<TT>> &list) {
+
+    ROOT_ONLY(comm);
 
     auto topIncore = std::chrono::high_resolution_clock::now();
 
@@ -60,134 +65,107 @@ namespace ChronusQ {
 
       // Coulomb-type (34,12) ERI contraction
       // AX(mn) = (mn | kl) X(kl)
-      if( C.contType == COULOMB ) JContractIncore(C);
+      if( C.contType == COULOMB ) JContractIncore(comm,C);
 
       // Exchange-type (23,12) ERI contraction
       // AX(mn) = (mk |ln) X(kl)
-      else if( C.contType == EXCHANGE ) KContractIncore(C);
+      else if( C.contType == EXCHANGE ) KContractIncore(comm,C);
 
     } // loop over matricies
 
     auto botIncore = std::chrono::high_resolution_clock::now();
     
     std::chrono::duration<double> durIncore = botIncore - topIncore;
+
+
 #ifdef _REPORT_INTEGRAL_TIMINGS
     std::cerr << "Incore Contraction took " << durIncore.count() << " s\n\n";
 #endif
   }; // AOIntegrals::twoBodyContractIncore
 
 
-  template<>
-  void AOIntegrals::twoBodyContractIncore(
-    std::vector<TwoBodyContraction<dcomplex,double>> &list) {
-
-    assert(std::all_of(list.begin(),list.end(),
-      [](TwoBodyContraction<dcomplex,double>& C){ 
-        return C.contType == COULOMB; 
-      }));
-
-    for(auto &C : list) JContractIncore(C);
-    
-  }; // AOIntegrals::twoBodyContractIncore (complex, real)
-
-
-
   /**
    *  \brief Perform a Coulomb-type (34,12) ERI contraction with
    *  a one-body operator.
    */   
-  template <typename T, typename G>
-  void AOIntegrals::JContractIncore(TwoBodyContraction<T,G> &C) {
+  template <typename IntsT>
+  template <typename TT>
+  void AOIntegrals<IntsT>::JContractIncore(MPI_Comm comm, TwoBodyContraction<TT> &C) {
 
-    // Temporaries Hermetian code
-    double *X, *AX;
-    if( C.HER ) {
+    IntsT *X  = reinterpret_cast<IntsT*>(C.X);
+    IntsT *AX = reinterpret_cast<IntsT*>(C.AX);
 
-      // Handle smart allocation of real matricies for Coulomb contraction
-      // with Hermetian matricies
-        
-      if( std::is_same<double,T>::value ) 
-        X = reinterpret_cast<double*>(C.X);
-      else {
-        // Copy over real part into allocated temporary
-        X = memManager_.malloc<double>(nSQ_);
-        std::transform(C.X,C.X + nSQ_,X,
-          []( T a ) -> double { return std::real(a); }
-        ); 
-      }
+    // Extract the real part of X if X is Hermetian and if the ints are
+    // real
+    const bool extractRealPartX = 
+      C.HER and std::is_same<IntsT,double>::value and 
+      std::is_same<TT,dcomplex>::value;
 
-      if( std::is_same<double,G>::value ) 
-        AX = reinterpret_cast<double*>(C.AX);
-      else {
-        AX = memManager_.malloc<double>(nSQ_);  
-        std::fill_n(AX,nSQ_,0.);
-      }
+    // Allocate scratch if IntsT and TT are different
+    const bool allocAXScratch = not std::is_same<IntsT,TT>::value;
 
-    } else
-      assert( (std::is_same<T,G>::value) );
+
+    if( extractRealPartX ) {
+
+      X = memManager_.malloc<IntsT>(nSQ_);
+      for(auto k = 0ul; k < nSQ_; k++) X[k] = std::real(C.X[k]);
+
+    }
+
+    if( allocAXScratch ) {
+
+      AX = memManager_.malloc<IntsT>(nSQ_);
+      std::fill_n(AX,nSQ_,0.);
+
+    }
+
 
     #ifdef _BULLET_PROOF_INCORE
 
     size_t NB3 = basisSet_.nBasis * nSQ_;
+    for(auto i = 0; i < basisSet_.nBasis; ++i)
+    for(auto j = 0; j < basisSet_.nBasis; ++j)
+    for(auto k = 0; k < basisSet_.nBasis; ++k)
+    for(auto l = 0; l < basisSet_.nBasis; ++l) 
 
-    // Hermetian code
-    if(C.HER) 
-    for(auto i = 0; i < basisSet_.nBasis; ++i)
-    for(auto j = 0; j < basisSet_.nBasis; ++j)
-    for(auto k = 0; k < basisSet_.nBasis; ++k)
-    for(auto l = 0; l < basisSet_.nBasis; ++l) {
-      AX[i + j*basisSet_.nBasis] +=
-        ERI[i + j*basisSet_.nBasis + k*nSQ_ + l*NB3] *
-        X[k + l*basisSet_.nBasis];
-    }
-    
-    // Nonhermetian code
-    else
-    for(auto i = 0; i < basisSet_.nBasis; ++i)
-    for(auto j = 0; j < basisSet_.nBasis; ++j)
-    for(auto k = 0; k < basisSet_.nBasis; ++k)
-    for(auto l = 0; l < basisSet_.nBasis; ++l) {
-      reinterpret_cast<T*>(C.AX)[i + j*basisSet_.nBasis] +=
-        ERI[i + j*basisSet_.nBasis + k*nSQ_ + l*NB3] *
-        reinterpret_cast<T*>(C.X)[k + l*basisSet_.nBasis];
-    }
+      C.AX[i + j*basisSet_.nBasis] +=ERI[i + j*basisSet_.nBasis + l*nSQ_ + k*NB3] *
+        C.X[k + l*basisSet_.nBasis];
 
     #else
 
 
-    // Hermetian code
-    if(C.HER) {
+    Gemm('C','N',nSQ_,1,nSQ_,IntsT(1.),ERI,nSQ_,X,nSQ_,IntsT(0.),AX,nSQ_);
 
-      Gemm('N','N',nSQ_,1,nSQ_,1.,ERI,nSQ_,X,nSQ_,0.,AX,nSQ_);
+    // if Complex ints + Hermitian, conjugate
+    if( std::is_same<IntsT,dcomplex>::value and C.HER )
+      IMatCopy('R',basisSet_.nBasis,basisSet_.nBasis,
+        IntsT(1.),AX,basisSet_.nBasis,basisSet_.nBasis);
 
-    // Non-hermetian code
-    } else {
+    // If non-hermetian, transpose
+    if( not C.HER )  {
 
-      Gemm('N','N',nSQ_,1,nSQ_,T(1.),ERI,nSQ_,reinterpret_cast<T*>(C.X),nSQ_,
-        T(0.),reinterpret_cast<T*>(C.AX),nSQ_);
+      IMatCopy('T',basisSet_.nBasis,basisSet_.nBasis,
+        IntsT(1.),AX,basisSet_.nBasis,basisSet_.nBasis);
 
     }
-
 
     #endif
 
     // Cleanup temporaries
-    if(C.HER) {
-        
-      if( not std::is_same<double,T>::value ) memManager_.free(X);
-      if( not std::is_same<double,G>::value ) {
-        // Copy over real result into persistant storage
-        std::copy_n(AX,nSQ_,C.AX);
-        memManager_.free(AX);
-      }
+    if( extractRealPartX ) memManager_.free(X);
+    if( allocAXScratch ) {
+
+      std::copy_n(AX,nSQ_,C.AX);
+      memManager_.free(AX);
+
     }
 
   }; // AOIntegrals::JContractIncore
 
 
-
-  template <typename T, typename G>
-  void AOIntegrals::KContractIncore(TwoBodyContraction<T,G> &C) {
+  template <typename IntsT>
+  template <typename TT>
+  void AOIntegrals<IntsT>::KContractIncore(MPI_Comm comm, TwoBodyContraction<TT> &C) {
 
     size_t NB3 = basisSet_.nBasis * nSQ_;
 
@@ -209,9 +187,9 @@ namespace ChronusQ {
 
     #pragma omp parallel for
     for(auto nu = 0; nu < basisSet_.nBasis; nu++) 
-      Gemm('N','N',basisSet_.nBasis,1,nSQ_,T(1.),
+      Gemm('N','N',basisSet_.nBasis,1,nSQ_,TT(1.),
         ERI  + nu * NB3,              basisSet_.nBasis,
-        C.X,                          nSQ_,T(0.),
+        C.X,                          nSQ_,TT(0.),
         C.AX + nu * basisSet_.nBasis, basisSet_.nBasis);
 
     SetLAThreads(LAThreads);

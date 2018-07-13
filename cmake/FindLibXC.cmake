@@ -1,7 +1,7 @@
 #
 # This file is part of the Chronus Quantum (ChronusQ) software package
 # 
-# Copyright (C) 2014-2017 Li Research Group (University of Washington)
+# Copyright (C) 2014-2018 Li Research Group (University of Washington)
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -35,12 +35,12 @@ if( NOT EXISTS "${LIBXC_PREFIX}/include/xc.h" )
 
   ExternalProject_Add(libxc
     PREFIX ${LIBXC_PREFIX}
-    URL "${LIBXC_PREFIX}/libxc-3.0.0.tar"
+    URL "${LIBXC_PREFIX}/libxc-4.0.4.tar.gz"
     CONFIGURE_COMMAND ./configure 
       --prefix=${LIBXC_PREFIX} 
-      CC=${CMAKE_C_COMPILER} 
-      CFLAGS=${CMAKE_C_FLAGS} 
-      FC=${CMAKE_Fortran_COMPILER}
+      CC=gcc
+      #CFLAGS=${CMAKE_C_FLAGS} 
+      FC=gfortran
     BUILD_COMMAND make
     BUILD_IN_SOURCE 1
     INSTALL_COMMAND make install

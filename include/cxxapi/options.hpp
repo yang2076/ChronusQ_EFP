@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -25,12 +25,14 @@
 #define __INCLUDED_OPTIONS_HPP__
 
 #include <cxxapi/input.hpp>
+#include <cxxapi/procedural.hpp>
 
 #include <molecule.hpp>
 #include <basisset.hpp>
 #include <aointegrals.hpp>
 #include <singleslater.hpp>
 #include <realtime.hpp>
+#include <response.hpp>
 
 // Preprocessor directive to aid the digestion of optional 
 // input arguments
@@ -44,31 +46,70 @@ namespace ChronusQ {
   // Parse the options relating to the Molecule object
   Molecule CQMoleculeOptions(std::ostream &, CQInputFile &);
 
+  void CQMOLECULE_VALID(std::ostream&, CQInputFile &);
   // Parse the options relating to the BasisSet
   BasisSet CQBasisSetOptions(std::ostream &, CQInputFile &, 
     Molecule &);
 
+  void CQBASIS_VALID(std::ostream&, CQInputFile &);
+
   // Parse the options relating to the SingleSlater 
   // (and variants)
   std::shared_ptr<SingleSlaterBase> CQSingleSlaterOptions(
-    std::ostream &, CQInputFile &, AOIntegrals &);
+    std::ostream &, CQInputFile &, std::shared_ptr<AOIntegralsBase> );
 
+  void CQQM_VALID(std::ostream&, CQInputFile &);
+  void CQDFTINT_VALID(std::ostream&, CQInputFile &);
 
   // Parse RT options
   std::shared_ptr<RealTimeBase> CQRealTimeOptions(
     std::ostream &, CQInputFile &, std::shared_ptr<SingleSlaterBase> &
   );
 
-  // Parse integral options
-  void CQIntsOptions(std::ostream&, CQInputFile&, AOIntegrals&);
+  void CQRT_VALID(std::ostream&, CQInputFile &);
 
+  // Parse Response options
+  std::shared_ptr<ResponseBase> CQResponseOptions(
+    std::ostream &, CQInputFile &, std::shared_ptr<SingleSlaterBase>
+  );
+
+  void CQRESPONSE_VALID(std::ostream&, CQInputFile &);
+  void CQMOR_VALID(std::ostream&, CQInputFile &);
+
+  // Parse integral options
+  std::shared_ptr<AOIntegralsBase> CQIntsOptions(std::ostream &, 
+    CQInputFile &, CQMemManager &, Molecule &, BasisSet &); 
+
+  void CQINTS_VALID(std::ostream&, CQInputFile &);
 
   // Parse the SCF options
   void CQSCFOptions(std::ostream&, CQInputFile&,
     SingleSlaterBase &, EMPerturbation &);
 
+  void CQSCF_VALID(std::ostream&, CQInputFile &);
+
   std::shared_ptr<CQMemManager> CQMiscOptions(std::ostream &,
     CQInputFile &);
+
+  void CQMISC_VALID(std::ostream&, CQInputFile &);
+
+
+  inline void CQINPUT_VALID(std::ostream &out, CQInputFile &input) {
+
+    CQMOLECULE_VALID(out,input);
+    CQBASIS_VALID(out,input);
+    CQINTS_VALID(out,input);
+    CQQM_VALID(out,input);
+    CQDFTINT_VALID(out,input);
+    CQSCF_VALID(out,input);
+    CQRT_VALID(out,input);
+    CQRESPONSE_VALID(out,input);
+    CQMOR_VALID(out,input);
+    CQMISC_VALID(out,input);
+
+  }
+
+
 };
 
 

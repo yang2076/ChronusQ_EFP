@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you ca redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -29,8 +29,8 @@
 
 namespace ChronusQ {
 
-  template <typename T>
-  void WaveFunction<T>::printMO(std::ostream &out) {
+  template <typename MatsT, typename IntsT>
+  void WaveFunction<MatsT,IntsT>::printMO(std::ostream &out) {
 
     size_t NB = aoints.basisSet().nBasis * this->nC;
    
@@ -38,10 +38,10 @@ namespace ChronusQ {
     if( mo2 != nullptr )
       prettyPrintSmart(std::cout,"MO 2",mo2,NB,NB,NB);
 
-  }; // WaveFunction<T>::printMO
+  }; // WaveFunction<T,MatsT,IntsT>::printMO
 
-  template <typename T>
-  void WaveFunction<T>::printEPS(std::ostream &out) {
+  template <typename MatsT, typename IntsT>
+  void WaveFunction<MatsT,IntsT>::printEPS(std::ostream &out) {
 
     size_t NB = aoints.basisSet().nBasis * this->nC;
    
@@ -49,7 +49,7 @@ namespace ChronusQ {
     if( eps2 != nullptr )
       prettyPrintSmart(std::cout,"EPS 2",eps2,NB,NB,NB);
 
-  }; // WaveFunction<T>::printEPS
+  }; // WaveFunction<T,MatsT,IntsT>::printEPS
 
 
 }; // namespace ChronusQ

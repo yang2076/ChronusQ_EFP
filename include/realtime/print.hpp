@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -46,8 +46,8 @@ namespace ChronusQ {
   }
 
 
-  template <template <typename> class _SSTyp, typename T>
-  void RealTime<_SSTyp,T>::printRTHeader() {
+  template <template <typename, typename> class _SSTyp, typename IntsT>
+  void RealTime<_SSTyp,IntsT>::printRTHeader() {
     
     std::cout << BannerTop << std::endl;
     std::cout << "Real-Time Propagation Settings:" << std::endl << std::endl;
@@ -172,8 +172,8 @@ namespace ChronusQ {
 
   };
 
-  template <template <typename> class _SSTyp, typename T>
-  void RealTime<_SSTyp,T>::printRTStep() { 
+  template <template <typename, typename> class _SSTyp, typename IntsT>
+  void RealTime<_SSTyp,IntsT>::printRTStep() { 
 
     std::cout << std::fixed << std::right;
 

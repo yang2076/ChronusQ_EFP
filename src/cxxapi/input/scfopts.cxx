@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -25,6 +25,42 @@
 #include <cerr.hpp>
 
 namespace ChronusQ {
+
+
+  void CQSCF_VALID( std::ostream &out, CQInputFile &input ) {
+
+    // Allowed keywords
+    std::vector<std::string> allowedKeywords = {
+      "ENETOL",
+      "DENTOL",
+      "MAXITER",
+      "INCFOCK",
+      "NINCFOCK",
+      "GUESS",
+      "ALG",
+      "EXTRAP",
+      "DIIS",
+      "NKEEP",
+      "DAMP",
+      "DAMPPARAM",
+      "DAMPERROR",
+      "FIELD",
+      "PRINTMOS"
+    };
+
+    // Specified keywords
+    std::vector<std::string> scfKeywords = input.getDataInSection("SCF");
+
+    // Make sure all of scfKeywords in allowedKeywords
+
+    for( auto &keyword : scfKeywords ) {
+      auto ipos = std::find(allowedKeywords.begin(),allowedKeywords.end(),keyword);
+      if( ipos == allowedKeywords.end() ) 
+        CErr("Keyword SCF." + keyword + " is not recognized",std::cout);// Error
+    }
+    // Check for disallowed combinations (if any)
+  }
+
 
   void CQSCFOptions(std::ostream &out, CQInputFile &input,
     SingleSlaterBase &ss, EMPerturbation &pert) {
@@ -72,6 +108,18 @@ namespace ChronusQ {
         ss.scfControls.guess = READDEN;
       else
         CErr("Unrecognized entry for SCF.GUESS");
+    )
+
+
+    // ALGORITHM
+    OPTOPT(
+
+        std::string algString = input.getData<std::string>("SCF.ALG");
+        if( not algString.compare("CONVENTIONAL") )
+          ss.scfControls.scfAlg = _CONVENTIONAL_SCF;
+        else if( not algString.compare("NR") )
+          ss.scfControls.scfAlg = _NEWTON_RAPHSON_SCF;
+
     )
 
 
@@ -129,7 +177,7 @@ namespace ChronusQ {
       if( not fieldTypeStr.compare("ELECTRIC") )
         fieldType = Electric;
       else if( not fieldTypeStr.compare("MAGNETIC") )
-        CErr("Magnetic Fields NYI");
+        fieldType = Magnetic;  
       else
         CErr(fieldTypeStr + "not a valid Field type");
 

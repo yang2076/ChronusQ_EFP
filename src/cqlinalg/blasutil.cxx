@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -122,7 +122,7 @@ namespace ChronusQ {
   void SetMat(char TRANS, size_t M, size_t N, _FScale ALPHA, _F1 *A, size_t LDA,
     size_t SA, _F2 *B, size_t LDB, size_t SB) {
 
-    assert( TRANS == 'N' );
+    assert( TRANS == 'N' or TRANS == 'R' );
 
     using namespace Eigen;
 
@@ -137,7 +137,8 @@ namespace ChronusQ {
     F1Map AMap(A,M,N, DynamicStride(LDA,SA));
     F2Map BMap(B,M,N, DynamicStride(LDB,SB));
 
-    BMap = ALPHA * AMap;
+    if      ( TRANS == 'N' ) BMap = ALPHA * AMap;
+    else if ( TRANS == 'R' ) BMap = ALPHA * AMap.conjugate();
 
   }
 
@@ -401,6 +402,11 @@ namespace ChronusQ {
   template 
   void IncBySubMat(size_t M, size_t N, size_t MSub, size_t NSub, double *ABig, 
     size_t LDAB, double *ASmall, size_t LDAS, 
+    std::vector<std::pair<size_t,size_t>> &SubMatCut);
+
+  template 
+  void IncBySubMat(size_t M, size_t N, size_t MSub, size_t NSub, dcomplex *ABig, 
+    size_t LDAB, dcomplex *ASmall, size_t LDAS, 
     std::vector<std::pair<size_t,size_t>> &SubMatCut);
 
 }; // namespace ChronusQ

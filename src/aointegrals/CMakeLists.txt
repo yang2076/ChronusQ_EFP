@@ -1,7 +1,7 @@
 #
 # This file is part of the Chronus Quantum (ChronusQ) software package
 # 
-# Copyright (C) 2014-2017 Li Research Group (University of Washington)
+# Copyright (C) 2014-2018 Li Research Group (University of Washington)
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,9 +20,13 @@
 # Contact the Developers:
 #   E-Mail: xsli@uw.edu
 #
-add_library(aointegrals STATIC aointegrals.cxx aointegrals_builders.cxx 
-  aointegrals_onee.cxx aointegrals_impl.cxx aointegrals_rel.cxx
-  print.cxx)
+add_library(aointegrals STATIC impl.cxx 
+aointegrals_onee_drivers.cxx
+aointegrals_onee_real_gto.cxx
+aointegrals_onee_complex_giao.cxx
+aointegrals_twoe_drivers.cxx
+aointegrals_twoe_real_gto.cxx 
+aointegrals_twoe_complex_giao.cxx)
 
 if(TARGET libint)
   add_dependencies(aointegrals libint)

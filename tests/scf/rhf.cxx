@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_SUITE( RHF )
 // Water 6-31G(d) test
 BOOST_FIXTURE_TEST_CASE( Water_631Gd, SerialJob ) {
 
-  CQSCFTEST( scf/serial/rhf/water_6-31Gd, water_6-31Gd.bin.ref );
+  CQSCFTEST( "scf/serial/rhf/water_6-31Gd", "water_6-31Gd.bin.ref" );
  
 };
 
@@ -38,7 +38,7 @@ BOOST_FIXTURE_TEST_CASE( Water_631Gd, SerialJob ) {
 // SMP Water 6-31G(d) test
 BOOST_FIXTURE_TEST_CASE( PAR_Water_631Gd, ParallelJob ) {
 
-  CQSCFTEST( scf/parallel/rhf/water_6-31Gd, water_6-31Gd.bin.ref );
+  CQSCFTEST( "scf/parallel/rhf/water_6-31Gd", "water_6-31Gd.bin.ref" );
  
 };
 

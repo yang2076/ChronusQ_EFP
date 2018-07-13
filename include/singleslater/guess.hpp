@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -82,18 +82,16 @@ namespace ChronusQ {
    *  \brief Forms a set of guess orbitals for a single slater
    *  determininant SCF in various ways
    */ 
-  template <typename T>
-  void SingleSlater<T>::formGuess() {
+  template <typename MatsT, typename IntsT>
+  void SingleSlater<MatsT,IntsT>::formGuess() {
 
     if( printLevel > 0 )
       std::cout << "  *** Forming Initial Guess Density for SCF Procedure ***"
                 << std::endl << std::endl;
 
-    if( aoints.molecule().nAtoms == 1  and scfControls.guess == SAD){
-      std::cout << " * WARNING: SAD guess does not make sense for an atom." << "\n";
-      std::cout << "Running CORE guess instead." << "\n";
+    if( this->aoints.molecule().nAtoms == 1  and scfControls.guess == SAD ) {
       CoreGuess();
-    }else if( scfControls.guess == CORE ) CoreGuess();
+    } else if( scfControls.guess == CORE ) CoreGuess();
     else if( scfControls.guess == SAD ) SADGuess();
     else if( scfControls.guess == RANDOM ) RandomGuess();
     else if( scfControls.guess == READMO ) ReadGuessMO(); 
@@ -107,33 +105,37 @@ namespace ChronusQ {
     getNewOrbitals(pert,false);
     
     // If RANDOM guess, scale the densites appropriately
+    // *** Replicates on all MPI processes ***
     if( scfControls.guess == RANDOM ) {
 
-      size_t NB    = aoints.basisSet().nBasis;
+      size_t NB    = this->aoints.basisSet().nBasis;
 
       double TS = 
-        this->template computeOBProperty<double,SCALAR>(aoints.overlap);
+        this->template computeOBProperty<double,SCALAR>(this->aoints.overlap);
 
       double TZ = 
-        this->template computeOBProperty<double,MZ>(aoints.overlap);
+        this->template computeOBProperty<double,MZ>(this->aoints.overlap);
       double TY = 
-        this->template computeOBProperty<double,MY>(aoints.overlap);
+        this->template computeOBProperty<double,MY>(this->aoints.overlap);
       double TX = 
-        this->template computeOBProperty<double,MX>(aoints.overlap);
+        this->template computeOBProperty<double,MX>(this->aoints.overlap);
 
       double magNorm = std::sqrt(TZ*TZ + TY*TY + TX*TX);
 
-      Scale(NB*NB,T(this->nO)/T(TS),this->onePDM[SCALAR],1);
+      Scale(NB*NB,MatsT(this->nO)/MatsT(TS),this->onePDM[SCALAR],1);
 
       for(auto k = 1; k < this->onePDM.size(); k++)
         if( magNorm > 1e-10 )
-          Scale(NB*NB,T(this->nOA - this->nOB)/T(magNorm),this->onePDM[k],1);
+          Scale(NB*NB,MatsT(this->nOA - this->nOB)/MatsT(magNorm),
+            this->onePDM[k],1);
         else
-          std::fill_n(this->onePDM[k],NB*NB,0.);
+          std::fill_n(this->onePDM[k],NB*NB,MatsT(0.));
 
         
 
     }
+
+//prettyPrintSmart(std::cout,"1pdm guess",this->onePDM[0],this->aoints.basisSet().nBasis,this->aoints.basisSet().nBasis,this->aoints.basisSet().nBasis);
 
   }; // SingleSlater<T>::formGuess
 
@@ -145,44 +147,51 @@ namespace ChronusQ {
    *  is the simplest choice for an initial guess, it is often
    *  a very poor guess.
    */
-  template <typename T>
-  void SingleSlater<T>::CoreGuess() {
+  template <typename MatsT, typename IntsT>
+  void SingleSlater<MatsT,IntsT>::CoreGuess() {
 
     if( printLevel > 0 )
       std::cout << "    * Forming the Core Hamiltonian Guess (F = H)\n\n";
 
-    size_t FSize = memManager.template getSize(fock[SCALAR]);
+    size_t FSize = memManager.template getSize(fockMatrix[SCALAR]);
     size_t NB    = std::sqrt(FSize);
 
     // Zero out the Fock
-    for(auto &F : fock) std::fill_n(F,FSize,0.);
+    for(auto &F : fockMatrix) std::fill_n(F,FSize,MatsT(0.));
 
     // Copy over the Core Hamiltonian
-    SetMatRE('N',NB,NB,1.,aoints.coreH[SCALAR],NB,fock[SCALAR],NB);
-    for(auto i = 1; i < aoints.coreH.size(); i++) 
-      SetMatIM('N',NB,NB,1.,aoints.coreH[i],NB,fock[i],NB);
+    for(auto i = 0; i < coreH.size(); i++) 
+      SetMat('N',NB,NB,MatsT(1.),coreH[i],NB,fockMatrix[i],NB);
 
-  }; // SingleSlater<T>::CoreGuess 
+  }; // SingleSlater::CoreGuess 
 
   /**
    *  
    */ 
-  template <typename T>
-  void SingleSlater<T>::SADGuess() {
+  template <typename MatsT, typename IntsT>
+  void SingleSlater<MatsT,IntsT>::SADGuess() {
+
+
+
+    // ROOT Communicator
+    int color = (MPIRank(comm) == 0) ? 1 : MPI_UNDEFINED;
+    MPI_Comm rcomm = MPICommSplit(comm,color,0);
+
+    //std::cerr << "RCOMM " << rcomm << std::endl;
 
     if( printLevel > 0 )
       std::cout << "    * Forming the Superposition of Atomic Densities Guess"
                 << " (SAD)\n\n";
 
-    size_t NB    = aoints.basisSet().nBasis;
+    size_t NB    = this->aoints.basisSet().nBasis;
     EMPerturbation pert;
 
-    // Zero out the densities
+    // Zero out the densities (For all MPI processes)
     for(auto &X : this->onePDM) std::fill_n(X,NB*NB,0.);
 
 
     // Determine the unique atoms
-    std::vector<Atom> uniqueElements(aoints.molecule().atoms);
+    std::vector<Atom> uniqueElements(this->aoints.molecule().atoms);
 
     // Sort the Atoms by atomic number for std::unique
     std::sort(uniqueElements.begin(),uniqueElements.end(),
@@ -209,8 +218,8 @@ namespace ChronusQ {
 
     // Create a map from atoms in molecule to unique atom index
     std::map<size_t,size_t> mapAtom2Uniq;
-    for(auto iAtm = 0ul; iAtm < aoints.molecule().nAtoms; iAtm++) {
-      size_t curAtomicNumber = aoints.molecule().atoms[iAtm].atomicNumber;
+    for(auto iAtm = 0ul; iAtm < this->aoints.molecule().nAtoms; iAtm++) {
+      size_t curAtomicNumber = this->aoints.molecule().atoms[iAtm].atomicNumber;
 
       auto el = std::find_if(uniqueElements.begin(),uniqueElements.end(),
                   [&](Atom &a){return a.atomicNumber == curAtomicNumber;});
@@ -225,6 +234,8 @@ namespace ChronusQ {
       std::cout << "  *** Running " << uniqueElements.size() 
                 << " Atomic SCF calculations for SAD Guess ***\n\n";
 
+
+    if( MPIRank(comm) == 0 )
     for(auto iUn = 0; iUn < uniqueElements.size(); iUn++) {
 
       // Get default multiplicity for the Atom
@@ -232,8 +243,8 @@ namespace ChronusQ {
       try { 
         defaultMultip = defaultMult[uniqueElements[iUn].atomicNumber];
       } catch(...) {
-        CErr("AtomZ = " + std::to_string(uniqueElements[iUn].atomicNumber) +
-             " not supported for SAD Guess");
+        CErr("AtomZ = " + std::to_string(uniqueElements[iUn].atomicNumber)
+             + " not supported for SAD Guess");
       }
 
 
@@ -260,21 +271,19 @@ namespace ChronusQ {
                   << multipName << std::endl;
 
       Molecule atom(0,defaultMultip,{ uniqueElements[iUn] });
-      BasisSet basis(aoints.basisSet().basisName, atom, 
-                 aoints.basisSet().forceCart, false);
+      BasisSet basis(this->aoints.basisSet().basisName, atom, 
+                 REAL_GTO,this->aoints.basisSet().forceCart, false);
      
-      AOIntegrals aointsAtom(this->memManager,atom,basis);
+      AOIntegrals<IntsT> aointsAtom(this->memManager,atom,basis);
       
-      aointsAtom.cAlg           = INCORE;
-      aointsAtom.computeERI();
-      aointsAtom.computeCoreHam();
+      aointsAtom.contrAlg = INCORE;
 
-      std::shared_ptr<SingleSlater<T>> ss;
+      std::shared_ptr<SingleSlater<MatsT,IntsT>> ss;
       
   
-      ss = std::dynamic_pointer_cast<SingleSlater<T>> (
-             std::make_shared<HartreeFock<T>>(
-               aointsAtom,1, ( defaultMultip == 1 )
+      ss = std::dynamic_pointer_cast<SingleSlater<MatsT,IntsT>> (
+             std::make_shared<HartreeFock<MatsT,IntsT>>(
+               rcomm,aointsAtom,1, ( defaultMultip == 1 )
              )
            );
 
@@ -282,6 +291,11 @@ namespace ChronusQ {
       ss->scfControls.doIncFock = false;        
       ss->scfControls.dampError = 1e-4;
       ss->scfControls.nKeep     = 8;
+      ss->setCoreH(NON_RELATIVISTIC);
+
+      ss->formCoreH(pert);
+      aointsAtom.computeERIGTO();
+
 
       ss->formGuess();
       ss->SCF(pert);
@@ -289,20 +303,35 @@ namespace ChronusQ {
       size_t NBbasis = basis.nBasis;
 
       // Place the atomic densities into the guess density
+      // *** This only places it into root MPI process ***
 
       for(auto iAtm = 0; iAtm < mapAtom2Uniq.size(); iAtm++)
         if( mapAtom2Uniq[iAtm] == iUn ) {
-          SetMat('N',NBbasis,NBbasis,T(1.),ss->onePDM[SCALAR],NBbasis,
-            this->onePDM[SCALAR] + aoints.basisSet().mapCen2BfSt[iAtm]*(1+NB),
-            NB);
+          SetMat('N',NBbasis,NBbasis,MatsT(1.),ss->onePDM[SCALAR],NBbasis,
+            this->onePDM[SCALAR] + 
+              this->aoints.basisSet().mapCen2BfSt[iAtm]*(1+NB), NB);
         }
 
     }
 
-    // Spin-Average the SAD density
-    if( this->onePDM.size() > 1 )
-      SetMat('N',NB,NB,T(this->nOA - this->nOB) / T(this->nO), 
+    // Spin-Average the SAD density (on MPI root)
+    if( this->onePDM.size() > 1 and MPIRank(comm) == 0 )
+      SetMat('N',NB,NB,MatsT(this->nOA - this->nOB) / MatsT(this->nO), 
         this->onePDM[SCALAR],NB,this->onePDM[MZ],NB);
+
+
+#ifdef CQ_ENABLE_MPI
+    // Broadcast the 1PDM to all MPI processes
+    if( MPISize(comm) > 1 ) {
+      std::cerr  << "  *** Scattering the SAD Density ***\n";
+      for(auto k = 0; k < this->onePDM.size(); k++)
+      MPIBCast(this->onePDM[k],NB*NB,0,comm);
+    }
+
+    // Free the ROOT communicator
+    if( rcomm != MPI_COMM_NULL) MPICommFree(rcomm);
+#endif
+
 
     if( printLevel > 0 )
       std::cout << std::endl
@@ -310,14 +339,15 @@ namespace ChronusQ {
 
     formFock(pert,false);
 
+
   }; // SingleSlater<T>::SADGuess
 
 
 
-  template <typename T>
-  void SingleSlater<T>::RandomGuess() {
+  template <typename MatsT, typename IntsT>
+  void SingleSlater<MatsT,IntsT>::RandomGuess() {
 
-    size_t NB    = aoints.basisSet().nBasis;
+    size_t NB    = this->aoints.basisSet().nBasis;
 
     // Set up random number generator
     std::random_device rd;
@@ -325,20 +355,32 @@ namespace ChronusQ {
 //  std::uniform_real_distribution<> dis(-5,5);
     std::normal_distribution<> dis(0,5);
 
-    for(auto &F : this->fock) std::fill_n(F,NB*NB,0.);
+    for(auto &F : this->fockMatrix) std::fill_n(F,NB*NB,MatsT(0.));
 
+    // Form the random Fock matrix on the root MPI process
+    if( MPIRank(comm) == 0 ) {
 
-    // Copy over the Core Hamiltonian
-    SetMatRE('N',NB,NB,1.,aoints.coreH[SCALAR],NB,fock[SCALAR],NB);
-    for(auto i = 1; i < aoints.coreH.size(); i++) 
-      SetMatIM('N',NB,NB,1.,aoints.coreH[i],NB,fock[i],NB);
-   
+      // Copy over the Core Hamiltonian
+      for(auto i = 0; i < coreH.size(); i++) 
+        SetMat('N',NB,NB,MatsT(1.),coreH[i],NB,fockMatrix[i],NB);
+      
 
-    // Randomize the Fock matricies
-    for(auto &F : this->fock) {
-      for(auto k = 0; k < NB*NB; k++) F[k] = dis(gen);
-      HerMat('L',NB,F,NB);
+      // Randomize the Fock matricies
+      for(auto &F : this->fockMatrix) {
+        for(auto k = 0; k < NB*NB; k++) F[k] = dis(gen);
+        HerMat('L',NB,F,NB);
+      }
+
     }
+
+#ifdef CQ_ENABLE_MPI
+    // BCast random fock to all MPI processes
+    if( MPISize(comm) > 1 ) {
+      std::cerr  << "  *** Scattering the RANDOM Fock ***\n";
+      for(auto k = 0; k < this->fockMatrix.size(); k++)
+        MPIBCast(this->fockMatrix[k],NB*NB,0,comm);
+    }
+#endif
 
   }
 
@@ -346,14 +388,14 @@ namespace ChronusQ {
    *  \brief Reads in 1PDM from bin file. 
    *
    **/
-  template <typename T>
-  void SingleSlater<T>::ReadGuess1PDM() {
+  template <typename MatsT, typename IntsT>
+  void SingleSlater<MatsT,IntsT>::ReadGuess1PDM() {
 
     if( printLevel > 0 )
       std::cout << "    * Reading in guess density from file "
         << savFile.fName() << "\n";
 
-    size_t t_hash = std::type_index(typeid(T)).hash_code();
+    size_t t_hash = std::type_index(typeid(MatsT)).hash_code();
     size_t d_hash = std::type_index(typeid(double)).hash_code();
     size_t c_hash = std::type_index(typeid(dcomplex)).hash_code();
 
@@ -386,7 +428,7 @@ namespace ChronusQ {
 
  
     // dimension of 1PDM 
-    auto NB = aoints.basisSet().nBasis;
+    auto NB = this->aoints.basisSet().nBasis;
     auto NB2 = NB*NB;
 
 
@@ -578,14 +620,14 @@ namespace ChronusQ {
    *  \brief Reads in MOs from bin file. 
    *
    **/
-  template <typename T>
-  void SingleSlater<T>::ReadGuessMO() {
+  template <typename MatsT, typename IntsT>
+  void SingleSlater<MatsT,IntsT>::ReadGuessMO() {
 
     if( printLevel > 0 )
       std::cout << "    * Reading in guess orbitals from file "
         << savFile.fName() << "\n";
  
-    size_t t_hash = std::type_index(typeid(T)).hash_code();
+    size_t t_hash = std::type_index(typeid(MatsT)).hash_code();
     size_t d_hash = std::type_index(typeid(double)).hash_code();
     size_t c_hash = std::type_index(typeid(dcomplex)).hash_code();
 
@@ -616,7 +658,7 @@ namespace ChronusQ {
     }
 
     // dimension of mo1 and mo2
-    auto NB = this->nC * aoints.basisSet().nBasis;
+    auto NB = this->nC * this->aoints.basisSet().nBasis;
     auto NB2 = NB*NB;
 
     auto MO1dims = savFile.getDims( "SCF/MO1" );

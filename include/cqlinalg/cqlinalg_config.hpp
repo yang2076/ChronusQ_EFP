@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -29,8 +29,33 @@
 // Choose linear algebra headers
 #ifdef _CQ_MKL
   #define MKL_Complex16 dcomplex // Redefine MKL complex type
+  #define MKL_Complex8  std::complex<float> // Redefine MKL complex type
   #include <mkl.h> // MKL
+
+  #ifdef CQ_ENABLE_MPI
+    #include <mkl_blacs.h>  
+    #include <mkl_scalapack.h>  
+    #include <mkl_pblas.h>
+
+    #define CXXBLACS_BLACS_Complex16 double
+    #define CXXBLACS_BLACS_Complex8  float
+    
+    #define CXXBLACS_HAS_BLACS
+    #define CXXBLACS_HAS_PBLAS
+    #define CXXBLACS_HAS_SCALAPACK
+  #endif
 #else
+
+  #ifdef CQ_ENABLE_MPI
+//  #error CXXBLAS + nonMKL Not Tested!
+  #endif
+
+  #define CXXBLACS_HAS_BLAS
+  #define CXXBLACS_BLAS_Complex16 double
+  #define CXXBLACS_BLAS_Complex8  float
+  //#define CXXBLACS_LAPACK_Complex16 double
+  //#define CXXBLACS_LAPACK_Complex8  float
+
   // Redefine OpenBLAS complex type
   #define lapack_complex_float std::complex<float> 
   #define lapack_complex_double dcomplex 
@@ -42,6 +67,13 @@
     int openblas_get_num_threads();
   }
 
+#endif
+
+#ifdef CQ_ENABLE_MPI
+  #define CXXBLACS_HAS_LAPACK
+  #include <cxxblacs.hpp>
+#else
+  #define CB_INT size_t
 #endif
 
 #include <memmanager.hpp>

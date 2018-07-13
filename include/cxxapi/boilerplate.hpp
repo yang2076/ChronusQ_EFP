@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -53,7 +53,22 @@ namespace ChronusQ {
     generateFmTTable();
     // SS end
 
+    // Parallelism
+
+    // SMP
     SetNumThreads(1);
+
+    // MPI
+#ifdef CQ_ENABLE_MPI
+  #ifdef _OPENMP
+    int mpi_th_support;
+    MPI_Init_thread(NULL,NULL,MPI_THREAD_MULTIPLE,&mpi_th_support);
+    assert(mpi_th_support == MPI_THREAD_MULTIPLE);
+  #else
+    MPI_Init(NULL,NULL);
+  #endif
+#endif
+    
 
     H5::Exception::dontPrint();
 
@@ -69,6 +84,11 @@ namespace ChronusQ {
 
     // Finalize libint2 env
     libint2::finalize();
+
+    // MPI
+#ifdef CQ_ENABLE_MPI
+    MPI_Finalize();
+#endif
 
   }; // finalize
 

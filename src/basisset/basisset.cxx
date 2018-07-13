@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -32,66 +32,6 @@
 
 namespace ChronusQ {
 
-  // Basis set keyword map
-  // TODO: Keywords for the Sapporo sets
-  std::unordered_map<std::string,std::string> basisKeyword = {
-    {  "STO-3G"         , "sto3g.gbs"                     },
-    {  "STO-6G"         , "sto6g.gbs"                     },
-    {  "3-21G"          , "3-21g.gbs"                     },
-    {  "4-31G"          , "4-31g.gbs"                     },
-    {  "6-31G"          , "6-31g.gbs"                     },
-    {  "6-31G(D)"       , "6-31g*.gbs"                    },
-    {  "6-31++G(D)"     , "6-31++g*.gbs"                  },
-    {  "6-311G"         , "6-311g.gbs"                    },
-    {  "6-311+G(D)"     , "6-311+g*.gbs"                  },
-    {  "6-311+G(D,P)"   , "6-311+g**.gbs"                 },
-    {  "6-311+G(2D,P)"  , "6-311+g_2d_p.gbs"              },
-    {  "CC-PVDZ"        , "cc-pvdz.gbs"                   },
-    {  "CC-PVTZ"        , "cc-pvtz.gbs"                   },
-    {  "CC-PVQZ"        , "cc-pvqz.gbs"                   },
-    {  "CC-PV5Z"        , "cc-pv5z.gbs"                   },
-    {  "CC-PV6Z"        , "cc-pv6z.gbs"                   },
-    {  "CC-PVDZ-RI"     , "cc-pvdz_ri.gbs"                },
-    {  "DEF2-SVP"       , "def2-svp.gbs"                  },
-    {  "DEF2-SVPD"      , "def2-svpd.gbs"                 },
-    {  "DEF2-TZVP"      , "def2-tzvp.gbs"                 },
-    {  "SAPPORO-DKH3-DZP-2012-ALL" , "sapporo-dkh3-dzp-2012_all.gbs" },
-    {  "SAPPORO-DKH3-DZP-2012-NO"  , "sapporo-dkh3-dzp-2012_no.gbs"  },
-    {  "SAPPORO-DKH3-DZP-2012-SP"  , "sapporo-dkh3-dzp-2012_sp.gbs"  },
-    {  "SAPPORO-DKH3-DZP-ALL"      , "sapporo-dkh3-dzp_all.gbs"      },
-    {  "SAPPORO-DKH3-DZP-NO"       , "sapporo-dkh3-dzp_no.gbs"       },
-    {  "SAPPORO-DKH3-DZP-SP"       , "sapporo-dkh3-dzp_sp.gbs"       },
-    {  "SAPPORO-DKH3-QZP-2012-ALL" , "sapporo-dkh3-qzp-2012_all.gbs" },
-    {  "SAPPORO-DKH3-QZP-2012-NO"  , "sapporo-dkh3-qzp-2012_no.gbs"  },
-    {  "SAPPORO-DKH3-QZP-2012-SP"  , "sapporo-dkh3-qzp-2012_sp.gbs"  },
-    {  "SAPPORO-DKH3-QZP-ALL"      , "sapporo-dkh3-qzp_all.gbs"      },
-    {  "SAPPORO-DKH3-QZP-NO"       , "sapporo-dkh3-qzp_no.gbs"       },
-    {  "SAPPORO-DKH3-QZP-SP"       , "sapporo-dkh3-qzp_sp.gbs"       },
-    {  "SAPPORO-DKH3-TZP-2012-ALL" , "sapporo-dkh3-tzp-2012_all.gbs" },
-    {  "SAPPORO-DKH3-TZP-2012-NO"  , "sapporo-dkh3-tzp-2012_no.gbs"  },
-    {  "SAPPORO-DKH3-TZP-2012-SP"  , "sapporo-dkh3-tzp-2012_sp.gbs"  },
-    {  "SAPPORO-DKH3-TZP-ALL"      , "sapporo-dkh3-tzp_all.gbs"      },
-    {  "SAPPORO-DKH3-TZP-NO"       , "sapporo-dkh3-tzp_no.gbs"       },
-    {  "SAPPORO-DKH3-TZP-SP"       , "sapporo-dkh3-tzp_sp.gbs"       },
-    {  "SAPPORO-DZP-2012-ALL"      , "sapporo-dzp-2012_all.gbs"      },
-    {  "SAPPORO-DZP-2012-NO"       , "sapporo-dzp-2012_no.gbs"       },
-    {  "SAPPORO-DZP-2012-SP"       , "sapporo-dzp-2012_sp.gbs"       },
-    {  "SAPPORO-DZP-ALL"           , "sapporo-dzp_all.gbs"           },
-    {  "SAPPORO-DZP-NO"            , "sapporo-dzp_no.gbs"            },
-    {  "SAPPORO-DZP-SP"            , "sapporo-dzp_sp.gbs"            },
-    {  "SAPPORO-QZP-2012-ALL"      , "sapporo-qzp-2012_all.gbs"      },
-    {  "SAPPORO-QZP-2012-NO"       , "sapporo-qzp-2012_no.gbs"       },
-    {  "SAPPORO-QZP-2012-SP"       , "sapporo-qzp-2012_sp.gbs"       },
-    {  "SAPPORO-QZP-ALL"           , "sapporo-qzp_all.gbs"           },
-    {  "SAPPORO-QZP-NO"            , "sapporo-qzp_no.gbs"            },
-    {  "SAPPORO-QZP-SP"            , "sapporo-qzp_sp.gbs"            },
-    {  "SAPPORO-TZP-2012-ALL"      , "sapporo-tzp-2012_all.gbs"      },
-    {  "SAPPORO-TZP-2012-NO"       , "sapporo-tzp-2012_no.gbs"       },
-    {  "SAPPORO-TZP-2012-SP"       , "sapporo-tzp-2012_sp.gbs"       },
-    {  "SAPPORO-TZP-ALL"           , "sapporo-tzp_all.gbs"           },
-    {  "SAPPORO-TZP-NO"            , "sapporo-tzp_no.gbs"            },
-    {  "SAPPORO-TZP-SP"            , "sapporo-tzp_sp.gbs"            }
-  };
 
 
   /**
@@ -106,8 +46,9 @@ namespace ChronusQ {
    *  \param [in] mol       Molecule for which to construct the BasisSet
    */
   BasisSet::BasisSet(std::string _basisName, const Molecule &mol,
-    bool _forceCart, bool doPrint) {
+    BASIS_FUNCTION_TYPE _basisType, bool _forceCart, bool doPrint) {
 
+    basisType = _basisType;
     forceCart = _forceCart;
     basisName = _basisName;
 
@@ -316,6 +257,22 @@ namespace ChronusQ {
   }; // BasisSet::uncontractShells
 
 
+  std::shared_ptr<BasisSet> BasisSet::uncontractBasis() {
+
+
+    // Copy basis
+    std::shared_ptr<BasisSet> newBasis = std::make_shared<BasisSet>(*this);
+
+    newBasis->shells = this->uncontractShells();
+    newBasis->update();
+
+    return newBasis;
+
+  };
+
+
+
+
   void BasisSet::makeMapPrim2Cont(double *SUn, double *MAP, CQMemManager &mem) {
 
     memset(MAP,0,nPrimitive * nBasis * sizeof(double));
@@ -336,16 +293,14 @@ namespace ChronusQ {
 
     } // loop over shells
 
-
  
     // Compute SUn * MAP
     double *SCR = mem.malloc<double>(nBasis*nPrimitive);
-    Gemm('N','T',nPrimitive,nBasis,nPrimitive,1.,SUn,nPrimitive,
-      MAP,nBasis,0.,SCR,nPrimitive);
+    Gemm('N','T',nPrimitive,nBasis,nPrimitive,static_cast<double>(1.),SUn,nPrimitive,
+      MAP,nBasis,static_cast<double>(0.),SCR,nPrimitive);
 
-    // Create the Libint2 Engine and set the precision
-    libint2::Engine engine(libint2::Operator::overlap,
-      maxPrim, maxL, 0);
+
+    libint2::Engine engine(libint2::Operator::overlap,maxPrim, maxL, 0);
     engine.set_precision(0.);
 
     const auto& buf_vec = engine.results();
@@ -382,7 +337,6 @@ namespace ChronusQ {
     mem.free(SCR);
 
   };  // BasisSet::makeMapPrim2Cont
-
 
   void ShellPairData::computeShellPairs(std::vector<libint2::Shell> &shs, 
       std::vector<size_t> &mapSh2Cen, size_t maxNPrim, size_t maxL, 
@@ -587,6 +541,7 @@ void pop_car2sph_matrix() {
   double scalecoeff;
 
   for ( int L = 0 ; L <= LIBINT2_MAX_AM ; L++ ) {
+
     carsize = (L+1)*(L+2)/2;
     car2sph_matrix.emplace_back((2*L+1)*carsize, 0.0);
     if ( L==0 ){
@@ -627,7 +582,8 @@ void pop_car2sph_matrix() {
 
 } //pop_car2sph_matrix()
 
-void cart2sph_transform( int l_i, int l_j, std::vector<double> &shell_element_sph, std::vector<double> &shell_element_cart) {
+void cart2sph_transform( int l_i, int l_j, std::vector<double> &shell_element_sph, 
+  std::vector<double> &shell_element_cart) {
 
   int cart_i = (l_i+1)*(l_i+2)/2;
   int cart_j = (l_j+1)*(l_j+2)/2;
@@ -706,6 +662,148 @@ void cart2sph_transform( int l_i, int l_j, std::vector<double> &shell_element_sp
     return shellpairs;
 
   } // genorderedShellPairs 
+
+
+
+
+
+
+
+
+
+
+
+void cart2sph_complex_transform( int l_i, int l_j, 
+  std::vector<dcomplex> &shell_element_sph, std::vector<dcomplex> &shell_element_cart) {
+
+  int cart_i = (l_i+1)*(l_i+2)/2;
+  int cart_j = (l_j+1)*(l_j+2)/2;
+  int cartsize = cart_i*cart_j;
+  int sphsize  = (2*l_i+1)*(2*l_j+1);
+  dcomplex tempVal;
+
+  if (sphsize != shell_element_sph.size() )
+    std::cout<<"spherical dimension doesn't match"<<std::endl;
+  if (cartsize != shell_element_cart.size() )
+    std::cout<<"cartesian dimension doesn't match"<<std::endl;
+ 
+  for( int i = 0 ; i<2*l_i+1 ; i++  ) {
+    for( int j = 0 ; j<2*l_j+1 ; j++ ) {
+      tempVal = 0.0;
+      for( int p = 0 ; p<cart_i ; p++ ) {
+        for( int q = 0 ; q<cart_j ; q++ ) {
+          tempVal += car2sph_matrix[l_i][i*cart_i+p]*car2sph_matrix[l_j][j*cart_j+q]
+                     *shell_element_cart[p*cart_j+q];
+        }
+      }
+
+    if (std::abs(tempVal)<1.0e-15) tempVal=0.0;
+    shell_element_sph[i*(2*l_j+1)+j] = tempVal;
+    }
+  }   
+} //cart2sph_complex_transform   
+
+void cart2sph_2e_transform( int l_i, int l_j, int l_k, int l_l, 
+  std::vector<double> &shell_element_sph, std::vector<double> &shell_element_cart) {
+
+  int cart_i = (l_i+1)*(l_i+2)/2;
+  int cart_j = (l_j+1)*(l_j+2)/2;
+  int cart_k = (l_k+1)*(l_k+2)/2;
+  int cart_l = (l_l+1)*(l_l+2)/2;
+
+  int cartsize = cart_i*cart_j*cart_k*cart_l;
+  int sphsize  = (2*l_i+1)*(2*l_j+1)*(2*l_k+1)*(2*l_l+1);
+  double tempVal;
+
+
+  if (sphsize != shell_element_sph.size() )
+    std::cout<<"spherical dimension doesn't match"<<std::endl;
+  if (cartsize != shell_element_cart.size() )
+    std::cout<<"cartesian dimension doesn't match"<<std::endl;
+
+ 
+  for( int i = 0 ; i<2*l_i+1 ; i++  ) {
+    for( int j = 0 ; j<2*l_j+1 ; j++ ) {
+      for( int k = 0 ; k<2*l_k+1 ; k++  ) {
+        for( int l = 0 ; l<2*l_l+1 ; l++  ) {
+          tempVal = 0.0;
+          for( int p = 0 ; p<cart_i ; p++ ) {
+            for( int q = 0 ; q<cart_j ; q++ ) {
+              for( int r = 0 ; r<cart_k ; r++ ) {
+                for( int s = 0 ; s<cart_l ; s++ ) {
+                  tempVal += car2sph_matrix[l_i][i*cart_i+p]
+                            *car2sph_matrix[l_j][j*cart_j+q]
+                            *car2sph_matrix[l_k][k*cart_k+r]
+                            *car2sph_matrix[l_l][l*cart_l+s]
+                            // *shell_element_cart[p*cart_j+q]
+                            *shell_element_cart[p*cart_j*cart_k*cart_l
+                                          +q*cart_k*cart_l+r*cart_l+s];
+                } // for s
+              }  // for r
+            }   // for q
+          }    // for p
+
+          if (std::abs(tempVal)<1.0e-15) tempVal=0.0;
+          shell_element_sph[i*(2*l_j+1)*(2*l_k+1)*(2*l_l+1) + j*(2*l_k+1)*(2*l_l+1)
+                            + k*(2*l_l+1) + l ] = tempVal;
+
+        }  // for l
+      }   // for k
+    }    // for j
+  }     // for i
+} // cart2sph_2e_transform   
+
+
+void cart2sph_complex_2e_transform( int l_i, int l_j, int l_k, int l_l, 
+  std::vector<dcomplex> &shell_element_sph, std::vector<dcomplex> &shell_element_cart) {
+
+  int cart_i = (l_i+1)*(l_i+2)/2;
+  int cart_j = (l_j+1)*(l_j+2)/2;
+  int cart_k = (l_k+1)*(l_k+2)/2;
+  int cart_l = (l_l+1)*(l_l+2)/2;
+
+  int cartsize = cart_i*cart_j*cart_k*cart_l;
+  int sphsize  = (2*l_i+1)*(2*l_j+1)*(2*l_k+1)*(2*l_l+1);
+  dcomplex tempVal;
+
+
+  if (sphsize != shell_element_sph.size() )
+    std::cout<<"spherical dimension doesn't match"<<std::endl;
+  if (cartsize != shell_element_cart.size() )
+    std::cout<<"cartesian dimension doesn't match"<<std::endl;
+
+ 
+  for( int i = 0 ; i<2*l_i+1 ; i++  ) {
+    for( int j = 0 ; j<2*l_j+1 ; j++ ) {
+      for( int k = 0 ; k<2*l_k+1 ; k++  ) {
+        for( int l = 0 ; l<2*l_l+1 ; l++  ) {
+          tempVal = 0.0;
+          for( int p = 0 ; p<cart_i ; p++ ) {
+            for( int q = 0 ; q<cart_j ; q++ ) {
+              for( int r = 0 ; r<cart_k ; r++ ) {
+                for( int s = 0 ; s<cart_l ; s++ ) {
+                  tempVal +=
+                            shell_element_cart[p*cart_j*cart_k*cart_l
+                                          +q*cart_k*cart_l+r*cart_l+s]
+                            *car2sph_matrix[l_i][i*cart_i+p]
+                            *car2sph_matrix[l_j][j*cart_j+q]
+                            *car2sph_matrix[l_k][k*cart_k+r]
+                            *car2sph_matrix[l_l][l*cart_l+s];
+                            // *shell_element_cart[p*cart_j+q]
+                } // for s
+              }  // for r
+            }   // for q
+          }    // for p
+
+          if (std::abs(tempVal)<1.0e-15) tempVal=0.0;
+          shell_element_sph[i*(2*l_j+1)*(2*l_k+1)*(2*l_l+1) + j*(2*l_k+1)*(2*l_l+1)
+                            + k*(2*l_l+1) + l ] = tempVal;
+
+        }  // for l
+      }   // for k
+    }    // for j
+  }     // for i
+} // cart2sph_complex_2e_transform   
 
 }; // namespace ChronusQ
 

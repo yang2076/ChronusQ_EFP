@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -25,7 +25,10 @@
 #define __INCLUDED_QUANTUM_BASE_HPP__
 
 #include <chronusq_sys.hpp>
+
 #include <util/typedefs.hpp>
+#include <util/mpi.hpp>
+
 #include <memmanager.hpp>
 #include <cqlinalg/blas1.hpp>
 
@@ -43,7 +46,9 @@ namespace ChronusQ {
   template <typename RetTyp, typename Left, typename Right>
   static inline RetTyp OperatorTrace(size_t N, const Left& op1 , 
     const Right& op2) {
+        
     return InnerProd<RetTyp>(N,op1,1,op2,1);
+
   } 
 
   /**
@@ -59,6 +64,8 @@ namespace ChronusQ {
   protected:
   private:
   public:
+
+    MPI_Comm      comm; ///< MPI Communicator
 
     CQMemManager& memManager; ///< Memory manager for matrix allocation
 
@@ -101,8 +108,8 @@ namespace ChronusQ {
      *  \param [in] _iCS  Whether or not system is closed shell
      *                    (only used when _nC == 1)
      */ 
-    QuantumBase(CQMemManager &mem, size_t _nC, bool _iCS): 
-      memManager(mem), nC(_nC), iCS(_iCS), 
+    QuantumBase(MPI_Comm c, CQMemManager &mem, size_t _nC, bool _iCS): 
+      memManager(mem), nC(_nC), iCS(_iCS), comm(c),
       elecDipole({0.,0.,0.}),
       elecQuadrupole{{{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}},
       elecOctupole{
@@ -133,15 +140,28 @@ namespace ChronusQ {
      *  field terms
      */ 
     void computeEnergy(EMPerturbation &pert){
+
+      ROOT_ONLY(comm);
+
       computeEnergy();
 
-      double delta(0);
-      if(pert.fields.size() != 0) {
-        auto dipole = pert.getAmp();
-        delta += InnerProd<double>(3,&dipole[0],1,&elecDipole[0],1);
-      };
 
-      totalEnergy += delta; // Increment total energy
+      // Field contributions to the energy
+      double field_delta(0.);
+
+      // Purely magnetic field contributions here
+      auto magDipoleField = pert.getDipoleAmp(Magnetic);
+
+
+      // Purely electric field contributions here
+      auto elecDipoleField = pert.getDipoleAmp(Electric);
+      field_delta += 
+        elecDipoleField[0] * elecDipole[0] +
+        elecDipoleField[1] * elecDipole[1] +
+        elecDipoleField[2] * elecDipole[2];
+
+
+      totalEnergy += field_delta; // Increment total energy
 
     };
 
@@ -153,10 +173,14 @@ namespace ChronusQ {
 
 
     inline void computeProperties(EMPerturbation &pert) {
+
+      ROOT_ONLY(comm);
+
       computeMultipole(pert);
       computeEnergy(pert);
       computeSpin();
       methodSpecificProperties();
+
     };
     
 

@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you ca redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -36,14 +36,18 @@
 // explicit pointers
 #define SingleSlater_COLLECTIVE_OP(OP_OP,OP_VEC_OP) \
   /* Handle Operators */\
-  OP_VEC_OP(T,this,other,memManager,fock); \
-  OP_VEC_OP(T,this,other,memManager,fockOrtho); \
-  OP_OP(double,this,other,memManager,JScalar); \
-  OP_VEC_OP(T,this,other,memManager,K); \
-  OP_VEC_OP(T,this,other,memManager,GD);\
-  OP_VEC_OP(T,this,other,memManager,onePDMOrtho);\
-  OP_VEC_OP(T,this,other,memManager,curOnePDM);\
-  OP_VEC_OP(T,this,other,memManager,deltaOnePDM);
+  OP_VEC_OP(MatsT,this,other,memManager,fockMatrix); \
+  OP_VEC_OP(MatsT,this,other,memManager,fockMatrixOrtho); \
+  OP_OP(MatsT,this,other,memManager,coulombMatrix); \
+  OP_VEC_OP(MatsT,this,other,memManager,exchangeMatrix); \
+  OP_VEC_OP(MatsT,this,other,memManager,twoeH);\
+  OP_VEC_OP(MatsT,this,other,memManager,onePDMOrtho);\
+  OP_VEC_OP(MatsT,this,other,memManager,curOnePDM);\
+  OP_VEC_OP(MatsT,this,other,memManager,deltaOnePDM);\
+  OP_OP(MatsT,this,other,memManager,ortho1);\
+  OP_OP(MatsT,this,other,memManager,ortho2);\
+  OP_VEC_OP(MatsT,this,other,memManager,coreH);\
+  OP_VEC_OP(MatsT,this,other,memManager,coreHPerturbed);
 
 namespace ChronusQ {
 
@@ -55,23 +59,24 @@ namespace ChronusQ {
    *  \param [in] dummy Dummy argument to fix calling signature for delegation 
    *    to copy constructor
    */ 
-  template <typename T>
-  template <typename U>
-  SingleSlater<T>::SingleSlater(const SingleSlater<U> &other,int dummy) : 
+  template <typename MatsT, typename IntsT>
+  template <typename MatsU> 
+  SingleSlater<MatsT,IntsT>::SingleSlater(const SingleSlater<MatsU,IntsT> &other,int dummy) : 
+    //orthoType(other.orthoType),coreType(other.coreType),
     QuantumBase(dynamic_cast<const QuantumBase&>(other)),
     WaveFunctionBase(dynamic_cast<const WaveFunctionBase&>(other)),
     SingleSlaterBase(dynamic_cast<const SingleSlaterBase&>(other)),
-    WaveFunction<T>(dynamic_cast<const WaveFunction<U>&>(other)) {
+    WaveFunction<MatsT,IntsT>(dynamic_cast<const WaveFunction<MatsU,IntsT>&>(other)) {
 
 #ifdef _SingleSlaterDebug
-    std::cout << "SingleSlater<T>::SingleSlater(const SingleSlater<U>&) "
+    std::cout << "SingleSlater<MatsT>::SingleSlater(const SingleSlater<U>&) "
               << "(this = " << this << ", other = " << &other << ")" 
               << std::endl;
 #endif
 
     SingleSlater_COLLECTIVE_OP(COPY_OTHER_MEMBER_OP, COPY_OTHER_MEMBER_VEC_OP);
 
-  }; // SingleSlater<T>::SingleSlater(const SingleSlater<U> &)
+  }; // SingleSlater<MatsT>::SingleSlater(const SingleSlater<U> &)
 
 
 
@@ -85,68 +90,70 @@ namespace ChronusQ {
    *  \param [in] dummy Dummy argument to fix calling signature for delegation 
    *    to move constructor
    */ 
-  template <typename T>
-  template <typename U>
-  SingleSlater<T>::SingleSlater(SingleSlater<U> &&other,int dummy) : 
+  template <typename MatsT, typename IntsT>
+  template <typename MatsU> 
+  SingleSlater<MatsT,IntsT>::SingleSlater(SingleSlater<MatsU,IntsT> &&other,int dummy) : 
+    //orthoType(other.orthoType),coreType(other.coreType),
     QuantumBase(dynamic_cast<QuantumBase&&>(std::move(other))),
     WaveFunctionBase(dynamic_cast<WaveFunctionBase&&>(std::move(other))),
     SingleSlaterBase(dynamic_cast<SingleSlaterBase&&>(std::move(other))),
-    WaveFunction<T>(dynamic_cast<WaveFunction<U>&&>(std::move(other))) {
+    WaveFunction<MatsT,IntsT>(dynamic_cast<WaveFunction<MatsU,IntsT>&&>(std::move(other))) {
 
 #ifdef _SingleSlaterDebug
-    std::cout << "SingleSlater<T>::SingleSlater(SingleSlater<U>&&) "
+    std::cout << "SingleSlater<MatsT>::SingleSlater(SingleSlater<U>&&) "
               << "(this = " << this << ", other = " << &other << ")" 
               << std::endl;
 #endif
 
     SingleSlater_COLLECTIVE_OP(MOVE_OTHER_MEMBER_OP, MOVE_OTHER_MEMBER_VEC_OP);
 
-  }; // SingleSlater<T>::SingleSlater(SingleSlater<U> &&)
+  }; // SingleSlater<MatsT>::SingleSlater(SingleSlater<U> &&)
 
 
   // Delagate the copy constructor to the conversion constructors
-  template <typename T>
-  SingleSlater<T>::SingleSlater(const SingleSlater<T> &other) : 
+  template <typename MatsT, typename IntsT>
+  SingleSlater<MatsT,IntsT>::SingleSlater(const SingleSlater<MatsT,IntsT> &other) : 
     SingleSlater(other,0){ };
-  template <typename T>
-  SingleSlater<T>::SingleSlater(SingleSlater<T> &&other) : 
+  template <typename MatsT, typename IntsT>
+  SingleSlater<MatsT,IntsT>::SingleSlater(SingleSlater<MatsT,IntsT> &&other) : 
     SingleSlater(std::move(other),0){ };
-
-
 
 
   /**
    *  Allocates the internal memory a SingleSlater object
    */ 
-  template <typename T>
-  void SingleSlater<T>::alloc() {
+  template <typename MatsT, typename IntsT>
+  void SingleSlater<MatsT,IntsT>::alloc() {
 
 #ifdef _SingleSlaterDebug
     std::cout << "SingleSlater::alloc (this = " << this << ")" << std::endl;
 #endif
 
-    size_t NB = aoints.basisSet().nBasis;
+    size_t NB = this->aoints.basisSet().nBasis;
 
-    SPIN_OPERATOR_ALLOC(NB,fock);
-    SPIN_OPERATOR_ALLOC(NB,fockOrtho);
-    SPIN_OPERATOR_ALLOC(NB,K);
-    SPIN_OPERATOR_ALLOC(NB,GD);
+    SPIN_OPERATOR_ALLOC(NB,fockMatrix);
+    SPIN_OPERATOR_ALLOC(NB,fockMatrixOrtho);
+    SPIN_OPERATOR_ALLOC(NB,exchangeMatrix);
+    SPIN_OPERATOR_ALLOC(NB,twoeH);
     SPIN_OPERATOR_ALLOC(NB,onePDMOrtho);
+    //SPIN_OPERATOR_ALLOC(NB,coreH);
+    //SPIN_OPERATOR_ALLOC(NB,coreHPerturbed);
+//    SPIN_OPERATOR_ALLOC(NB,ortho1);
+//    SPIN_OPERATOR_ALLOC(NB,ortho2);
 
-    // J only has a scalar component
-    JScalar = memManager.template malloc<double>(NB*NB);
+    coulombMatrix = memManager.template malloc<MatsT>(NB*NB);
 
     SPIN_OPERATOR_ALLOC(NB,curOnePDM);
     SPIN_OPERATOR_ALLOC(NB,deltaOnePDM);
 
-  }; // SingleSlater<T>::alloc
+  }; // SingleSlater<MatsT>::alloc
 
 
   /**
    *  Deallocates the internal memory a SingleSlater object
    */ 
-  template <typename T>
-  void SingleSlater<T>::dealloc() {
+  template <typename MatsT, typename IntsT>
+  void SingleSlater<MatsT,IntsT>::dealloc() {
 
 #ifdef _SingleSlaterDebug
     std::cout << "SingleSlater::dealloc (this = " << this << ")" << std::endl;
@@ -154,20 +161,26 @@ namespace ChronusQ {
 
     SingleSlater_COLLECTIVE_OP(DEALLOC_OP_5, DEALLOC_VEC_OP_5);
 
-  }; // SingleSlater<T>::dealloc
+  }; // SingleSlater<MatsT>::dealloc
 
 }; // namespace ChronusQ
 
 
 // Other implementation files
-#include <singleslater/quantum.hpp> // Quantum declarations
-#include <singleslater/fock.hpp>    // Fock matrix header
-#include <singleslater/guess.hpp>   // Guess header
-#include <singleslater/scf.hpp>     // SCF header
-#include <singleslater/extrap.hpp>  // Extrapolate header
-#include <singleslater/print.hpp>   // Print header
-#include <singleslater/pop.hpp>     // Population analysis
+#include <singleslater/quantum.hpp>   // Quantum declarations
+#include <singleslater/fock.hpp>      // Fock matrix header
+#include <singleslater/guess.hpp>     // Guess header
+#include <singleslater/scf.hpp>       // SCF header
+#include <singleslater/extrap.hpp>    // Extrapolate header
+#include <singleslater/print.hpp>     // Print header
+#include <singleslater/pop.hpp>       // Population analysis
 
 #include <singleslater/kohnsham/impl.hpp> // KS headers
+#include <singleslater/kohnsham/fxc.hpp> // KS headers
+#include <singleslater/ortho.hpp>
+
+#include <singleslater/hartreefock/scf.hpp> 
+#include <singleslater/kohnsham/scf.hpp>  
+
 
 #endif

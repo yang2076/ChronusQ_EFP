@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -49,5 +49,39 @@ namespace ChronusQ {
 
     return INFO;
   }; // LinSolve (complex)
+
+
+
+  // Real wraps DTRSM
+  template <>
+  void TriLinSolve(char SIDE, char UPLO, char TRANS, char DIAG, int M, int N, 
+    double ALPHA, double *A, int LDA, double *B, int LDB){
+
+#ifdef _CQ_MKL
+    dtrsm(&SIDE,&UPLO,&TRANS,&DIAG,&M,&N,&ALPHA,A,&LDA,B,&LDB);
+#else
+    dtrsm_(&SIDE,&UPLO,&TRANS,&DIAG,&M,&N,&ALPHA,A,&LDA,B,&LDB);
+#endif
+
+  }; // TriLinSolve (real)
+
+
+  // Complex wraps ZTRSM
+  template <>
+  void TriLinSolve(char SIDE, char UPLO, char TRANS, char DIAG, int M, int N, 
+    dcomplex ALPHA, dcomplex *A, int LDA, dcomplex *B, int LDB){
+
+#ifdef _CQ_MKL
+    ztrsm(&SIDE,&UPLO,&TRANS,&DIAG,&M,&N,&ALPHA,A,&LDA,B,&LDB);
+#else
+    ztrsm_(&SIDE,&UPLO,&TRANS,&DIAG,&M,&N,reinterpret_cast<double*>(&ALPHA),
+      reinterpret_cast<double*>(A),&LDA,reinterpret_cast<double*>(B),&LDB);
+#endif
+
+  }; // TriLinSolve (complex)
+
+
+
+
 
 }; // namespace ChronusQ

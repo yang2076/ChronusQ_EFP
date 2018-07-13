@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -60,29 +60,100 @@ namespace ChronusQ {
 #ifdef _CQ_MKL
     dzgemm(&TRANSA,&TRANSB,&M,&N,&K,&ALPHA,A,&LDA,B,&LDB,&BETA,C,&LDC);
 #else
-    assert( TRANSA == 'N' and (TRANSB == 'N' or TRANSB == 'C') );
+    assert( (TRANSA == 'N' or TRANSA == 'C') and (TRANSB == 'N' or TRANSB == 'C') );
 
+    int COLS_A = (TRANSA == 'N') ? K : N;
     int COLS_B = (TRANSB == 'N') ? N : K;
 
     Eigen::Map<
       Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor>
-    > AMap(A,LDA,K);
+    > AMap(A,LDA,COLS_A);
 
     Eigen::Map<
       Eigen::Matrix<dcomplex,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor>
     > BMap(B,LDB,COLS_B), CMap(C,LDC,N);
 
-    if(TRANSB == 'N')
-      CMap.block(0,0,M,N).noalias() = 
-        AMap.block(0,0,M,K).cast<dcomplex>() *
-        BMap.block(0,0,K,N);
-    else
-      CMap.block(0,0,M,N).noalias() = 
-        AMap.block(0,0,M,K).cast<dcomplex>() *
-        BMap.block(0,0,N,K).adjoint();
+    if(TRANSB == 'N') {
+      if(TRANSA == 'N')
+        CMap.block(0,0,M,N).noalias() = 
+          AMap.block(0,0,M,K).cast<dcomplex>() *
+          BMap.block(0,0,K,N);
+      else
+        CMap.block(0,0,M,N).noalias() = 
+          AMap.block(0,0,K,M).cast<dcomplex>().adjoint() *
+          BMap.block(0,0,K,N);
+    } else {
+      if(TRANSA == 'N')
+        CMap.block(0,0,M,N).noalias() = 
+          AMap.block(0,0,M,K).cast<dcomplex>() *
+          BMap.block(0,0,N,K).adjoint();
+      else
+        CMap.block(0,0,M,N).noalias() = 
+          AMap.block(0,0,K,M).cast<dcomplex>().adjoint() *
+          BMap.block(0,0,N,K).adjoint();
+    }
 #endif
 
   }; // GEMM (real,complex,complex)
+
+
+
+
+
+
+
+
+
+  template<>
+  void Trmm(char SIDE, char UPLO, char TRANSA, char DIAG, int M, int N, 
+    double ALPHA, double *A, int LDA, double *B, int LDB){
+
+#ifdef _CQ_MKL
+    dtrmm
+#else
+    dtrmm_
+#endif
+    (&SIDE,&UPLO,&TRANSA,&DIAG,&M,&N,&ALPHA,A,&LDA,B,&LDB);
+
+  }; // TRMM (real,real,real)
+
+
+  template<>
+  void Trmm(char SIDE, char UPLO, char TRANSA, char DIAG, int M, int N, 
+    dcomplex ALPHA, dcomplex *A, int LDA, dcomplex *B, int LDB) {
+
+#ifdef _CQ_MKL
+    ztrmm(&SIDE,&UPLO,&TRANSA,&DIAG,&M,&N,&ALPHA,A,&LDA,B,&LDB);
+#else
+    ztrmm_(&SIDE,&UPLO,&TRANSA,&DIAG,&M,&N,reinterpret_cast<double*>(&ALPHA),
+      reinterpret_cast<double*>(A),&LDA,reinterpret_cast<double*>(B),&LDB);
+#endif
+    
+
+  }; // TRMM (complex,complex,complex)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   /*
    *  performs one of the symmetric rank 2k operations

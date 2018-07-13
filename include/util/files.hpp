@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -37,9 +37,13 @@ inline H5::CompType H5PredType() {
     return H5::CompType(
       H5::DataType(H5::PredType::NATIVE_DOUBLE).getId()
     );
-  else if( std::is_same<size_t,T>::value ) 
+  else if( std::is_same<uint64_t,T>::value ) 
     return H5::CompType(
       H5::DataType(H5::PredType::NATIVE_UINT64).getId()
+    );
+  else if( std::is_same<int32_t,T>::value ) 
+    return H5::CompType(
+      H5::DataType(H5::PredType::NATIVE_INT32).getId()
     );
   else if( std::is_same<dcomplex,T>::value ) {
     typedef struct {

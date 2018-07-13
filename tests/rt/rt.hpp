@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -78,16 +78,16 @@ using namespace ChronusQ;
   refFile.readData("/RT/ENERGY",&yDummy[0]);\
   \
   for(auto i = 0; i < energyDim1[0]; i++) \
-    BOOST_CHECK(std::abs(xDummy[i] - yDummy[i]) < 1e-9);\
+    BOOST_CHECK_MESSAGE(std::abs(xDummy[i] - yDummy[i]) < 1e-8, std::abs(xDummy[i] - yDummy[i]));\
   \
   xDummy3.resize(dipoleDim1[0]); yDummy3.resize(dipoleDim1[0]);\
   resFile.readData("/RT/LEN_ELEC_DIPOLE",&xDummy3[0][0]);\
   refFile.readData("/RT/LEN_ELEC_DIPOLE",&yDummy3[0][0]);\
   \
   for(auto i = 0; i < energyDim1[0]; i++) {\
-    BOOST_CHECK(std::abs(xDummy3[i][0] - yDummy3[i][0]) < 1e-9);\
-    BOOST_CHECK(std::abs(xDummy3[i][1] - yDummy3[i][1]) < 1e-9);\
-    BOOST_CHECK(std::abs(xDummy3[i][2] - yDummy3[i][2]) < 1e-9);\
+    BOOST_CHECK_MESSAGE(std::abs(xDummy3[i][0] - yDummy3[i][0]) < 1e-8, std::abs(xDummy3[i][0] - yDummy3[i][0]));\
+    BOOST_CHECK_MESSAGE(std::abs(xDummy3[i][1] - yDummy3[i][1]) < 1e-8, std::abs(xDummy3[i][1] - yDummy3[i][1]));\
+    BOOST_CHECK_MESSAGE(std::abs(xDummy3[i][2] - yDummy3[i][2]) < 1e-8, std::abs(xDummy3[i][2] - yDummy3[i][2]));\
   }
 
 #endif

@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -236,9 +236,9 @@ namespace ChronusQ {
                       const shell_set &,
                       libint2::ShellPair&,libint2::Shell&,libint2::Shell&
                     )
-                > (&AOIntegrals::computePotentialV),this,molecule_.chargeDist,
-                          std::placeholders::_1, std::placeholders::_2,
-                          std::placeholders::_3),
+                > (&AOIntegrals::computePotentialV),this,
+                          molecule_.chargeDist,  std::placeholders::_1, 
+                          std::placeholders::_2, std::placeholders::_3),
                 basisSet_.shells);
 
 ;
@@ -287,10 +287,12 @@ namespace ChronusQ {
     kinetic   = _kinetic[0];
     potential = _potential[0];
 
-    magDipole = { _L[0], _L[1], _L[2] };
+    std::copy(_L.begin() ,_L.end() ,std::back_inserter(magDipole));
+    std::copy(_M2.begin(),_M2.end(),std::back_inserter(magQuadrupole));
 
-    // FIXME: Save velocity gague integrals!
-
+    std::copy(_E1V.begin(),_E1V.end(),std::back_inserter(velElecDipole));
+    std::copy(_E2V.begin(),_E2V.end(),std::back_inserter(velElecQuadrupole));
+    std::copy(_E3V.begin(),_E3V.end(),std::back_inserter(velElecOctupole));
 
     // Compute Orthonormalization trasformations
     computeOrtho();
@@ -331,12 +333,37 @@ namespace ChronusQ {
           octupoleList[i], lenElecOctupole[i], {NB,NB} );
 
 
+
+
+
       // Magnetic Dipole
       for(auto i = 0; i < 3; i++)
         savFile.safeWriteData("INTS/MAG_DIPOLE_" + 
           dipoleList[i], magDipole[i], {NB,NB} );
 
-      // FIXME: Write valocity gauge integrals!
+      // Magnetic Quadrupole
+      for(auto i = 0; i < 6; i++)
+        savFile.safeWriteData("INTS/MAG_QUADRUPOLE_" + 
+          quadrupoleList[i], magQuadrupole[i], {NB,NB} );
+
+
+
+
+
+      // Velocity Gauge electric dipole
+      for(auto i = 0; i < 3; i++)
+        savFile.safeWriteData("INTS/ELEC_DIPOLE_VEL_" + 
+          dipoleList[i], velElecDipole[i], {NB,NB} );
+
+      // Velocity Gauge electric quadrupole
+      for(auto i = 0; i < 6; i++)
+        savFile.safeWriteData("INTS/ELEC_QUADRUPOLE_VEL_" + 
+          quadrupoleList[i], velElecQuadrupole[i], {NB,NB} );
+
+      // Velocity Gauge electric octupole
+      for(auto i = 0; i < 10; i++)
+        savFile.safeWriteData("INTS/ELEC_OCTUPOLE_VEL_" + 
+          octupoleList[i], velElecOctupole[i], {NB,NB} );
     }
 
   }; // AOIntegrals::computeAOOneE

@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -35,6 +35,8 @@
 #include <physcon.hpp>
 
 #include <util/threads.hpp>
+#include <util/mpi.hpp>
+
 #include <cqlinalg/cqlinalg_config.hpp>
 
 // INT_DEBUG_LEVEL == 1 - Timing
@@ -472,6 +474,8 @@ namespace ChronusQ {
 
   protected:
  
+    MPI_Comm         comm;
+
     CQMemManager     &memManager_; ///< Memory managment
     Molecule         &molecule_;   ///< Molecule object for nuclear potential
     BasisSet         &basisSet_;   ///< BasisSet for the GTO basis defintion
@@ -492,10 +496,10 @@ namespace ChronusQ {
      *  Constructs a BeckeIntegrator object from a Quadrature scheme for the
      *  radial integration
      */ 
-    BeckeIntegrator(CQMemManager &mem, Molecule &mol,BasisSet &basis, _QTyp1 g, 
-      size_t NAng, size_t NRadPerMacroBatch, SHELL_EVAL_TYPE typ, 
-      double epsScreen) :
-      memManager_(mem),molecule_(mol),basisSet_(basis),typ_(typ),
+    BeckeIntegrator(MPI_Comm c, CQMemManager &mem, Molecule &mol,
+      BasisSet &basis, _QTyp1 g, size_t NAng, size_t NRadPerMacroBatch, 
+      SHELL_EVAL_TYPE typ, double epsScreen) :
+      comm(c), memManager_(mem),molecule_(mol),basisSet_(basis),typ_(typ),
       epsScreen_(epsScreen),
       SphereIntegrator<_QTyp1>(g,NAng,{0.,0.,0.},1.,NRadPerMacroBatch),
       NDer((typ_ == GRADIENT) ? 4:1){ };
@@ -623,6 +627,10 @@ namespace ChronusQ {
 #endif
 
       size_t nthreads = GetNumThreads();
+      size_t mpiRank  = MPIRank(comm);
+      size_t mpiSize  = MPISize(comm);
+
+      assert( mpiSize <= molecule_.nAtoms );
 
       size_t maxBatchSize      = this->nRadPerMacroBatch * this->q2.nPts;
       size_t maxBatchSizeAtoms = maxBatchSize * molecule_.nAtoms;
@@ -834,6 +842,10 @@ namespace ChronusQ {
 
       // Perform integration over atomic centers, by using spherical Integrators
       for(iAtm = 0; iAtm < molecule_.nAtoms; iAtm++) {
+
+
+        // Round robin on mpi processes
+        if( iAtm % mpiSize != mpiRank ) continue;
 
         this->Center = {molecule_.atoms[iAtm].coord[0],
                         molecule_.atoms[iAtm].coord[1],

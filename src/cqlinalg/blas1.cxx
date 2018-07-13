@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -47,14 +47,32 @@ namespace ChronusQ {
   }; // InnerProd real = (real,real)
 
 
-  void DaxPy(int N, double alpha, double *X, int INCX, double *Y, int INCY) {
+  template<>
+  void AXPY(int N, double alpha, double *X, int INCX, double *Y, int INCY) {
 #ifdef _CQ_MKL
     daxpy
 #else
     daxpy_
 #endif 
       (&N,&alpha,X,&INCX,Y,&INCY);
-  }; // y <- alpha*x + y 
+  }; // AXPY (real,real)
+
+  template<>
+  void AXPY(int N, dcomplex alpha, dcomplex *X, int INCX, dcomplex *Y, int INCY) {
+#ifdef _CQ_MKL
+    zaxpy(&N,&alpha,X,&INCX,Y,&INCY);
+#else
+    zaxpy_(&N,reinterpret_cast<double*>(&alpha),reinterpret_cast<double*>(X),
+      &INCX,reinterpret_cast<double*>(Y),&INCY);
+#endif 
+      
+  }; // AXPY (complex,complex)
+
+
+  template<>
+  void AXPY(int N, double alpha, dcomplex *X, int INCX, dcomplex *Y, int INCY) {
+    AXPY(N,dcomplex(alpha),X,INCX,Y,INCY);
+  }; // AXPY (complex,real)
 
 
   template<>
@@ -106,6 +124,31 @@ namespace ChronusQ {
   }; // InnerProd complex = (complex,real)
 
 
+//SS start
+/*
+  template<>
+  dcomplex InnerProd(int N, double *X, int INCX, dcomplex *Y, int INCY) {
+    INCX *= 2;
+    double re =
+#ifdef _CQ_MKL
+      ddot
+#else
+      ddot_
+#endif 
+        (&N,X,&INCX,reinterpret_cast<double*>(Y),&INCY);
+
+    double im = -
+#ifdef _CQ_MKL
+      ddot
+#else
+      ddot_
+#endif 
+        (&N,X,&INCX,reinterpret_cast<double*>(Y) + 1,&INCY);
+
+    return dcomplex(re,im);
+  }; // InnerProd complex = (real,complex)
+*/
+//SS end
 
 
   template<>

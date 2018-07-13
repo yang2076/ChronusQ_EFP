@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you ca redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@
   
 #define Quantum_COLLECTIVE_OP(OP_MEMBER,OP_VEC_OP) \
   /* Handle densities */\
-  OP_VEC_OP(T,this,other,memManager,onePDM); 
+  OP_VEC_OP(MatsT,this,other,memManager,onePDM); 
 
 
 
@@ -47,9 +47,9 @@ namespace ChronusQ {
    *  \param [in] dummy Dummy argument to fix calling signature for delegation 
    *    to copy constructor
    */ 
-  template <typename T>
-  template <typename U>
-  Quantum<T>::Quantum(const Quantum<U> &other, int dummy) : 
+  template <typename MatsT>
+  template <typename MatsU>
+  Quantum<MatsT>::Quantum(const Quantum<MatsU> &other, int dummy) : 
     QuantumBase(dynamic_cast<const QuantumBase&>(other)) {
 
     #ifdef _QuantumDebug
@@ -72,9 +72,9 @@ namespace ChronusQ {
    *  \param [in] dummy Dummy argument to fix calling signature for delegation 
    *    to move constructor
    */ 
-  template <typename T>
-  template <typename U>
-  Quantum<T>::Quantum(Quantum<U> &&other, int dummy) : 
+  template <typename MatsT>
+  template <typename MatsU>
+  Quantum<MatsT>::Quantum(Quantum<MatsU> &&other, int dummy) : 
     QuantumBase(dynamic_cast<QuantumBase&&>(std::move(other))) {
 
     #ifdef _QuantumDebug
@@ -87,10 +87,10 @@ namespace ChronusQ {
   }; // Quantum<T>::Quantum(Quantum<U> &&)
 
   // Delagate the copy constructor to the conversion constructors
-  template <typename T>
-  Quantum<T>::Quantum(const Quantum<T> &other) : Quantum(other,0){ };
-  template <typename T>
-  Quantum<T>::Quantum(Quantum<T> &&other) : Quantum(std::move(other),0){ };
+  template <typename MatsT>
+  Quantum<MatsT>::Quantum(const Quantum<MatsT> &other) : Quantum(other,0){ };
+  template <typename MatsT>
+  Quantum<MatsT>::Quantum(Quantum<MatsT> &&other) : Quantum(std::move(other),0){ };
 
 
 
@@ -100,8 +100,8 @@ namespace ChronusQ {
    *
    *  \param [in] N Dimension of density matricies
    */ 
-  template <typename T>
-  void Quantum<T>::alloc(size_t N) {
+  template <typename MatsT>
+  void Quantum<MatsT>::alloc(size_t N) {
 
     #ifdef _QuantumDebug
     std::cout << "Quantum::alloc (this = " << this << ")" << std::endl;
@@ -115,8 +115,8 @@ namespace ChronusQ {
   /**
    *  Deallocates the internal memory a Quantum object
    */ 
-  template <typename T>
-  void Quantum<T>::dealloc() {
+  template <typename MatsT>
+  void Quantum<MatsT>::dealloc() {
 
     #ifdef _QuantumDebug
     std::cout << "Quantum::dealloc (this = " << this << ")" << std::endl;

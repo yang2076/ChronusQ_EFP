@@ -1,7 +1,7 @@
 #
 # This file is part of the Chronus Quantum (ChronusQ) software package
 # 
-# Copyright (C) 2014-2017 Li Research Group (University of Washington)
+# Copyright (C) 2014-2018 Li Research Group (University of Washington)
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ set(FUNC_TEST_BINARY_ROOT "${TEST_BINARY_ROOT}/func" )
 
 
 # Set up compilation of Functionality test exe
-add_executable(functest ../ut.cxx contract.cxx)
+add_executable(functest ../ut.cxx contract.cxx ordqz.cxx gplhr.cxx)
 
 target_compile_definitions(functest PUBLIC BOOST_TEST_MODULE=FUNC)
 target_include_directories(functest PUBLIC ${FUNC_TEST_SOURCE_ROOT} 
@@ -40,3 +40,12 @@ endif()
 
 # Add the Tests
 add_test( DIRECT_CONTRACTION functest --report_level=detailed --run_test=DIRECT_CONTRACTION)
+add_test( ORDQZ functest --report_level=detailed --run_test=ORDQZ)
+add_test( GPLHR functest --report_level=detailed --run_test=GPLHR_TESTS)
+
+
+if( CQ_ENABLE_MPI )
+
+  add_test( NAME GPLHR_MPI COMMAND ${MPIEXEC} -np 2 "./functest" "--report_level=detailed" "--run_test=GPLHR_TESTS" )
+
+endif()

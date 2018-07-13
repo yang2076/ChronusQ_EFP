@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -25,6 +25,33 @@
 #include <cerr.hpp>
 
 namespace ChronusQ {
+
+  /**
+   *
+   *  Check valid keywords in the section.
+   *
+  */
+  void CQRT_VALID( std::ostream &out, CQInputFile &input ) {
+
+    // Allowed keywords
+    std::vector<std::string> allowedKeywords = {
+      "TMAX",
+      "DELTAT",
+      "IRSTRT",
+      "FIELD"
+    };
+
+    // Specified keywords
+    std::vector<std::string> rtKeywords = input.getDataInSection("RT");
+
+    // Make sure all of basisKeywords in allowedKeywords
+    for( auto &keyword : rtKeywords ) {
+      auto ipos = std::find(allowedKeywords.begin(),allowedKeywords.end(),keyword);
+      if( ipos == allowedKeywords.end() ) 
+        CErr("Keyword RT." + keyword + " is not recognized",std::cout);// Error
+    }
+    // Check for disallowed combinations (if any)
+  }
 
   /**
    *  \brief Construct a RealTime object using the input 
@@ -52,46 +79,30 @@ namespace ChronusQ {
 
   
     // Determine  reference and construct RT object
-      
-    try {
 
-      rt = std::dynamic_pointer_cast<RealTimeBase>(
-        std::make_shared<RealTime<HartreeFock,double>>(
-          dynamic_cast<HartreeFock<double>&>(*ss)
-        )
-      );
-    
+
+    bool found = false;
+
+
+    #define CONSTRUCT_RT(_REF,_MT,_IT)             \
+    if( not found ) try {                          \
+      rt = std::dynamic_pointer_cast<RealTimeBase>( \
+          std::make_shared< RealTime<_REF,_IT> >(  \
+            dynamic_cast< _REF<_MT,_IT>& >(*ss)    \
+          )                                        \
+        );                                         \
     } catch(...) { }
 
-    try {
 
-      rt = std::dynamic_pointer_cast<RealTimeBase>(
-        std::make_shared<RealTime<KohnSham,double>>(
-          dynamic_cast<KohnSham<double>&>(*ss)
-        )
-      );
-    
-    } catch(...) { }
+    // Construct RT object
 
-    try {
+    CONSTRUCT_RT( HartreeFock, double, double     );
+    CONSTRUCT_RT( HartreeFock, dcomplex, double   );
+  //CONSTRUCT_RT( HartreeFock, dcomplex, dcomplex );
 
-      rt = std::dynamic_pointer_cast<RealTimeBase>(
-        std::make_shared<RealTime<HartreeFock,dcomplex>>(
-          dynamic_cast<HartreeFock<dcomplex>&>(*ss)
-        )
-      );
-
-    } catch(...) {  }
-
-    try {
-
-      rt = std::dynamic_pointer_cast<RealTimeBase>(
-        std::make_shared<RealTime<KohnSham,dcomplex>>(
-          dynamic_cast<KohnSham<dcomplex>&>(*ss)
-        )
-      );
-
-    } catch(...) {  }
+    CONSTRUCT_RT( KohnSham, double, double     );
+    CONSTRUCT_RT( KohnSham, dcomplex, double   );
+  //CONSTRUCT_RT( KohnSham, dcomplex, dcomplex );
 
 
     // Parse Options

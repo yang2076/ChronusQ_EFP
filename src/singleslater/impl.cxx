@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -25,23 +25,37 @@
 
 namespace ChronusQ {
 
-  template class SingleSlater<double>;
-  template class SingleSlater<dcomplex>;
+  template class SingleSlater<double,double>;
+  template class SingleSlater<dcomplex,double>;
+  template class SingleSlater<dcomplex,dcomplex>;
 
   // Instantiate copy constructors
-  template SingleSlater<dcomplex>::SingleSlater(const SingleSlater<double> &,
-    int);
+  template SingleSlater<dcomplex,double>::SingleSlater(const SingleSlater<double,double> &, int);
+  template SingleSlater<dcomplex,dcomplex>::SingleSlater(const SingleSlater<dcomplex,dcomplex> &, int);
 
-  // Instantiate copy ructors
-  template SingleSlater<dcomplex>::SingleSlater( SingleSlater<double> &&, int);
+  // Instantiate move ctors
+  template SingleSlater<dcomplex,double>::SingleSlater( SingleSlater<double,double> &&, int);
 
-  template class KohnSham<double>;
-  template class KohnSham<dcomplex>;
-
+  template class HartreeFock<double,double>;
+  template class HartreeFock<dcomplex,double>;
+  template class HartreeFock<dcomplex,dcomplex>;
   // Instantiate copy constructors
-  template KohnSham<dcomplex>::KohnSham(const KohnSham<double> &, int);
-
+  template HartreeFock<dcomplex,double>::HartreeFock(const HartreeFock<double,double> &, int);
   // Instantiate copy ructors
-  template KohnSham<dcomplex>::KohnSham( KohnSham<double> &&, int);
+  template HartreeFock<dcomplex,double>::HartreeFock( HartreeFock<double,double> &&, int);
+
+  template class KohnSham<double,double>;
+  template class KohnSham<dcomplex,double>;
+  template class KohnSham<dcomplex,dcomplex>;
+  // Instantiate copy constructors
+  template KohnSham<dcomplex,double>::KohnSham(const KohnSham<double,double> &, int);
+  // Instantiate copy ructors
+  template KohnSham<dcomplex,double>::KohnSham( KohnSham<double,double> &&, int);
+
+  template void KohnSham<double,double>::formFXC(MPI_Comm,std::vector<TwoBodyContraction<double>> &);
+  template void KohnSham<double,double>::formFXC(MPI_Comm,std::vector<TwoBodyContraction<dcomplex>> &);
+
+  template void KohnSham<dcomplex,double>::formFXC(MPI_Comm,std::vector<TwoBodyContraction<dcomplex>> &);
+  template void KohnSham<dcomplex,dcomplex>::formFXC(MPI_Comm,std::vector<TwoBodyContraction<dcomplex>> &);
 
 }; // namespace ChronusQ

@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -45,16 +45,18 @@ namespace ChronusQ {
    *
    *  Specializes the Quantum class of the same type; 
    */
-  template <typename T>
-  class WaveFunction : virtual public WaveFunctionBase, public Quantum<T> {
+  template <typename MatsT, typename IntsT>
+  class WaveFunction : virtual public WaveFunctionBase, public Quantum<MatsT> {
   protected:
 
     // Useful typedefs
-    typedef T*                   oper_t;
+    typedef MatsT*               oper_t;
     typedef std::vector<oper_t>  oper_t_coll;
 
   public:
     
+    AOIntegrals<IntsT> &aoints; ///< AOIntegrals for the evaluation of GTO integrals
+
     // Operator storage
     oper_t  mo1;  ///< Full (nC > 1) / ALPHA (nC == 1) MO coefficient matrix
     oper_t  mo2;  ///< BETA (nC == 1) MO coefficient matrix
@@ -73,14 +75,30 @@ namespace ChronusQ {
      *  \param [in] _nC  Number of spin components (1 and 2 are supported)
      *  \param [in] iCS  Whether or not to treat as closed shell
      */ 
-    WaveFunction(AOIntegrals &aoi, size_t _nC, bool iCS) :
-      QuantumBase(aoi.memManager(),_nC,iCS),
-      WaveFunctionBase(aoi,_nC,iCS),
-      Quantum<T>(aoi.memManager(),_nC,iCS,aoi.basisSet().nBasis), 
-      mo1(nullptr), mo2(nullptr), eps1(nullptr), eps2(nullptr) {
+    WaveFunction(MPI_Comm c, AOIntegrals<IntsT> &aoi, size_t _nC, bool iCS) :
+      QuantumBase(c, aoi.memManager(),_nC,iCS),
+      WaveFunctionBase(c, aoi.memManager(),_nC,iCS),
+      Quantum<MatsT>(c, aoi.memManager(),_nC,iCS,aoi.basisSet().nBasis), 
+      mo1(nullptr), mo2(nullptr), eps1(nullptr), eps2(nullptr), aoints(aoi) {
+
+      // Compute meta data
+
+      this->nO = this->aoints.molecule().nTotalE;
+      this->nV = 2*aoints.basisSet().nBasis - nO;
+
+      if( this->iCS ) {
+        this->nOA = this->nO / 2; this->nOB = this->nO / 2;
+        this->nVA = this->nV / 2; this->nVB = this->nV / 2;
+      } else {
+        size_t nSingleE = aoints.molecule().multip - 1;
+        this->nOB = (this->nO - nSingleE) / 2;
+        this->nOA = this->nOB + nSingleE;
+        this->nVA = aoints.basisSet().nBasis - this->nOA;
+        this->nVB = aoints.basisSet().nBasis - this->nOB;
+      }
 
       // Allocate internal memory
-      if(aoi.basisSet().nBasis != 0) alloc();
+      if(aoints.basisSet().nBasis != 0) alloc();
 
     };
 
@@ -88,8 +106,10 @@ namespace ChronusQ {
     // on the following constructors
 
     // Different type
-    template <typename U> WaveFunction(const WaveFunction<U> &, int dummy = 0);
-    template <typename U> WaveFunction(WaveFunction<U> &&     , int dummy = 0);
+    template <typename MatsU> 
+      WaveFunction(const WaveFunction<MatsU,IntsT> &, int dummy = 0);
+    template <typename MatsU> 
+      WaveFunction(WaveFunction<MatsU,IntsT> &&     , int dummy = 0);
 
     // Same type
     WaveFunction(const WaveFunction &);

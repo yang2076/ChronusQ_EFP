@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -29,12 +29,13 @@
 
 namespace ChronusQ {
 
-  template <template <typename> class _SSTyp, typename T>
-  void RealTime<_SSTyp,T>::alloc() {
+  template <template <typename, typename> class _SSTyp, typename IntsT>
+  void RealTime<_SSTyp,IntsT>::alloc() {
 
-    size_t OSize = memManager_.template getSize<T>(reference_.onePDM[0]);
+    size_t OSize = 
+      memManager_.template getSize<dcomplex>(propagator_.onePDM[0]);
 
-    for(auto i = 0; i < reference_.onePDM.size(); i++) {
+    for(auto i = 0; i < propagator_.onePDM.size(); i++) {
       DOSav.emplace_back(memManager_.template malloc<dcomplex>(OSize));
       UH.emplace_back(memManager_.template malloc<dcomplex>(OSize));
     }
@@ -42,8 +43,8 @@ namespace ChronusQ {
   };
 
 
-  template <template <typename> class _SSTyp, typename T>
-  void RealTime<_SSTyp,T>::dealloc() {
+  template <template <typename, typename> class _SSTyp, typename IntsT>
+  void RealTime<_SSTyp,IntsT>::dealloc() {
 
     for(auto &X : DOSav) memManager_.free(X);
     for(auto &X : UH)    memManager_.free(X);

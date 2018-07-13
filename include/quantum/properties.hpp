@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you ca redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -32,11 +32,11 @@ namespace ChronusQ {
    *  \brief Perform matrix trace with proper component of the density for
    *  property evaluation. Return zeros when necessacy.
    */ 
-  template <typename T>
+  template <typename MatsT>
   template <typename RetTyp, DENSITY_TYPE DenTyp, typename Op>
-  RetTyp Quantum<T>::OperatorSpinCombine(const Op &op) {
+  RetTyp Quantum<MatsT>::OperatorSpinCombine(const Op &op) {
     double rZero(0.);
-    bool isReal = std::is_same<double,T>::value;
+    bool isReal = std::is_same<double,MatsT>::value;
 
     size_t DSize = memManager.template getSize(onePDM[SCALAR]);
 

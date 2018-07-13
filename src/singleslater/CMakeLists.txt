@@ -1,7 +1,7 @@
 #
 # This file is part of the Chronus Quantum (ChronusQ) software package
 # 
-# Copyright (C) 2014-2017 Li Research Group (University of Washington)
+# Copyright (C) 2014-2018 Li Research Group (University of Washington)
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 # Contact the Developers:
 #   E-Mail: xsli@uw.edu
 #
-add_library(singleslater STATIC impl.cxx)
+add_library(singleslater STATIC impl.cxx fock.cxx)
 
 # Append aointegrals to executable link
 list(APPEND CQEX_LINK singleslater)

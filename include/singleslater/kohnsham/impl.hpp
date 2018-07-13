@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -37,32 +37,32 @@
 
 namespace ChronusQ {
 
-  template <typename T>
-  template <typename U>
-  KohnSham<T>::KohnSham(const KohnSham<U> &other, int dummy) :
-    SingleSlater<T>(dynamic_cast<const SingleSlater<U>&>(other),dummy),
+  template <typename MatsT, typename IntsT>
+  template <typename MatsU> 
+  KohnSham<MatsT,IntsT>::KohnSham(const KohnSham<MatsU,IntsT> &other, int dummy) :
+    SingleSlater<MatsT,IntsT>(dynamic_cast<const SingleSlater<MatsU,IntsT>&>(other),dummy),
     QuantumBase(dynamic_cast<const QuantumBase&>(other)),
     WaveFunctionBase(dynamic_cast<const WaveFunctionBase&>(other))
     { 
       KOHNSHAM_COLLECTIVE_OP(COPY_OTHER_MEMBER,COPY_OTHER_MEMBER_VEC_OP);
     };
 
-  template <typename T>
-  template <typename U>
-  KohnSham<T>::KohnSham(KohnSham<U> &&other, int dummy) :
-    SingleSlater<T>(dynamic_cast<SingleSlater<U>&&>(std::move(other)),dummy),
+  template <typename MatsT, typename IntsT>
+  template <typename MatsU> 
+  KohnSham<MatsT,IntsT>::KohnSham(KohnSham<MatsU,IntsT> &&other, int dummy) :
+    SingleSlater<MatsT,IntsT>(dynamic_cast<SingleSlater<MatsU,IntsT>&&>(std::move(other)),dummy),
     QuantumBase(dynamic_cast<QuantumBase&&>(std::move(other))),
     WaveFunctionBase(dynamic_cast<WaveFunctionBase&&>(std::move(other)))
     { 
       KOHNSHAM_COLLECTIVE_OP(MOVE_OTHER_MEMBER,MOVE_OTHER_MEMBER_VEC_OP);
     };
 
-  template <typename T>
-  KohnSham<T>::KohnSham(const KohnSham<T> &other) :
+  template <typename MatsT, typename IntsT>
+  KohnSham<MatsT,IntsT>::KohnSham(const KohnSham<MatsT,IntsT> &other) :
     KohnSham(other,0) { }
 
-  template <typename T>
-  KohnSham<T>::KohnSham(KohnSham<T> &&other) :
+  template <typename MatsT, typename IntsT>
+  KohnSham<MatsT,IntsT>::KohnSham(KohnSham<MatsT,IntsT> &&other) :
     KohnSham(std::move(other),0) { }
 
 

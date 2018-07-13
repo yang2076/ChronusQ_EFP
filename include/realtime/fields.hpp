@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ namespace ChronusQ {
    *
    *  All TDEMField classes are derived from this one.
    */ 
-  struct TDEMFieldBase {
+  struct TDEMFieldBase : virtual public EMFieldBase {
 
     std::shared_ptr<FieldEnvelopeBase> envelope; ///< Field envelope
 
@@ -193,26 +193,6 @@ namespace ChronusQ {
     }
 
 
-    /**
-     *  \brief Obtain the tensorial field amplitude at a specific time
-     *  as the sum of all the field contributions.
-     *
-     *  FIXME: This function only works if all fields in perturbation
-     *  are of the same type (i.e. electric dipole, etc).
-     *
-     *  \param [in]
-     */ 
-    std::valarray<double> getAmp(double t){
-
-      assert(fields.size() != 0);
-
-      std::valarray<double> amp = fields[0]->getAmp(t);
-      for(auto i = 1; i < fields.size(); i++)
-        amp += fields[i]->getAmp(t);
-
-      return amp;
-
-    }
 
     EMPerturbation getPert(double t) {
 
@@ -234,6 +214,41 @@ namespace ChronusQ {
 
     }
     
+
+
+    template <size_t N>
+    inline std::array<double, N> getNAmp(EMFieldTyp TYPE, double t) {
+
+      std::array<double, N> amp = {0., 0., 0.};
+
+
+      for(auto &field : fields) {
+
+        if( field->emFieldTyp == TYPE  and field->size == N ) {
+
+          auto tmp_amp = field->getAmp(t);
+          amp[0] += tmp_amp[0];
+          amp[1] += tmp_amp[1];
+          amp[2] += tmp_amp[2];
+
+        }
+
+      }
+
+      return amp;
+    }
+
+
+
+
+
+    inline std::array<double, 3> getDipoleAmp(EMFieldTyp TYPE, double t) {
+
+      return getNAmp<3>(TYPE,t);
+
+    }
+
+
   }; // struct TDEMPerturbation
 };
 

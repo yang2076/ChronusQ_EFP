@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -36,6 +36,9 @@ int main(int argc, char *argv[]) {
 
   ChronusQ::initialize();
 
+  int rank = MPIRank();
+  int size = MPISize();
+
   std::string inFileName, outFileName;
   std::string rstFileName, scrFileName;
 
@@ -45,6 +48,12 @@ int main(int argc, char *argv[]) {
   if(argc < 2) { // No Options
 
     CErr("No Command Line Arguements Given",std::cout);
+  //inFileName = "distfromroot_reduced.inp";
+  //std::vector<std::string> tokens;
+  //split(tokens,inFileName,".");
+
+  //outFileName = tokens[0] + ".out";
+  //rstFileName = tokens[0] + ".bin";
 
   } else if(argc == 2) { // Just Input File
 
@@ -92,17 +101,20 @@ int main(int argc, char *argv[]) {
     }
 
     // Remove destination file if it exists
-    if( boost::filesystem::exists( rstFileName ) )
+    if( boost::filesystem::exists( rstFileName ) and rank == 0 )
       boost::filesystem::remove( rstFileName );
 
     // Copy over "old" rst file into new rst file
-    boost::filesystem::copy_file( oldRstFileName, rstFileName);
+    if( rank == 0 ) {
+
+      boost::filesystem::copy_file( oldRstFileName, rstFileName);
         
-    std::cout << "  * Copying " << oldRstFileName << "  -->  "
-      << rstFileName << std::endl;
+      std::cout << "  * Copying " << oldRstFileName << "  -->  "
+        << rstFileName << std::endl;
+
+    }
 
   }
-
 
   RunChronusQ(inFileName,outFileName,rstFileName,scrFileName);
 

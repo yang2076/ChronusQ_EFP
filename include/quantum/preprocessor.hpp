@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -26,16 +26,16 @@
 
 #define SPIN_OPERATOR_ALLOC(NB,X) \
   /* Always allocate Scalar matricies */ \
-  X.emplace_back(this->memManager.template malloc<T>(NB*NB)); \
+  X.emplace_back(this->memManager.template malloc<MatsT>(NB*NB)); \
   \
   /* If 2C or open shell, populate Mz storage */ \
   if(this->nC > 1 or not this->iCS) \
-    X.emplace_back(this->memManager.template malloc<T>(NB*NB)); \
+    X.emplace_back(this->memManager.template malloc<MatsT>(NB*NB)); \
   \
   /* If 2C, populate My / Mx */ \
   if(this->nC > 1) { \
-    X.emplace_back(this->memManager.template malloc<T>(NB*NB)); \
-    X.emplace_back(this->memManager.template malloc<T>(NB*NB)); \
+    X.emplace_back(this->memManager.template malloc<MatsT>(NB*NB)); \
+    X.emplace_back(this->memManager.template malloc<MatsT>(NB*NB)); \
   }
 
 

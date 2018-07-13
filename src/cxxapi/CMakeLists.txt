@@ -1,7 +1,7 @@
 #
 # This file is part of the Chronus Quantum (ChronusQ) software package
 # 
-# Copyright (C) 2014-2017 Li Research Group (University of Washington)
+# Copyright (C) 2014-2018 Li Research Group (University of Washington)
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,7 +24,8 @@
 set(INPUT_SRC input/parse.cxx)
 set(OPT_SRC input/molopts.cxx input/basisopts.cxx 
   input/singleslateropts.cxx input/scfopts.cxx input/rtopts.cxx
-  input/intsopts.cxx input/miscopts.cxx procedural.cxx)
+  input/intsopts.cxx input/miscopts.cxx input/respopts.cxx 
+  procedural.cxx)
 add_library(cxxcq STATIC ${INPUT_SRC} ${OPT_SRC})
 list(INSERT CQEX_LINK 0 cxxcq)
 set(CQEX_LINK ${CQEX_LINK} PARENT_SCOPE)

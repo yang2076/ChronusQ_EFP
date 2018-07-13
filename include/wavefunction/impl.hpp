@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you ca redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -32,8 +32,8 @@
   
 #define WaveFunction_COLLECTIVE_OP(OP_MEMBER,OP_OP) \
   /* Handle densities */\
-  OP_OP(T,this,other,this->memManager,mo1); \
-  OP_OP(T,this,other,this->memManager,mo2); \
+  OP_OP(MatsT,this,other,this->memManager,mo1); \
+  OP_OP(MatsT,this,other,this->memManager,mo2); \
   OP_OP(double,this,other,this->memManager,eps1); \
   OP_OP(double,this,other,this->memManager,eps2); \
 
@@ -49,23 +49,22 @@ namespace ChronusQ {
    *  \param [in] dummy Dummy argument to fix calling signature for delegation 
    *    to copy constructor
    */ 
-  template <typename T>
-  template <typename U>
-  WaveFunction<T>::WaveFunction(const WaveFunction<U> &other, int dummy) : 
+  template <typename MatsT, typename IntsT>
+  template <typename MatsU> 
+  WaveFunction<MatsT,IntsT>::WaveFunction(const WaveFunction<MatsU,IntsT> &other,int dummy) :
+    aoints(other.aoints),
     QuantumBase(dynamic_cast<const QuantumBase &>(other)),
     WaveFunctionBase(dynamic_cast<const WaveFunctionBase &>(other)),
-    Quantum<T>(dynamic_cast<const Quantum<U>&>(other)) {
+    Quantum<MatsT>(dynamic_cast<const Quantum<MatsU>&>(other)) {
 
 #ifdef _WaveFunctionDebug
     std::cout << "WaveFunction<T>::WaveFunction(const WaveFunction<U>&) "
               << "(this = " << this << ", other = " << &other << ")" 
               << std::endl;
 #endif
-
     WaveFunction_COLLECTIVE_OP(COPY_OTHER_MEMBER,COPY_OTHER_MEMBER_OP);
 
   }; // WaveFunction<T>::WaveFunction(const WaveFunction<U> &)
-
 
   /**
    *  Constructs a WaveFunction object from another of a another (possibly the 
@@ -77,12 +76,13 @@ namespace ChronusQ {
    *  \param [in] dummy Dummy argument to fix calling signature for delegation 
    *    to move constructor
    */ 
-  template <typename T>
-  template <typename U>
-  WaveFunction<T>::WaveFunction(WaveFunction<U> &&other, int dummy) : 
+  template <typename MatsT, typename IntsT>
+  template <typename MatsU> 
+  WaveFunction<MatsT,IntsT>::WaveFunction(WaveFunction<MatsU,IntsT> &&other, int dummy) : 
+    aoints(other.aoints),
     QuantumBase(dynamic_cast<QuantumBase &&>(std::move(other))),
     WaveFunctionBase(dynamic_cast<WaveFunctionBase &&>(std::move(other))),
-    Quantum<T>(dynamic_cast<Quantum<U>&&>(std::move(other))) {
+    Quantum<MatsT>(dynamic_cast<Quantum<MatsU>&&>(std::move(other))) {
 
 #ifdef _WaveFunctionDebug
     std::cout << "WaveFunction<T>::WaveFunction(WaveFunction<U>&&) "
@@ -94,13 +94,12 @@ namespace ChronusQ {
 
   }; // WaveFunction<T>::WaveFunction(WaveFunction<U> &&)
 
-
   // Delagate the copy constructor to the conversion constructors
-  template <typename T>
-  WaveFunction<T>::WaveFunction(const WaveFunction<T> &other) : 
+  template <typename MatsT, typename IntsT>
+  WaveFunction<MatsT,IntsT>::WaveFunction(const WaveFunction<MatsT,IntsT> &other) : 
     WaveFunction(other,0){ };
-  template <typename T>
-  WaveFunction<T>::WaveFunction(WaveFunction<T> &&other) : 
+  template <typename MatsT, typename IntsT>
+  WaveFunction<MatsT,IntsT>::WaveFunction(WaveFunction<MatsT,IntsT> &&other) : 
     WaveFunction(std::move(other),0){ };
 
 
@@ -110,8 +109,8 @@ namespace ChronusQ {
   /**
    *  Allocates the internal memory a WaveFunction object
    */ 
-  template <typename T>
-  void WaveFunction<T>::alloc() {
+  template <typename MatsT, typename IntsT>
+  void WaveFunction<MatsT,IntsT>::alloc() {
 
 #ifdef _WaveFunctionDebug
     std::cout << "WaveFunction::alloc (this = " << this << ")" << std::endl;
@@ -119,11 +118,11 @@ namespace ChronusQ {
 
     size_t NB = this->nC * this->aoints.basisSet().nBasis;
 
-    mo1  = this->memManager.template malloc<T>(NB*NB);
+    mo1  = this->memManager.template malloc<MatsT>(NB*NB);
     eps1 = this->memManager.template malloc<double>(NB);
 
     if( this->nC == 1 and (not this->iCS) ) {
-      mo2  = this->memManager.template malloc<T>(NB*NB);
+      mo2  = this->memManager.template malloc<MatsT>(NB*NB);
       eps2 = this->memManager.template malloc<double>(NB);
     }
 
@@ -134,8 +133,8 @@ namespace ChronusQ {
   /**
    *  Deallocates the internal memory a WaveFunction object
    */ 
-  template <typename T>
-  void WaveFunction<T>::dealloc() {
+  template <typename MatsT, typename IntsT>
+  void WaveFunction<MatsT,IntsT>::dealloc() {
 
 #ifdef _WaveFunctionDebug
     std::cout << "WaveFunction::dealloc (this = " << this << ")" << std::endl;

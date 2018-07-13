@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -28,6 +28,58 @@
 namespace ChronusQ {
 
   /**
+   *
+   *  Check valid keywords in the section.
+   *
+  */
+  void CQQM_VALID( std::ostream &out, CQInputFile &input ) {
+
+    // Allowed keywords
+    std::vector<std::string> allowedKeywords = {
+      "REFERENCE",
+      "JOB"
+    };
+
+    // Specified keywords
+    std::vector<std::string> qmKeywords = input.getDataInSection("QM");
+
+    // Make sure all of basisKeywords in allowedKeywords
+    for( auto &keyword : qmKeywords ) {
+      auto ipos = std::find(allowedKeywords.begin(),allowedKeywords.end(),keyword);
+      if( ipos == allowedKeywords.end() ) 
+        CErr("Keyword QM." + keyword + " is not recognized",std::cout);// Error
+    }
+    // Check for disallowed combinations (if any)
+  }
+
+  /**
+   *
+   *  Check valid keywords in the section.
+   *
+  */
+  void CQDFTINT_VALID( std::ostream &out, CQInputFile &input ) {
+
+    // Allowed keywords
+    std::vector<std::string> allowedKeywords = {
+      "EPS",
+      "NANG",
+      "NRAD",
+      "NMACRO"
+    };
+
+    // Specified keywords
+    std::vector<std::string> dftintKeywords = input.getDataInSection("DFTINT");
+
+    // Make sure all of basisKeywords in allowedKeywords
+    for( auto &keyword : dftintKeywords ) {
+      auto ipos = std::find(allowedKeywords.begin(),allowedKeywords.end(),keyword);
+      if( ipos == allowedKeywords.end() ) 
+        CErr("Keyword DFTINT." + keyword + " is not recognized",std::cout);// Error
+    }
+    // Check for disallowed combinations (if any)
+  }
+
+  /**
    *  \brief Construct a SingleSlater object using the input 
    *  file.
    *
@@ -42,7 +94,7 @@ namespace ChronusQ {
    */ 
   std::shared_ptr<SingleSlaterBase> CQSingleSlaterOptions(
     std::ostream &out, CQInputFile &input, 
-    AOIntegrals &aoints) {
+    std::shared_ptr<AOIntegralsBase> aoints) {
 
     out << "  *** Parsing QM.REFERENCE options ***\n";
 
@@ -253,7 +305,7 @@ namespace ChronusQ {
     // Raw reference
     if( isRawRef ) {
       out << "  *** Auto-determination of reference: " << refString << " -> ";
-      iCS = aoints.molecule().multip == 1;
+      iCS = aoints->molecule().multip == 1;
 
       if(iCS) out << "R" << refString;
       else    out << "U" << refString;
@@ -261,7 +313,7 @@ namespace ChronusQ {
       out << " ***" << std::endl;
       
     } else if( isRRef )
-      if( aoints.molecule().multip != 1 )
+      if( aoints->molecule().multip != 1 )
         CErr("Spin-Restricted Reference only valid for singlet spin multiplicities",out);
       else
         iCS = true;
@@ -272,11 +324,25 @@ namespace ChronusQ {
     }
 
     // Sanity Checks
+    bool isGIAO = aoints->basisSet().basisType == COMPLEX_GIAO;
+
     if( nC == 2 and not RCflag.compare("REAL") )
       CErr("Real + Two-Component not valid",out);
 
-  //if( nC == 2 and isKSRef )
-  //  CErr("Kohn-Sham + Two-Component not valid",out);
+    if( isGIAO and not RCflag.compare("REAL") )
+      CErr("Real + GIAO not valid",out);
+
+    if( isGIAO and isKSRef )
+      CErr("KS + GIAO not valid",out);
+
+    if( isGIAO and isX2CRef )
+      CErr("X2C + GIAO not valid",out);
+
+
+
+
+
+
 
     // Determine Real/Complex if need be
     if(not RCflag.compare("AUTO") ) {
@@ -293,11 +359,7 @@ namespace ChronusQ {
 
 
     // Override core hamiltoninan type for X2C
-    if( isX2CRef ) 
-      aoints.coreType = EXACT_2C;
-
-
-
+      
 
     // FIXME: Should put this somewhere else
     // Parse KS integration
@@ -333,12 +395,11 @@ namespace ChronusQ {
 
 
 
+  #define KS_LIST(T) \
+    funcName,funcList,MPI_COMM_WORLD,intParam,dynamic_cast<AOIntegrals<T>&>(*aoints),nC,iCS
 
-
-
-
-
-
+  #define HF_LIST(T) \
+    MPI_COMM_WORLD,dynamic_cast<AOIntegrals<T>&>(*aoints),nC,iCS
 
 
     // Construct the SS object
@@ -347,43 +408,65 @@ namespace ChronusQ {
     if( not RCflag.compare("REAL") )
       if( isKSRef )
         ss = std::dynamic_pointer_cast<SingleSlaterBase>(
-            std::make_shared<KohnSham<double>>(
-              funcName,funcList,intParam,aoints,nC,iCS
+            std::make_shared<KohnSham<double,double>>( KS_LIST(double) )
+          );
+      else if(not isGIAO)
+        ss = std::dynamic_pointer_cast<SingleSlaterBase>(
+            std::make_shared<HartreeFock<double,double>>( HF_LIST(double) )
+          );
+      else
+        CErr("GIAO + REAL is not a valid option.",out);
+
+    else if( not RCflag.compare("COMPLEX") and not isGIAO)
+      if( isKSRef and isX2CRef)
+        ss = std::dynamic_pointer_cast<SingleSlaterBase>(
+            std::make_shared<KohnSham<dcomplex,double>>(
+              "Exact Two Component", "X2C-", KS_LIST(double)
+            )
+          );
+      else if( isKSRef)
+        ss = std::dynamic_pointer_cast<SingleSlaterBase>(
+            std::make_shared<KohnSham<dcomplex,double>>( KS_LIST(double) )
+          );
+      else if( isX2CRef)
+        ss = std::dynamic_pointer_cast<SingleSlaterBase>(
+            std::make_shared<HartreeFock<dcomplex,double>>(
+              "Exact Two Component","X2C-",HF_LIST(double)
             )
           );
       else
         ss = std::dynamic_pointer_cast<SingleSlaterBase>(
-            std::make_shared<HartreeFock<double>>(
-              aoints,nC,iCS
+            std::make_shared<HartreeFock<dcomplex,double>>( HF_LIST(double) )
+          );
+    else
+      if( isKSRef and isX2CRef)
+        ss = std::dynamic_pointer_cast<SingleSlaterBase>(
+            std::make_shared<KohnSham<dcomplex,dcomplex>>(
+              "Exact Two Component", "X2C-", KS_LIST(dcomplex)
             )
           );
-    else if( not RCflag.compare("COMPLEX") )
-      if( isKSRef and isX2CRef )
+      else if( isKSRef)
         ss = std::dynamic_pointer_cast<SingleSlaterBase>(
-            std::make_shared<KohnSham<dcomplex>>(
-              "Exact Two Component", "X2C-", funcName,funcList,intParam,aoints,nC,iCS
-            )
+            std::make_shared<KohnSham<dcomplex,dcomplex>>( KS_LIST(dcomplex) )
           );
-      else if( isKSRef )
+      else if( isX2CRef)
         ss = std::dynamic_pointer_cast<SingleSlaterBase>(
-            std::make_shared<KohnSham<dcomplex>>(
-              funcName,funcList,intParam,aoints,nC,iCS
-            )
-          );
-      else if( isX2CRef )
-        ss = std::dynamic_pointer_cast<SingleSlaterBase>(
-            std::make_shared<HartreeFock<dcomplex>>(
-              "Exact Two Component","X2C-",aoints,nC,iCS
+            std::make_shared<HartreeFock<dcomplex,dcomplex>>(
+              "Exact Two Component","X2C-",HF_LIST(dcomplex)
             )
           );
       else
         ss = std::dynamic_pointer_cast<SingleSlaterBase>(
-            std::make_shared<HartreeFock<dcomplex>>(
-              aoints,nC,iCS
-            )
+            std::make_shared<HartreeFock<dcomplex,dcomplex>>( HF_LIST(dcomplex) )
           );
 
 
+
+
+
+
+    if( isX2CRef ) ss->setCoreH(RELATIVISTIC_X2C_1E);
+    else           ss->setCoreH(NON_RELATIVISTIC);
 
 
 

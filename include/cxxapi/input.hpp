@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -138,6 +138,25 @@ namespace ChronusQ {
       return dict_.at(pr.first).find(pr.second) != dict_.at(pr.first).end();
     }
   
+
+
+
+
+    inline std::vector<std::string> getDataInSection( std::string section )  {
+
+      std::vector<std::string> datasets;
+
+      if( containsSection(section) ) {
+
+        for(auto & data : dict_[section])
+          datasets.emplace_back(data.first);
+
+      }
+
+      return datasets;
+
+    }
+
   }; // CQInputFile class
   
   

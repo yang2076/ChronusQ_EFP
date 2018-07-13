@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -69,10 +69,11 @@ namespace ChronusQ {
     assert(ALG == 'D');
     assert(std::real(ALPHA) < 1e-14);
 
-    double AIM = std::imag(ALPHA);
+    double AIM = std::is_same<_FExp,dcomplex>::value ? std::imag(ALPHA) : 0.;
 
-    MatDiagFunc([&](double x) -> _F2 { return dcomplex(std::cos(AIM*x),std::sin(AIM*x)); },
-      N,A,LDA,ExpA,LDEXPA,mem);
+    MatDiagFunc([&](double x) -> _F2 { 
+        return dcomplex(std::cos(AIM*x),std::sin(AIM*x)); 
+      }, N,A,LDA,ExpA,LDEXPA,mem);
 
   };
 

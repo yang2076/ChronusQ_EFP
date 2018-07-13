@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -26,11 +26,14 @@
 
 #include <singleslater.hpp>
 #include <util/matout.hpp>
+#include <util/math.hpp>
 #include <cqlinalg/blas1.hpp>
 #include <cqlinalg/blasutil.hpp>
+#include <cqlinalg/matfunc.hpp>
 
 // SCF definitions for SingleSlaterBase
 #include <singleslater/base/scf.hpp> 
+
 
 namespace ChronusQ {
 
@@ -39,8 +42,10 @@ namespace ChronusQ {
    *
    *  Saves a copy of the current AO 1PDM and orthonormal Fock
    */ 
-  template <typename T>
-  void SingleSlater<T>::saveCurrentState() {
+  template <typename MatsT, typename IntsT>
+  void SingleSlater<MatsT,IntsT>::saveCurrentState() {
+
+    ROOT_ONLY(comm); 
 
 
     // Checkpoint if file exists
@@ -49,7 +54,7 @@ namespace ChronusQ {
       size_t NB = this->aoints.basisSet().nBasis;
       size_t NBC = this->nC * NB;
 
-      auto t_type_indx = std::type_index(typeid(T));
+      auto t_type_indx = std::type_index(typeid(MatsT));
       size_t t_hash = t_type_indx.hash_code();
 
       // Save Field type
@@ -60,19 +65,19 @@ namespace ChronusQ {
         { "SCALAR", "MZ", "MY", "MX" };
 
       // Save Matricies
-      for(auto i = 0; i < this->fock.size(); i++) {
+      for(auto i = 0; i < this->fockMatrix.size(); i++) {
 
         savFile.safeWriteData("SCF/1PDM_" + spinLabel[i],
           this->onePDM[i],{NB,NB});
 
         savFile.safeWriteData("SCF/FOCK_" + spinLabel[i],
-          this->fock[i],{NB,NB});
+          this->fockMatrix[i],{NB,NB});
 
         savFile.safeWriteData("SCF/1PDM_ORTHO_" + spinLabel[i],
           this->onePDMOrtho[i],{NB,NB});
 
         savFile.safeWriteData("SCF/FOCK_ORTHO_" + spinLabel[i],
-          this->fockOrtho[i],{NB,NB});
+          this->fockMatrixOrtho[i],{NB,NB});
 
       }
 
@@ -105,7 +110,7 @@ namespace ChronusQ {
     // If file doesnt exist, checkpoint important bits in core
     } else {
 
-      size_t OSize = memManager.template getSize(fock[SCALAR]);
+      size_t OSize = memManager.template getSize(fockMatrix[SCALAR]);
 
       // Copy over current AO density matrix
       for(auto i = 0; i < this->onePDM.size(); i++)
@@ -118,16 +123,82 @@ namespace ChronusQ {
           
         // Avoid saving the guess Fock for extrapolation
         if (scfConv.nSCFIter > 0) {
-          for(auto i = 0; i < this->fockOrtho.size(); i++)
-            std::copy_n(this->fockOrtho[i],OSize,prevFock[i]);
+          for(auto i = 0; i < this->fockMatrixOrtho.size(); i++)
+            std::copy_n(this->fockMatrixOrtho[i],OSize,prevFock[i]);
         }
       }
 
     }
 
-  }; // SingleSlater<T>::saveCurrentState()
+  }; // SingleSlater<MatsT>::saveCurrentState()
 
 
+  template <typename MatsT, typename IntsT>
+  void SingleSlater<MatsT, IntsT>::ConventionalSCF(bool modF) {
+
+    // Transform AO fock into the orthonormal basis (on root MPI process)
+    ao2orthoFock();
+
+    // Modify fock matrix if requested (on root MPI process)
+    if( modF ) modifyFock();
+
+    // Diagonalize the orthonormal fock Matrix (on root MPI process)
+    diagOrthoFock();
+
+    // Form the orthonormal density (in the AO storage, 
+    // updates all MPI processes)
+    formDensity();
+
+    // Copy the AO storage to orthonormal storage and back transform
+    // the density into the AO basis. This is because ortho2aoDen
+    // requires the onePDMOrtho storage is populated.
+    //
+    // *** Replicated on all MPI processes ***
+    for(auto i = 0; i < this->onePDM.size(); i++)
+      std::copy_n(this->onePDM[i],
+        memManager.template getSize(onePDMOrtho[i]),
+        onePDMOrtho[i]);
+
+    // Transform the orthonormal density to the AO basis 
+    // (on root MPI process)
+    ortho2aoDen();
+
+    ortho2aoMOs();
+
+  }
+
+  template <typename MatsT, typename IntsT>
+  void SingleSlater<MatsT,IntsT>::NewtonRaphsonSCF() {
+
+    MatsT* C = getNRCoeffs();
+
+    // MO(:,i) = MO(:,i) + \sum_a C(a,i) MO(:,a)
+    const size_t NB   = this->aoints.basisSet().nBasis;
+    const size_t NB2  = NB * NB;
+    const size_t NBC  = nC * NB;
+    const size_t NBC2 = NBC * NBC;
+
+    const size_t NO    = (nC == 2) ? this->nO : this->nOA;
+    const size_t NV    = (nC == 2) ? this->nV : this->nVA;
+    const size_t nOAVA = this->nOA * this->nVA;
+    const size_t nOBVB = this->nOB * this->nVB;
+
+    for(auto i = 0ul, ai = 0ul; i < NO;  i++)
+    for(auto a = NO           ; a < NBC; a++, ai++) 
+      AXPY(NBC,-C[ai],this->mo1 + a*NBC,1,this->mo1 + i*NBC,1);
+
+    if( nC == 1 and not iCS )
+      for(auto i = 0ul, ai = 0ul; i < this->nOB;  i++)
+      for(auto a = this->nOB   ; a < NB; a++, ai++) 
+        AXPY(NB,-C[ai + nOAVA],this->mo2 + a*NB,1,this->mo2 + i*NB,1);
+
+    this->memManager.free(C);
+
+
+    orthoAOMO();
+    formDensity();
+
+  }
 
 
 
@@ -136,44 +207,145 @@ namespace ChronusQ {
    *
    *  Currently implements the fixed-point SCF procedure.
    */ 
-  template <typename T>
-  void SingleSlater<T>::getNewOrbitals(EMPerturbation &pert, bool frmFock) {
+  template <typename MatsT, typename IntsT>
+  void SingleSlater<MatsT,IntsT>::getNewOrbitals(EMPerturbation &pert, 
+      bool frmFock) {
 
     bool increment = scfControls.doIncFock and 
                      scfConv.nSCFIter % scfControls.nIncFock != 0 and
                      scfControls.guess != RANDOM;
 
     // Form the Fock matrix D(k) -> F(k)
-    if( frmFock ) formFock(pert,increment);
+    if( frmFock ) {
+      formFock(pert,increment);
+      //if( MPIRank(comm) == 0 )
+      //  printFockTimings(std::cout);
+    }
 
-    // Transform AO fock into the orthonormal basis
-    ao2orthoFock();
+    if( scfControls.scfAlg == _NEWTON_RAPHSON_SCF and scfConv.nSCFIter > 0 )
+      scfControls.scfStep = _NEWTON_RAPHSON_STEP;
 
-    // Modify fock matrix if requested
-    if( scfControls.doExtrap and frmFock ) modifyFock();
+    if( scfControls.scfStep == _CONVENTIONAL_SCF_STEP )
+      ConventionalSCF(scfControls.doExtrap and frmFock);
+    else
+      NewtonRaphsonSCF();
 
-    // Diagonalize the orthonormal fock Matrix
-    diagOrthoFock();
 
-    // Form the orthonormal density (in the AO storage)
-    formDensity();
-
-    // Copy the AO storage to orthonormal storage and back transform
-    // the density into the AO basis. This is because ortho2aoDen
-    // requires the onePDMOrtho storage is populated.
-    for(auto i = 0; i < this->onePDM.size(); i++)
-      std::copy_n(this->onePDM[i],
-        memManager.template getSize(onePDMOrtho[i]),
-        onePDMOrtho[i]);
-
-    // Transform the orthonormal density to the AO basis
-    ortho2aoDen();
-
-    ortho2aoMOs();
+#ifdef CQ_ENABLE_MPI
+    // Broadcast the AO 1PDM to all MPI processes
+    if( MPISize(comm) > 1 ) {
+      std::cerr  << "  *** Scattering the 1PDM ***\n";
+      for(auto k = 0; k < this->onePDM.size(); k++)
+        MPIBCast(this->onePDM[k],
+          memManager.template getSize(this->onePDM[k]),0,comm);
+    }
+#endif
 
   }; // SingleSlater<T>::getNewOrbitals
 
 
+
+  template <typename MatsT, typename IntsT>
+  bool SingleSlater<MatsT, IntsT>::checkStability() {
+
+    double W;
+    MatsT* J;
+    std::tie(W,J) = this->getStab();
+    std::cout << "  * LOWEST STABILITY EIGENVALUE " << 
+      std::scientific << W << "\n";
+
+    if( W < 0. and std::abs(W) > 1e-08 )
+      std::cout << "  * LOWEST STABILITY EIGENVALUE NEGATIVE: " 
+        << "PERFORMING THOULESS ROTATION\n";
+    else { 
+
+      std::cout << "  * LOWEST STABILITY EIGENVALUE POSITIVE: " 
+        << "WAVE FUNCTION 2nd ORDER STABLE\n";
+
+      this->memManager.free(J); return true; 
+
+    }
+
+    const size_t NB   = this->aoints.basisSet().nBasis;
+    const size_t NB2  = NB * NB;
+    const size_t NBC  = nC * NB;
+    const size_t NBC2 = NBC * NBC;
+
+    const size_t NO    = (nC == 2) ? this->nO : this->nOA;
+    const size_t NV    = (nC == 2) ? this->nV : this->nVA;
+    const size_t nOAVA = this->nOA * this->nVA;
+    const size_t nOBVB = this->nOB * this->nVB;
+
+
+    MatsT* ROT    = this->memManager.template malloc<MatsT>(NBC2);
+    MatsT* EXPROT = this->memManager.template malloc<MatsT>(NBC2);
+    std::fill_n(ROT,NBC2,0.);
+
+    for(auto i = 0ul, ai = 0ul; i < NO;  i++)
+    for(auto a = NO;            a < NBC; a++, ai++) {
+
+      ROT[a + i*NBC] =  J[ai];
+      ROT[i + a*NBC] = -SmartConj(J[ai]);
+
+    }      
+
+    // FIXME: need to generalize MatExp to take non-hermetian and real
+    // matricies
+    //MatExp('D',NBC,T(-1.),ROT,NBC,EXPROT,NBC,this->memManager);
+
+    // Taylor
+    MatsT s = 1.;
+    std::copy_n(ROT,NBC2,EXPROT); // n = 1
+    Scale(NBC2,-s,EXPROT,1);
+    for(auto j = 0; j < NBC; j++) EXPROT[j*(NBC+1)] += 1.; // n = 0
+
+    MatsT* SCR  = this->memManager.template malloc<MatsT>(NBC2);
+    MatsT* SCR2 = this->memManager.template malloc<MatsT>(NBC2);
+    std::copy_n(ROT,NBC2,SCR);
+
+    size_t tayMax = 30; 
+    for(auto n = 2; n <= tayMax; n++) {
+
+      MatsT* M = nullptr;
+      if( n % 2 ) {
+        Gemm('N','N',NBC,NBC,NBC,MatsT(1.),ROT,NBC,SCR2,NBC,MatsT(0.),SCR,NBC);
+        M = SCR;
+      } else {
+        Gemm('N','N',NBC,NBC,NBC,MatsT(1.),ROT,NBC,SCR,NBC,MatsT(0.),SCR2,NBC);
+        M = SCR2;
+      }
+
+      MatsT fact = std::pow(-s,n)/factorial(n);
+      MatAdd('N','N',NBC,NBC,MatsT(1.),EXPROT,NBC,fact,M,NBC,
+        EXPROT,NBC);
+
+    }
+
+    /*
+    Gemm('C','N',NBC,NBC,NBC,T(1.),EXPROT,NBC,EXPROT,NBC,T(0.),SCR,NBC);
+   // prettyPrintSmart(std::cerr,"ROT",ROT,NBC,NBC,NBC);
+   // prettyPrintSmart(std::cerr,"EXPROT",EXPROT,NBC,NBC,NBC);
+    prettyPrintSmart(std::cout,"SCR",SCR,NBC,NBC,NBC);
+   // CErr();
+   */
+
+
+    // MO1 = MO1 * EXPROT
+    Gemm('N','N',NBC,NBC,NBC,MatsT(1.),this->mo1,NBC,EXPROT,NBC,MatsT(0.),
+      ROT,NBC);
+    std::copy_n(ROT,NBC2,this->mo1);
+
+
+
+
+    orthoAOMO();
+    this->formDensity();
+    this->formDelta();
+    this->memManager.free(J,ROT,EXPROT);
+
+    return false;
+
+  }
 
 
 
@@ -187,69 +359,104 @@ namespace ChronusQ {
    *  Checks change in energy and density between SCF iterations,
    *    if *both* converged -> SCF converged.
    */ 
-  template <typename T>
-  bool SingleSlater<T>::evalConver(EMPerturbation &pert) {
+  template <typename MatsT, typename IntsT>
+  bool SingleSlater<MatsT, IntsT>::evalConver(EMPerturbation &pert) {
 
-    // Check energy convergence
+    bool isConverged;
+
+    formDelta(); // Get change in density on all MPI processes
+
+    // Compute all SCF convergence information on root process
+    if( MPIRank(comm) == 0 ) {
       
-    // Save copy of old Energy
-    double oldEnergy = this->totalEnergy;
+      // Check energy convergence
+        
+      // Save copy of old Energy
+      double oldEnergy = this->totalEnergy;
 
-    // Compute new energy (with new Density)
-    this->computeProperties(pert);
-    scfConv.deltaEnergy = this->totalEnergy - oldEnergy;
+      // Compute new energy (with new Density)
+      this->computeProperties(pert);
+      scfConv.deltaEnergy = this->totalEnergy - oldEnergy;
 
-    bool energyConv = std::abs(scfConv.deltaEnergy) < scfControls.eneConvTol;
+      bool energyConv = std::abs(scfConv.deltaEnergy) < 
+                        scfControls.eneConvTol;
+
+      /*
+      bool energySuperConv = std::abs(scfConv.deltaEnergy) < 
+                             1e-2 * scfControls.eneConvTol;
+                             */
+      bool energySuperConv = false;
 
 
-    // Check density convergence
 
-    formDelta(); // Get change in density
-    size_t DSize = memManager. template getSize(fock[SCALAR]);
-    scfConv.RMSDenScalar = TwoNorm<double>(DSize,deltaOnePDM[SCALAR],1);
-    scfConv.RMSDenMag = 0.;
-    for(auto i = 1; i < deltaOnePDM.size(); i++)
-      scfConv.RMSDenMag += std::pow(TwoNorm<double>(DSize,deltaOnePDM[i],1),2.);
-    scfConv.RMSDenMag = std::sqrt(scfConv.RMSDenMag);
-    
-
-    bool denConv = scfConv.RMSDenScalar < scfControls.denConvTol;
-
-    // Check FP convergence
-    bool FDConv(false);
-
-    bool isConverged = FDConv or (energyConv and denConv);
-
-    // Toggle damping based on energy difference
-    if( scfControls.doExtrap ) {
-      // TODO: should enable print statements only when print flag is high 
-      // enough 
-      bool largeEDiff = std::abs(scfConv.deltaEnergy) > scfControls.dampError;
-      if( scfControls.doDamp and not largeEDiff and 
-          scfControls.dampParam > 0.) {
-
-        if( printLevel > 0 )
-          std::cout << 
-            "    *** Damping Disabled - Energy Difference Fell Below " <<
-            scfControls.dampError << " ***" << std::endl;
-
-        scfControls.dampParam = 0.;
-
-      } else if( scfControls.doDamp and largeEDiff and 
-                 scfControls.dampParam <= 0.) {
-
-        if( printLevel > 0 )
-          std::cout << "    *** Damping Enabled Due to "<<
-            scfControls.dampError << " Oscillation in Energy ***" << std::endl;
-
-        scfControls.dampParam = scfControls.dampStartParam;
-
+      // Check density convergence
+ 
+      size_t DSize = memManager. template getSize(fockMatrix[SCALAR]);
+      size_t NB    = this->aoints.basisSet().nBasis;
+      scfConv.RMSDenScalar = 
+        TwoNorm<double>(DSize,deltaOnePDM[SCALAR],1) / NB;
+      scfConv.RMSDenMag = 0.;
+      for(auto i = 1; i < deltaOnePDM.size(); i++)
+        scfConv.RMSDenMag += 
+          std::pow(TwoNorm<double>(DSize,deltaOnePDM[i],1),2.);
+ 
+      scfConv.RMSDenMag = std::sqrt(scfConv.RMSDenMag) / NB;
+      
+ 
+      bool denConv = scfConv.RMSDenScalar < scfControls.denConvTol;
+ 
+      // Check FP convergence
+      bool FDConv(false);
+ 
+      isConverged = FDConv or (energyConv and denConv) or energySuperConv;
+ 
+      // Toggle damping based on energy difference
+      if( scfControls.doExtrap ) {
+        // TODO: should enable print statements only when print flag is high 
+        // enough 
+        bool largeEDiff = 
+          std::abs(scfConv.deltaEnergy) > scfControls.dampError;
+ 
+        if( scfControls.doDamp and not largeEDiff and 
+            scfControls.dampParam > 0.) {
+ 
+          if( printLevel > 0 )
+            std::cout << 
+              "    *** Damping Disabled - Energy Difference Fell Below " <<
+              scfControls.dampError << " ***" << std::endl;
+ 
+          scfControls.dampParam = 0.;
+ 
+        } else if( scfControls.doDamp and largeEDiff and 
+                   scfControls.dampParam <= 0.) {
+ 
+          if( printLevel > 0 )
+            std::cout << "    *** Damping Enabled Due to "<<
+              scfControls.dampError << " Oscillation in Energy ***" << std::endl;
+ 
+          scfControls.dampParam = scfControls.dampStartParam;
+ 
+        }
       }
+
     }
+
+
+    // If converged and NR, check for saddle point and poke along
+    // that direction ala https://doi.org/10.1063/1.4918561
+    if( scfControls.scfAlg == _NEWTON_RAPHSON_SCF and isConverged )
+      isConverged = checkStability();
+
+
+#ifdef CQ_ENABLE_MPI
+    // Broadcast whether or not we're converged to ensure that all
+    // MPI processes exit the SCF simultaneously
+    if( MPISize(comm) > 1 ) MPIBCast(isConverged,0,comm);
+#endif
 
     return isConverged;
 
-  }; // SingleSlater<T>::evalConver
+  }; // SingleSlater<MatsT>::evalConver
 
 
 
@@ -260,34 +467,45 @@ namespace ChronusQ {
    *
    *  Saves onePDM - curOnePDM in deltaOnePDM
    */ 
-  template <typename T>
-  void SingleSlater<T>::formDelta() {
+  template <typename MatsT, typename IntsT>
+  void SingleSlater<MatsT,IntsT>::formDelta() {
 
-    size_t NB = aoints.basisSet().nBasis;
+    size_t NB = this->aoints.basisSet().nBasis;
 
-    if( not savFile.exists() )
-      for(auto i = 0; i < this->onePDM.size(); i++)
-        MatAdd('N','N',NB,NB,T(1.),this->onePDM[i],NB,T(-1.),
-          curOnePDM[i],NB,deltaOnePDM[i],NB);
-    else {
+    // Compute difference on root MPI process
+    if( MPIRank(comm) == 0 ) {
+      if( not savFile.exists() )
+        for(auto i = 0; i < this->onePDM.size(); i++)
+          MatAdd('N','N',NB,NB,MatsT(1.),this->onePDM[i],NB,MatsT(-1.),
+            curOnePDM[i],NB,deltaOnePDM[i],NB);
+      else {
 
-      T* DENSCR = this->memManager.template malloc<T>(NB*NB);
-      const std::array<std::string,4> spinLabel =
-        { "SCALAR", "MZ", "MY", "MX" };
+        MatsT* DENSCR = this->memManager.template malloc<MatsT>(NB*NB);
+        const std::array<std::string,4> spinLabel =
+          { "SCALAR", "MZ", "MY", "MX" };
 
-      for(auto i = 0; i < this->onePDM.size(); i++) {
+        for(auto i = 0; i < this->onePDM.size(); i++) {
 
-        savFile.readData("/SCF/1PDM_" + spinLabel[i],DENSCR);
+          savFile.readData("/SCF/1PDM_" + spinLabel[i],DENSCR);
 
-        MatAdd('N','N',NB,NB,T(1.),this->onePDM[i],NB,T(-1.),
-          DENSCR,NB,deltaOnePDM[i],NB);
+          MatAdd('N','N',NB,NB,MatsT(1.),this->onePDM[i],NB,MatsT(-1.),
+            DENSCR,NB,deltaOnePDM[i],NB);
+        }
+
+        this->memManager.free(DENSCR);
+
       }
-
-      this->memManager.free(DENSCR);
-
     }
 
-  }; // SingleSlater<T>:formDelta
+#ifdef CQ_ENABLE_MPI
+    // Broadcast the change in the 1PDM
+    if( MPISize(comm) > 1 ) 
+      for(auto &X : deltaOnePDM) {
+        MPIBCast(X,NB*NB,0,comm);
+      }
+#endif
+
+  }; // SingleSlater<MatsT>:formDelta
 
   
 
@@ -301,26 +519,27 @@ namespace ChronusQ {
    *  (in WaveFunction::mo1 and possibly WaveFunction::mo2) and
    *  orbital energies. General for both 1 and 2 spin components
    */ 
-  template <typename T>
-  void SingleSlater<T>::diagOrthoFock() {
+  template <typename MatsT, typename IntsT>
+  void SingleSlater<MatsT,IntsT>::diagOrthoFock() {
 
-    size_t NB = aoints.basisSet().nBasis * nC;
+    ROOT_ONLY(comm); 
+    size_t NB = this->aoints.basisSet().nBasis * nC;
     size_t NB2 = NB*NB;
 
-    // Copy over the fockOrtho into MO storage
+    // Copy over the fockMatrixOrtho into MO storage
     if(nC == 1 and iCS) 
-      std::transform(fockOrtho[SCALAR],fockOrtho[SCALAR] + NB2,this->mo1,
-        [](T a){ return a / 2.; }
+      std::transform(fockMatrixOrtho[SCALAR],fockMatrixOrtho[SCALAR] + NB2,this->mo1,
+        [](MatsT a){ return a / 2.; }
       );
     else if(nC == 1)
       for(auto j = 0; j < NB2; j++) {
-        this->mo1[j] = 0.5 * (fockOrtho[SCALAR][j] + fockOrtho[MZ][j]); 
-        this->mo2[j] = 0.5 * (fockOrtho[SCALAR][j] - fockOrtho[MZ][j]); 
+        this->mo1[j] = 0.5 * (fockMatrixOrtho[SCALAR][j] + fockMatrixOrtho[MZ][j]); 
+        this->mo2[j] = 0.5 * (fockMatrixOrtho[SCALAR][j] - fockMatrixOrtho[MZ][j]); 
       }
     else { 
 
-      SpinGather(NB/2,this->mo1,NB,fockOrtho[SCALAR],NB/2,fockOrtho[MZ],
-        NB/2,fockOrtho[MY],NB/2,fockOrtho[MX],NB/2);
+      SpinGather(NB/2,this->mo1,NB,fockMatrixOrtho[SCALAR],NB/2,fockMatrixOrtho[MZ],
+        NB/2,fockMatrixOrtho[MY],NB/2,fockMatrixOrtho[MX],NB/2);
 
     }
 
@@ -339,22 +558,23 @@ namespace ChronusQ {
     printMO(std::cout);
 #endif
 
-  }; // SingleSlater<T>::diagOrthoFock
+  }; // SingleSlater<MatsT>::diagOrthoFock
 
 
   /**
    *  \brief Transforms all of the spin components of the AO fock
    *  matrix to the orthonormal basis.
    *
-   *  Populates / overwrites fockOrtho storage
+   *  Populates / overwrites fockMatrixOrtho storage
    */ 
-  template <typename T>
-  void SingleSlater<T>::ao2orthoFock() {
+  template <typename MatsT, typename IntsT>
+  void SingleSlater<MatsT,IntsT>::ao2orthoFock() {
 
-    for(auto i = 0; i < fock.size(); i++)
-      aoints.Ortho1Trans(fock[i],fockOrtho[i]);
+    ROOT_ONLY(comm); 
+    for(auto i = 0; i < fockMatrix.size(); i++)
+      Ortho1TransT(fockMatrix[i],fockMatrixOrtho[i]);
 
-  }; // SingleSlater<T>::ao2orthoFock
+  }; // SingleSlater<MatsT>::ao2orthoFock
 
 
 
@@ -364,48 +584,81 @@ namespace ChronusQ {
    *
    *  Populates / overwrites onePDM storage
    */ 
-  template <typename T>
-  void SingleSlater<T>::ortho2aoDen() {
+  template <typename MatsT, typename IntsT>
+  void SingleSlater<MatsT,IntsT>::ortho2aoDen() {
+
+    ROOT_ONLY(comm);
 
     for(auto i = 0; i < onePDMOrtho.size(); i++)
-      aoints.Ortho1Trans(onePDMOrtho[i],this->onePDM[i]);
+      Ortho1Trans(onePDMOrtho[i],this->onePDM[i]);
 
 #if 0
     print1PDMOrtho(std::cout);
 #endif
 
-  }; // SingleSlater<T>::ao2orthoFock
+  }; // SingleSlater<MatsT>::ao2orthoFock
 
   
-  template <typename T>
-  void SingleSlater<T>::ortho2aoMOs() {
+  template <typename MatsT, typename IntsT>
+  void SingleSlater<MatsT,IntsT>::ortho2aoMOs() {
 
-    size_t NB = aoints.basisSet().nBasis;
+    size_t NB = this->aoints.basisSet().nBasis;
 
-    T* SCR = this->memManager.template malloc<T>(this->nC*NB*NB);
+    // Transform MOs on MPI root as slave processes do not have
+    // updated MO coefficients
+    if( MPIRank(comm) == 0 ) {
+      MatsT* SCR = this->memManager.template malloc<MatsT>(this->nC*NB*NB);
 
-    // Transform the (top half) of MO1
-    Gemm('N','N',NB,this->nC*NB,NB,T(1.),aoints.ortho1,NB,
-      this->mo1,this->nC*NB,T(0.),SCR,NB);
-    SetMat('N',NB,this->nC*NB,T(1.),SCR,NB,this->mo1,this->nC*NB);
-    
-    if( this->nC == 2 ) {
+      // Transform the (top half) of MO1
+      Gemm('N','N',NB,this->nC*NB,NB,MatsT(1.),this->ortho1,NB,
+        this->mo1,this->nC*NB,MatsT(0.),SCR,NB);
+      SetMat('N',NB,this->nC*NB,MatsT(1.),SCR,NB,this->mo1,this->nC*NB);
+      
+      if( this->nC == 2 ) {
 
-      // Transform the bottom half of MO1
-      Gemm('N','N',NB,this->nC*NB,NB,T(1.),aoints.ortho1,NB,
-        this->mo1 + NB,this->nC*NB,T(0.),SCR,NB);
-      SetMat('N',NB,this->nC*NB,T(1.),SCR,NB,this->mo1 + NB,this->nC*NB);
+        // Transform the bottom half of MO1
+        Gemm('N','N',NB,this->nC*NB,NB,MatsT(1.),this->ortho1,NB,
+          this->mo1 + NB,this->nC*NB,MatsT(0.),SCR,NB);
+        SetMat('N',NB,this->nC*NB,MatsT(1.),SCR,NB,this->mo1 + NB,this->nC*NB);
 
-    } else if( not this->iCS ) {
+      } else if( not this->iCS ) {
 
-      // Transform MO2
-      Gemm('N','N',NB,NB,NB,T(1.),aoints.ortho1,NB,this->mo2,NB,T(0.),SCR,NB);
-      SetMat('N',NB,NB,T(1.),SCR,NB,this->mo2,NB);
+        // Transform MO2
+        Gemm('N','N',NB,NB,NB,MatsT(1.),this->ortho1,NB,this->mo2,NB,MatsT(0.),
+          SCR,NB);
+        SetMat('N',NB,NB,MatsT(1.),SCR,NB,this->mo2,NB);
+
+      }
+
+      this->memManager.free(SCR);
 
     }
 
+#ifdef CQ_ENABLE_MPI
 
-    this->memManager.free(SCR);
+
+    // Broadcast the updated MOs to all MPI processes
+    if( MPISize(comm) > 1 ) {
+
+      std::cerr  << "  *** Scattering the AO-MOs ***\n";
+      MPIBCast(this->mo1,nC*nC*NB*NB,0,comm);
+      if( nC == 1 and not iCS )
+        MPIBCast(this->mo2,nC*nC*NB*NB,0,comm);
+
+      std::cerr  << "  *** Scattering EPS ***\n";
+      MPIBCast(this->eps1,nC*NB,0,comm);
+      if( nC == 1 and not iCS )
+        MPIBCast(this->eps2,nC*NB,0,comm);
+
+      std::cerr  << "  *** Scattering FOCK ***\n";
+      for(int k = 0; k < fockMatrix.size(); k++)
+        MPIBCast(fockMatrix[k],NB*NB,0,comm);
+
+    }
+
+#endif
+
+    MOFOCK(); // Form the MO fock matrix
 
 #if 0
     // Check proper orthonormalized wrt overlap
@@ -415,10 +668,10 @@ namespace ChronusQ {
 
 
     // MO1 inner product
-    Gemm('N','N',NB,this->nC*NB,NB,T(1.),aoints.overlap,NB,
+    Gemm('N','N',NB,this->nC*NB,NB,T(1.),this->aoints.overlap,NB,
       this->mo1,this->nC*NB,T(0.),SCR2,this->nC*NB);
     if(this->nC == 2)
-      Gemm('N','N',NB,this->nC*NB,NB,T(1.),aoints.overlap,NB,
+      Gemm('N','N',NB,this->nC*NB,NB,T(1.),this->aoints.overlap,NB,
         this->mo1+NB,this->nC*NB,T(0.),SCR2+NB,this->nC*NB);
    
     Gemm('C','N',this->nC*NB,this->nC*NB,this->nC*NB,T(1.),this->mo1,
@@ -435,7 +688,7 @@ namespace ChronusQ {
 
 
     if(this->nC == 1 and not this->iCS) {
-      Gemm('N','N',NB,NB,NB,T(1.),aoints.overlap,NB,this->mo2,NB,T(0.),SCR2,NB);
+      Gemm('N','N',NB,NB,NB,T(1.),this->aoints.overlap,NB,this->mo2,NB,T(0.),SCR2,NB);
       Gemm('C','N',NB,NB,NB,T(1.),this->mo2,NB,SCR2,NB,T(0.),SCR3,NB);
 
       for(auto i = 0; i < this->nC*NB; i++)
@@ -449,7 +702,7 @@ namespace ChronusQ {
 
 #endif
 
-  }; // SingleSlater<T>::ortho2aoMOs
+  }; // SingleSlater<MatsT>::ortho2aoMOs
 
 
   /**
@@ -457,14 +710,14 @@ namespace ChronusQ {
    *
    *  Allocate memory for extrapolation and compute the energy
    */ 
-  template <typename T>
-  void SingleSlater<T>::SCFInit() {
+  template <typename MatsT, typename IntsT>
+  void SingleSlater<MatsT,IntsT>::SCFInit() {
 
     // Allocate additional storage if doing some type of 
     // extrapolation during the SCF procedure
     if ( scfControls.doExtrap ) allocExtrapStorage();
 
-  }; // SingleSlater<T>::SCFInit
+  }; // SingleSlater<MatsT>::SCFInit
 
 
 
@@ -474,13 +727,69 @@ namespace ChronusQ {
    *
    *  Deallocate the memory allocated for extrapolation.
    */ 
-  template <typename T>
-  void SingleSlater<T>::SCFFin() {
+  template <typename MatsT, typename IntsT>
+  void SingleSlater<MatsT,IntsT>::SCFFin() {
 
     // Deallocate extrapolation storage
     if ( scfControls.doExtrap ) deallocExtrapStorage();
 
-  }; // SingleSlater<T>::SCFFin
+  }; // SingleSlater<MatsT>::SCFFin
+
+
+
+
+  /**
+   *  \brief Reorthogonalize the MOs wrt overlap
+   */
+  template <typename MatsT, typename IntsT>
+  void SingleSlater<MatsT, IntsT>::orthoAOMO() {
+
+    const size_t NB   = this->aoints.basisSet().nBasis;
+    const size_t NB2  = NB * NB;
+    const size_t NBC  = this->nC * NB;
+    const size_t NBC2 = NBC * NBC;
+
+    // Reorthogonalize MOs wrt S
+    MatsT* SCR  = this->memManager.template malloc<MatsT>(NBC*NBC);
+    MatsT* SCR2 = this->memManager.template malloc<MatsT>(NBC*NBC);
+
+    // SCR2 = C**H S C
+    Gemm('N','N',NB,NBC,NB,MatsT(1.),this->aoints.overlap,NB,this->mo1,NBC,MatsT(0.),
+      SCR,NBC);
+    if( this->nC == 2 )
+      Gemm('N','N',NB,NBC,NB,MatsT(1.),this->aoints.overlap,NB,this->mo1+NB,NBC,
+        MatsT(0.),SCR+NB,NBC);
+
+    Gemm('C','N',NBC,NBC,NBC,MatsT(1.),this->mo1,NBC,SCR,NBC,MatsT(0.),SCR2,NBC);
+
+    // SCR2 = L L**H -> L
+    int INFO = Cholesky('L',NBC,SCR2,NBC);
+
+    // SCR2 = L^-1
+    INFO = TriInv('L','N',NBC,SCR2,NBC);
+
+    // MO1 = MO1 * L^-H
+    Trmm('R','L','C','N',NBC,NBC,MatsT(1.),SCR2,NBC,this->mo1,NBC);
+
+    // Reorthogonalize MOB
+    if( this->nC == 1 and not this->iCS ) {
+      Gemm('N','N',NB,NB,NB,MatsT(1.),this->aoints.overlap,NB,this->mo2,NB,MatsT(0.),
+        SCR,NB);
+      Gemm('C','N',NB,NB,NB,MatsT(1.),this->mo2,NBC,SCR,NB,MatsT(0.),SCR2,NB);
+
+      // SCR2 = L L**H -> L
+      INFO = Cholesky('L',NB,SCR2,NB);
+
+      // SCR2 = L^-1
+      INFO = TriInv('L','N',NB,SCR2,NB);
+
+      // MO2 = MO2 * L^-H
+      Trmm('R','L','C','N',NB,NB,MatsT(1.),SCR2,NB,this->mo2,NB);
+
+    }
+
+    this->memManager.free(SCR,SCR2);
+  }
 
 }; // namespace ChronusQ
 

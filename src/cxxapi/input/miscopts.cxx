@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -25,9 +25,30 @@
 #include <cerr.hpp>
 
 #include <util/threads.hpp>
+#include <util/mpi.hpp>
 
 namespace ChronusQ {
 
+  void CQMISC_VALID( std::ostream &out, CQInputFile &input ) {
+
+    // Allowed keywords
+    std::vector<std::string> allowedKeywords = {
+      "MEM",
+      "MEMBLK",
+      "NSMP"
+    };
+
+    // Specified keywords
+    std::vector<std::string> miscKeywords = input.getDataInSection("MISC");
+
+    // Make sure all of miscKeywords in allowedKeywords
+    for( auto &keyword : miscKeywords ) {
+      auto ipos = std::find(allowedKeywords.begin(),allowedKeywords.end(),keyword);
+      if( ipos == allowedKeywords.end() ) 
+        CErr("Keyword MISC." + keyword + " is not recognized",std::cout);// Error
+    }
+    // Check for disallowed combinations (if any)
+  }
 
   std::shared_ptr<CQMemManager> CQMiscOptions(std::ostream &out,
     CQInputFile &input) {
@@ -87,7 +108,9 @@ namespace ChronusQ {
 
     out << "  *** Allocating " << memPrint << " " << postfix << "B *** \n";
     out << "  *** ChronusQ will use " << GetNumThreads() 
-        << " OpenMP threads ***\n\n";
+        << " OpenMP threads ***\n";
+    out << "  *** ChronusQ will use " << MPISize() 
+        << " MPI Processes ***\n\n";
     out << "\n\n";
 
     return std::make_shared<CQMemManager>(mem,blkSize);

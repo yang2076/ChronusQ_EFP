@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -25,13 +25,13 @@
 
 namespace ChronusQ {
 
-  template class WaveFunction<double>;
-  template class WaveFunction<dcomplex>;
+  template class WaveFunction<double,double>;
+  template class WaveFunction<dcomplex,double>;
+  template class WaveFunction<dcomplex,dcomplex>;
 
   // Instantiate copy constructors
-  template WaveFunction<dcomplex>::WaveFunction(const WaveFunction<double> &,
-    int);
+  template WaveFunction<dcomplex,double>::WaveFunction(const WaveFunction<double,double> &, int);
   // Instantiate copy ructors
-  template WaveFunction<dcomplex>::WaveFunction( WaveFunction<double> &&,int);
+  template WaveFunction<dcomplex,double>::WaveFunction( WaveFunction<double,double> &&,int);
 
 }; // namespace ChronusQ

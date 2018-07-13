@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -22,9 +22,36 @@
  *  
  */
 #include <cxxapi/options.hpp>
+#include <util/mpi.hpp>
 #include <cerr.hpp>
 
 namespace ChronusQ {
+
+  /**
+   *
+   *  Check valid keywords in the section.
+   *
+  */
+  void CQBASIS_VALID( std::ostream &out, CQInputFile &input ) {
+
+    // Allowed keywords
+    std::vector<std::string> allowedKeywords = {
+      "FORCECART",
+      "BASIS",
+      "BASISTYPE"
+    };
+
+    // Specified keywords
+    std::vector<std::string> basisKeywords = input.getDataInSection("BASIS");
+
+    // Make sure all of basisKeywords in allowedKeywords
+    for( auto &keyword : basisKeywords ) {
+      auto ipos = std::find(allowedKeywords.begin(),allowedKeywords.end(),keyword);
+      if( ipos == allowedKeywords.end() ) 
+        CErr("Keyword BASIS." + keyword + " is not recognized",std::cout);// Error
+    }
+    // Check for disallowed combinations (if any)
+  }
 
   /**
    *  Construct a basis set object using the input file.
@@ -46,12 +73,31 @@ namespace ChronusQ {
     std::string basisName;
     try {
       basisName = input.getData<std::string>("BASIS.BASIS");
+
+      if( std::find_if( basisKeyword.begin(), basisKeyword.end(),
+            [&]( std::pair<std::string, std::string> x ) -> bool{
+              return not x.first.compare(basisName); 
+            } ) == basisKeyword.end() ) {
+
+
+        CErr(basisName + " is not a supported Basis Set");
+
+      }
+
     } catch(...) {
       CErr("BasisSet not specified!",out);
     }
 
+    BASIS_FUNCTION_TYPE bType = REAL_GTO;
+    try{
+      std::string bTypeString = input.getData<std::string>("BASIS.BASISTYPE");
+      if(not bTypeString.compare("GIAO")) bType = COMPLEX_GIAO;
+      else if(not bTypeString.compare("GTO")) bType = REAL_GTO;
+      else CErr("BASIS.BASISTYPE not valid.",out);
+    } catch(...) {;}
+
     // Construct the BasisSet object
-    BasisSet basis(basisName,mol,forceCart);
+    BasisSet basis(basisName,mol,bType,forceCart,MPIRank() == 0);
 
     // Ouput BasisSet information
     out << basis << std::endl;

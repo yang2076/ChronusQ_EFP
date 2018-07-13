@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -45,8 +45,8 @@ std::array<T,N> valarray2array(const std::valarray<T> &x) {
 
 namespace ChronusQ {
 
-  template <template <typename> class _SSTyp, typename T>
-  void RealTime<_SSTyp,T>::doPropagation() {
+  template <template <typename, typename> class _SSTyp, typename IntsT>
+  void RealTime<_SSTyp,IntsT>::doPropagation() {
 
     printRTHeader();
 
@@ -158,7 +158,7 @@ namespace ChronusQ {
       data.Energy.push_back(propagator_.totalEnergy);
       data.ElecDipole.push_back(propagator_.elecDipole);
       if( pert_t.fields.size() > 0 )
-      data.ElecDipoleField.push_back( valarray2array<3,double>(pert_t.getAmp()) );
+      data.ElecDipoleField.push_back( pert_t.getDipoleAmp(Electric) );
 
 
       // Print progress line in the output file
@@ -219,8 +219,8 @@ namespace ChronusQ {
    *      = \frac{1}{2}U^S \otimes I_2 + \frac{1}{2} U^k \otimes \sigma_k
    *  \f]
    */ 
-  template <template <typename> class _SSTyp, typename T>
-  void RealTime<_SSTyp,T>::formPropagator() {
+  template <template <typename, typename> class _SSTyp, typename IntsT>
+  void RealTime<_SSTyp,IntsT>::formPropagator() {
 
     size_t NB = propagator_.aoints.basisSet().nBasis;
 
@@ -230,7 +230,7 @@ namespace ChronusQ {
     if( UH.size() == 1 ) {
       // See docs for factor of 2
       MatExp('D',NB,dcomplex(0.,-curState.stepSize/2.),
-        propagator_.fockOrtho[SCALAR],NB,UH[SCALAR],NB,memManager_);
+        propagator_.fockMatrixOrtho[SCALAR],NB,UH[SCALAR],NB,memManager_);
 
       Scale(NB*NB,dcomplex(2.),UH[SCALAR],1);
 
@@ -239,20 +239,20 @@ namespace ChronusQ {
 
       // Transform SCALAR / MZ -> ALPHA / BETA
       for(auto i = 0; i < NB*NB; i++) {
-        dcomplex tmp = propagator_.fockOrtho[SCALAR][i];
+        dcomplex tmp = propagator_.fockMatrixOrtho[SCALAR][i];
 
-        propagator_.fockOrtho[SCALAR][i] = 
-          0.5 * (tmp + propagator_.fockOrtho[MZ][i]);
+        propagator_.fockMatrixOrtho[SCALAR][i] = 
+          0.5 * (tmp + propagator_.fockMatrixOrtho[MZ][i]);
 
-        propagator_.fockOrtho[MZ][i] = 
-          0.5 * (tmp - propagator_.fockOrtho[MZ][i]);
+        propagator_.fockMatrixOrtho[MZ][i] = 
+          0.5 * (tmp - propagator_.fockMatrixOrtho[MZ][i]);
 
       }
 
       MatExp('D',NB,dcomplex(0.,-curState.stepSize),
-        propagator_.fockOrtho[SCALAR],NB,UH[SCALAR],NB,memManager_);
+        propagator_.fockMatrixOrtho[SCALAR],NB,UH[SCALAR],NB,memManager_);
       MatExp('D',NB,dcomplex(0.,-curState.stepSize),
-        propagator_.fockOrtho[MZ],NB,UH[MZ],NB,memManager_);
+        propagator_.fockMatrixOrtho[MZ],NB,UH[MZ],NB,memManager_);
 
       // Transform ALPHA / BETA -> SCALAR / MZ
       for(auto i = 0; i < NB*NB; i++) {
@@ -270,9 +270,9 @@ namespace ChronusQ {
       dcomplex *F2C  = SCR;
       dcomplex *UH2C = F2C + 4*NB*NB;
 
-      SpinGather(NB,F2C,2*NB,propagator_.fockOrtho[SCALAR],NB,
-        propagator_.fockOrtho[MZ],NB,propagator_.fockOrtho[MY],NB,
-        propagator_.fockOrtho[MX],NB);
+      SpinGather(NB,F2C,2*NB,propagator_.fockMatrixOrtho[SCALAR],NB,
+        propagator_.fockMatrixOrtho[MZ],NB,propagator_.fockMatrixOrtho[MY],NB,
+        propagator_.fockMatrixOrtho[MX],NB);
 
       MatExp('D',2*NB,dcomplex(0.,-curState.stepSize),F2C,2*NB,UH2C,2*NB,
         memManager_);
@@ -295,8 +295,8 @@ namespace ChronusQ {
 
 
   
-  template <template <typename> class _SSTyp, typename T>
-  void RealTime<_SSTyp,T>::propagateWFN() {
+  template <template <typename, typename> class _SSTyp, typename IntsT>
+  void RealTime<_SSTyp,IntsT>::propagateWFN() {
 
     size_t NB = propagator_.aoints.basisSet().nBasis;
     size_t NC = propagator_.nC;
@@ -322,14 +322,18 @@ namespace ChronusQ {
 
       // Create X(Z) = (U**H * DO)(Z) in SCR1
         
-      // SCR1 = 0.5 * U(S)**H * DO(Z)
-      Gemm('N','N',NB,NB,NB,dcomplex(0.5),UH[SCALAR],NB,
-        propagator_.onePDMOrtho[MZ],NB,dcomplex(0.),SCR1,NB);
+      if( propagator_.onePDMOrtho.size() > 1 ) {
 
-      // SCR1 += 0.5 * U(Z)**H * DO(S)
-      if( UH.size() != 1 )
-        Gemm('N','N',NB,NB,NB,dcomplex(0.5),UH[MZ],NB,
-          propagator_.onePDMOrtho[SCALAR],NB,dcomplex(1.),SCR1,NB);
+        // SCR1 = 0.5 * U(S)**H * DO(Z)
+        Gemm('N','N',NB,NB,NB,dcomplex(0.5),UH[SCALAR],NB,
+          propagator_.onePDMOrtho[MZ],NB,dcomplex(0.),SCR1,NB);
+
+        // SCR1 += 0.5 * U(Z)**H * DO(S)
+        if( UH.size() != 1 )
+          Gemm('N','N',NB,NB,NB,dcomplex(0.5),UH[MZ],NB,
+            propagator_.onePDMOrtho[SCALAR],NB,dcomplex(1.),SCR1,NB);
+
+      }
 
 
 
@@ -363,6 +367,7 @@ namespace ChronusQ {
           propagator_.onePDMOrtho[MZ],NB);
 
       }
+
     } else {
 
       // Gather DO

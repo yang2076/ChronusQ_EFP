@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -94,6 +94,132 @@ namespace ChronusQ {
   template <typename _F>
   int LUInv(int N, _F *A, int LDA, CQMemManager &mem);
 
+
+  /**
+   *  \brief Computes the Bunch-Kaufman factorization of an hermetian 
+   *  matrix A. Smart wrapper around DSYTRF or ZHETRF depending on context.
+   *
+   *  See http://www.netlib.org/lapack/lapack-3.1.1/html/dsytrf.f.html or
+   *      http://www.netlib.org/lapack/lapack-3.1.1/html/zhetrf.f.html for
+   *  parameter documentation.
+   */  
+  template <typename _F>
+  int BunchKaufman(char UPLO, int N, _F *A, int LDA, int *IPIV, 
+    CQMemManager &mem);
+
+
+  /**
+   *  \brief Computes the Bunch-Kaufman factorization of an hermetian 
+   *  matrix A. Wraps BunchKaufman with internal allocation of IPIV
+   */  
+  template <typename _F>
+  int BunchKaufman(char UPLO, int N, _F *A, int LDA, CQMemManager &mem) {
+
+    int * IPIV = mem.malloc<int>(std::min(1,N));
+    int INFO = BunchKaufman(UPLO,N,A,LDA,IPIV,mem);
+    mem.free(IPIV);
+    return INFO;
+
+  }
+
+
+  /**
+   *  \brief Computes the inverse of a triangular matrix A. Smart wrapper 
+   *  around DTRTRI or ZTRTRI depending on context.
+   *
+   *  See http://www.netlib.org/lapack/lapack-3.1.1/html/dtrtri.f.html or
+   *      http://www.netlib.org/lapack/lapack-3.1.1/html/ztrtri.f.html for
+   *  parameter documentation.
+   */  
+  template <typename _F>
+  int TriInv(char UPLO, char DIAG, int N, _F *A, int LDA);
+
+
+
+
+
+
+
+  /**
+   *  \brief Computes the QR factorization of a general matrix A:
+   *  returns Q in place of A and returns an upper triangular R.
+   *  Smart wrapper around DGEQRF / DORGQR or ZGEQRF / ZUNGQR
+   *  depending on the context
+   */
+  template <typename _F>
+  int QR(int M, int N, _F *A, int LDA, _F *R, int LDR, CQMemManager &mem);
+
+
+  /**
+   *  \brief Computes the QR factorization of a general matrix A:
+   *  returns Q in place of A and discards R
+   *  Smart wrapper around DGEQRF / DORGQR or ZGEQRF / ZUNGQR
+   *  depending on the context
+   */
+  template <typename _F>
+  inline int QR(int M, int N, _F *A, int LDA, CQMemManager &mem) {
+
+    int LDR = std::min(M,N);
+    _F *R = mem.template malloc<_F>(LDR*LDR);
+
+    int INFO = QR(M,N,A,LDA,R,LDR,mem);
+
+    mem.free(R);
+
+    return INFO;
+
+  }
+
+
+
+
+
+  /**
+   *  \brief Computes the generalized Shur (QZ) factorization of general
+   *  matricies (A,B). Smart wrapper around DGGES or ZGGES depending 
+   *  on the context
+   */
+  template <typename _F>
+  int QZ(char JOBVSL, char JOBVSR, int N, _F *A, int LDA, _F *B, int LDB,
+    dcomplex *ALPHA, _F *BETA, _F *VSL, int LDVSL, _F *VSR, int LDVSR,
+    CQMemManager &mem); 
+
+
+  template <typename _F>
+  inline int QZ(char JOBVSL, char JOBVSR, int N, _F *A, int LDA, _F *B, int LDB,
+    dcomplex *W, _F *VSL, int LDVSL, _F *VSR, int LDVSR, CQMemManager &mem) {
+
+
+    dcomplex *ALPHA = mem.template malloc<dcomplex>(N);
+    _F       *BETA  = mem.template malloc<_F>(N);
+
+    int INFO = QZ(JOBVSL,JOBVSR,N,A,LDA,B,LDB,ALPHA,BETA,VSL,LDVSL,VSR,LDVSR,
+      mem);
+
+    for(auto k = 0; k < N; k++) {
+
+      if( std::abs(BETA[k]) < 1e-12 )
+        std::cout << "WARNING: SMALL BETA INCURRED IN QZ" << std::endl;
+
+      W[k] = ALPHA[k] / BETA[k];
+
+    }
+
+    mem.free(ALPHA,BETA);
+
+    return INFO;
+
+  } 
+
+  template <typename _F>
+  int OrdQZ(char JOBVSL, char JOBVSR, int N, _F *A, int LDA, _F *B, 
+    int LDB, dcomplex *ALPHA, _F *BETA, double SIMGA, _F *VSL, 
+    int LDVSL, _F *VSR, int LDVSR, CQMemManager &mem);
+
+  template <typename _F>
+  int OrdQZ2(char JOBVSL, char JOBVSR, int N, _F *A, int LDA, _F *B, 
+    int LDB, dcomplex *ALPHA, _F *BETA, double hLim, double SIMGA, _F *VSL, 
+    int LDVSL, _F *VSR, int LDVSR, CQMemManager &mem);
 
 }; // namespace ChronusQ
 

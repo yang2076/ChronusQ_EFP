@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -46,6 +46,31 @@ namespace ChronusQ {
     return INFO;
 
   }; // SVD (double)
+
+  template <>
+  int SVD(char JOBU, char JOBVT, int M, int N, dcomplex *A, int LDA, double *S,
+    dcomplex *U, int LDU, dcomplex *VT, int LDVT, CQMemManager &mem) {
+
+    int INFO;
+  
+    int LRWORK = 5*std::min(M,N);
+    double   *RWORK = mem.malloc<double>(LRWORK);
+
+    auto test = std::bind(zgesvd_,&JOBU,&JOBVT,&M,&N,A,&LDA,S,U,&LDU,VT,&LDVT,
+      std::placeholders::_1,std::placeholders::_2,RWORK,&INFO);
+  
+    int LWORK  = getLWork<dcomplex>(test);
+    dcomplex *WORK  = mem.malloc<dcomplex>(LWORK);
+
+    
+    zgesvd_(&JOBU,&JOBVT,&M,&N,A,&LDA,S,U,&LDU,VT,&LDVT,WORK,&LWORK,RWORK,
+      &INFO);
+
+    mem.free(WORK,RWORK);
+
+    return INFO;
+
+  }; // SVD (dcomplex)
 
 
 }; // namespace ChronusQ

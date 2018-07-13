@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 
 #include <chronusq_sys.hpp>
 #include <wavefunction/base.hpp>
+#include <aointegrals.hpp>
 
 #include <fields.hpp>
 #include <util/files.hpp>
@@ -51,6 +52,22 @@ namespace ChronusQ {
   };
 
   /**
+   *  The types of steps for the SCF
+   */
+  enum SCF_STEP {
+    _CONVENTIONAL_SCF_STEP,
+    _NEWTON_RAPHSON_STEP
+  };
+
+  /**
+   *  SCF Algorithms
+   */
+  enum SCF_ALG {
+    _CONVENTIONAL_SCF,
+    _NEWTON_RAPHSON_SCF
+  };
+
+  /**
    *  \brief A struct to hold the information pertaining to
    *  the control of an SCF procedure.
    *
@@ -66,6 +83,11 @@ namespace ChronusQ {
     // TODO: need to add logic to set this
     // Extrapolation flag for DIIS and damping
     bool doExtrap = true;     ///< Whether to extrapolate Fock matrix
+
+
+    // Algorithm and step
+    SCF_STEP  scfStep = _CONVENTIONAL_SCF_STEP;
+    SCF_ALG   scfAlg  = _CONVENTIONAL_SCF;
 
     // Guess Settings
     SS_GUESS guess = SAD;
@@ -136,7 +158,16 @@ namespace ChronusQ {
        
     // Print Controls
     size_t printLevel; ///< Print Level
+
+    // Current Timings
+    double GDDur;
               
+    // Integral variables
+    CORE_HAMILTONIAN_TYPE coreType   = NON_RELATIVISTIC;  ///< Core Hamiltonian type
+    ORTHO_TYPE            orthoType  = LOWDIN; ///< Orthogonalization scheme
+
+    OneETerms oneETerms; ///< One electron terms to be computed
+
     // SCF Variables
     SCFControls    scfControls; ///< Controls for the SCF procedure
     SCFConvergence scfConv;     ///< Current status of SCF convergence
@@ -146,53 +177,73 @@ namespace ChronusQ {
     SingleSlaterBase(SingleSlaterBase &&)      = default;
 
     SingleSlaterBase() = delete;
-    SingleSlaterBase(AOIntegrals &aoi, size_t _nC, bool iCS) : 
-      WaveFunctionBase(aoi,_nC,iCS), QuantumBase(aoi.memManager(),_nC,iCS),
-      printLevel(1) { };
+
+    SingleSlaterBase(MPI_Comm c, CQMemManager &mem, size_t _nC, bool iCS) : 
+      WaveFunctionBase(c, mem,_nC,iCS), QuantumBase(c, mem,_nC,iCS),
+      printLevel((MPIRank(c) == 0) ? 1 : 0) { };
 
     
+    // Setters
+    inline void setCoreH(CORE_HAMILTONIAN_TYPE cType) {
+
+      coreType = cType;
+
+      if(coreType == NON_RELATIVISTIC) 
+        oneETerms={false,true,false};
+
+      else if(coreType == RELATIVISTIC_X2C_1E) 
+        oneETerms={true,true,true};
+
+    }
+      
 
 
     // Procedural Functions to be defined in all derived classes
       
     // In essence, all derived classes should be able to:
-    //   1. Form a Fock matrix with the ability to increment
+    //   Form a Fock matrix with the ability to increment
     virtual void formFock(EMPerturbation &, bool increment = false, double xHFX = 1.) = 0;
 
-    //   2. Form an initial Guess (which populates the Fock, Density 
-    //     and energy)
+    //   Form an initial Guess (which populates the Fock, Density 
+    //   and energy)
     virtual void formGuess() = 0;
 
-    //   3. Obtain a new set of orbitals / densities from current
-    //      set of densities
+    //   Form the core Hamiltonian
+    virtual void formCoreH(EMPerturbation&) = 0;
+
+    //   Obtain a new set of orbitals / densities from current
+    //   set of densities
     virtual void getNewOrbitals(EMPerturbation &, bool frmFock = true) = 0;
 
-    //   4. Save the current state of the wave function
+    //   Save the current state of the wave function
     virtual void saveCurrentState() = 0;
 
-    //   5. Save some metric regarding the change in the wave function
-    //      from the currently saved state (i.e. between SCF iterations)
+    //   Save some metric regarding the change in the wave function
+    //   from the currently saved state (i.e. between SCF iterations)
     virtual void formDelta() = 0;
 
-    //   6. Evaluate SCF convergence. This function should populate the
-    //      SingleSlaterBase::scfConv variable and compare it to the 
-    //      SingleSlaterBase::scfControls variable to evaluate convergence
+    //   Evaluate SCF convergence. This function should populate the
+    //   SingleSlaterBase::scfConv variable and compare it to the 
+    //   SingleSlaterBase::scfControls variable to evaluate convergence
     virtual bool evalConver(EMPerturbation &) = 0;
 
-    //   7. Print SCF header, footer and progress
+    //   Print SCF header, footer and progress
     void printSCFHeader(std::ostream &out, EMPerturbation &);
-    void printSCFProg(std::ostream &out = std::cout);
+    void printSCFProg(std::ostream &out = std::cout,
+      bool printDiff = true);
 
-    //   8. Initialize and finalize the SCF environment
+    //   Initialize and finalize the SCF environment
     virtual void SCFInit() = 0;
     virtual void SCFFin()  = 0;
 
-    //   9. Print various matricies
+    //   Print various matricies
     virtual void printFock(std::ostream& )     = 0;
     virtual void print1PDMOrtho(std::ostream&) = 0;
     virtual void printGD(std::ostream&)        = 0;
     virtual void printJ(std::ostream&)         = 0;
     virtual void printK(std::ostream&)         = 0;
+
+    virtual void printFockTimings(std::ostream&) = 0;
 
     // Procedural Functions to be shared among all derived classes
       

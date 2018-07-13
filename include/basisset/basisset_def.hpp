@@ -1,7 +1,7 @@
 /* 
  *  This file is part of the Chronus Quantum (ChronusQ) software package
  *  
- *  Copyright (C) 2014-2017 Li Research Group (University of Washington)
+ *  Copyright (C) 2014-2018 Li Research Group (University of Washington)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -33,11 +33,11 @@
 
 namespace ChronusQ {
 
-
-
-
-
-
+  enum BASIS_FUNCTION_TYPE {
+    REAL_GTO,
+    COMPLEX_GIAO,
+    COMPLEX_GTO
+  };
 
   struct ShellPairData {
 
@@ -65,11 +65,6 @@ namespace ChronusQ {
   };
 
 
-
-
-
-
-
   /**
    *  \brief The BasisSet struct. Contains information pertinant
    *  for a gaussian type orbital (GTO) basis set. 
@@ -91,6 +86,8 @@ namespace ChronusQ {
     size_t nShell;      ///< Number of CGTO basis shells
     size_t maxPrim;     ///< Max primitive dimension of basis
     size_t maxL;        ///< Max angular momentum of basis
+    
+    BASIS_FUNCTION_TYPE basisType = REAL_GTO; ///< Type of basis function
 
     cartvec_t centers; ///< A list of centers that comprise the BasisSet
 
@@ -111,6 +108,7 @@ namespace ChronusQ {
     // Path / Molecule constructor.
     // See src/basisset/basisset.cxx for documentation
     BasisSet(std::string _basisName, const Molecule &mol, 
+      BASIS_FUNCTION_TYPE _basisType, 
       bool _forceCart = false, bool doPrint = true);
        
     /**
@@ -152,16 +150,103 @@ namespace ChronusQ {
     // Misc functions
       
     std::vector<libint2::Shell> uncontractShells();
-    void makeMapPrim2Cont(double *, double *, CQMemManager&);
+    void makeMapPrim2Cont(double*, double*, CQMemManager&);
 
 
-    private:
+    std::shared_ptr<BasisSet> uncontractBasis();
 
-      // Update BasisSet object member data (nBasis, etc).
-      // See src/basisset/basisset.cxx for documentation
-      void update();
+
+    // Update BasisSet object member data (nBasis, etc).
+    // See src/basisset/basisset.cxx for documentation
+    void update();
 
   }; // BasisSet struct
+
+
+
+
+
+
+
+
+  // Basis set keyword map
+  static std::unordered_map<std::string,std::string> 
+    basisKeyword = {
+    {  "STO-3G"         , "sto3g.gbs"                     },
+    {  "STO-6G"         , "sto6g.gbs"                     },
+    {  "3-21G"          , "3-21g.gbs"                     },
+    {  "4-31G"          , "4-31g.gbs"                     },
+    {  "6-31G"          , "6-31g.gbs"                     },
+    {  "6-31G(D)"       , "6-31g*.gbs"                    },
+    {  "6-31++G(D)"     , "6-31++g*.gbs"                  },
+    {  "6-311G"         , "6-311g.gbs"                    },
+    {  "6-311+G(D)"     , "6-311+g*.gbs"                  },
+    {  "6-311+G(D,P)"   , "6-311+g**.gbs"                 },
+    {  "6-311+G(2D,P)"  , "6-311+g_2d_p.gbs"              },
+    {  "CC-PVDZ"        , "cc-pvdz.gbs"                   },
+    {  "CC-PVTZ"        , "cc-pvtz.gbs"                   },
+    {  "CC-PVQZ"        , "cc-pvqz.gbs"                   },
+    {  "CC-PV5Z"        , "cc-pv5z.gbs"                   },
+    {  "CC-PV6Z"        , "cc-pv6z.gbs"                   },
+//  {  "CC-PVDZ-RI"     , "cc-pvdz_ri.gbs"                },
+//  {  "DEF2-SVP"       , "def2-svp.gbs"                  },
+//  {  "DEF2-SVPD"      , "def2-svpd.gbs"                 },
+//  {  "DEF2-TZVP"      , "def2-tzvp.gbs"                 },
+    {  "SAPPORO-DKH3-DZP-2012-ALL" , "sapporo-dkh3-dzp-2012_all.gbs" },
+    {  "SAPPORO-DKH3-DZP-2012-NO"  , "sapporo-dkh3-dzp-2012_no.gbs"  },
+    {  "SAPPORO-DKH3-DZP-2012-SP"  , "sapporo-dkh3-dzp-2012_sp.gbs"  },
+    {  "SAPPORO-DKH3-DZP-ALL"      , "sapporo-dkh3-dzp_all.gbs"      },
+    {  "SAPPORO-DKH3-DZP-NO"       , "sapporo-dkh3-dzp_no.gbs"       },
+    {  "SAPPORO-DKH3-DZP-SP"       , "sapporo-dkh3-dzp_sp.gbs"       },
+    {  "SAPPORO-DKH3-QZP-2012-ALL" , "sapporo-dkh3-qzp-2012_all.gbs" },
+    {  "SAPPORO-DKH3-QZP-2012-NO"  , "sapporo-dkh3-qzp-2012_no.gbs"  },
+    {  "SAPPORO-DKH3-QZP-2012-SP"  , "sapporo-dkh3-qzp-2012_sp.gbs"  },
+    {  "SAPPORO-DKH3-QZP-ALL"      , "sapporo-dkh3-qzp_all.gbs"      },
+    {  "SAPPORO-DKH3-QZP-NO"       , "sapporo-dkh3-qzp_no.gbs"       },
+    {  "SAPPORO-DKH3-QZP-SP"       , "sapporo-dkh3-qzp_sp.gbs"       },
+    {  "SAPPORO-DKH3-TZP-2012-ALL" , "sapporo-dkh3-tzp-2012_all.gbs" },
+    {  "SAPPORO-DKH3-TZP-2012-NO"  , "sapporo-dkh3-tzp-2012_no.gbs"  },
+    {  "SAPPORO-DKH3-TZP-2012-SP"  , "sapporo-dkh3-tzp-2012_sp.gbs"  },
+    {  "SAPPORO-DKH3-TZP-ALL"      , "sapporo-dkh3-tzp_all.gbs"      },
+    {  "SAPPORO-DKH3-TZP-NO"       , "sapporo-dkh3-tzp_no.gbs"       },
+    {  "SAPPORO-DKH3-TZP-SP"       , "sapporo-dkh3-tzp_sp.gbs"       },
+    {  "SAPPORO-DZP-2012-ALL"      , "sapporo-dzp-2012_all.gbs"      },
+    {  "SAPPORO-DZP-2012-NO"       , "sapporo-dzp-2012_no.gbs"       },
+    {  "SAPPORO-DZP-2012-SP"       , "sapporo-dzp-2012_sp.gbs"       },
+    {  "SAPPORO-DZP-ALL"           , "sapporo-dzp_all.gbs"           },
+    {  "SAPPORO-DZP-NO"            , "sapporo-dzp_no.gbs"            },
+    {  "SAPPORO-DZP-SP"            , "sapporo-dzp_sp.gbs"            },
+    {  "SAPPORO-QZP-2012-ALL"      , "sapporo-qzp-2012_all.gbs"      },
+    {  "SAPPORO-QZP-2012-NO"       , "sapporo-qzp-2012_no.gbs"       },
+    {  "SAPPORO-QZP-2012-SP"       , "sapporo-qzp-2012_sp.gbs"       },
+    {  "SAPPORO-QZP-ALL"           , "sapporo-qzp_all.gbs"           },
+    {  "SAPPORO-QZP-NO"            , "sapporo-qzp_no.gbs"            },
+    {  "SAPPORO-QZP-SP"            , "sapporo-qzp_sp.gbs"            },
+    {  "SAPPORO-TZP-2012-ALL"      , "sapporo-tzp-2012_all.gbs"      },
+    {  "SAPPORO-TZP-2012-NO"       , "sapporo-tzp-2012_no.gbs"       },
+    {  "SAPPORO-TZP-2012-SP"       , "sapporo-tzp-2012_sp.gbs"       },
+    {  "SAPPORO-TZP-ALL"           , "sapporo-tzp_all.gbs"           },
+    {  "SAPPORO-TZP-NO"            , "sapporo-tzp_no.gbs"            },
+    {  "SAPPORO-TZP-SP"            , "sapporo-tzp_sp.gbs"            }
+  };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // SS start  
   extern std::vector<std::vector<std::array<int,3>>> cart_ang_list; //list of cartesian angular momentum.
@@ -182,6 +267,17 @@ namespace ChronusQ {
   double polyCoeff(int, int);
 
   void cart2sph_transform( int, int, std::vector<double>&, std::vector<double>& ); 
+  void cart2sph_complex_transform( int, int, std::vector<dcomplex>&, std::vector<dcomplex>& ); 
+  
+  void cart2sph_2e_transform( int, int, int, int, std::vector<double>&, 
+    std::vector<double>& ); 
+
+  void cart2sph_complex_2e_transform( int, int, int, int, std::vector<dcomplex>&, 
+    std::vector<dcomplex>& ); 
+
+  // pre calculate shellpair data
+  std::vector<libint2::ShellPair> genShellPairs( std::vector<libint2::Shell>&, double );
+  std::vector<libint2::ShellPair> genOrderedShellPairs( std::vector<libint2::Shell>&, double );
 
   // pre calculate shellpair data
   std::vector<libint2::ShellPair> genShellPairs( std::vector<libint2::Shell>&, double );
