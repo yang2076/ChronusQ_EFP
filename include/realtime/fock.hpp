@@ -63,10 +63,27 @@ namespace ChronusQ {
     auto EFP_ = dynamic_cast<EFP<IntsT,dcomplex>* >(EFP_1);
     if(EFP_ != NULL and EFP_bool == true)
       EFP_->get_new_user_data(&propagator_);
+    
 
 
   };
 
+  template <template <typename, typename> class _SSTyp, typename IntsT>
+  void RealTime<_SSTyp,IntsT>::Restart() {
+    std::cout << "*** Please pay attention to that you are using the restart RT job \n\
+for this moment. So the first line of dipole result is the original \n\
+value for time 0. but not the time you specified! The following results \n\
+will match the time shown at the left for the ongoing calculation." << std::endl;
+
+    const std::array<std::string,4> spinLabel =
+      { "SCALAR", "MZ", "MY", "MX" };
+    for(auto i = 0; i < propagator_.fockMatrix.size();i++){
+      savFile.readData("RT/1PDM_" + spinLabel[i],propagator_.onePDM[i]);
+      savFile.readData("RT/1PDM_ORTHO_" + spinLabel[i],propagator_.onePDMOrtho[i]);
+      savFile.readData("RT/FOCK_ORTHO_" + spinLabel[i],propagator_.fockMatrixOrtho[i]);
+      savFile.readData("RT/FOCK_" + spinLabel[i],propagator_.fockMatrix[i]);
+    } 
+  };
 }; // namespace ChronusQ
 
 

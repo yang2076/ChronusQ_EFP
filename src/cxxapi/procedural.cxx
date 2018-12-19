@@ -193,13 +193,13 @@ namespace ChronusQ {
       auto rt = CQRealTimeOptions(output,input,ss);
       rt->savFile = rstFile;
       rt->EFP_user_data_change(EFP_1,EFP_bool);
+      if(rt->curState.RT_Restart)
+        rt->Restart();
       rt->doPropagation(EFP_1,EFP_bool);
 
     }
 
     if( not jobType.compare("RESP") ) {
-      std::cout << "Before response" << std::endl;
-      std::cout << memManager << std::endl;
 
       auto resp = CQResponseOptions(output,input,ss);
       resp->savFile = rstFile;

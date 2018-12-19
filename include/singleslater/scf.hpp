@@ -94,6 +94,8 @@ namespace ChronusQ {
         {1});
       savFile.safeWriteData("SCF/MANY_BODY_ENERGY",&this->MBEnergy,
         {1});
+      savFile.safeWriteData("SCF/EFP_ENERGY",&this->EFPEnergy,
+        {1});
 
       // Save Multipoles
       savFile.safeWriteData("SCF/LEN_ELECTRIC_DIPOLE",&this->elecDipole[0],
@@ -552,6 +554,7 @@ namespace ChronusQ {
         memManager );
       if( INFO != 0 ) CErr("HermetianEigen failed in Fock2",std::cout);
     }
+    
 
 #if 0
     printMO(std::cout);

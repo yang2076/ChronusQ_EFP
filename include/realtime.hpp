@@ -64,6 +64,8 @@ namespace ChronusQ {
     double  xTime = 0.; ///< Current time point
     size_t  iStep = 0;  ///< Step index of current time point
     double  stepSize;   ///< Current step size
+    bool    RT_Restart = false;
+    double  restart_time = 0.;
 
     PropagationStep curStep;  ///< Current integration step
 
@@ -107,6 +109,7 @@ namespace ChronusQ {
     // RealTimeBase procedural functions
     virtual void doPropagation(EFPBase* EFP_,bool EFP_bool)         = 0;
     virtual void EFP_user_data_change(EFPBase* EFP_,bool EFP_bool)  = 0;
+    virtual void Restart() = 0;
 
     // Progress functions
     void printRTHeader();
@@ -178,6 +181,7 @@ namespace ChronusQ {
     void formPropagator();
     void formFock(bool,EFPBase* EFP_,bool EFP_bool,double t);
     void EFP_user_data_change(EFPBase* EFP_,bool EFP_bool);
+    void Restart();
     void propagateWFN();
 
     // Progress functions

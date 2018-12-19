@@ -56,8 +56,9 @@ namespace ChronusQ {
     bool FinMM(false); // Wrap up the MMUT iterations
 
     size_t NB = propagator_.aoints.basisSet().nBasis;
+    int restart_step = curState.restart_time / intScheme.deltaT ;
 
-    for( curState.xTime = 0., curState.iStep = 0; 
+    for( curState.xTime = curState.restart_time, curState.iStep = restart_step; 
          curState.xTime <= (intScheme.tMax + intScheme.deltaT/4); 
          curState.xTime += intScheme.deltaT, curState.iStep++ ) {
 
@@ -126,6 +127,8 @@ namespace ChronusQ {
           Swap(memManager_.template getSize<dcomplex>(DOSav[i]),
             DOSav[i],1,propagator_.onePDMOrtho[i],1);
 
+        savFile.safeWriteData("RT/DOSav_SCALAR",DOSav[0],{NB,NB});
+        savFile.safeWriteData("RT/DOSav_MZ",DOSav[1],{NB,NB});
         curState.stepSize = 2. * intScheme.deltaT;
 
       } else {
@@ -201,6 +204,9 @@ namespace ChronusQ {
   //mathematicaPrint(std::cerr,"Dipole-X",&data.ElecDipole[0][0],
   //  curState.iStep,1,curState.iStep,3);
 
+    const std::array<std::string,4> spinLabel =
+      { "SCALAR", "MZ", "MY", "MX" };
+
     if( savFile.exists() ) {
       savFile.safeWriteData("RT/TIME",&data.Time[0],{data.Time.size()});
       savFile.safeWriteData("RT/ENERGY",&data.Energy[0],{data.Time.size()});
@@ -210,6 +216,12 @@ namespace ChronusQ {
       if( data.ElecDipoleField.size() > 0 )
       savFile.safeWriteData("RT/LEN_ELEC_DIPOLE_FIELD",&data.ElecDipoleField[0][0],
         {data.Time.size(),3});
+      for(auto i = 0; i < propagator_.fockMatrix.size();i++){
+        savFile.safeWriteData("RT/1PDM_" + spinLabel[i],propagator_.onePDM[i],{NB,NB});
+        savFile.safeWriteData("RT/1PDM_ORTHO_" + spinLabel[i],propagator_.onePDMOrtho[i],{NB,NB});
+        savFile.safeWriteData("RT/FOCK_ORTHO_" + spinLabel[i],propagator_.fockMatrixOrtho[i],{NB,NB});
+        savFile.safeWriteData("RT/FOCK_" + spinLabel[i],propagator_.fockMatrix[i],{NB,NB});
+      } 
     }
 
   }; // RealTime::doPropagation
@@ -316,6 +328,8 @@ namespace ChronusQ {
       // SCR = 0.5 * U(S)**H * DO(S)
       Gemm('N','N',NB,NB,NB,dcomplex(0.5),UH[SCALAR],NB,
         propagator_.onePDMOrtho[SCALAR],NB,dcomplex(0.),SCR,NB);
+      savFile.safeWriteData("RT/1PDM_ORTHO_SCALAR",propagator_.onePDMOrtho[0],{NB,NB});
+      savFile.safeWriteData("RT/UH",UH[0],{NB,NB});
 
       // SCR += 0.5 * U(Z)**H * DO(Z)
       if( UH.size() != 1 )

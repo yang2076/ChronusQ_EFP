@@ -38,7 +38,9 @@ namespace ChronusQ {
       "TMAX",
       "DELTAT",
       "IRSTRT",
-      "FIELD"
+      "FIELD",
+      "RESTART",
+      "RESTART_TIME"
     };
 
     // Specified keywords
@@ -119,6 +121,18 @@ namespace ChronusQ {
       CErr("Must specify RT.DELTAT for integration time step");
     }
     
+    try {
+      rt->curState.RT_Restart = input.getData<bool>("RT.Restart");
+    } catch(...) {
+      // CErr("Must specify RT. integration time step");
+    }
+
+    try {
+      rt->curState.restart_time = input.getData<double>("RT.Restart_time");
+    } catch(...) {
+      // CErr("Must specify RT. integration time step");
+    }
+
     // MMUT Restart
     OPTOPT(
       rt->intScheme.iRstrt = input.getData<size_t>("RT.IRSTRT");

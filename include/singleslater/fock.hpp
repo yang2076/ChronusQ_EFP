@@ -108,17 +108,14 @@ namespace ChronusQ {
     if( EFP_ != NULL and EFP_bool == true ){
 
     // Begin EFP interior calculation of energy  	
-      std::cout << "efp_0" << std::endl;
       EFP_->EFP_Compute(0);
 
-      std::cout << "efp_1" << std::endl;
     // electrostatic contribution to Fock Matrix
       if(EFP_cou_contri.size() == 0)
         EFP_multipole_contri(EFP_1,EFP_bool);        
       for(int i = 0; i < fockMatrix.size(); i++){
         MatAdd('N','N', NB, NB, MatsT(1.), fockMatrix[i], NB, MatsT(2.), EFP_cou_contri[0], NB, fockMatrix[i], NB);
       } 
-      std::cout << "efp_2" << std::endl;
 
     // induction contribution to Fock Matrix
 
@@ -126,7 +123,6 @@ namespace ChronusQ {
       memset(efp_pol_contri, 0, NB*NB*sizeof(MatsT));
       auto Pol_contri = EFP_->One_electron_EFP_pol();
       SetMat('N',NB,NB,IntsT(1.),Pol_contri,NB,efp_pol_contri,NB);
-      std::cout << "efp_3" << std::endl;
 
 
       for(int i = 0; i < fockMatrix.size(); i++){
@@ -135,7 +131,6 @@ namespace ChronusQ {
     // Energy of EFP impact on QM
       this->EFPEnergy = this->template computeOBProperty<double,SCALAR>(efp_pol_contri)
                       + this->template computeOBProperty<double,SCALAR>(EFP_cou_contri[0]);
-      std::cout << "efp_4" << std::endl;
       this->memManager.template free(efp_pol_contri);
       this->memManager.template free(Pol_contri);
     }
