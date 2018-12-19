@@ -25,6 +25,7 @@
 #define __INCLUDED_SINGLESLATER_SCF_HPP__
 
 #include <singleslater.hpp>
+#include <chronusqefp.hpp>
 #include <util/matout.hpp>
 #include <util/math.hpp>
 #include <cqlinalg/blas1.hpp>
@@ -135,10 +136,9 @@ namespace ChronusQ {
 
   template <typename MatsT, typename IntsT>
   void SingleSlater<MatsT, IntsT>::ConventionalSCF(bool modF) {
-
+    
     // Transform AO fock into the orthonormal basis (on root MPI process)
     ao2orthoFock();
-
     // Modify fock matrix if requested (on root MPI process)
     if( modF ) modifyFock();
 
@@ -208,16 +208,14 @@ namespace ChronusQ {
    *  Currently implements the fixed-point SCF procedure.
    */ 
   template <typename MatsT, typename IntsT>
-  void SingleSlater<MatsT,IntsT>::getNewOrbitals(EMPerturbation &pert, 
-      bool frmFock) {
-
+  void SingleSlater<MatsT,IntsT>::getNewOrbitals(EMPerturbation &pert, EFPBase* EFP_1,
+      bool EFP_bool, bool frmFock) {
     bool increment = scfControls.doIncFock and 
                      scfConv.nSCFIter % scfControls.nIncFock != 0 and
                      scfControls.guess != RANDOM;
-
     // Form the Fock matrix D(k) -> F(k)
     if( frmFock ) {
-      formFock(pert,increment);
+      formFock(pert,EFP_1,EFP_bool,increment);
       //if( MPIRank(comm) == 0 )
       //  printFockTimings(std::cout);
     }
@@ -225,11 +223,12 @@ namespace ChronusQ {
     if( scfControls.scfAlg == _NEWTON_RAPHSON_SCF and scfConv.nSCFIter > 0 )
       scfControls.scfStep = _NEWTON_RAPHSON_STEP;
 
-    if( scfControls.scfStep == _CONVENTIONAL_SCF_STEP )
+    if( scfControls.scfStep == _CONVENTIONAL_SCF_STEP ){
       ConventionalSCF(scfControls.doExtrap and frmFock);
+    } 
     else
       NewtonRaphsonSCF();
-
+    
 
 #ifdef CQ_ENABLE_MPI
     // Broadcast the AO 1PDM to all MPI processes
@@ -360,7 +359,7 @@ namespace ChronusQ {
    *    if *both* converged -> SCF converged.
    */ 
   template <typename MatsT, typename IntsT>
-  bool SingleSlater<MatsT, IntsT>::evalConver(EMPerturbation &pert) {
+  bool SingleSlater<MatsT, IntsT>::evalConver(EMPerturbation &pert, double* wf_denp_ptr) {
 
     bool isConverged;
 
@@ -375,7 +374,7 @@ namespace ChronusQ {
       double oldEnergy = this->totalEnergy;
 
       // Compute new energy (with new Density)
-      this->computeProperties(pert);
+      this->computeProperties(pert,*wf_denp_ptr);
       scfConv.deltaEnergy = this->totalEnergy - oldEnergy;
 
       bool energyConv = std::abs(scfConv.deltaEnergy) < 
@@ -735,7 +734,18 @@ namespace ChronusQ {
 
   }; // SingleSlater<MatsT>::SCFFin
 
-
+  /**
+   *  Get the induction energy from EFP 
+  */
+  template <typename MatsT, typename IntsT>
+  void SingleSlater<MatsT,IntsT>::EFP_wf_dependent(EFPBase* EFP_1, bool EFP_bool, double* wf_denp_ptr) {
+    if(EFP_1 != NULL and EFP_bool == true){ 
+      auto EFP_ = dynamic_cast<EFP<IntsT,MatsT>* >(EFP_1);
+      EFP_->Wavefunction_dependent(wf_denp_ptr);
+    }
+    else 
+      *wf_denp_ptr = 0;
+  };// SingleSlater<MatsT,IntsT>::EFP_wf_dependent
 
 
   /**

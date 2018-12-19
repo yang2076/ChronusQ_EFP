@@ -26,6 +26,7 @@
 //#define _DEBUGGIAO 
 
 #include <singleslater.hpp>
+#include <chronusqefp.hpp>
 #include <cqlinalg/blasext.hpp>
 #include <cqlinalg/blasutil.hpp>
 #include <cqlinalg/blas3.hpp>
@@ -146,7 +147,7 @@ namespace ChronusQ {
     this->OBEnergy = 
       this->template computeOBProperty<double,DENSITY_TYPE::SCALAR>(
          coreH[SCALAR]);
-    
+
     
     
     // One body Spin Orbit
@@ -182,16 +183,20 @@ namespace ChronusQ {
       this->template computeOBProperty<double,DENSITY_TYPE::MX>(this->twoeH[MX]);
 
     this->MBEnergy *= 0.25;
+    this->NREnergy = this->aoints.molecule().nucRepEnergy;
+
 
     // Assemble total energy
     this->totalEnergy = 
-      this->OBEnergy + this->MBEnergy + this->aoints.molecule().nucRepEnergy;
+      this->OBEnergy + this->MBEnergy + this->NREnergy + this->EFPEnergy;
 
     // Sanity checks
     assert( not std::isnan(this->OBEnergy) );
     assert( not std::isnan(this->MBEnergy) );
+    assert( not std::isnan(this->EFPEnergy) );
     assert( not std::isinf(this->OBEnergy) );
     assert( not std::isinf(this->MBEnergy) );
+    assert( not std::isinf(this->EFPEnergy) );
 
   }; // SingleSlater<T>::computeEnergy
 
@@ -207,6 +212,7 @@ namespace ChronusQ {
     for(auto &atom : this->aoints.molecule().atoms)
       MatAdd('N','N',3,1,1.,&this->elecDipole[0],3,double(atom.atomicNumber),
         &atom.coord[0],3,&this->elecDipole[0],3);
+
 
     // Electric contribution to the quadrupoles
     for(size_t iXYZ = 0, iX = 0; iXYZ < 3; iXYZ++)
@@ -224,6 +230,8 @@ namespace ChronusQ {
     for(size_t jXYZ = 0; jXYZ < 3; jXYZ++) 
       this->elecQuadrupole[iXYZ][jXYZ] +=
         atom.atomicNumber * atom.coord[iXYZ] * atom.coord[jXYZ];
+
+    
 
     // Electric contribution to the octupoles
     for(size_t iXYZ = 0, iX = 0; iXYZ < 3; iXYZ++)
@@ -253,6 +261,7 @@ namespace ChronusQ {
       this->elecOctupole[iXYZ][jXYZ][kXYZ] +=
         atom.atomicNumber * atom.coord[iXYZ] * atom.coord[jXYZ] *
         atom.coord[kXYZ];
+
   };
 
 

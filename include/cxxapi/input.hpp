@@ -25,11 +25,16 @@
 #define _INCLUDED_INPUT_HPP_
 
 #include <chronusq_sys.hpp>
-
+#include "efp.h"
 
 namespace ChronusQ {
 
 
+  struct Fragment_ifm{
+    std::vector<std::string> fragments;
+    const double* Frag_coord;
+    enum efp_coord_type Coord_type;
+  };
   /**
    *  \brief A class to handle the parsing a data fetching from a 
    *  ChronusQ input file.

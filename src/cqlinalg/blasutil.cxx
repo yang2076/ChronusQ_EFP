@@ -179,8 +179,8 @@ namespace ChronusQ {
 
 #endif
 
-
-
+  // One more SetMat specialization after the following
+  // specializations (uses SetMatRE)
 
   template<>
   void SetMatRE(char TRANS, size_t M, size_t N, double ALPHA, double *A, 
@@ -247,6 +247,14 @@ namespace ChronusQ {
     SetMat(TRANS,M,N,0.,A,LDA,1,B,LDA,1);
 
   }; // GetMatIM (real)
+
+  // If assigning a complex matrix with a real one, discard imaginary
+  template <>
+  void SetMat(char TRANS, size_t M, size_t N, double ALPHA, double *A, size_t LDA,
+              size_t SA, dcomplex *B, size_t LDB, size_t SB) {
+    memset(B, 0, SB * sizeof(dcomplex));
+    SetMatRE(TRANS, M, N, ALPHA, A, LDA, B, LDB);
+  };  // SetMat (real, real, complex)
 
 
 

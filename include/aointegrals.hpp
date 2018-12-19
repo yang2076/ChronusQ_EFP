@@ -187,11 +187,13 @@ namespace ChronusQ {
   private:
 
     typedef IntsT* oper_t; ///< Storage of an operator
+    
     typedef std::vector<oper_t> oper_t_coll; ///< A collection of operators
-
+    typedef std::vector<oper_t_coll> oper_t_coll2; ///< A double collection of operators
     // General wrapper for 1-e integrals
     // See src/aointegrals/aointegrals_onee_drivers.cxx for documentation
     std::vector<IntsT*> OneEDriverLibint(libint2::Operator,std::vector<libint2::Shell>&);
+    std::vector<IntsT*> OneEDriverEFP(libint2::Operator,std::vector<libint2::Shell>&,int,std::array<double,3>);
 
     // 1-e builders for in-house integral code
     template <size_t NOPER, bool SYMM, typename F>
@@ -227,6 +229,13 @@ namespace ChronusQ {
     // 2-e Storage
     oper_t ERI = nullptr;    ///< Electron-Electron repulsion integrals (4 index) 
 
+    // EFP integrals
+    oper_t_coll  envE0;
+    oper_t_coll2 envE1;
+    oper_t_coll2 envE2;
+    oper_t_coll2 envE3;
+    oper_t_coll2 indE1;
+   
     // Constructors
     
     // Disable default constructor
@@ -290,6 +299,9 @@ namespace ChronusQ {
     void computeERIGIAO(EMPerturbation&);               // Evaluate ERIs in the GIAO basis
     void computeSchwartz();                             // Evaluate schwartz bounds (currently implemented for CGTOs 
 
+    IntsT* computeEFPContributions_Coulomb(double*,double*,size_t*);
+    IntsT* computeEFPContributions_Pol(double*,double*,size_t*);
+    void computeEFP_integrals(double*,size_t*,int);
 
     // Integral contraction
 

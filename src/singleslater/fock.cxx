@@ -33,7 +33,7 @@
 #include <Eigen/Sparse>
 #include <Eigen/Dense>
 #include <Eigen/Core>
-
+#include <chronusqefp.hpp>
 // #define _DEBUGGIAOONEE //SS  
 
 namespace ChronusQ {
@@ -154,13 +154,12 @@ namespace ChronusQ {
     if( this->aoints.basisSet().basisType == COMPLEX_GIAO and pert_has_type(emPert,Magnetic) ) 
       addMagPert(emPert,CH);
 
-
 #ifdef _DEBUGGIAOONEE
       // prettyPrintSmart(std::cout,"Core H",CH[0],NB,NB,NB);
-      for ( auto ii = 0 ; ii < CH.size() ; ii++ ) { 
-        std::cout<<"ii= "<<ii<<std::endl;
-        prettyPrintSmart(std::cout,"Core H",CH[ii],NB,NB,NB);
-      }
+    for ( auto ii = 0 ; ii < CH.size() ; ii++ ) { 
+      std::cout<<"ii= "<<ii<<std::endl;
+      prettyPrintSmart(std::cout,"Core H",CH[ii],NB,NB,NB);
+    }
 #endif 
 
   };  // void SingleSlater::computeNRCH(std::vector<MatsT*> &CH)
@@ -169,7 +168,7 @@ namespace ChronusQ {
 
   template void SingleSlater<double,double>::computeNRCH(EMPerturbation& emPert,std::vector<double*> &CH);
   template void SingleSlater<dcomplex,double>::computeNRCH(EMPerturbation& emPert,std::vector<dcomplex*> &CH);
-  template void SingleSlater<dcomplex,dcomplex>::computeNRCH(EMPerturbation& emPert, std::vector<dcomplex*> &CH);
+  template void SingleSlater<dcomplex,dcomplex>::computeNRCH(EMPerturbation& emPert,std::vector<dcomplex*> &CH);
 
 
 

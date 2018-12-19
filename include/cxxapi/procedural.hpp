@@ -25,9 +25,8 @@
 #define _INCLUDED_PROCEDURAL_HPP_
 
 #include <chronusq_sys.hpp>
-
+#include <chronusqefp.hpp>
 namespace ChronusQ {
-
   void RunChronusQ(std::string inFileName,
     std::string outFileName, std::string rstFileName,
     std::string scrFileName);

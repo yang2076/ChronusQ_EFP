@@ -47,12 +47,23 @@ namespace ChronusQ {
   };
 
   template <template <typename, typename> class _SSTyp, typename IntsT>
-  void RealTime<_SSTyp,IntsT>::formFock(bool increment, double t) {
+  void RealTime<_SSTyp,IntsT>::formFock(bool increment, EFPBase* EFP_1, bool EFP_bool, double t) {
 
     // Get perturbation for the current time and build a Fock matrix
     EMPerturbation pert_t = pert.getPert(curState.xTime);
 
-    propagator_.formFock(pert_t,increment);
+    propagator_.formFock(pert_t,EFP_1,EFP_bool,increment);
+
+
+  };
+
+  template <template <typename, typename> class _SSTyp, typename IntsT>
+  void RealTime<_SSTyp,IntsT>::EFP_user_data_change(EFPBase* EFP_1, bool EFP_bool) {
+
+    auto EFP_ = dynamic_cast<EFP<IntsT,dcomplex>* >(EFP_1);
+    if(EFP_ != NULL and EFP_bool == true)
+      EFP_->get_new_user_data(&propagator_);
+
 
   };
 

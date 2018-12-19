@@ -105,7 +105,8 @@ namespace ChronusQ {
 
 
     // RealTimeBase procedural functions
-    virtual void doPropagation()         = 0;
+    virtual void doPropagation(EFPBase* EFP_,bool EFP_bool)         = 0;
+    virtual void EFP_user_data_change(EFPBase* EFP_,bool EFP_bool)  = 0;
 
     // Progress functions
     void printRTHeader();
@@ -137,7 +138,6 @@ namespace ChronusQ {
     typedef std::vector<oper_t>       oper_t_coll;
 
     SingleSlaterBase         *reference_ = nullptr;  ///< Initial conditions
-    _SSTyp<dcomplex,IntsT>    propagator_; ///< Object for time propagation
 
     oper_t_coll DOSav;
     oper_t_coll UH;
@@ -145,6 +145,7 @@ namespace ChronusQ {
   public:
 
 
+    _SSTyp<dcomplex,IntsT>    propagator_; ///< Object for time propagation
     // Constructors
 
     // Disable default, copy and move constructors
@@ -173,9 +174,10 @@ namespace ChronusQ {
 
 
     // RealTime procedural functions
-    void doPropagation(); // From RealTimeBase
+    void doPropagation(EFPBase* EFP_,bool EFP_bool); // From RealTimeBase
     void formPropagator();
-    void formFock(bool,double t);
+    void formFock(bool,EFPBase* EFP_,bool EFP_bool,double t);
+    void EFP_user_data_change(EFPBase* EFP_,bool EFP_bool);
     void propagateWFN();
 
     // Progress functions

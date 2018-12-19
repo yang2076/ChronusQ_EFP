@@ -33,6 +33,8 @@
 #include <singleslater.hpp>
 #include <realtime.hpp>
 #include <response.hpp>
+#include <memmanager.hpp>
+#include <chronusqefp.hpp>
 
 // Preprocessor directive to aid the digestion of optional 
 // input arguments
@@ -93,12 +95,23 @@ namespace ChronusQ {
 
   void CQMISC_VALID(std::ostream&, CQInputFile &);
 
+  // Parse the EFP options
+  void CQEFP_VALID(std::ostream&, CQInputFile&);
+
+  ::efp_opts CQEFPOptions(std::ostream&, CQInputFile&);
+
+  void CQFragCoord(std::ostream&, CQInputFile&, CQMemManager&, struct Fragment_ifm*);
+
+
+  std::string CQEFPFilePath(std::ostream&, CQInputFile&);  
+  std::shared_ptr<EFPBase> CQEFPControl(std::ostream&, CQInputFile&, std::shared_ptr<AOIntegralsBase>&, std::shared_ptr<SingleSlaterBase>&,bool);
 
   inline void CQINPUT_VALID(std::ostream &out, CQInputFile &input) {
 
     CQMOLECULE_VALID(out,input);
     CQBASIS_VALID(out,input);
     CQINTS_VALID(out,input);
+    CQEFP_VALID(out,input);
     CQQM_VALID(out,input);
     CQDFTINT_VALID(out,input);
     CQSCF_VALID(out,input);

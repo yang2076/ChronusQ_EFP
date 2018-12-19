@@ -1,0 +1,1528 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+AOIntegrals	aointegrals.hpp	/^    AOIntegrals(CQMemManager &memManager, Molecule &mol, BasisSet &basis) :$/;"	f	class:ChronusQ::AOIntegrals
+AOIntegrals	aointegrals.hpp	/^  class AOIntegrals : public AOIntegralsBase {$/;"	c	namespace:ChronusQ
+AOIntegrals	aointegrals/impl.hpp	/^  AOIntegrals<IntsT>::AOIntegrals(AOIntegrals<IntsT> &&other) :$/;"	f	class:ChronusQ::AOIntegrals
+AOIntegrals	aointegrals/impl.hpp	/^  AOIntegrals<IntsT>::AOIntegrals(const AOIntegrals<IntsT> &other) :$/;"	f	class:ChronusQ::AOIntegrals
+AOIntegralsBase	aointegrals.hpp	/^    AOIntegralsBase(CQMemManager &mem, Molecule &mol, BasisSet &basis) :$/;"	f	struct:ChronusQ::AOIntegralsBase
+AOIntegralsBase	aointegrals.hpp	/^  struct AOIntegralsBase { $/;"	s	namespace:ChronusQ
+AOIntegrals_COLLECTIVE_OP	aointegrals/impl.hpp	34;"	d
+AVL_	itersolver.hpp	/^    _F     *AVL_  = nullptr;$/;"	m	class:ChronusQ::IterDiagonalizer
+AVR_	itersolver.hpp	/^    _F     *AVR_  = nullptr;$/;"	m	class:ChronusQ::IterDiagonalizer
+AV_	itersolver.hpp	/^    _F*    AV_  = nullptr;$/;"	m	class:ChronusQ::IterLinearSolver
+AX	aointegrals.hpp	/^    T*  AX; \/\/\/< 1-Body (2 index) storage for the contraction$/;"	m	struct:ChronusQ::TwoBodyContraction
+AX	response/tbase.hpp	/^    T* AX;$/;"	m	struct:ChronusQ::RESPONSE_CONTRACTION
+AllOps	response/enums.hpp	/^  static std::vector<ResponseOperator> AllOps = {$/;"	m	namespace:ChronusQ
+AllocatedBlocks_	memmanager.hpp	/^    std::unordered_map<void*,std::pair<size_t,size_t>> AllocatedBlocks_;$/;"	m	class:ChronusQ::CQMemManager
+AngPerBohr	physcon.hpp	/^  constexpr double AngPerBohr    = 0.52917721092;$/;"	m	namespace:ChronusQ
+AntiHerOps	response/enums.hpp	/^  static std::vector<ResponseOperator> AntiHerOps = {$/;"	m	namespace:ChronusQ
+Atom	atom.hpp	/^    Atom(const size_t AN = 0, const size_t MN = 0, const double MASS = 0., $/;"	f	struct:ChronusQ::Atom
+Atom	atom.hpp	/^    Atom(const size_t AN, const size_t MN, const double MASS, $/;"	f	struct:ChronusQ::Atom
+Atom	atom.hpp	/^    Atom(std::string symb, double X = 0., double Y = 0., double Z = 0.) :$/;"	f	struct:ChronusQ::Atom
+Atom	atom.hpp	/^  inline Atom::Atom(std::string symb, std::array<double,3> XYZ) :$/;"	f	class:ChronusQ::Atom
+Atom	atom.hpp	/^  struct Atom {$/;"	s	namespace:ChronusQ
+AvogConst	physcon.hpp	/^  constexpr double AvogConst     = 6.02214129e+23;$/;"	m	namespace:ChronusQ
+B3LYP	dft.hpp	/^    B3LYP() : GGA(XC_HYB_GGA_XC_B3LYP) { }$/;"	f	class:ChronusQ::B3LYP
+B3LYP	dft.hpp	/^  class B3LYP : public GGA {$/;"	c	namespace:ChronusQ
+BASIS_FUNCTION_TYPE	basisset/basisset_def.hpp	/^  enum BASIS_FUNCTION_TYPE {$/;"	g	namespace:ChronusQ
+BEightyEight	dft.hpp	/^    BEightyEight() : GGA(XC_GGA_X_B88) { }$/;"	f	class:ChronusQ::BEightyEight
+BEightyEight	dft.hpp	/^  class BEightyEight : public GGA {$/;"	c	namespace:ChronusQ
+BHANDH	dft.hpp	/^    BHANDH() : GGA(XC_HYB_GGA_XC_BHANDH) { }$/;"	f	class:ChronusQ::BHANDH
+BHANDH	dft.hpp	/^  class BHANDH : public GGA {$/;"	c	namespace:ChronusQ
+BHANDHLYP	dft.hpp	/^    BHANDHLYP() : GGA(XC_HYB_GGA_XC_BHANDHLYP) { }$/;"	f	class:ChronusQ::BHANDHLYP
+BHANDHLYP	dft.hpp	/^  class BHANDHLYP : public GGA {$/;"	c	namespace:ChronusQ
+BannerEnd	cxxapi/output.hpp	/^  constexpr char  BannerEnd[] = "================================================================================";$/;"	m	namespace:ChronusQ
+BannerMid	cxxapi/output.hpp	/^  constexpr char  BannerMid[] = "--------------------------------------------------------------------------------";$/;"	m	namespace:ChronusQ
+BannerTop	cxxapi/output.hpp	/^  constexpr char  BannerTop[] = "================================================================================";$/;"	m	namespace:ChronusQ
+BasisSet	basisset/basisset_def.hpp	/^  struct BasisSet {$/;"	s	namespace:ChronusQ
+BatchIntegrator	grid/integrator.hpp	/^  void BatchIntegrator(_RetType &res, const _Func &F, std::vector<_PtTyp> &batch, $/;"	f	namespace:ChronusQ
+BeckeIntegrator	grid/integrator.hpp	/^    BeckeIntegrator(MPI_Comm c, CQMemManager &mem, Molecule &mol,$/;"	f	class:ChronusQ::BeckeIntegrator
+BeckeIntegrator	grid/integrator.hpp	/^  class BeckeIntegrator : public SphereIntegrator<_QTyp1> {$/;"	c	namespace:ChronusQ
+BlockSize_	memmanager.hpp	/^    size_t BlockSize_;    \/\/\/< Segregation block size$/;"	m	class:ChronusQ::CQMemManager
+Brillouin	response/enums.hpp	/^    Brillouin$/;"	e	enum:ChronusQ::ResponseOperator
+BunchKaufman	cqlinalg/factorization.hpp	/^  int BunchKaufman(char UPLO, int N, _F *A, int LDA, CQMemManager &mem) {$/;"	f	namespace:ChronusQ
+CB_INT	cqlinalg/cqlinalg_config.hpp	76;"	d
+CDIIS	singleslater/base.hpp	/^    CDIIS,      \/\/\/< Commutator DIIS$/;"	e	enum:ChronusQ::DIIS_ALG
+CEDIIS	singleslater/base.hpp	/^    CEDIIS,     \/\/\/< Commutator & Energy DIIS$/;"	e	enum:ChronusQ::DIIS_ALG
+CErr	cerr.hpp	/^  inline void CErr(const std::string &msg = "Die Die Die", $/;"	f	namespace:ChronusQ
+CErr	cerr.hpp	/^  inline void CErr(std::exception_ptr eptr, std::ostream &out = std::cout) {$/;"	f	namespace:ChronusQ
+CHOLESKY	aointegrals.hpp	/^    CHOLESKY$/;"	e	enum:ChronusQ::ORTHO_TYPE
+COC	molecule.hpp	/^    cart_t    COC; \/\/\/< Center-of-charge of the Molecule$/;"	m	struct:ChronusQ::Molecule
+COM	molecule.hpp	/^    cart_t    COM; \/\/\/< Center-of-mass of the Molecule$/;"	m	struct:ChronusQ::Molecule
+COMPLEX_GIAO	basisset/basisset_def.hpp	/^    COMPLEX_GIAO,$/;"	e	enum:ChronusQ::BASIS_FUNCTION_TYPE
+COMPLEX_GTO	basisset/basisset_def.hpp	/^    COMPLEX_GTO$/;"	e	enum:ChronusQ::BASIS_FUNCTION_TYPE
+CONTRACTION_ALGORITHM	aointegrals.hpp	/^  enum CONTRACTION_ALGORITHM {$/;"	g	namespace:ChronusQ
+COPY_OTHER_MEMBER	util/preprocessor.hpp	50;"	d
+COPY_OTHER_MEMBER_OP	util/preprocessor.hpp	51;"	d
+COPY_OTHER_MEMBER_VEC_OP	util/preprocessor.hpp	58;"	d
+CORE	singleslater/base.hpp	/^    CORE,$/;"	e	enum:ChronusQ::SS_GUESS
+CORE_HAMILTONIAN_TYPE	aointegrals.hpp	/^  enum CORE_HAMILTONIAN_TYPE {$/;"	g	namespace:ChronusQ
+COULOMB	aointegrals.hpp	/^    COULOMB, \/\/\/< (mn | kl) X(lk)$/;"	e	enum:ChronusQ::TWOBODY_CONTRACTION_TYPE
+CQBanner	cxxapi/output.hpp	/^  constexpr char CQBanner[] = $/;"	m	namespace:ChronusQ
+CQINPUT_VALID	cxxapi/options.hpp	/^  inline void CQINPUT_VALID(std::ostream &out, CQInputFile &input) {$/;"	f	namespace:ChronusQ
+CQInputFile	cxxapi/input.hpp	/^    CQInputFile(std::shared_ptr<std::ifstream> inFile) :$/;"	f	class:ChronusQ::CQInputFile
+CQInputFile	cxxapi/input.hpp	/^    CQInputFile(std::string inFileName) :$/;"	f	class:ChronusQ::CQInputFile
+CQInputFile	cxxapi/input.hpp	/^  class CQInputFile {$/;"	c	namespace:ChronusQ
+CQMemManager	memmanager.hpp	/^     CQMemManager(size_t N = 0, size_t BlockSize = 2048) :$/;"	f	class:ChronusQ::CQMemManager
+CQMemManager	memmanager.hpp	/^  class CQMemManager : public mem_backend {$/;"	c	namespace:ChronusQ
+CQOutputFooter	cxxapi/output.hpp	/^  inline void CQOutputFooter(std::ostream &out) {$/;"	f	namespace:ChronusQ
+CQOutputHeader	cxxapi/output.hpp	/^  inline void CQOutputHeader(std::ostream &out) {$/;"	f	namespace:ChronusQ
+CUBE_TYPE	cubegen.hpp	/^  enum CUBE_TYPE {$/;"	g	namespace:ChronusQ
+CXXBLACS_BLACS_Complex16	cqlinalg/cqlinalg_config.hpp	40;"	d
+CXXBLACS_BLACS_Complex8	cqlinalg/cqlinalg_config.hpp	41;"	d
+CXXBLACS_BLAS_Complex16	cqlinalg/cqlinalg_config.hpp	54;"	d
+CXXBLACS_BLAS_Complex8	cqlinalg/cqlinalg_config.hpp	55;"	d
+CXXBLACS_HAS_BLACS	cqlinalg/cqlinalg_config.hpp	43;"	d
+CXXBLACS_HAS_BLAS	cqlinalg/cqlinalg_config.hpp	53;"	d
+CXXBLACS_HAS_LAPACK	cqlinalg/cqlinalg_config.hpp	73;"	d
+CXXBLACS_HAS_PBLAS	cqlinalg/cqlinalg_config.hpp	44;"	d
+CXXBLACS_HAS_SCALAPACK	cqlinalg/cqlinalg_config.hpp	45;"	d
+CatFile	cxxapi/output.hpp	/^  inline void CatFile(std::ostream &out, std::string fName) {$/;"	f	namespace:ChronusQ
+Center	grid/integrator.hpp	/^    cart_t Center;            \/\/\/< Origin of the ball$/;"	m	class:ChronusQ::SphereIntegrator
+ChebyshevExpansion	realtime/enums.hpp	/^    ChebyshevExpansion$/;"	e	enum:ChronusQ::PropagatorAlgorithm
+ChronusQ	aointegrals.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	aointegrals/contract/direct.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	aointegrals/contract/incore.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	aointegrals/impl.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	aointegrals/inhouseaointegral.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	aointegrals/print.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	atom.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	basisset/basisset_def.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	basisset/basisset_util.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	basisset/reference.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	cerr.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	chronusqefp.hpp	/^namespace ChronusQ{$/;"	n
+ChronusQ	cqlinalg/blas1.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	cqlinalg/blas3.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	cqlinalg/blasext.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	cqlinalg/blasutil.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	cqlinalg/eig.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	cqlinalg/factorization.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	cqlinalg/matfunc.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	cqlinalg/ortho.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	cqlinalg/solve.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	cqlinalg/svd.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	cqlinalg/util.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	cubegen.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	cxxapi/boilerplate.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	cxxapi/input.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	cxxapi/options.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	cxxapi/output.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	cxxapi/procedural.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	dft.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	extrapolate.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	fields.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	grid/integrator.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	grid/quadrature.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	itersolver.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	itersolver/gmres.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	itersolver/gplhr.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	itersolver/iterdiagonalizer.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	itersolver/iterlinearsolver.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	memmanager.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	molecule.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	morspec.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	physcon.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	quantum.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	quantum/base.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	quantum/impl.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	quantum/print.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	quantum/properties.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	realtime.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	realtime/enums.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	realtime/fields.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	realtime/fields/envelope.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	realtime/fock.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	realtime/memory.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	realtime/print.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	realtime/propagation.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	response/base.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	response/enums.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	response/fdr.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	response/memory.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	response/particleparticle.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	response/particleparticle/hartreefock.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	response/particleparticle/kohnsham.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	response/particleparticle/singleslater.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	response/particleparticle/singleslater_helper.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	response/polarization.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	response/polarization/hartreefock.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	response/polarization/kohnsham.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	response/polarization/singleslater.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	response/polarization/singleslater_helper.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	response/print.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	response/properties.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	response/residue.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	response/results.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	response/settings.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	response/tbase.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	singleslater.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	singleslater/base.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	singleslater/base/scf.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	singleslater/extrap.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	singleslater/fock.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	singleslater/guess.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	singleslater/hartreefock.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	singleslater/hartreefock/scf.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	singleslater/impl.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	singleslater/kohnsham.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	singleslater/kohnsham/fxc.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	singleslater/kohnsham/impl.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	singleslater/kohnsham/scf.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	singleslater/kohnsham/vxc.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	singleslater/ortho.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	singleslater/pop.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	singleslater/print.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	singleslater/quantum.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	singleslater/scf.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	util/files.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	util/math.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	util/matout.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	util/mpi.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	util/threads.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	util/time.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	util/typedefs.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	wavefunction.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	wavefunction/base.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	wavefunction/impl.hpp	/^namespace ChronusQ {$/;"	n
+ChronusQ	wavefunction/print.hpp	/^namespace ChronusQ {$/;"	n
+ComplexGIAOIntEngine	aointegrals/inhouseaointegral.hpp	/^  struct ComplexGIAOIntEngine {$/;"	s	namespace:ChronusQ
+Constant	realtime/enums.hpp	/^    Constant,$/;"	e	enum:ChronusQ::FieldEnvelopeTyp
+ConventionalSCF	singleslater/scf.hpp	/^  void SingleSlater<MatsT, IntsT>::ConventionalSCF(bool modF) {$/;"	f	class:ChronusQ::SingleSlater
+CoreGuess	singleslater/guess.hpp	/^  void SingleSlater<MatsT,IntsT>::CoreGuess() {$/;"	f	class:ChronusQ::SingleSlater
+CouPerEl	physcon.hpp	/^  constexpr double CouPerEl      = 1.602176565e-19;$/;"	m	namespace:ChronusQ
+CouPerEl_ESU	physcon.hpp	/^  constexpr double CouPerEl_ESU = $/;"	m	namespace:ChronusQ
+CreateDataSet	util/files.hpp	76;"	d
+CreateH5File	util/files.hpp	73;"	d
+CreateRootComm	util/mpi.hpp	/^  static inline MPI_Comm CreateRootComm(MPI_Comm c) {$/;"	f	namespace:ChronusQ
+CubeGen	cubegen.hpp	/^      CubeGen( std::string name, CUBE_TYPE ct, std::array<size_t,3> npts,$/;"	f	class:ChronusQ::CubeGen
+CubeGen	cubegen.hpp	/^  class CubeGen : public Base {$/;"	c	namespace:ChronusQ
+CubeGenBase	cubegen.hpp	/^    CubeGenBase(std::string name, CUBE_TYPE ct, size_t nx, size_t ny, $/;"	f	struct:ChronusQ::CubeGenBase
+CubeGenBase	cubegen.hpp	/^    CubeGenBase(std::string name, CUBE_TYPE ct, std::array<size_t,3> npts) :$/;"	f	struct:ChronusQ::CubeGenBase
+CubeGenBase	cubegen.hpp	/^  struct CubeGenBase {$/;"	s	namespace:ChronusQ
+DEALLOC_OP	util/preprocessor.hpp	35;"	d
+DEALLOC_OP_5	util/preprocessor.hpp	45;"	d
+DEALLOC_VEC_OP	util/preprocessor.hpp	36;"	d
+DEALLOC_VEC_OP_5	util/preprocessor.hpp	46;"	d
+DENFIT	aointegrals.hpp	/^    DENFIT$/;"	e	enum:ChronusQ::CONTRACTION_ALGORITHM
+DENSITY_TYPE	quantum/base.hpp	/^  enum DENSITY_TYPE {$/;"	g	namespace:ChronusQ
+DFTFunctional	dft.hpp	/^    DFTFunctional(int FUNC_IDENT) { $/;"	f	class:ChronusQ::DFTFunctional
+DFTFunctional	dft.hpp	/^  class DFTFunctional {$/;"	c	namespace:ChronusQ
+DIIS	extrapolate.hpp	/^    DIIS(size_t nExtrap, size_t nMat, size_t OSize, oper_t_coll2 errorMetric) :$/;"	f	class:ChronusQ::DIIS
+DIIS	extrapolate.hpp	/^  class DIIS {$/;"	c	namespace:ChronusQ
+DIIS_ALG	singleslater/base.hpp	/^  enum DIIS_ALG {$/;"	g	namespace:ChronusQ
+DIRECT	aointegrals.hpp	/^    DIRECT,$/;"	e	enum:ChronusQ::CONTRACTION_ALGORITHM
+DOSav	realtime.hpp	/^    oper_t_coll DOSav;$/;"	m	class:ChronusQ::RealTime
+DUMMY	util/preprocessor.hpp	28;"	d
+DUMMY2	util/preprocessor.hpp	29;"	d
+DUMMY3	util/preprocessor.hpp	30;"	d
+DescAX	response/tbase.hpp	/^    CXXBLACS::ScaLAPACK_Desc_t DescAX;$/;"	m	struct:ChronusQ::RESPONSE_CONTRACTION
+DescX	response/tbase.hpp	/^    CXXBLACS::ScaLAPACK_Desc_t DescX;$/;"	m	struct:ChronusQ::RESPONSE_CONTRACTION
+Diagonalization	realtime/enums.hpp	/^    Diagonalization,$/;"	e	enum:ChronusQ::PropagatorAlgorithm
+EBohrPerDebye	physcon.hpp	/^  constexpr double EBohrPerDebye = 0.393430307;$/;"	m	namespace:ChronusQ
+ECD_CROSS_SECTION_MD	morspec.hpp	/^    ECD_CROSS_SECTION_MD$/;"	e	enum:ChronusQ::MOR_TARGET
+EDIIS	singleslater/base.hpp	/^    EDIIS,      \/\/\/< Energy DIIS$/;"	e	enum:ChronusQ::DIIS_ALG
+EFP	chronusqefp.hpp	/^  class EFP{$/;"	c	namespace:ChronusQ
+EFP_cou	singleslater.hpp	/^    oper_t_coll EFP_cou;$/;"	m	class:ChronusQ::SingleSlater
+EFP_pol	singleslater.hpp	/^    oper_t_coll EFP_pol;$/;"	m	class:ChronusQ::SingleSlater
+EMField	fields.hpp	/^    EMField(EMFieldTyp em, FieldGauge fg,$/;"	f	struct:ChronusQ::EMField
+EMField	fields.hpp	/^    EMField(EMFieldTyp em, const _VecTyp &x): $/;"	f	struct:ChronusQ::EMField
+EMField	fields.hpp	/^    EMField(const _VecTyp &x): EMField(Electric,Length,x){ };$/;"	f	struct:ChronusQ::EMField
+EMField	fields.hpp	/^  struct EMField : virtual public EMFieldBase {$/;"	s	namespace:ChronusQ
+EMFieldBase	fields.hpp	/^    EMFieldBase(EMFieldTyp em = Electric, FieldGauge fg = Length,$/;"	f	struct:ChronusQ::EMFieldBase
+EMFieldBase	fields.hpp	/^  struct EMFieldBase {$/;"	s	namespace:ChronusQ
+EMFieldTyp	fields.hpp	/^  enum EMFieldTyp {$/;"	g	namespace:ChronusQ
+EMPerturbation	fields.hpp	/^  struct EMPerturbation {$/;"	s	namespace:ChronusQ
+ERI	aointegrals.hpp	/^    oper_t ERI = nullptr;    \/\/\/< Electron-Electron repulsion integrals (4 index) $/;"	m	class:ChronusQ::AOIntegrals
+EVPerHartree	physcon.hpp	/^  constexpr double EVPerHartree  = 27.211396132;$/;"	m	namespace:ChronusQ
+EXCHANGE	aointegrals.hpp	/^    EXCHANGE,\/\/\/< (mn | kl) X(nk)$/;"	e	enum:ChronusQ::TWOBODY_CONTRACTION_TYPE
+ElecDipole	realtime.hpp	/^    std::vector<std::array<double,3>> ElecDipole;$/;"	m	struct:ChronusQ::IntegrationData
+ElecDipoleField	realtime.hpp	/^    std::vector<std::array<double,3>> ElecDipoleField;$/;"	m	struct:ChronusQ::IntegrationData
+Electric	fields.hpp	/^    Electric,$/;"	e	enum:ChronusQ::EMFieldTyp
+Energy	realtime.hpp	/^    std::vector<double> Energy;$/;"	m	struct:ChronusQ::IntegrationData
+ExpMagnus2	realtime/enums.hpp	/^    ExpMagnus2$/;"	e	enum:ChronusQ::IntegrationAlgorithm
+ExplicitMagnus2	realtime/enums.hpp	/^    ExplicitMagnus2$/;"	e	enum:ChronusQ::PropagationStep
+FDCommutator	singleslater/extrap.hpp	/^  void SingleSlater<MatsT,IntsT>::FDCommutator(oper_t_coll &FDC) {$/;"	f	class:ChronusQ::SingleSlater
+FDObservables	response/results.hpp	/^  struct FDObservables {$/;"	s	namespace:ChronusQ
+FDR	response/enums.hpp	/^    FDR$/;"	e	enum:ChronusQ::ResponseType
+FDResponseResults	response/results.hpp	/^  struct FDResponseResults {$/;"	s	namespace:ChronusQ
+FDResponseSettings	response/settings.hpp	/^  struct FDResponseSettings {$/;"	s	namespace:ChronusQ
+FSPerAUTime	physcon.hpp	/^  constexpr double FSPerAUTime   = 2.41884326505e-2;$/;"	m	namespace:ChronusQ
+FULL	response/enums.hpp	/^    FULL,$/;"	e	enum:ChronusQ::SINGLESLATER_POLAR_COPT
+FieldEnvelope	realtime/fields/envelope.hpp	/^    FieldEnvelope(double on, double off): FieldEnvelopeBase(on,off){ };$/;"	f	struct:ChronusQ::FieldEnvelope
+FieldEnvelope	realtime/fields/envelope.hpp	/^  struct FieldEnvelope<Step> : FieldEnvelopeBase {$/;"	s	namespace:ChronusQ
+FieldEnvelopeBase	realtime/fields/envelope.hpp	/^    FieldEnvelopeBase(double on, double off): tOn(on), tOff(off){ };$/;"	f	struct:ChronusQ::FieldEnvelopeBase
+FieldEnvelopeBase	realtime/fields/envelope.hpp	/^  struct FieldEnvelopeBase {$/;"	s	namespace:ChronusQ
+FieldEnvelopeTyp	realtime/enums.hpp	/^  enum FieldEnvelopeTyp {$/;"	g	namespace:ChronusQ
+FieldGauge	fields.hpp	/^  enum FieldGauge {$/;"	g	namespace:ChronusQ
+ForwardEuler	realtime/enums.hpp	/^    ForwardEuler,$/;"	e	enum:ChronusQ::PropagationStep
+GDDur	singleslater/base.hpp	/^    double GDDur;$/;"	m	class:ChronusQ::SingleSlaterBase
+GGA	dft.hpp	/^    GGA(int FUNC_IDENT) : DFTFunctional(FUNC_IDENT) { this->isGGA_ = true;};$/;"	f	class:ChronusQ::GGA
+GGA	dft.hpp	/^  class GGA : public DFTFunctional {$/;"	c	namespace:ChronusQ
+GMRES	itersolver.hpp	/^    GMRES($/;"	f	class:ChronusQ::GMRES
+GMRES	itersolver.hpp	/^  class GMRES : public IterLinearSolver<_F> {$/;"	c	namespace:ChronusQ
+GPLHR	itersolver.hpp	/^    GPLHR($/;"	f	class:ChronusQ::GPLHR
+GPLHR	itersolver.hpp	/^  class GPLHR : public IterDiagonalizer<_F> {$/;"	c	namespace:ChronusQ
+GRADIENT	basisset/basisset_util.hpp	/^    GRADIENT,$/;"	e	enum:ChronusQ::SHELL_EVAL_TYPE
+Gaussian	realtime/enums.hpp	/^    Gaussian,$/;"	e	enum:ChronusQ::FieldEnvelopeTyp
+Gemm	cqlinalg/blas3.hpp	/^  void Gemm(char TRANSA, char TRANSB, CB_INT M, CB_INT N, CB_INT K, _F ALPHA,$/;"	f	namespace:ChronusQ
+GetLAThreads	util/threads.hpp	/^  inline size_t GetLAThreads() {$/;"	f	namespace:ChronusQ
+GetNumThreads	util/threads.hpp	/^  inline size_t GetNumThreads() {$/;"	f	namespace:ChronusQ
+GetRealPtr	aointegrals/contract/direct.hpp	61;"	d
+GetThreadID	util/threads.hpp	/^  inline size_t GetThreadID() {$/;"	f	namespace:ChronusQ
+GramSchmidt	cqlinalg/ortho.hpp	/^  size_t GramSchmidt(size_t N, size_t Mold, size_t Mnew, F *V, size_t LDV, $/;"	f	namespace:ChronusQ
+GramSchmidt	cqlinalg/ortho.hpp	/^  void GramSchmidt(size_t N, size_t Mold, size_t Mnew, F *VL, size_t LDVL, $/;"	f	namespace:ChronusQ
+Guess	itersolver.hpp	/^    _F *Guess = nullptr;$/;"	m	class:ChronusQ::GPLHR
+H5PredType	util/files.hpp	/^inline H5::CompType H5PredType() {$/;"	f
+HBar	physcon.hpp	/^  constexpr double HBar = PlanckConst \/ 2. \/ M_PI;$/;"	m	namespace:ChronusQ
+HER	aointegrals.hpp	/^    bool HER; \/\/\/< Whether or not X is hermetian$/;"	m	struct:ChronusQ::TwoBodyContraction
+HHR_	itersolver.hpp	/^    _F * HHR_ = nullptr;$/;"	m	class:ChronusQ::GMRES
+HartreeFock	singleslater/hartreefock.hpp	/^    HartreeFock(HartreeFock<MatsT,IntsT> &&other) :$/;"	f	class:ChronusQ::HartreeFock
+HartreeFock	singleslater/hartreefock.hpp	/^    HartreeFock(HartreeFock<MatsU,IntsU> &&other, int dummy = 0) :$/;"	f	class:ChronusQ::HartreeFock
+HartreeFock	singleslater/hartreefock.hpp	/^    HartreeFock(MPI_Comm c, AOIntegrals<IntsT> &aoi, Args... args) : $/;"	f	class:ChronusQ::HartreeFock
+HartreeFock	singleslater/hartreefock.hpp	/^    HartreeFock(const HartreeFock<MatsT,IntsT> &other) :$/;"	f	class:ChronusQ::HartreeFock
+HartreeFock	singleslater/hartreefock.hpp	/^    HartreeFock(const HartreeFock<MatsU,IntsU> &other, int dummy = 0) :$/;"	f	class:ChronusQ::HartreeFock
+HartreeFock	singleslater/hartreefock.hpp	/^    HartreeFock(std::string rL, std::string rS, MPI_Comm c,$/;"	f	class:ChronusQ::HartreeFock
+HartreeFock	singleslater/hartreefock.hpp	/^  class HartreeFock : public SingleSlater<MatsT,IntsT>,$/;"	c	namespace:ChronusQ
+HerOps	response/enums.hpp	/^  static std::vector<ResponseOperator> HerOps = {$/;"	m	namespace:ChronusQ
+INCORE	aointegrals.hpp	/^    INCORE,$/;"	e	enum:ChronusQ::CONTRACTION_ALGORITHM
+INT_DEBUG_LEVEL	grid/integrator.hpp	45;"	d
+IntegralT	chronusqefp.hpp	/^    size_t IntegralT;$/;"	m	struct:ChronusQ::SSType
+IntegrationAlgorithm	realtime/enums.hpp	/^  enum IntegrationAlgorithm {$/;"	g	namespace:ChronusQ
+IntegrationData	realtime.hpp	/^  struct IntegrationData {$/;"	s	namespace:ChronusQ
+IntegrationParam	singleslater/kohnsham.hpp	/^  struct IntegrationParam {$/;"	s	namespace:ChronusQ
+IntegrationProgress	realtime.hpp	/^  struct IntegrationProgress {$/;"	s	namespace:ChronusQ
+IntegrationScheme	realtime.hpp	/^  struct IntegrationScheme {$/;"	s	namespace:ChronusQ
+Integrator1D	grid/integrator.hpp	/^    Integrator1D( _QTyp g ) : q(std::move(g)) {$/;"	f	class:ChronusQ::Integrator1D
+Integrator1D	grid/integrator.hpp	/^    Integrator1D(size_t N, Args... args) :$/;"	f	class:ChronusQ::Integrator1D
+Integrator1D	grid/integrator.hpp	/^  class Integrator1D {$/;"	c	namespace:ChronusQ
+Integrator2D	grid/integrator.hpp	/^    Integrator2D(_QTyp1 g1, _QTyp2 g2) : $/;"	f	class:ChronusQ::Integrator2D
+Integrator2D	grid/integrator.hpp	/^  class Integrator2D {$/;"	c	namespace:ChronusQ
+Integrator3D	grid/integrator.hpp	/^    Integrator3D(_QTyp1 g1, _QTyp2 g2, _QTyp3 g3) : $/;"	f	class:ChronusQ::Integrator3D
+Integrator3D	grid/integrator.hpp	/^  class Integrator3D {$/;"	c	namespace:ChronusQ
+IntsT	morspec.hpp	/^    typedef typename Reference::ints_type  IntsT;$/;"	t	class:ChronusQ::MORSpec
+IterDiagonalizer	itersolver.hpp	/^    IterDiagonalizer($/;"	f	class:ChronusQ::IterDiagonalizer
+IterDiagonalizer	itersolver.hpp	/^  class IterDiagonalizer : public IterSolver<_F> {$/;"	c	namespace:ChronusQ
+IterLinearSolver	itersolver.hpp	/^    IterLinearSolver($/;"	f	class:ChronusQ::IterLinearSolver
+IterLinearSolver	itersolver.hpp	/^  class IterLinearSolver : public IterSolver<_F> {$/;"	c	namespace:ChronusQ
+IterSolver	itersolver.hpp	/^    IterSolver($/;"	f	class:ChronusQ::IterSolver
+IterSolver	itersolver.hpp	/^  class IterSolver {$/;"	c	namespace:ChronusQ
+JContractIncore	aointegrals/contract/incore.hpp	/^  void AOIntegrals<IntsT>::JContractIncore(MPI_Comm comm, TwoBodyContraction<TT> &C) {$/;"	f	class:ChronusQ::AOIntegrals
+JPerHartree	physcon.hpp	/^  constexpr double JPerHartree   = 4.35974434e-18;$/;"	m	namespace:ChronusQ
+J_	itersolver.hpp	/^    _F * J_   = nullptr;$/;"	m	class:ChronusQ::GMRES
+K	response/enums.hpp	/^    M,K,MK,KM$/;"	e	enum:ChronusQ::SINGLESLATER_POLAR_COPT
+KContractIncore	aointegrals/contract/incore.hpp	/^  void AOIntegrals<IntsT>::KContractIncore(MPI_Comm comm, TwoBodyContraction<TT> &C) {$/;"	f	class:ChronusQ::AOIntegrals
+KM	response/enums.hpp	/^    M,K,MK,KM$/;"	e	enum:ChronusQ::SINGLESLATER_POLAR_COPT
+KOHNSHAM_COLLECTIVE_OP	singleslater/kohnsham/impl.hpp	31;"	d
+KS_DEBUG_LEVEL	singleslater/kohnsham.hpp	36;"	d
+KgPerAMU	physcon.hpp	/^  constexpr double KgPerAMU      = 1.6650538921e-27;$/;"	m	namespace:ChronusQ
+KohnSham	singleslater/kohnsham.hpp	/^    KohnSham(std::string funcName,$/;"	f	class:ChronusQ::KohnSham
+KohnSham	singleslater/kohnsham.hpp	/^    KohnSham(std::string rL, std::string rS, std::string funcName,$/;"	f	class:ChronusQ::KohnSham
+KohnSham	singleslater/kohnsham.hpp	/^  class KohnSham : public SingleSlater<MatsT,IntsT>,$/;"	c	namespace:ChronusQ
+KohnSham	singleslater/kohnsham/impl.hpp	/^  KohnSham<MatsT,IntsT>::KohnSham(KohnSham<MatsT,IntsT> &&other) :$/;"	f	class:ChronusQ::KohnSham
+KohnSham	singleslater/kohnsham/impl.hpp	/^  KohnSham<MatsT,IntsT>::KohnSham(KohnSham<MatsU,IntsT> &&other, int dummy) :$/;"	f	class:ChronusQ::KohnSham
+KohnSham	singleslater/kohnsham/impl.hpp	/^  KohnSham<MatsT,IntsT>::KohnSham(const KohnSham<MatsT,IntsT> &other) :$/;"	f	class:ChronusQ::KohnSham
+KohnSham	singleslater/kohnsham/impl.hpp	/^  KohnSham<MatsT,IntsT>::KohnSham(const KohnSham<MatsU,IntsT> &other, int dummy) :$/;"	f	class:ChronusQ::KohnSham
+L	cubegen.hpp	/^    std::array<double,3> L;$/;"	m	struct:ChronusQ::CubeGenBase
+LDA	dft.hpp	/^    LDA(int FUNC_IDENT) : DFTFunctional(FUNC_IDENT) { this->isGGA_ = false;};$/;"	f	class:ChronusQ::LDA
+LDA	dft.hpp	/^  class LDA : public DFTFunctional {$/;"	c	namespace:ChronusQ
+LOWDIN	aointegrals.hpp	/^    LOWDIN,$/;"	e	enum:ChronusQ::ORTHO_TYPE
+LU	cqlinalg/factorization.hpp	/^  int LU(int M, int N, _F *A, int LDA, CQMemManager &mem) {$/;"	f	namespace:ChronusQ
+LYP	dft.hpp	/^    LYP() : GGA(XC_GGA_C_LYP) { }$/;"	f	class:ChronusQ::LYP
+LYP	dft.hpp	/^  class LYP : public GGA {$/;"	c	namespace:ChronusQ
+LenElectricDipole	response/enums.hpp	/^    LenElectricDipole,$/;"	e	enum:ChronusQ::ResponseOperator
+LenElectricOctupole	response/enums.hpp	/^    LenElectricOctupole,$/;"	e	enum:ChronusQ::ResponseOperator
+LenElectricQuadrupole	response/enums.hpp	/^    LenElectricQuadrupole,$/;"	e	enum:ChronusQ::ResponseOperator
+Length	fields.hpp	/^    Length,$/;"	e	enum:ChronusQ::FieldGauge
+LinRamp	realtime/enums.hpp	/^    LinRamp,$/;"	e	enum:ChronusQ::FieldEnvelopeTyp
+LinSolve	cqlinalg/solve.hpp	/^  inline CB_INT LinSolve(const CB_INT N, const CB_INT NRHS, _F *A, $/;"	f	namespace:ChronusQ
+LinSolve	cqlinalg/solve.hpp	/^  inline int LinSolve(int N, int NRHS, _F *A, int LDA, _F *B, $/;"	f	namespace:ChronusQ
+LinearTrans_t	itersolver.hpp	/^    typedef std::function< void(size_t,_F*,_F*) >    LinearTrans_t;$/;"	t	class:ChronusQ::IterSolver
+M	response/enums.hpp	/^    M,K,MK,KM$/;"	e	enum:ChronusQ::SINGLESLATER_POLAR_COPT
+MB	response/settings.hpp	/^    CB_INT MB = 2; \/\/\/< BLACS distribution factor$/;"	m	struct:ChronusQ::ResponseSettings
+MBEnergy	quantum/base.hpp	/^    double MBEnergy;   \/\/\/< Many(2)-Body operator contribution to the energy$/;"	m	class:ChronusQ::QuantumBase
+MK	response/enums.hpp	/^    M,K,MK,KM$/;"	e	enum:ChronusQ::SINGLESLATER_POLAR_COPT
+MKL_Complex16	cqlinalg/cqlinalg_config.hpp	31;"	d
+MKL_Complex8	cqlinalg/cqlinalg_config.hpp	32;"	d
+MMUT	realtime/enums.hpp	/^    MMUT,$/;"	e	enum:ChronusQ::IntegrationAlgorithm
+MOFOCK	singleslater/fock.hpp	/^  void SingleSlater<MatsT,IntsT>::MOFOCK() {$/;"	f	class:ChronusQ::SingleSlater
+MOI	molecule.hpp	/^    cartmat_t MOI; \/\/\/< Moment of inertia of the Molecule$/;"	m	struct:ChronusQ::Molecule
+MORSettings	morspec.hpp	/^  struct MORSettings {$/;"	s	namespace:ChronusQ
+MORSpec	morspec.hpp	/^    MORSpec( MPI_Comm c, std::shared_ptr<Reference> ref ) : $/;"	f	class:ChronusQ::MORSpec
+MORSpec	morspec.hpp	/^  class MORSpec : public ResponseTBase<dcomplex>, public MORSpecBase {$/;"	c	namespace:ChronusQ
+MORSpecBase	morspec.hpp	/^  struct MORSpecBase {$/;"	s	namespace:ChronusQ
+MOR_TARGET	morspec.hpp	/^  enum MOR_TARGET {$/;"	g	namespace:ChronusQ
+MOVE_OTHER_MEMBER	util/preprocessor.hpp	67;"	d
+MOVE_OTHER_MEMBER_OP	util/preprocessor.hpp	68;"	d
+MOVE_OTHER_MEMBER_VEC_OP	util/preprocessor.hpp	76;"	d
+MPIBCast	util/mpi.hpp	/^  static inline void MPIBCast(T& msg, int root, MPI_Comm c) {$/;"	f	namespace:ChronusQ
+MPIBCast	util/mpi.hpp	/^  static inline void MPIBCast(T* msg, int count, int root, MPI_Comm c) {$/;"	f	namespace:ChronusQ
+MPICommFree	util/mpi.hpp	/^  static inline void MPICommFree(MPI_Comm &comm) {$/;"	f	namespace:ChronusQ
+MPICommSplit	util/mpi.hpp	/^  static inline MPI_Comm MPICommSplit(MPI_Comm comm, int color, int key) {$/;"	f	namespace:ChronusQ
+MPIRank	util/mpi.hpp	/^  static inline int MPIRank(MPI_Comm comm = MPI_COMM_WORLD) {$/;"	f	namespace:ChronusQ
+MPISize	util/mpi.hpp	/^  static inline int MPISize(MPI_Comm comm = MPI_COMM_WORLD) {$/;"	f	namespace:ChronusQ
+MPI_Barrier	util/mpi.hpp	/^  static inline void MPI_Barrier(MPI_Comm c) { };$/;"	f	namespace:ChronusQ
+MPI_Comm	util/mpi.hpp	/^    MPI_Comm() : MPI_Comm(0) { } ;$/;"	f	struct:ChronusQ::MPI_Comm
+MPI_Comm	util/mpi.hpp	/^    MPI_Comm(int c) : internal(c){ }$/;"	f	struct:ChronusQ::MPI_Comm
+MPI_Comm	util/mpi.hpp	/^  struct MPI_Comm { $/;"	s	namespace:ChronusQ
+MPI_UNDEFINED	util/mpi.hpp	66;"	d
+MX	quantum/base.hpp	/^    SCALAR=0,MZ=1,MY=2,MX=3$/;"	e	enum:ChronusQ::DENSITY_TYPE
+MY	quantum/base.hpp	/^    SCALAR=0,MZ=1,MY=2,MX=3$/;"	e	enum:ChronusQ::DENSITY_TYPE
+MZ	quantum/base.hpp	/^    SCALAR=0,MZ=1,MY=2,MX=3$/;"	e	enum:ChronusQ::DENSITY_TYPE
+Magnetic	fields.hpp	/^    Magnetic$/;"	e	enum:ChronusQ::EMFieldTyp
+MagneticDipole	response/enums.hpp	/^    MagneticDipole,$/;"	e	enum:ChronusQ::ResponseOperator
+MagneticQuadrupole	response/enums.hpp	/^    MagneticQuadrupole,$/;"	e	enum:ChronusQ::ResponseOperator
+MassEl_KG	physcon.hpp	/^  constexpr double MassEl_KG = $/;"	m	namespace:ChronusQ
+MatrixT	chronusqefp.hpp	/^    size_t MatrixT;$/;"	m	struct:ChronusQ::SSType
+ModifiedMidpoint	realtime/enums.hpp	/^    ModifiedMidpoint,$/;"	e	enum:ChronusQ::PropagationStep
+Molecule	molecule.hpp	/^    Molecule(const int C = 0, const int M = 0, std::vector<Atom> _atoms = {}) :$/;"	f	struct:ChronusQ::Molecule
+Molecule	molecule.hpp	/^  struct Molecule {$/;"	s	namespace:ChronusQ
+N	response/tbase.hpp	/^    size_t N;$/;"	m	struct:ChronusQ::RESPONSE_CONTRACTION
+NAlloc_	memmanager.hpp	/^    size_t NAlloc_;       \/\/\/< Number of blocks currently allocated$/;"	m	class:ChronusQ::CQMemManager
+NDer	grid/integrator.hpp	/^    size_t           NDer;         \/\/\/< Number of required basis set derivatives$/;"	m	class:ChronusQ::BeckeIntegrator
+NMPerHartree	physcon.hpp	/^  constexpr double NMPerHartree  = 45.56335;$/;"	m	namespace:ChronusQ
+NOGRAD	basisset/basisset_util.hpp	/^    NOGRAD$/;"	e	enum:ChronusQ::SHELL_EVAL_TYPE
+NONE	singleslater/base.hpp	/^    NONE = -1  $/;"	e	enum:ChronusQ::DIIS_ALG
+NON_RELATIVISTIC	aointegrals.hpp	/^    NON_RELATIVISTIC,$/;"	e	enum:ChronusQ::CORE_HAMILTONIAN_TYPE
+N_	itersolver.hpp	/^    size_t N_;       \/\/\/< Problem dimension$/;"	m	class:ChronusQ::IterSolver
+N_	memmanager.hpp	/^    size_t N_;            \/\/\/< Total bytes to be allocated$/;"	m	class:ChronusQ::CQMemManager
+NewtonRaphsonSCF	singleslater/scf.hpp	/^  void SingleSlater<MatsT,IntsT>::NewtonRaphsonSCF() {$/;"	f	class:ChronusQ::SingleSlater
+Normalize	cqlinalg/blas1.hpp	/^  inline double Normalize(int N, _F *X, int INCX) {$/;"	f	namespace:ChronusQ
+OBEnergy	quantum/base.hpp	/^    double OBEnergy;   \/\/\/< 1-Body operator contribution to the energy$/;"	m	class:ChronusQ::QuantumBase
+OPA_CROSS_SECTION_EDA	morspec.hpp	/^    OPA_CROSS_SECTION_EDA,$/;"	e	enum:ChronusQ::MOR_TARGET
+OPTOPT	cxxapi/options.hpp	39;"	d
+ORTHO_TYPE	aointegrals.hpp	/^  enum ORTHO_TYPE {$/;"	g	namespace:ChronusQ
+OSize	extrapolate.hpp	/^    size_t         OSize;       \/\/\/< Size of the error metrics used to construct B$/;"	m	class:ChronusQ::DIIS
+OneETerms	aointegrals.hpp	/^  struct OneETerms {$/;"	s	namespace:ChronusQ
+OpenDataSet	util/files.hpp	81;"	d
+OpenH5File	util/files.hpp	68;"	d
+OperatorSize	response/enums.hpp	/^  static std::map<ResponseOperator,size_t> OperatorSize = {$/;"	m	namespace:ChronusQ
+OperatorSpinCombine	quantum/properties.hpp	/^  RetTyp Quantum<MatsT>::OperatorSpinCombine(const Op &op) {$/;"	f	class:ChronusQ::Quantum
+OperatorTrace	quantum/base.hpp	/^  static inline RetTyp OperatorTrace(size_t N, const Left& op1 , $/;"	f	namespace:ChronusQ
+OrbitalHessianSettings	response/polarization.hpp	/^  struct OrbitalHessianSettings {$/;"	s	namespace:ChronusQ
+Ortho1Trans	singleslater/ortho.hpp	/^  void SingleSlater<MatsT,IntsT>::Ortho1Trans(TT* A, TT* TransA) {$/;"	f	class:ChronusQ::SingleSlater
+Ortho1TransT	singleslater/ortho.hpp	/^  void SingleSlater<MatsT,IntsT>::Ortho1TransT(TT* A, TT* TransA) {$/;"	f	class:ChronusQ::SingleSlater
+Ortho2Trans	singleslater/ortho.hpp	/^  void SingleSlater<MatsT,IntsT>::Ortho2Trans(TT* A, TT* TransA) {$/;"	f	class:ChronusQ::SingleSlater
+PAIR	aointegrals.hpp	/^    PAIR     \/\/\/< (mn | kl) X(nl)$/;"	e	enum:ChronusQ::TWOBODY_CONTRACTION_TYPE
+PBE0	dft.hpp	/^    PBE0() : GGA(XC_HYB_GGA_XC_PBEH) { }$/;"	f	class:ChronusQ::PBE0
+PBE0	dft.hpp	/^  class PBE0 : public GGA {$/;"	c	namespace:ChronusQ
+PBEC	dft.hpp	/^    PBEC() : GGA(XC_GGA_C_PBE) { }$/;"	f	class:ChronusQ::PBEC
+PBEC	dft.hpp	/^  class PBEC : public GGA {$/;"	c	namespace:ChronusQ
+PBEX	dft.hpp	/^    PBEX() : GGA(XC_GGA_X_PBE) { }$/;"	f	class:ChronusQ::PBEX
+PBEX	dft.hpp	/^  class PBEX : public GGA {$/;"	c	namespace:ChronusQ
+PC_	response/tbase.hpp	/^    std::function< void(size_t,T,T*,T*) >       PC_;$/;"	m	class:ChronusQ::ResponseTBase
+PP_A	response/enums.hpp	/^    PP_A,$/;"	e	enum:ChronusQ::ParticleParticleTDA
+PP_AA	response/enums.hpp	/^    PP_AA,$/;"	e	enum:ChronusQ::ParticleParticleProp_SpinSep
+PP_AB	response/enums.hpp	/^    PP_AB,$/;"	e	enum:ChronusQ::ParticleParticleProp_SpinSep
+PP_BB	response/enums.hpp	/^    PP_BB$/;"	e	enum:ChronusQ::ParticleParticleProp_SpinSep
+PP_C	response/enums.hpp	/^    PP_C$/;"	e	enum:ChronusQ::ParticleParticleTDA
+PRINT_SMALL	util/matout.hpp	/^constexpr long double PRINT_SMALL = 1e-10;$/;"	m	namespace:ChronusQ
+PVcrossP	aointegrals.hpp	/^    oper_t_coll  PVcrossP;  $/;"	m	class:ChronusQ::AOIntegrals
+PVdotP	aointegrals.hpp	/^    oper_t       PVdotP = nullptr;$/;"	m	class:ChronusQ::AOIntegrals
+ParticleParticleProp_SpinSep	response/enums.hpp	/^  enum ParticleParticleProp_SpinSep {$/;"	g	namespace:ChronusQ
+ParticleParticlePropagator	response/particleparticle.hpp	/^      ParticleParticlePropagator( MPI_Comm c, ResponseType job, $/;"	f	class:ChronusQ::ParticleParticlePropagator
+ParticleParticlePropagator	response/particleparticle.hpp	/^      ParticleParticlePropagator( const ParticleParticlePropagator &other ) : $/;"	f	class:ChronusQ::ParticleParticlePropagator
+ParticleParticlePropagator	response/particleparticle.hpp	/^  class ParticleParticlePropagator< HartreeFock<MatsT,IntsT> > : $/;"	c	namespace:ChronusQ
+ParticleParticlePropagator	response/particleparticle.hpp	/^  class ParticleParticlePropagator< KohnSham<MatsT,IntsT> > : $/;"	c	namespace:ChronusQ
+ParticleParticlePropagator	response/particleparticle.hpp	/^  class ParticleParticlePropagator< SingleSlater<MatsT,IntsT> > : $/;"	c	namespace:ChronusQ
+ParticleParticleTDA	response/enums.hpp	/^  enum ParticleParticleTDA {$/;"	g	namespace:ChronusQ
+PlanckConst	physcon.hpp	/^  constexpr double PlanckConst   = 6.62606957e-34;$/;"	m	namespace:ChronusQ
+PolarizationPropagator	response/polarization.hpp	/^      PolarizationPropagator( MPI_Comm c, ResponseType job, $/;"	f	class:ChronusQ::PolarizationPropagator
+PolarizationPropagator	response/polarization.hpp	/^      PolarizationPropagator( const PolarizationPropagator &other ) : $/;"	f	class:ChronusQ::PolarizationPropagator
+PolarizationPropagator	response/polarization.hpp	/^  class PolarizationPropagator< HartreeFock<MatsT, IntsT> > : $/;"	c	namespace:ChronusQ
+PolarizationPropagator	response/polarization.hpp	/^  class PolarizationPropagator< KohnSham<MatsT, IntsT> > : $/;"	c	namespace:ChronusQ
+PolarizationPropagator	response/polarization.hpp	/^  class PolarizationPropagator< SingleSlater<MatsT, IntsT> > : $/;"	c	namespace:ChronusQ
+PropagationStep	realtime/enums.hpp	/^  enum PropagationStep {$/;"	g	namespace:ChronusQ
+PropagatorAlgorithm	realtime/enums.hpp	/^  enum PropagatorAlgorithm {$/;"	g	namespace:ChronusQ
+QR	cqlinalg/factorization.hpp	/^  inline int QR(int M, int N, _F *A, int LDA, CQMemManager &mem) {$/;"	f	namespace:ChronusQ
+QZ	cqlinalg/factorization.hpp	/^  inline int QZ(char JOBVSL, char JOBVSR, int N, _F *A, int LDA, _F *B, int LDB,$/;"	f	namespace:ChronusQ
+Quadrature	grid/quadrature.hpp	/^    Quadrature(size_t N, double a, double b):$/;"	f	struct:ChronusQ::Quadrature
+Quadrature	grid/quadrature.hpp	/^  struct Quadrature {$/;"	s	namespace:ChronusQ
+QuadratureTemplate	grid/quadrature.hpp	94;"	d
+Quantum	quantum.hpp	/^    Quantum(MPI_Comm c, CQMemManager &mem, size_t _nC = 1, $/;"	f	class:ChronusQ::Quantum
+Quantum	quantum.hpp	/^  class Quantum : virtual public QuantumBase {$/;"	c	namespace:ChronusQ
+Quantum	quantum/impl.hpp	/^  Quantum<MatsT>::Quantum(Quantum<MatsT> &&other) : Quantum(std::move(other),0){ };$/;"	f	class:ChronusQ::Quantum
+Quantum	quantum/impl.hpp	/^  Quantum<MatsT>::Quantum(Quantum<MatsU> &&other, int dummy) : $/;"	f	class:ChronusQ::Quantum
+Quantum	quantum/impl.hpp	/^  Quantum<MatsT>::Quantum(const Quantum<MatsT> &other) : Quantum(other,0){ };$/;"	f	class:ChronusQ::Quantum
+Quantum	quantum/impl.hpp	/^  Quantum<MatsT>::Quantum(const Quantum<MatsU> &other, int dummy) : $/;"	f	class:ChronusQ::Quantum
+QuantumBase	quantum/base.hpp	/^    QuantumBase(MPI_Comm c, CQMemManager &mem, size_t _nC, bool _iCS): $/;"	f	class:ChronusQ::QuantumBase
+QuantumBase	quantum/base.hpp	/^  class QuantumBase {$/;"	c	namespace:ChronusQ
+Quantum_COLLECTIVE_OP	quantum/impl.hpp	34;"	d
+RANDOM	singleslater/base.hpp	/^    RANDOM,$/;"	e	enum:ChronusQ::SS_GUESS
+READDEN	singleslater/base.hpp	/^    READDEN$/;"	e	enum:ChronusQ::SS_GUESS
+READMO	singleslater/base.hpp	/^    READMO,$/;"	e	enum:ChronusQ::SS_GUESS
+REAL_GTO	basisset/basisset_def.hpp	/^    REAL_GTO,$/;"	e	enum:ChronusQ::BASIS_FUNCTION_TYPE
+RELATIVISTIC_4C	aointegrals.hpp	/^    RELATIVISTIC_4C$/;"	e	enum:ChronusQ::CORE_HAMILTONIAN_TYPE
+RELATIVISTIC_X2C_1E	aointegrals.hpp	/^    RELATIVISTIC_X2C_1E,$/;"	e	enum:ChronusQ::CORE_HAMILTONIAN_TYPE
+RELATIVISTIC_X2C_2E	aointegrals.hpp	/^    RELATIVISTIC_X2C_2E,$/;"	e	enum:ChronusQ::CORE_HAMILTONIAN_TYPE
+RELATIVISTIC_X2C_SPIN_FREE	aointegrals.hpp	/^    RELATIVISTIC_X2C_SPIN_FREE,$/;"	e	enum:ChronusQ::CORE_HAMILTONIAN_TYPE
+RESIDUE	response/enums.hpp	/^    RESIDUE,$/;"	e	enum:ChronusQ::ResponseType
+RESL_	itersolver.hpp	/^    _F     *RESL_ = nullptr;$/;"	m	class:ChronusQ::IterDiagonalizer
+RESPONSE_CONTRACTION	response/tbase.hpp	/^  struct RESPONSE_CONTRACTION {$/;"	s	namespace:ChronusQ
+RESR_	itersolver.hpp	/^    _F     *RESR_ = nullptr;$/;"	m	class:ChronusQ::IterDiagonalizer
+RES_	itersolver.hpp	/^    _F*    RES_ = nullptr;$/;"	m	class:ChronusQ::IterLinearSolver
+RHS	response/results.hpp	/^    T* RHS = nullptr;$/;"	m	struct:ChronusQ::FDResponseResults
+RHS_	itersolver.hpp	/^    _F*    RHS_ = nullptr;$/;"	m	class:ChronusQ::IterLinearSolver
+RIJ	molecule.hpp	/^    dynmat_t RIJ;         \/\/\/< Nuclear distance matrix$/;"	m	struct:ChronusQ::Molecule
+RMSDenMag	singleslater/base.hpp	/^    double RMSDenMag;    \/\/\/< RMS change in magnetization (X,Y,Z) density$/;"	m	struct:ChronusQ::SCFConvergence
+RMSDenScalar	singleslater/base.hpp	/^    double RMSDenScalar; \/\/\/< RMS change in Scalar density$/;"	m	struct:ChronusQ::SCFConvergence
+ROOT_ONLY	util/mpi.hpp	142;"	d
+RTFormattedLine	realtime/print.hpp	/^  void RTFormattedLine(std::ostream &out, std::string s) {$/;"	f	namespace:ChronusQ
+RTFormattedLine	realtime/print.hpp	/^  void RTFormattedLine(std::ostream &out, std::string s, T v) {$/;"	f	namespace:ChronusQ
+RTFormattedLine	realtime/print.hpp	/^  void RTFormattedLine(std::ostream &out, std::string s, T v, U u) {$/;"	f	namespace:ChronusQ
+R_	itersolver.hpp	/^    _F * R_   = nullptr;$/;"	m	class:ChronusQ::GMRES
+RandomGuess	singleslater/guess.hpp	/^  void SingleSlater<MatsT,IntsT>::RandomGuess() {$/;"	f	class:ChronusQ::SingleSlater
+ReadGuess1PDM	singleslater/guess.hpp	/^  void SingleSlater<MatsT,IntsT>::ReadGuess1PDM() {$/;"	f	class:ChronusQ::SingleSlater
+ReadGuessMO	singleslater/guess.hpp	/^  void SingleSlater<MatsT,IntsT>::ReadGuessMO() {$/;"	f	class:ChronusQ::SingleSlater
+RealGTOIntEngine	aointegrals/inhouseaointegral.hpp	/^  struct RealGTOIntEngine {$/;"	s	namespace:ChronusQ
+RealTime	realtime.hpp	/^    RealTime(_SSTyp<RefMatsT,IntsT> &reference) : $/;"	f	class:ChronusQ::RealTime
+RealTime	realtime.hpp	/^  class RealTime : public RealTimeBase {$/;"	c	namespace:ChronusQ
+RealTimeBase	realtime.hpp	/^    RealTimeBase( CQMemManager &memManager): memManager_(memManager){ }$/;"	f	struct:ChronusQ::RealTimeBase
+RealTimeBase	realtime.hpp	/^  struct RealTimeBase {$/;"	s	namespace:ChronusQ
+RefT	morspec.hpp	/^    typedef typename Reference::value_type RefT;$/;"	t	class:ChronusQ::MORSpec
+ReferenceBasisSet	basisset/reference.hpp	/^    ReferenceBasisSet(const std::string &path, bool forceCart = false,$/;"	f	class:ChronusQ::ReferenceBasisSet
+ReferenceBasisSet	basisset/reference.hpp	/^  class ReferenceBasisSet {$/;"	c	namespace:ChronusQ
+ReferenceShell	basisset/reference.hpp	/^  struct ReferenceShell {$/;"	s	namespace:ChronusQ
+RelRes	itersolver.hpp	/^    double *RelRes = nullptr;$/;"	m	class:ChronusQ::GPLHR
+ResObservables	response/results.hpp	/^  struct ResObservables {$/;"	s	namespace:ChronusQ
+ResidueResponseResults	response/results.hpp	/^  struct ResidueResponseResults {$/;"	s	namespace:ChronusQ
+ResidueResponseSettings	response/settings.hpp	/^  struct ResidueResponseSettings {$/;"	s	namespace:ChronusQ
+ResponseBase	response/base.hpp	/^    ResponseBase( ResponseType job = RESIDUE) { genSettings.jobType = job; }$/;"	f	struct:ChronusQ::ResponseBase
+ResponseBase	response/base.hpp	/^    ResponseBase( const ResponseBase & other ) :$/;"	f	struct:ChronusQ::ResponseBase
+ResponseBase	response/base.hpp	/^  struct ResponseBase {$/;"	s	namespace:ChronusQ
+ResponseOperator	response/enums.hpp	/^  enum ResponseOperator {$/;"	g	namespace:ChronusQ
+ResponseRefBase	response/tbase.hpp	/^    ResponseRefBase( MPI_Comm c, ResponseType job, $/;"	f	class:ChronusQ::ResponseRefBase
+ResponseRefBase	response/tbase.hpp	/^    ResponseRefBase( const ResponseRefBase &other ) : $/;"	f	class:ChronusQ::ResponseRefBase
+ResponseRefBase	response/tbase.hpp	/^  class ResponseRefBase : $/;"	c	namespace:ChronusQ
+ResponseSettings	response/settings.hpp	/^  struct ResponseSettings {$/;"	s	namespace:ChronusQ
+ResponseTBase	response/tbase.hpp	/^    ResponseTBase( MPI_Comm c, ResponseType job, CQMemManager &mem, $/;"	f	class:ChronusQ::ResponseTBase
+ResponseTBase	response/tbase.hpp	/^    ResponseTBase( const ResponseTBase &other ) : $/;"	f	class:ChronusQ::ResponseTBase
+ResponseTBase	response/tbase.hpp	/^  class ResponseTBase : public ResponseBase {$/;"	c	namespace:ChronusQ
+ResponseType	response/enums.hpp	/^  enum ResponseType {$/;"	g	namespace:ChronusQ
+Rotatory_CGS_Length	physcon.hpp	/^  constexpr double Rotatory_CGS_Length = $/;"	m	namespace:ChronusQ
+Rotatory_CGS_Vel	physcon.hpp	/^  constexpr double Rotatory_CGS_Vel = $/;"	m	namespace:ChronusQ
+S3_MAX	aointegrals/contract/direct.hpp	1008;"	d
+S3_MAX	aointegrals/contract/direct.hpp	407;"	d
+SAD	singleslater/base.hpp	/^    SAD,$/;"	e	enum:ChronusQ::SS_GUESS
+SADGuess	singleslater/guess.hpp	/^  void SingleSlater<MatsT,IntsT>::SADGuess() {$/;"	f	class:ChronusQ::SingleSlater
+SCALAR	quantum/base.hpp	/^    SCALAR=0,MZ=1,MY=2,MX=3$/;"	e	enum:ChronusQ::DENSITY_TYPE
+SCF	singleslater/base/scf.hpp	/^  void SingleSlaterBase::SCF(EMPerturbation &pert) {$/;"	f	class:ChronusQ::SingleSlaterBase
+SCFControls	singleslater/base.hpp	/^  struct SCFControls {$/;"	s	namespace:ChronusQ
+SCFConvergence	singleslater/base.hpp	/^  struct SCFConvergence {$/;"	s	namespace:ChronusQ
+SCFFin	singleslater/scf.hpp	/^  void SingleSlater<MatsT,IntsT>::SCFFin() {$/;"	f	class:ChronusQ::SingleSlater
+SCFInit	singleslater/scf.hpp	/^  void SingleSlater<MatsT,IntsT>::SCFInit() {$/;"	f	class:ChronusQ::SingleSlater
+SCF_ALG	singleslater/base.hpp	/^  enum SCF_ALG {$/;"	g	namespace:ChronusQ
+SCF_STEP	singleslater/base.hpp	/^  enum SCF_STEP {$/;"	g	namespace:ChronusQ
+SExpect	quantum/base.hpp	/^    cart_t SExpect; \/\/\/< Expectation values of Sx, Sy and Sz$/;"	m	class:ChronusQ::QuantumBase
+SHELL_EVAL_TYPE	basisset/basisset_util.hpp	/^  enum SHELL_EVAL_TYPE {$/;"	g	namespace:ChronusQ
+SINGLESLATER_POLAR_COPT	response/enums.hpp	/^  enum SINGLESLATER_POLAR_COPT {$/;"	g	namespace:ChronusQ
+SOL	response/results.hpp	/^    U* SOL = nullptr;$/;"	m	struct:ChronusQ::FDResponseResults
+SOL_	itersolver.hpp	/^    _F*    SOL_ = nullptr;$/;"	m	class:ChronusQ::IterLinearSolver
+SPIN_OPERATOR_ALLOC	quantum/preprocessor.hpp	27;"	d
+SSType	chronusqefp.hpp	/^    SSType(dcomplex garbage0, dcomplex garbage1, SingleSlaterBase* ssptr_):$/;"	f	struct:ChronusQ::SSType
+SSType	chronusqefp.hpp	/^    SSType(dcomplex garbage0, double garbage1, SingleSlaterBase* ssptr_):$/;"	f	struct:ChronusQ::SSType
+SSType	chronusqefp.hpp	/^    SSType(double garbage0, dcomplex garbage1, SingleSlaterBase* ssptr_):$/;"	f	struct:ChronusQ::SSType
+SSType	chronusqefp.hpp	/^    SSType(double garbage0, double garbage1, SingleSlaterBase* ssptr_):$/;"	f	struct:ChronusQ::SSType
+SSType	chronusqefp.hpp	/^  struct SSType{$/;"	s	namespace:ChronusQ
+SS_GUESS	singleslater/base.hpp	/^  enum SS_GUESS {$/;"	g	namespace:ChronusQ
+SSq	quantum/base.hpp	/^    double    SSq;  \/\/\/< Expectation value of S^2$/;"	m	class:ChronusQ::QuantumBase
+SafeFile	util/files.hpp	/^      SafeFile( const std::string &fName = "", $/;"	f	class:ChronusQ::SafeFile
+SafeFile	util/files.hpp	/^  class SafeFile {$/;"	c	namespace:ChronusQ
+Scale	grid/integrator.hpp	/^    double Scale;             \/\/\/< Radial scaling parameter$/;"	m	class:ChronusQ::SphereIntegrator
+SetLAThreads	util/threads.hpp	/^  inline void SetLAThreads(size_t n) {$/;"	f	namespace:ChronusQ
+SetMat	cqlinalg/blasutil.hpp	/^  void SetMat(char TRANS, size_t M, size_t N, _FScale ALPHA, _F1 *A, size_t LDA,$/;"	f	namespace:ChronusQ
+SetNumThreads	util/threads.hpp	/^  inline void SetNumThreads(size_t n) {$/;"	f	namespace:ChronusQ
+ShellBlockNorm	aointegrals/contract/direct.hpp	/^  double * ShellBlockNorm(std::vector<libint2::Shell> &shSet, T *MAT, $/;"	f	namespace:ChronusQ
+ShellBlockNorm	aointegrals/contract/direct.hpp	/^  void ShellBlockNorm(std::vector<libint2::Shell> &shSet, T *MAT, $/;"	f	namespace:ChronusQ
+ShellPairData	basisset/basisset_def.hpp	/^  struct ShellPairData {$/;"	s	namespace:ChronusQ
+Shift_t	itersolver.hpp	/^    typedef std::function< void(size_t,_F,_F*,_F*) > Shift_t;$/;"	t	class:ChronusQ::IterSolver
+SingleSlater	singleslater.hpp	/^    SingleSlater(MPI_Comm c, AOIntegrals<IntsT> &aoi, Args... args) : $/;"	f	class:ChronusQ::SingleSlater
+SingleSlater	singleslater.hpp	/^  class SingleSlater : public SingleSlaterBase, public WaveFunction<MatsT,IntsT>{$/;"	c	namespace:ChronusQ
+SingleSlater	singleslater/impl.hpp	/^  SingleSlater<MatsT,IntsT>::SingleSlater(SingleSlater<MatsT,IntsT> &&other) : $/;"	f	class:ChronusQ::SingleSlater
+SingleSlater	singleslater/impl.hpp	/^  SingleSlater<MatsT,IntsT>::SingleSlater(SingleSlater<MatsU,IntsT> &&other,int dummy) : $/;"	f	class:ChronusQ::SingleSlater
+SingleSlater	singleslater/impl.hpp	/^  SingleSlater<MatsT,IntsT>::SingleSlater(const SingleSlater<MatsT,IntsT> &other) : $/;"	f	class:ChronusQ::SingleSlater
+SingleSlater	singleslater/impl.hpp	/^  SingleSlater<MatsT,IntsT>::SingleSlater(const SingleSlater<MatsU,IntsT> &other,int dummy) : $/;"	f	class:ChronusQ::SingleSlater
+SingleSlaterBase	singleslater/base.hpp	/^    SingleSlaterBase(MPI_Comm c, CQMemManager &mem, size_t _nC, bool iCS) : $/;"	f	class:ChronusQ::SingleSlaterBase
+SingleSlaterBase	singleslater/base.hpp	/^  class SingleSlaterBase : virtual public WaveFunctionBase {$/;"	c	namespace:ChronusQ
+SingleSlaterParticleParticleBase	response/particleparticle.hpp	/^  struct SingleSlaterParticleParticleBase { $/;"	s	namespace:ChronusQ
+SingleSlaterPolarBase	response/polarization.hpp	/^  struct SingleSlaterPolarBase { $/;"	s	namespace:ChronusQ
+SingleSlater_COLLECTIVE_OP	singleslater/impl.hpp	37;"	d
+SlaterExchange	dft.hpp	/^    SlaterExchange() : LDA(XC_LDA_X) { }$/;"	f	class:ChronusQ::SlaterExchange
+SlaterExchange	dft.hpp	/^  class SlaterExchange : public LDA {$/;"	c	namespace:ChronusQ
+SmartConj	util/math.hpp	/^  inline dcomplex SmartConj(const dcomplex &x) { return std::conj(x); }$/;"	f	namespace:ChronusQ
+SmartConj	util/math.hpp	/^  inline double SmartConj(const double &x) { return x; }$/;"	f	namespace:ChronusQ
+SpeedOfLight	physcon.hpp	/^  constexpr double SpeedOfLight  = 137.035999074;$/;"	m	namespace:ChronusQ
+SpeedOfLight_CM	physcon.hpp	/^  constexpr double SpeedOfLight_CM = 2.99792458e+10; $/;"	m	namespace:ChronusQ
+SphereIntegrator	grid/integrator.hpp	/^    SphereIntegrator( _QTyp1 g, size_t NAng , cart_t center, double scale,$/;"	f	class:ChronusQ::SphereIntegrator
+SphereIntegrator	grid/integrator.hpp	/^  class SphereIntegrator : public Integrator2D<_QTyp1,Lebedev> {$/;"	c	namespace:ChronusQ
+Step	realtime/enums.hpp	/^    Step$/;"	e	enum:ChronusQ::FieldEnvelopeTyp
+T	morspec.hpp	/^    typedef dcomplex T;$/;"	t	class:ChronusQ::MORSpec
+T	response/tbase.hpp	/^    typedef typename Reference::value_type T;$/;"	t	class:ChronusQ::ResponseRefBase
+TDEMField	realtime/fields.hpp	/^    TDEMField(EMFieldTyp em, Env env, const _UnitVector &uv) :$/;"	f	struct:ChronusQ::TDEMField
+TDEMField	realtime/fields.hpp	/^    TDEMField(EMFieldTyp em, FieldGauge fg, $/;"	f	struct:ChronusQ::TDEMField
+TDEMField	realtime/fields.hpp	/^    TDEMField(EMFieldTyp em, FieldGauge fg, Env env, const _UnitVector &uv) :$/;"	f	struct:ChronusQ::TDEMField
+TDEMField	realtime/fields.hpp	/^    TDEMField(EMFieldTyp em, std::shared_ptr<FieldEnvelopeBase> env, $/;"	f	struct:ChronusQ::TDEMField
+TDEMField	realtime/fields.hpp	/^  struct TDEMField : public TDEMFieldBase, public EMField<_UnitVector> {$/;"	s	namespace:ChronusQ
+TDEMFieldBase	realtime/fields.hpp	/^    TDEMFieldBase(std::shared_ptr<FieldEnvelopeBase> env): envelope(env){ };$/;"	f	struct:ChronusQ::TDEMFieldBase
+TDEMFieldBase	realtime/fields.hpp	/^  struct TDEMFieldBase : virtual public EMFieldBase {$/;"	s	namespace:ChronusQ
+TDEMPerturbation	realtime/fields.hpp	/^  struct TDEMPerturbation {$/;"	s	namespace:ChronusQ
+TWOBODY_CONTRACTION_TYPE	aointegrals.hpp	/^  enum TWOBODY_CONTRACTION_TYPE {$/;"	g	namespace:ChronusQ
+TaylorExpansion	realtime/enums.hpp	/^    TaylorExpansion,$/;"	e	enum:ChronusQ::PropagatorAlgorithm
+Time	realtime.hpp	/^    std::vector<double> Time;$/;"	m	struct:ChronusQ::IntegrationData
+TwoBodyContraction	aointegrals.hpp	/^  struct TwoBodyContraction {$/;"	s	namespace:ChronusQ
+UH	realtime.hpp	/^    oper_t_coll UH;$/;"	m	class:ChronusQ::RealTime
+U_	itersolver.hpp	/^    _F * U_   = nullptr;$/;"	m	class:ChronusQ::GMRES
+VL	response/results.hpp	/^    T      *VL = nullptr;$/;"	m	struct:ChronusQ::ResidueResponseResults
+VL_	itersolver.hpp	/^    _F     *VL_   = nullptr;$/;"	m	class:ChronusQ::IterDiagonalizer
+VR	itersolver.hpp	/^    _F*       VR()     const { return VR_;     }$/;"	f	class:ChronusQ::IterDiagonalizer
+VR	response/results.hpp	/^    T      *VR = nullptr;$/;"	m	struct:ChronusQ::ResidueResponseResults
+VR_	itersolver.hpp	/^    _F     *VR_   = nullptr;$/;"	m	class:ChronusQ::IterDiagonalizer
+VWNIII	dft.hpp	/^    VWNIII() : LDA(XC_LDA_C_VWN_3) { }$/;"	f	class:ChronusQ::VWNIII
+VWNIII	dft.hpp	/^  class VWNIII : public LDA {$/;"	c	namespace:ChronusQ
+VWNV	dft.hpp	/^    VWNV() : LDA(XC_LDA_C_VWN_RPA) { }$/;"	f	class:ChronusQ::VWNV
+VWNV	dft.hpp	/^  class VWNV : public LDA {$/;"	c	namespace:ChronusQ
+VWNV_G	dft.hpp	/^    VWNV_G() : LDA(XC_LDA_C_VWN) { }$/;"	f	class:ChronusQ::VWNV_G
+VWNV_G	dft.hpp	/^  class VWNV_G : public LDA {$/;"	c	namespace:ChronusQ
+VXC	singleslater/kohnsham.hpp	/^    std::vector<double*> VXC; \/\/\/< VXC terms$/;"	m	class:ChronusQ::KohnSham
+VXCDur	singleslater/kohnsham.hpp	/^    double VXCDur;$/;"	m	class:ChronusQ::KohnSham
+VXC_DEBUG_LEVEL	singleslater/kohnsham/vxc.hpp	41;"	d
+V_	itersolver.hpp	/^    _F*    V_   = nullptr;$/;"	m	class:ChronusQ::IterLinearSolver
+V_	memmanager.hpp	/^    std::vector<char> V_; \/\/\/< Internal memort$/;"	m	class:ChronusQ::CQMemManager
+VelElectricDipole	response/enums.hpp	/^    VelElectricDipole,$/;"	e	enum:ChronusQ::ResponseOperator
+VelElectricOctupole	response/enums.hpp	/^    VelElectricOctupole,$/;"	e	enum:ChronusQ::ResponseOperator
+VelElectricQuadrupole	response/enums.hpp	/^    VelElectricQuadrupole,$/;"	e	enum:ChronusQ::ResponseOperator
+Velocity	fields.hpp	/^    Velocity$/;"	e	enum:ChronusQ::FieldGauge
+W	response/results.hpp	/^    double *W  = nullptr;$/;"	m	struct:ChronusQ::ResidueResponseResults
+W_	itersolver.hpp	/^    _F * W_   = nullptr;$/;"	m	class:ChronusQ::GMRES
+WaveFunction	wavefunction.hpp	/^    WaveFunction(MPI_Comm c, AOIntegrals<IntsT> &aoi, size_t _nC, bool iCS) :$/;"	f	class:ChronusQ::WaveFunction
+WaveFunction	wavefunction.hpp	/^  class WaveFunction : virtual public WaveFunctionBase, public Quantum<MatsT> {$/;"	c	namespace:ChronusQ
+WaveFunction	wavefunction/impl.hpp	/^  WaveFunction<MatsT,IntsT>::WaveFunction(WaveFunction<MatsT,IntsT> &&other) : $/;"	f	class:ChronusQ::WaveFunction
+WaveFunction	wavefunction/impl.hpp	/^  WaveFunction<MatsT,IntsT>::WaveFunction(WaveFunction<MatsU,IntsT> &&other, int dummy) : $/;"	f	class:ChronusQ::WaveFunction
+WaveFunction	wavefunction/impl.hpp	/^  WaveFunction<MatsT,IntsT>::WaveFunction(const WaveFunction<MatsT,IntsT> &other) : $/;"	f	class:ChronusQ::WaveFunction
+WaveFunction	wavefunction/impl.hpp	/^  WaveFunction<MatsT,IntsT>::WaveFunction(const WaveFunction<MatsU,IntsT> &other,int dummy) :$/;"	f	class:ChronusQ::WaveFunction
+WaveFunctionBase	wavefunction/base.hpp	/^    WaveFunctionBase(MPI_Comm c, CQMemManager &mem, size_t _nC, bool iCS) : $/;"	f	class:ChronusQ::WaveFunctionBase
+WaveFunctionBase	wavefunction/base.hpp	/^  class WaveFunctionBase : virtual public QuantumBase {$/;"	c	namespace:ChronusQ
+WaveFunctionCubeGenBase	cubegen.hpp	/^    WaveFunctionCubeGenBase(std::string name, CUBE_TYPE ct, $/;"	f	class:ChronusQ::WaveFunctionCubeGenBase
+WaveFunctionCubeGenBase	cubegen.hpp	/^  class WaveFunctionCubeGenBase : public CubeGenBase {$/;"	c	namespace:ChronusQ
+WaveFunction_COLLECTIVE_OP	wavefunction/impl.hpp	33;"	d
+X	aointegrals.hpp	/^    T*  X;  \/\/\/< 1-Body (2 index) operator to contraction$/;"	m	struct:ChronusQ::TwoBodyContraction
+X	response/tbase.hpp	/^    T* X;$/;"	m	struct:ChronusQ::RESPONSE_CONTRACTION
+XCEnergy	singleslater/kohnsham.hpp	/^    double XCEnergy; \/\/\/< Exchange-correlation energy$/;"	m	class:ChronusQ::KohnSham
+_BATCH_DIRECT	aointegrals/contract/direct.hpp	48;"	d
+_CHARGE_DENSITY	cubegen.hpp	/^    _CHARGE_DENSITY,$/;"	e	enum:ChronusQ::CUBE_TYPE
+_CONVENTIONAL_SCF	singleslater/base.hpp	/^    _CONVENTIONAL_SCF,$/;"	e	enum:ChronusQ::SCF_ALG
+_CONVENTIONAL_SCF_STEP	singleslater/base.hpp	/^    _CONVENTIONAL_SCF_STEP,$/;"	e	enum:ChronusQ::SCF_STEP
+_ELECTROSTATIC_POTENTIAL	cubegen.hpp	/^    _ELECTROSTATIC_POTENTIAL$/;"	e	enum:ChronusQ::CUBE_TYPE
+_FULL_DIRECT	aointegrals/contract/direct.hpp	39;"	d
+_INCLUDED_INPUT_HPP_	cxxapi/input.hpp	25;"	d
+_INCLUDED_PROCEDURAL_HPP_	cxxapi/procedural.hpp	25;"	d
+_NEWTON_RAPHSON_SCF	singleslater/base.hpp	/^    _NEWTON_RAPHSON_SCF$/;"	e	enum:ChronusQ::SCF_ALG
+_NEWTON_RAPHSON_STEP	singleslater/base.hpp	/^    _NEWTON_RAPHSON_STEP$/;"	e	enum:ChronusQ::SCF_STEP
+_PRECOMPUTE_SHELL_PAIRS	aointegrals/contract/direct.hpp	43;"	d
+_SHZ_SCREEN	aointegrals/contract/direct.hpp	45;"	d
+_SPIN_DENSITY	cubegen.hpp	/^    _SPIN_DENSITY,$/;"	e	enum:ChronusQ::CUBE_TYPE
+_SingleSlaterDebug	singleslater.hpp	34;"	d
+_USE_EIGHT_FOLD	aointegrals/contract/direct.hpp	52;"	d
+_USE_FOUR_FOLD	aointegrals/contract/direct.hpp	54;"	d
+_WaveFunctionDebug	wavefunction.hpp	34;"	d
+__CERR_RUNTIMEERR__	cerr.hpp	32;"	d
+__INCLUDED_AOINTEGRALS_CONTRACT_DIRECT_HPP__	aointegrals/contract/direct.hpp	25;"	d
+__INCLUDED_AOINTEGRALS_CONTRACT_HPP__	aointegrals/contract.hpp	25;"	d
+__INCLUDED_AOINTEGRALS_CONTRACT_INCORE_HPP__	aointegrals/contract/incore.hpp	25;"	d
+__INCLUDED_AOINTEGRALS_HPP__	aointegrals.hpp	25;"	d
+__INCLUDED_AOINTEGRALS_IMPL_HPP__	aointegrals/impl.hpp	25;"	d
+__INCLUDED_AOINTEGRALS_INHOUSEAOINTEGRAL_HPP__	aointegrals/inhouseaointegral.hpp	25;"	d
+__INCLUDED_AOINTEGRALS_PRINT_HPP__	aointegrals/print.hpp	25;"	d
+__INCLUDED_ATOM_HPP__	atom.hpp	25;"	d
+__INCLUDED_BASISSET_DEF_HPP__	basisset/basisset_def.hpp	25;"	d
+__INCLUDED_BASISSET_HPP__	basisset.hpp	26;"	d
+__INCLUDED_BASISSET_REFERENCE_HPP__	basisset/reference.hpp	25;"	d
+__INCLUDED_BASISSET_UTIL_HPP__	basisset/basisset_util.hpp	25;"	d
+__INCLUDED_BOILERPLATE_HPP__	cxxapi/boilerplate.hpp	25;"	d
+__INCLUDED_CERR_HPP__	cerr.hpp	25;"	d
+__INCLUDED_CHRONUSQ_HEADER_HPP__	chronusqefp.hpp	2;"	d
+__INCLUDED_CHRONUSQ_SYS_HPP__	chronusq_sys.hpp	25;"	d
+__INCLUDED_CQLINALG_BLAS1_HPP__	cqlinalg/blas1.hpp	25;"	d
+__INCLUDED_CQLINALG_BLAS3_HPP__	cqlinalg/blas3.hpp	25;"	d
+__INCLUDED_CQLINALG_BLASEXT_HPP__	cqlinalg/blasext.hpp	25;"	d
+__INCLUDED_CQLINALG_BLASUTIL_HPP__	cqlinalg/blasutil.hpp	25;"	d
+__INCLUDED_CQLINALG_CONFIG_HPP__	cqlinalg/cqlinalg_config.hpp	25;"	d
+__INCLUDED_CQLINALG_EIG_HPP__	cqlinalg/eig.hpp	25;"	d
+__INCLUDED_CQLINALG_FACTORIZATION_HPP__	cqlinalg/factorization.hpp	25;"	d
+__INCLUDED_CQLINALG_HPP__	cqlinalg.hpp	26;"	d
+__INCLUDED_CQLINALG_MATFUNC_HPP__	cqlinalg/matfunc.hpp	25;"	d
+__INCLUDED_CQLINALG_ORTHO_HPP__	cqlinalg/ortho.hpp	25;"	d
+__INCLUDED_CQLINALG_SOLVE_HPP__	cqlinalg/solve.hpp	25;"	d
+__INCLUDED_CQLINALG_SVD_HPP__	cqlinalg/svd.hpp	25;"	d
+__INCLUDED_CQLINALG_UTIL_HPP__	cqlinalg/util.hpp	25;"	d
+__INCLUDED_CUBEGEN_HPP__	cubegen.hpp	25;"	d
+__INCLUDED_DFT_HPP__	dft.hpp	25;"	d
+__INCLUDED_EXTRAPOLATE_HPP__	extrapolate.hpp	25;"	d
+__INCLUDED_FIELDS_HPP__	fields.hpp	25;"	d
+__INCLUDED_GMRES_HPP__	itersolver/gmres.hpp	25;"	d
+__INCLUDED_GPLHR_HPP__	itersolver/gplhr.hpp	25;"	d
+__INCLUDED_GRID_INTEGRATOR_HPP__	grid/integrator.hpp	26;"	d
+__INCLUDED_GRID_QUADRATURE_HPP__	grid/quadrature.hpp	26;"	d
+__INCLUDED_ITERDIAGONALIZER_HPP__	itersolver/iterdiagonalizer.hpp	25;"	d
+__INCLUDED_ITERLINEARSOLVER_HPP__	itersolver/iterlinearsolver.hpp	25;"	d
+__INCLUDED_ITERSOLVER_HPP__	itersolver.hpp	25;"	d
+__INCLUDED_ITERSOLVER_IMPL_HPP__	itersolver/impl.hpp	25;"	d
+__INCLUDED_MEMMANAGER_HPP__	memmanager.hpp	25;"	d
+__INCLUDED_MOLECULE_HPP__	molecule.hpp	25;"	d
+__INCLUDED_MORSPEC_HPP__	morspec.hpp	25;"	d
+__INCLUDED_OPTIONS_HPP__	cxxapi/options.hpp	25;"	d
+__INCLUDED_OUTPUT_HPP__	cxxapi/output.hpp	25;"	d
+__INCLUDED_PARTICLEPARTICLE_HARTREEFOCK_HPP__	response/particleparticle/hartreefock.hpp	25;"	d
+__INCLUDED_PARTICLEPARTICLE_KOHNSHAM_HPP__	response/particleparticle/kohnsham.hpp	25;"	d
+__INCLUDED_PARTICLEPARTICLE_SINGLESLATER_HELPER_HPP__	response/particleparticle/singleslater_helper.hpp	25;"	d
+__INCLUDED_PARTICLEPARTICLE_SINGLESLATER_HPP__	response/particleparticle/singleslater.hpp	25;"	d
+__INCLUDED_POLARIZATION_HARTREEFOCK_HPP__	response/polarization/hartreefock.hpp	25;"	d
+__INCLUDED_POLARIZATION_KOHNSHAM_HPP__	response/polarization/kohnsham.hpp	25;"	d
+__INCLUDED_POLARIZATION_SINGLESLATER_HELPER_HPP__	response/polarization/singleslater_helper.hpp	25;"	d
+__INCLUDED_POLARIZATION_SINGLESLATER_HPP__	response/polarization/singleslater.hpp	25;"	d
+__INCLUDED_QUANTUM_BASE_HPP__	quantum/base.hpp	25;"	d
+__INCLUDED_QUANTUM_HPP__	quantum.hpp	25;"	d
+__INCLUDED_QUANTUM_IMPL_HPP__	quantum/impl.hpp	25;"	d
+__INCLUDED_QUANTUM_PREPROCESSOR_HPP__	quantum/preprocessor.hpp	25;"	d
+__INCLUDED_QUANTUM_PRINT_HPP__	quantum/print.hpp	25;"	d
+__INCLUDED_QUANTUM_PROPERTIES_HPP__	quantum/properties.hpp	25;"	d
+__INCLUDED_REALTIME_ENUMS_HPP__	realtime/enums.hpp	26;"	d
+__INCLUDED_REALTIME_FIELDS_ENVELOPE_HPP__	realtime/fields/envelope.hpp	2;"	d
+__INCLUDED_REALTIME_FIELDS_HPP__	realtime/fields.hpp	26;"	d
+__INCLUDED_REALTIME_FOCK_HPP__	realtime/fock.hpp	25;"	d
+__INCLUDED_REALTIME_HPP__	realtime.hpp	25;"	d
+__INCLUDED_REALTIME_IMPL_HPP__	realtime/impl.hpp	25;"	d
+__INCLUDED_REALTIME_MEMORY_HPP__	realtime/memory.hpp	25;"	d
+__INCLUDED_REALTIME_PRINT_HPP__	realtime/print.hpp	25;"	d
+__INCLUDED_REALTIME_PROPAGATION_HPP__	realtime/propagation.hpp	25;"	d
+__INCLUDED_RESPONSE_BASE_HPP__	response/base.hpp	25;"	d
+__INCLUDED_RESPONSE_ENUMS_HPP__	response/enums.hpp	25;"	d
+__INCLUDED_RESPONSE_FDR_HPP__	response/fdr.hpp	25;"	d
+__INCLUDED_RESPONSE_HPP__	response.hpp	25;"	d
+__INCLUDED_RESPONSE_IMPL_HPP__	response/impl.hpp	25;"	d
+__INCLUDED_RESPONSE_MEMORY_HPP__	response/memory.hpp	25;"	d
+__INCLUDED_RESPONSE_PARTICLEPARTICLE_HPP__	response/particleparticle.hpp	25;"	d
+__INCLUDED_RESPONSE_POLARIZATION_HPP__	response/polarization.hpp	25;"	d
+__INCLUDED_RESPONSE_PRINT_HPP__	response/print.hpp	25;"	d
+__INCLUDED_RESPONSE_PROPERTIES_HPP__	response/properties.hpp	25;"	d
+__INCLUDED_RESPONSE_RESIDUE_HPP__	response/residue.hpp	25;"	d
+__INCLUDED_RESPONSE_RESULTS_HPP__	response/results.hpp	25;"	d
+__INCLUDED_RESPONSE_SETTINGS_HPP__	response/settings.hpp	25;"	d
+__INCLUDED_RESPONSE_TBASE_HPP__	response/tbase.hpp	25;"	d
+__INCLUDED_SINGLESLATERBASE_SCF_HPP__	singleslater/base/scf.hpp	25;"	d
+__INCLUDED_SINGLESLATER_BASE_HPP__	singleslater/base.hpp	25;"	d
+__INCLUDED_SINGLESLATER_EXTRAP_HPP__	singleslater/extrap.hpp	25;"	d
+__INCLUDED_SINGLESLATER_FOCK_HPP__	singleslater/fock.hpp	25;"	d
+__INCLUDED_SINGLESLATER_GUESS_HPP__	singleslater/guess.hpp	25;"	d
+__INCLUDED_SINGLESLATER_HARTREEFOCK_HPP__	singleslater/hartreefock.hpp	25;"	d
+__INCLUDED_SINGLESLATER_HARTREEFOCK_SCF_HPP__	singleslater/hartreefock/scf.hpp	25;"	d
+__INCLUDED_SINGLESLATER_HPP__	singleslater.hpp	25;"	d
+__INCLUDED_SINGLESLATER_IMPL_HPP__	singleslater/impl.hpp	25;"	d
+__INCLUDED_SINGLESLATER_KOHNSHAM_FXC_HPP__	singleslater/kohnsham/fxc.hpp	25;"	d
+__INCLUDED_SINGLESLATER_KOHNSHAM_HPP__	singleslater/kohnsham.hpp	25;"	d
+__INCLUDED_SINGLESLATER_KOHNSHAM_IMPL_HPP__	singleslater/kohnsham/impl.hpp	25;"	d
+__INCLUDED_SINGLESLATER_KOHNSHAM_SCF_HPP__	singleslater/kohnsham/scf.hpp	25;"	d
+__INCLUDED_SINGLESLATER_KOHNSHAM_VXC_HPP__	singleslater/kohnsham/vxc.hpp	25;"	d
+__INCLUDED_SINGLESLATER_ORTHO_HPP__	singleslater/ortho.hpp	25;"	d
+__INCLUDED_SINGLESLATER_POP_HPP__	singleslater/pop.hpp	25;"	d
+__INCLUDED_SINGLESLATER_PRINT_HPP__	singleslater/print.hpp	25;"	d
+__INCLUDED_SINGLESLATER_QUANTUM_HPP__	singleslater/quantum.hpp	25;"	d
+__INCLUDED_SINGLESLATER_SCF_HPP__	singleslater/scf.hpp	25;"	d
+__INCLUDED_UTIL_FILES_HPP__	util/files.hpp	25;"	d
+__INCLUDED_UTIL_MATH_HPP__	util/math.hpp	25;"	d
+__INCLUDED_UTIL_MATOUT_HPP__	util/matout.hpp	25;"	d
+__INCLUDED_UTIL_MPI_HPP__	util/mpi.hpp	25;"	d
+__INCLUDED_UTIL_PREPROCESSOR__	util/preprocessor.hpp	25;"	d
+__INCLUDED_UTIL_THREADS_HPP__	util/threads.hpp	25;"	d
+__INCLUDED_UTIL_TIME_HPP__	util/time.hpp	25;"	d
+__INCLUDED_UTIL_TYPEDEFS_HPP__	util/typedefs.hpp	25;"	d
+__INCLUDED_WAVEFUNCTION_BASE_HPP__	wavefunction/base.hpp	25;"	d
+__INCLUDED_WAVEFUNCTION_HPP__	wavefunction.hpp	25;"	d
+__INCLUDED_WAVEFUNCTION_IMPL_HPP__	wavefunction/impl.hpp	25;"	d
+__INCLUDED_WAVEFUNCTION_PRINT_HPP__	wavefunction/print.hpp	25;"	d
+__INCLUDE_PHYSCON_HPP	physcon.hpp	25;"	d
+aDim_	response/particleparticle.hpp	/^      size_t aDim_  = 0;$/;"	m	class:ChronusQ::ParticleParticlePropagator
+aOps	response/settings.hpp	/^    std::vector<ResponseOperator> aOps  = AllOps;$/;"	m	struct:ChronusQ::ResponseSettings
+addField	fields.hpp	/^    inline void addField(EMFieldTyp em, FieldGauge fg, const _UV &uv) {$/;"	f	struct:ChronusQ::EMPerturbation
+addField	fields.hpp	/^    inline void addField(EMFieldTyp em, const _UV &uv) {$/;"	f	struct:ChronusQ::EMPerturbation
+addField	fields.hpp	/^    inline void addField(_Field f){ addField(std::make_shared<_Field>(f)); }$/;"	f	struct:ChronusQ::EMPerturbation
+addField	fields.hpp	/^    inline void addField(std::shared_ptr<EMFieldBase> f) {$/;"	f	struct:ChronusQ::EMPerturbation
+addField	fields.hpp	/^    inline void addField(std::shared_ptr<_Field> f){ addField(cast(f)); };$/;"	f	struct:ChronusQ::EMPerturbation
+addField	realtime.hpp	/^    inline void addField(Args... args){ pert.addField(args...); }$/;"	f	struct:ChronusQ::RealTimeBase
+addField	realtime/fields.hpp	/^    inline void addField(EMFieldTyp em, Env env, const _UV &uv) {$/;"	f	struct:ChronusQ::TDEMPerturbation
+addField	realtime/fields.hpp	/^    inline void addField(EMFieldTyp em, FieldGauge fg, Env env, $/;"	f	struct:ChronusQ::TDEMPerturbation
+addField	realtime/fields.hpp	/^    inline void addField(_TDField f){ addField(std::make_shared<_TDField>(f)); }$/;"	f	struct:ChronusQ::TDEMPerturbation
+addField	realtime/fields.hpp	/^    inline void addField(std::shared_ptr<TDEMFieldBase> f) {$/;"	f	struct:ChronusQ::TDEMPerturbation
+addField	realtime/fields.hpp	/^    inline void addField(std::shared_ptr<_TDField> f){ addField(cast(f)); };$/;"	f	struct:ChronusQ::TDEMPerturbation
+alloc	itersolver.hpp	/^    virtual void alloc() {$/;"	f	class:ChronusQ::IterDiagonalizer
+alloc	itersolver.hpp	/^    virtual void alloc() {$/;"	f	class:ChronusQ::IterLinearSolver
+alloc	itersolver.hpp	/^    void alloc() {$/;"	f	class:ChronusQ::GMRES
+alloc	itersolver.hpp	/^    void alloc() {$/;"	f	class:ChronusQ::GPLHR
+alloc	quantum/impl.hpp	/^  void Quantum<MatsT>::alloc(size_t N) {$/;"	f	class:ChronusQ::Quantum
+alloc	realtime/memory.hpp	/^  void RealTime<_SSTyp,IntsT>::alloc() {$/;"	f	class:ChronusQ::RealTime
+alloc	singleslater/impl.hpp	/^  void SingleSlater<MatsT,IntsT>::alloc() {$/;"	f	class:ChronusQ::SingleSlater
+alloc	wavefunction/impl.hpp	/^  void WaveFunction<MatsT,IntsT>::alloc() {$/;"	f	class:ChronusQ::WaveFunction
+allocExtrapStorage	singleslater/extrap.hpp	/^  void SingleSlater<MatsT,IntsT>::allocExtrapStorage() {$/;"	f	class:ChronusQ::SingleSlater
+allocFDRResults	response/memory.hpp	/^  void ResponseTBase<T>::allocFDRResults() {$/;"	f	class:ChronusQ::ResponseTBase
+allocMem	memmanager.hpp	/^     void allocMem() {$/;"	f	class:ChronusQ::CQMemManager
+allocResidueResults	response/memory.hpp	/^  void ResponseTBase<T>::allocResidueResults() {$/;"	f	class:ChronusQ::ResponseTBase
+allocResults	response/base.hpp	/^    inline void allocResults() {$/;"	f	struct:ChronusQ::ResponseBase
+alreadyRan_	response/tbase.hpp	/^    bool          alreadyRan_  = false;$/;"	m	class:ChronusQ::ResponseTBase
+ampVec	fields.hpp	/^    _VecTyp ampVec;$/;"	m	struct:ChronusQ::EMField
+ao2orthoFock	singleslater/scf.hpp	/^  void SingleSlater<MatsT,IntsT>::ao2orthoFock() {$/;"	f	class:ChronusQ::SingleSlater
+aoints	chronusqefp.hpp	/^    AOIntegrals<IntsT> &aoints;$/;"	m	class:ChronusQ::EFP
+aoints	wavefunction.hpp	/^    AOIntegrals<IntsT> &aoints; \/\/\/< AOIntegrals for the evaluation of GTO integrals$/;"	m	class:ChronusQ::WaveFunction
+atomicMass	atom.hpp	/^    double atomicMass;   \/\/\/< Atomic Mass (in a.u.)$/;"	m	struct:ChronusQ::Atom
+atomicNumber	atom.hpp	/^    size_t atomicNumber; \/\/\/< Atomic Number (# of protons)$/;"	m	struct:ChronusQ::Atom
+atoms	molecule.hpp	/^    std::vector<Atom> atoms; \/\/\/< The Atoms of which the Molecule consists$/;"	m	struct:ChronusQ::Molecule
+bFreq	response/settings.hpp	/^    std::vector<double> bFreq      = { 0. };$/;"	m	struct:ChronusQ::FDResponseSettings
+bOps	response/settings.hpp	/^    std::vector<ResponseOperator> bOps  = { LenElectricDipole };$/;"	m	struct:ChronusQ::ResponseSettings
+bannerEnd	cxxapi/output.hpp	/^  constexpr char  bannerEnd[] = "--------------------------------------------------------------------------------";$/;"	m	namespace:ChronusQ
+bannerMid	cxxapi/output.hpp	/^  constexpr char  bannerMid[] = "  ----------------------------------------------------------------------------  ";$/;"	m	namespace:ChronusQ
+bannerTop	cxxapi/output.hpp	/^  constexpr char  bannerTop[] = "--------------------------------------------------------------------------------";$/;"	m	namespace:ChronusQ
+basisFile_	basisset/reference.hpp	/^    std::ifstream  basisFile_; \/\/\/< File object for basis file$/;"	m	class:ChronusQ::ReferenceBasisSet
+basisKeyword	basisset/basisset_def.hpp	/^    basisKeyword = {$/;"	m	namespace:ChronusQ
+basisName	basisset/basisset_def.hpp	/^    std::string basisName;$/;"	m	struct:ChronusQ::BasisSet
+basisPath_	basisset/reference.hpp	/^    std::string    basisPath_; \/\/\/< Path to basis file$/;"	m	class:ChronusQ::ReferenceBasisSet
+basisSet	aointegrals.hpp	/^    BasisSet&     basisSet()   { return basisSet_;   }$/;"	f	struct:ChronusQ::AOIntegralsBase
+basisSet_	aointegrals.hpp	/^    BasisSet     &basisSet_;   \/\/\/< BasisSet for the GTO basis defintion$/;"	m	struct:ChronusQ::AOIntegralsBase
+basisSet_	grid/integrator.hpp	/^    BasisSet         &basisSet_;   \/\/\/< BasisSet for the GTO basis defintion$/;"	m	class:ChronusQ::BeckeIntegrator
+basisType	basisset/basisset_def.hpp	/^    BASIS_FUNCTION_TYPE basisType = REAL_GTO; \/\/\/< Type of basis function$/;"	m	struct:ChronusQ::BasisSet
+blockTransform	response/polarization.hpp	/^      inline void blockTransform(size_t N, size_t nVec, double fact, $/;"	f	class:ChronusQ::PolarizationPropagator
+cDim_	response/particleparticle.hpp	/^      size_t cDim_  = 0;$/;"	m	class:ChronusQ::ParticleParticlePropagator
+calcCenDist	grid/integrator.hpp	/^    void calcCenDist(std::vector<cart_t> &batchPt, double *rSq, double *R,  $/;"	f	class:ChronusQ::BeckeIntegrator
+cart_t	util/typedefs.hpp	/^  typedef std::array<double,3>    cart_t; \/\/\/< Cartesian point$/;"	t	namespace:ChronusQ
+cartmat_t	util/typedefs.hpp	/^  typedef std::array<cart_t,3>    cartmat_t; \/\/\/< Cartesian matrix$/;"	t	namespace:ChronusQ
+cartrk3_t	util/typedefs.hpp	/^  typedef std::array<cartmat_t,3> cartrk3_t; \/\/\/< Cartesian tensor (3)$/;"	t	namespace:ChronusQ
+cartvec_t	util/typedefs.hpp	/^  typedef std::vector<cart_t>     cartvec_t; \/\/\/< Vector of cartesian points$/;"	t	namespace:ChronusQ
+cast	fields.hpp	/^    cast(std::shared_ptr<EMField<_UnitVector>> x) {$/;"	f	namespace:ChronusQ
+cast	realtime/fields.hpp	/^    cast(std::shared_ptr<TDEMField<_UnitVector>> x) {$/;"	f	namespace:ChronusQ
+cast	realtime/fields/envelope.hpp	/^    cast(std::shared_ptr<FieldEnvelope<_Typ>> x) {$/;"	f	namespace:ChronusQ
+centers	basisset/basisset_def.hpp	/^    cartvec_t centers; \/\/\/< A list of centers that comprise the BasisSet$/;"	m	struct:ChronusQ::BasisSet
+charge	chronusqefp.hpp	/^    double*         charge;$/;"	m	class:ChronusQ::EFP
+charge	molecule.hpp	/^    int  charge;   \/\/\/< Overall charge of the Molecule (atomic units)$/;"	m	struct:ChronusQ::Molecule
+chargeDist	molecule.hpp	/^    std::vector<libint2::Shell> chargeDist;$/;"	m	struct:ChronusQ::Molecule
+checkConv	itersolver/gplhr.hpp	/^  bool GPLHR<_F>::checkConv(size_t nR, double *RelRes) { $/;"	f	class:ChronusQ::GPLHR
+checkStability	singleslater/scf.hpp	/^  bool SingleSlater<MatsT, IntsT>::checkStability() {$/;"	f	class:ChronusQ::SingleSlater
+cmplxPC_	response/tbase.hpp	/^    std::function< void(size_t,dcomplex,dcomplex*,dcomplex*) > cmplxPC_;$/;"	m	class:ChronusQ::ResponseTBase
+coeffs	extrapolate.hpp	/^    std::vector<T> coeffs;      \/\/\/< Vector of extrapolation coeficients$/;"	m	class:ChronusQ::DIIS
+comm	grid/integrator.hpp	/^    MPI_Comm         comm;$/;"	m	class:ChronusQ::BeckeIntegrator
+comm	quantum/base.hpp	/^    MPI_Comm      comm; \/\/\/< MPI Communicator$/;"	m	class:ChronusQ::QuantumBase
+comm_	itersolver.hpp	/^    MPI_Comm     comm_;$/;"	m	class:ChronusQ::IterSolver
+comm_	response/tbase.hpp	/^    MPI_Comm      comm_;$/;"	m	class:ChronusQ::ResponseTBase
+computeEnergy	quantum/base.hpp	/^    void computeEnergy(EMPerturbation &pert){$/;"	f	class:ChronusQ::QuantumBase
+computeEnergy	singleslater/kohnsham.hpp	/^    virtual void computeEnergy() {$/;"	f	class:ChronusQ::KohnSham
+computeEnergy	singleslater/quantum.hpp	/^  void SingleSlater<MatsT,IntsT>::computeEnergy() {$/;"	f	class:ChronusQ::SingleSlater
+computeGIAOPotentialV	aointegrals/inhouseaointegral.hpp	/^    static inline std::vector<std::vector<dcomplex>> computeGIAOPotentialV( libint2::ShellPair& pair, $/;"	f	struct:ChronusQ::ComplexGIAOIntEngine
+computeMultipole	singleslater/quantum.hpp	/^  void SingleSlater<MatsT,IntsT>::computeMultipole(EMPerturbation &pert) {$/;"	f	class:ChronusQ::SingleSlater
+computeOBProperty	quantum.hpp	/^    inline RetTyp computeOBProperty(const Op &op) {$/;"	f	class:ChronusQ::Quantum
+computeOBProperty	quantum.hpp	/^    inline std::vector<RetTyp> computeOBProperty(const std::vector<Op> &opv) {$/;"	f	class:ChronusQ::Quantum
+computeOrtho	singleslater/fock.hpp	/^  void SingleSlater<MatsT,IntsT>::computeOrtho() {$/;"	f	class:ChronusQ::SingleSlater
+computePotentialV	aointegrals/inhouseaointegral.hpp	/^    static inline std::vector<std::vector<double>> computePotentialV($/;"	f	struct:ChronusQ::RealGTOIntEngine
+computeProperties	quantum/base.hpp	/^    inline void computeProperties(EMPerturbation &pert) {$/;"	f	class:ChronusQ::QuantumBase
+computeSL	aointegrals/inhouseaointegral.hpp	/^    static inline std::vector<std::vector<double>> computeSL(libint2::ShellPair &pair,$/;"	f	struct:ChronusQ::RealGTOIntEngine
+computeSpin	singleslater/quantum.hpp	/^  void SingleSlater<MatsT,IntsT>::computeSpin() {$/;"	f	class:ChronusQ::SingleSlater
+computepVdotp	aointegrals/inhouseaointegral.hpp	/^    static inline std::vector<std::vector<double>> computepVdotp($/;"	f	struct:ChronusQ::RealGTOIntEngine
+configOptions	morspec.hpp	/^  void MORSpec<Reference>::configOptions() {$/;"	f	class:ChronusQ::MORSpec
+configOptions	response/particleparticle/singleslater.hpp	/^  void ParticleParticlePropagator<SingleSlater<MatsT,IntsT>>::configOptions() {$/;"	f	class:ChronusQ::ParticleParticlePropagator
+configOptions	response/polarization/singleslater.hpp	/^  void PolarizationPropagator<SingleSlater<MatsT, IntsT>>::configOptions() {$/;"	f	class:ChronusQ::PolarizationPropagator
+constructShifts	morspec.hpp	/^    void constructShifts() {$/;"	f	class:ChronusQ::MORSpec
+constructShifts	response/particleparticle/singleslater.hpp	/^  void ParticleParticlePropagator<SingleSlater<MatsT,IntsT>>::constructShifts() {$/;"	f	class:ChronusQ::ParticleParticlePropagator
+constructShifts	response/polarization/singleslater.hpp	/^  void PolarizationPropagator<SingleSlater<MatsT, IntsT>>::constructShifts() {$/;"	f	class:ChronusQ::PolarizationPropagator
+constructShifts	response/tbase.hpp	/^    virtual void constructShifts() {$/;"	f	class:ChronusQ::ResponseTBase
+constructZVars	singleslater/kohnsham/vxc.hpp	/^  void KohnSham<MatsT,IntsT>::constructZVars(DENSITY_TYPE denTyp, bool isGGA, size_t NPts, $/;"	f	class:ChronusQ::KohnSham
+constructZVarsFXC	singleslater/kohnsham/fxc.hpp	/^  void KohnSham<MatsT, IntsT>::constructZVarsFXC(DENSITY_TYPE denTyp, bool isGGA, size_t NPts, $/;"	f	class:ChronusQ::KohnSham
+contType	aointegrals.hpp	/^    TWOBODY_CONTRACTION_TYPE contType;$/;"	m	struct:ChronusQ::TwoBodyContraction
+containsData	cxxapi/input.hpp	/^    inline bool containsData(std::string str) const {$/;"	f	class:ChronusQ::CQInputFile
+containsSection	cxxapi/input.hpp	/^    inline bool containsSection(std::string str) const {$/;"	f	class:ChronusQ::CQInputFile
+contrAlg	aointegrals.hpp	/^    CONTRACTION_ALGORITHM contrAlg = DIRECT;\/\/\/< Alg for 2-body contraction$/;"	m	struct:ChronusQ::AOIntegralsBase
+convCrit	morspec.hpp	/^    double convCrit  = 1e-2;$/;"	m	struct:ChronusQ::MORSettings
+convCrit	response/settings.hpp	/^    double convCrit = 1e-10;$/;"	m	struct:ChronusQ::ResponseSettings
+convCrit_	itersolver.hpp	/^    double convCrit_; \/\/\/< Convergence criteria$/;"	m	class:ChronusQ::IterSolver
+coord	atom.hpp	/^    std::array<double,3> coord; \/\/\/< X,Y,Z coordinates$/;"	m	struct:ChronusQ::Atom
+coord_type	chronusqefp.hpp	/^    enum efp_coord_type coord_type; $/;"	m	class:ChronusQ::EFP	typeref:enum:ChronusQ::EFP::efp_coord_type
+coreH	aointegrals.hpp	/^    bool coreH; \/\/overlap, kinetic, potential$/;"	m	struct:ChronusQ::OneETerms
+coreH	singleslater.hpp	/^    oper_t_coll coreH;          \/\/\/< Core Hamiltonian (scalar and magnetization)$/;"	m	class:ChronusQ::SingleSlater
+coreHPerturbed	singleslater.hpp	/^    oper_t_coll coreHPerturbed; \/\/\/< Perturbed Core Hamiltonian (scalar and magnetization)$/;"	m	class:ChronusQ::SingleSlater
+coreType	singleslater/base.hpp	/^    CORE_HAMILTONIAN_TYPE coreType   = NON_RELATIVISTIC;  \/\/\/< Core Hamiltonian type$/;"	m	class:ChronusQ::SingleSlaterBase
+coulombMatrix	singleslater.hpp	/^    oper_t  coulombMatrix = nullptr;         \/\/\/< scalar Coulomb Matrix$/;"	m	class:ChronusQ::SingleSlater
+createDataSet	util/files.hpp	/^      inline void createDataSet(const std::string &data,$/;"	f	class:ChronusQ::SafeFile
+createFile	util/files.hpp	/^      inline void createFile() {$/;"	f	class:ChronusQ::SafeFile
+createGroup	util/files.hpp	/^      inline void createGroup(const std::string &group) {$/;"	f	class:ChronusQ::SafeFile
+cubeFile	cubegen.hpp	/^    std::shared_ptr<std::ofstream> cubeFile;$/;"	m	struct:ChronusQ::CubeGenBase
+cubeName	cubegen.hpp	/^    std::string cubeName;$/;"	m	struct:ChronusQ::CubeGenBase
+cubeType	cubegen.hpp	/^    CUBE_TYPE cubeType;$/;"	m	struct:ChronusQ::CubeGenBase
+cube_gen_base_identity	cubegen.hpp	/^    struct cube_gen_base_identity< R,$/;"	s	namespace:ChronusQ::detail
+cube_gen_base_identity	cubegen.hpp	/^    struct cube_gen_base_identity{ };$/;"	s	namespace:ChronusQ::detail
+curOnePDM	singleslater.hpp	/^    oper_t_coll curOnePDM;    \/\/\/< List of the current 1PDMs$/;"	m	class:ChronusQ::SingleSlater
+curState	realtime.hpp	/^    IntegrationProgress curState;  \/\/\/< Current state of the time propagation$/;"	m	struct:ChronusQ::RealTimeBase
+curStep	realtime.hpp	/^    PropagationStep curStep;  \/\/\/< Current integration step$/;"	m	struct:ChronusQ::IntegrationProgress
+dampError	singleslater/base.hpp	/^    double dampError      = 1e-1; \/\/\/< Energy oscillation to turn off damp$/;"	m	struct:ChronusQ::SCFControls
+dampFactor	response/settings.hpp	/^    double              dampFactor = 0.;$/;"	m	struct:ChronusQ::FDResponseSettings
+dampParam	singleslater/base.hpp	/^    double dampParam      = dampStartParam; \/\/\/< Current Damp parameter $/;"	m	struct:ChronusQ::SCFControls
+dampStartParam	singleslater/base.hpp	/^    double dampStartParam = 0.7;            \/\/\/< Starting damping parameter$/;"	m	struct:ChronusQ::SCFControls
+data	realtime.hpp	/^    IntegrationData     data;      \/\/\/< Data collection$/;"	m	struct:ChronusQ::RealTimeBase
+dcomplex	chronusq_sys.hpp	/^typedef std::complex<double> dcomplex;$/;"	t
+deMin	response/settings.hpp	/^    double deMin = 0.;$/;"	m	struct:ChronusQ::ResidueResponseSettings
+dealloc	aointegrals/impl.hpp	/^  template <typename IntsT> void AOIntegrals<IntsT>::dealloc() {$/;"	f	class:ChronusQ::AOIntegrals
+dealloc	quantum/impl.hpp	/^  void Quantum<MatsT>::dealloc() {$/;"	f	class:ChronusQ::Quantum
+dealloc	realtime/memory.hpp	/^  void RealTime<_SSTyp,IntsT>::dealloc() {$/;"	f	class:ChronusQ::RealTime
+dealloc	response/results.hpp	/^    inline void dealloc(CQMemManager &mem) {$/;"	f	struct:ChronusQ::FDObservables
+dealloc	response/results.hpp	/^    inline void dealloc(CQMemManager &mem) {$/;"	f	struct:ChronusQ::FDResponseResults
+dealloc	response/results.hpp	/^    inline void dealloc(CQMemManager &mem) {$/;"	f	struct:ChronusQ::ResObservables
+dealloc	response/results.hpp	/^    inline void dealloc(CQMemManager &mem) {$/;"	f	struct:ChronusQ::ResidueResponseResults
+dealloc	singleslater/impl.hpp	/^  void SingleSlater<MatsT,IntsT>::dealloc() {$/;"	f	class:ChronusQ::SingleSlater
+dealloc	wavefunction/impl.hpp	/^  void WaveFunction<MatsT,IntsT>::dealloc() {$/;"	f	class:ChronusQ::WaveFunction
+deallocExtrapStorage	singleslater/extrap.hpp	/^  void SingleSlater<MatsT,IntsT>::deallocExtrapStorage() {$/;"	f	class:ChronusQ::SingleSlater
+defaultPreCondShift_	itersolver.hpp	/^    inline void defaultPreCondShift_(size_t nVec, _F shift, _F *V, _F *AV) {$/;"	f	class:ChronusQ::IterSolver
+defaultShiftVec_	itersolver.hpp	/^    inline void defaultShiftVec_(size_t nVec, _F shift, _F *V, _F *AV) {$/;"	f	class:ChronusQ::IterSolver
+deltaEnergy	singleslater/base.hpp	/^    double deltaEnergy;  \/\/\/< Convergence of Energy$/;"	m	struct:ChronusQ::SCFConvergence
+deltaOnePDM	singleslater.hpp	/^    oper_t_coll deltaOnePDM;  \/\/\/< List of the changes in the 1PDMs$/;"	m	class:ChronusQ::SingleSlater
+deltaT	realtime.hpp	/^    double deltaT  = 0.01; \/\/\/< Time-step in AU$/;"	m	struct:ChronusQ::IntegrationScheme
+denConvTol	singleslater/base.hpp	/^    double denConvTol = 1e-8;  \/\/\/< Density convergence criteria$/;"	m	struct:ChronusQ::SCFControls
+descFullMat_	response/tbase.hpp	/^    CXXBLACS::ScaLAPACK_Desc_t           descFullMat_;$/;"	m	class:ChronusQ::ResponseTBase
+detail	cubegen.hpp	/^  namespace detail {$/;"	n	namespace:ChronusQ
+dfdrResults	response/tbase.hpp	/^    FDResponseResults<T,dcomplex> dfdrResults;$/;"	m	class:ChronusQ::ResponseTBase
+diagOrthoFock	singleslater/scf.hpp	/^  void SingleSlater<MatsT,IntsT>::diagOrthoFock() {$/;"	f	class:ChronusQ::SingleSlater
+dict_	cxxapi/input.hpp	/^      std::unordered_map<std::string,std::string>> dict_; $/;"	m	class:ChronusQ::CQInputFile
+diisAlg	singleslater/base.hpp	/^    DIIS_ALG diisAlg = CDIIS; \/\/\/< Type of DIIS extrapolation $/;"	m	struct:ChronusQ::SCFControls
+diisError	singleslater.hpp	/^    oper_t_coll2 diisError;   \/\/\/< List of orthonormal [F,D] for DIIS extrap$/;"	m	class:ChronusQ::SingleSlater
+diisFock	singleslater.hpp	/^    oper_t_coll2 diisFock;    \/\/\/< List of AO Fock matrices for DIIS extrap$/;"	m	class:ChronusQ::SingleSlater
+diisOnePDM	singleslater.hpp	/^    oper_t_coll2 diisOnePDM;  \/\/\/< List of AO Density matrices for DIIS extrap$/;"	m	class:ChronusQ::SingleSlater
+directScaffold	aointegrals/contract/direct.hpp	/^  void AOIntegrals<IntsT>::directScaffold($/;"	f	class:ChronusQ::AOIntegrals
+directScaffold	aointegrals/contract/direct.hpp	/^  void AOIntegrals<dcomplex>::directScaffold( MPI_Comm comm, const bool screen,$/;"	f	class:ChronusQ::AOIntegrals
+directScaffold	aointegrals/contract/direct.hpp	/^  void AOIntegrals<double>::directScaffold($/;"	f	class:ChronusQ::AOIntegrals
+distMatFromRoot	response/settings.hpp	/^    bool distMatFromRoot = false; \/\/\/< Form mat on root process and distribute$/;"	m	struct:ChronusQ::ResponseSettings
+doAPB_AMB	response/polarization.hpp	/^      bool doAPB_AMB = false;$/;"	m	struct:ChronusQ::SingleSlaterPolarBase
+doDamp	singleslater/base.hpp	/^    bool   doDamp         = true;           \/\/\/< Flag for turning on damping$/;"	m	struct:ChronusQ::SCFControls
+doExtrap	singleslater/base.hpp	/^    bool doExtrap = true;     \/\/\/< Whether to extrapolate Fock matrix$/;"	m	struct:ChronusQ::SCFControls
+doFull	response/settings.hpp	/^    bool doFull        = true; \/\/\/< Solve Problem by (Sca)LAPACK$/;"	m	struct:ChronusQ::ResponseSettings
+doIncFock	singleslater/base.hpp	/^    bool   doIncFock = true; \/\/\/< Whether to perform an incremental fock build$/;"	m	struct:ChronusQ::SCFControls
+doNR	response/polarization.hpp	/^      bool doNR      = false;$/;"	m	struct:ChronusQ::SingleSlaterPolarBase
+doOcc_	response/particleparticle.hpp	/^      bool   doOcc_ = false;$/;"	m	class:ChronusQ::ParticleParticlePropagator
+doPropagation	realtime/propagation.hpp	/^  void RealTime<_SSTyp,IntsT>::doPropagation() {$/;"	f	class:ChronusQ::RealTime
+doReduced	response/polarization.hpp	/^      bool doReduced = false;$/;"	m	struct:ChronusQ::SingleSlaterPolarBase
+doRefine	morspec.hpp	/^    bool   doRefine  = false;$/;"	m	struct:ChronusQ::MORSettings
+doRelErr	morspec.hpp	/^    bool   doRelErr  = true;$/;"	m	struct:ChronusQ::MORSettings
+doSA	response/settings.hpp	/^    bool doSA     = false;$/;"	m	struct:ChronusQ::ResponseSettings
+doStab	response/polarization.hpp	/^      bool doStab    = false;$/;"	m	struct:ChronusQ::SingleSlaterPolarBase
+doStarRef	response/particleparticle.hpp	/^    bool                          doStarRef   = false; \/\/ Do "*" reference$/;"	m	struct:ChronusQ::SingleSlaterParticleParticleBase
+doTDA	response/settings.hpp	/^    bool doTDA    = false;$/;"	m	struct:ChronusQ::ResponseSettings
+doVir_	response/particleparticle.hpp	/^      bool   doVir_ = false;$/;"	m	class:ChronusQ::ParticleParticlePropagator
+dynmat_t	util/typedefs.hpp	/^  typedef std::vector<dynvec_t>   dynmat_t; \/\/\/< Dynamic matrix$/;"	t	namespace:ChronusQ
+dynvec_t	util/typedefs.hpp	/^  typedef std::vector<double>     dynvec_t; \/\/\/< Dynamic vector$/;"	t	namespace:ChronusQ
+ecd_len_RM	response/results.hpp	/^    double * ecd_len_RM    = nullptr;$/;"	m	struct:ChronusQ::FDObservables
+ecd_vel_PMQ	response/results.hpp	/^    double * ecd_vel_PMQ   = nullptr;$/;"	m	struct:ChronusQ::FDObservables
+edStrength	response/results.hpp	/^    double * edStrength    = nullptr;$/;"	m	struct:ChronusQ::FDObservables
+ed_ed_Polar	response/results.hpp	/^    U* ed_ed_Polar = nullptr;$/;"	m	struct:ChronusQ::FDResponseResults
+efp_	chronusqefp.hpp	/^    ::efp*          efp_;$/;"	m	class:ChronusQ::EFP
+efp_energy_	chronusqefp.hpp	/^    ::efp_energy*   efp_energy_;$/;"	m	class:ChronusQ::EFP
+eigVal	itersolver.hpp	/^    dcomplex* eigVal() const { return eigVal_; }$/;"	f	class:ChronusQ::IterDiagonalizer
+eigVal_	itersolver.hpp	/^    dcomplex * eigVal_ = nullptr;$/;"	m	class:ChronusQ::IterDiagonalizer
+eigVecNorm	morspec.hpp	/^    void                 eigVecNorm()                   {};$/;"	f	class:ChronusQ::MORSpec
+eigVecNorm	response/particleparticle/singleslater.hpp	/^  void ParticleParticlePropagator<SingleSlater<MatsT,IntsT>>::eigVecNorm() {$/;"	f	class:ChronusQ::ParticleParticlePropagator
+eigVecNorm	response/polarization/singleslater.hpp	/^  void PolarizationPropagator<SingleSlater<MatsT, IntsT>>::eigVecNorm() {$/;"	f	class:ChronusQ::PolarizationPropagator
+elecDipole	quantum/base.hpp	/^    cart_t elecDipole;        \/\/\/< Electric Dipole in the length gauge$/;"	m	class:ChronusQ::QuantumBase
+elecOctupole	quantum/base.hpp	/^    cartrk3_t elecOctupole;   \/\/\/< Electric Octupole in the length gauge$/;"	m	class:ChronusQ::QuantumBase
+elecQuadrupole	quantum/base.hpp	/^    cartmat_t elecQuadrupole; \/\/\/< Electric Quadrupole in the length gauge$/;"	m	class:ChronusQ::QuantumBase
+emFieldTyp	fields.hpp	/^    EMFieldTyp emFieldTyp;$/;"	m	struct:ChronusQ::EMFieldBase
+eneConvTol	singleslater/base.hpp	/^    double eneConvTol = 1e-10; \/\/\/< Energy convergence criteria$/;"	m	struct:ChronusQ::SCFControls
+energy_denp	chronusqefp.hpp	/^    double*         energy_denp;$/;"	m	class:ChronusQ::EFP
+energy_vxc	singleslater/kohnsham/vxc.hpp	/^  double KohnSham<MatsT,IntsT>::energy_vxc(size_t NPts, std::vector<double> &weights, double *epsEval, double *DenS){$/;"	f	class:ChronusQ::KohnSham
+envE0	aointegrals.hpp	/^    oper_t_coll  envE0;$/;"	m	class:ChronusQ::AOIntegrals
+envE1	aointegrals.hpp	/^    oper_t_coll2 envE1;$/;"	m	class:ChronusQ::AOIntegrals
+envE2	aointegrals.hpp	/^    oper_t_coll2 envE2;$/;"	m	class:ChronusQ::AOIntegrals
+envelope	realtime/fields.hpp	/^    std::shared_ptr<FieldEnvelopeBase> envelope; \/\/\/< Field envelope$/;"	m	struct:ChronusQ::TDEMFieldBase
+eo_ed_Polar	response/results.hpp	/^    U* eo_ed_Polar = nullptr;$/;"	m	struct:ChronusQ::FDResponseResults
+eo_eo_Polar	response/results.hpp	/^    U* eo_eo_Polar = nullptr;$/;"	m	struct:ChronusQ::FDResponseResults
+eo_eq_Polar	response/results.hpp	/^    U* eo_eq_Polar = nullptr;$/;"	m	struct:ChronusQ::FDResponseResults
+eps1	wavefunction.hpp	/^    double* eps1; \/\/\/< Full (nC > 1) \/ ALPHA (nC == 1) Fock eigenvalues$/;"	m	class:ChronusQ::WaveFunction
+eps2	wavefunction.hpp	/^    double* eps2; \/\/\/< BETA (nC == 1) Fock eigenvalues$/;"	m	class:ChronusQ::WaveFunction
+epsScreen_	grid/integrator.hpp	/^    double           epsScreen_;   \/\/\/< Raw screening tolerance$/;"	m	class:ChronusQ::BeckeIntegrator
+epsilon	singleslater/kohnsham.hpp	/^    double epsilon      = 1e-12; \/\/\/< Screening parameter$/;"	m	struct:ChronusQ::IntegrationParam
+eq_ed_Polar	response/results.hpp	/^    U* eq_ed_Polar = nullptr;$/;"	m	struct:ChronusQ::FDResponseResults
+eq_eq_Polar	response/results.hpp	/^    U* eq_eq_Polar = nullptr;$/;"	m	struct:ChronusQ::FDResponseResults
+errorMetric	extrapolate.hpp	/^    oper_t_coll2   errorMetric; \/\/\/< Vector of vectors containing error metrics$/;"	m	class:ChronusQ::DIIS
+eval	aointegrals.hpp	/^    bool eval;$/;"	m	struct:ChronusQ::TwoBodyContraction
+evalCDCube	cubegen.hpp	/^    void evalCDCube(){$/;"	f	class:ChronusQ::WaveFunctionCubeGenBase
+evalConver	singleslater/scf.hpp	/^  bool SingleSlater<MatsT, IntsT>::evalConver(EMPerturbation &pert) {$/;"	f	class:ChronusQ::SingleSlater
+evalCube	cubegen.hpp	/^    void evalCube() {$/;"	f	struct:ChronusQ::CubeGenBase
+evalDen	singleslater/kohnsham/vxc.hpp	/^  void KohnSham<MatsT,IntsT>::evalDen(SHELL_EVAL_TYPE typ, size_t NPts,size_t NBE, size_t NB, $/;"	f	class:ChronusQ::KohnSham
+evalEPCube	cubegen.hpp	/^    void evalEPCube(){$/;"	f	class:ChronusQ::WaveFunctionCubeGenBase
+evalEXC_VXC	dft.hpp	/^    void evalEXC_VXC(size_t N, double *rho, double *eps, double *vxc) {$/;"	f	class:ChronusQ::DFTFunctional
+evalEXC_VXC	dft.hpp	/^    void evalEXC_VXC(size_t N, double *rho, double *sigma, double *eps, double *vrho, $/;"	f	class:ChronusQ::DFTFunctional
+evalEXC_VXC_FXC	dft.hpp	/^    void evalEXC_VXC_FXC(size_t N, double *rho, double *eps, double *vxc, double *fxc) {$/;"	f	class:ChronusQ::DFTFunctional
+evalEXC_VXC_FXC	dft.hpp	/^    void evalEXC_VXC_FXC(size_t N, double *rho, double *sigma, double *eps, double *vrho, $/;"	f	class:ChronusQ::DFTFunctional
+evalPartitionWeights	grid/integrator.hpp	/^    double evalPartitionWeights(size_t iCurrent, $/;"	f	class:ChronusQ::BeckeIntegrator
+evalProp	response/settings.hpp	/^    bool evalProp   = true;$/;"	m	struct:ChronusQ::ResponseSettings
+evalProperties	response/properties.hpp	/^    ResponseTBase<T>::evalProperties($/;"	f	class:ChronusQ::ResponseTBase
+evalSDCube	cubegen.hpp	/^    void evalSDCube() {$/;"	f	class:ChronusQ::WaveFunctionCubeGenBase
+evalShellSet	basisset/basisset_util.hpp	/^  inline void evalShellSet(CQMemManager &memManager,SHELL_EVAL_TYPE typ, std::vector<libint2::Shell> &shells, $/;"	f	namespace:ChronusQ
+exchangeMatrix	singleslater.hpp	/^    oper_t_coll exchangeMatrix;    \/\/\/< List of populated exact (HF) exchange matricies$/;"	m	class:ChronusQ::SingleSlater
+exists	util/files.hpp	/^      inline bool exists() const { return exists_; }$/;"	f	class:ChronusQ::SafeFile
+exists_	util/files.hpp	/^    bool        exists_;$/;"	m	class:ChronusQ::SafeFile
+extractEig1	morspec.hpp	/^    void extractEig1() {$/;"	f	class:ChronusQ::MORSpec
+extractEig2	morspec.hpp	/^    void extractEig2() {$/;"	f	class:ChronusQ::MORSpec
+extractEigFull	morspec.hpp	/^    void extractEigFull() {$/;"	f	class:ChronusQ::MORSpec
+extractEigRed	morspec.hpp	/^    void extractEigRed(){ $/;"	f	class:ChronusQ::MORSpec
+extrapolate	extrapolate.hpp	/^  bool DIIS<T>::extrapolate(){$/;"	f	class:ChronusQ::DIIS
+fName	util/files.hpp	/^      inline std::string fName() const{ return fName_; }$/;"	f	class:ChronusQ::SafeFile
+fName_	util/files.hpp	/^    std::string fName_;$/;"	m	class:ChronusQ::SafeFile
+fdObs	response/base.hpp	/^    FDObservables  fdObs;$/;"	m	struct:ChronusQ::ResponseBase
+fdrObservables	response/properties.hpp	/^  void ResponseTBase<T>::fdrObservables(FDResponseResults<T,U> &results) {$/;"	f	class:ChronusQ::ResponseTBase
+fdrProperties	response/tbase.hpp	/^    inline void fdrProperties() {$/;"	f	class:ChronusQ::ResponseTBase
+fdrRF	response/properties.hpp	/^  void ResponseTBase<T>::fdrRF(FDResponseResults<T,U> &results) {$/;"	f	class:ChronusQ::ResponseTBase
+fdrResults	response/tbase.hpp	/^    FDResponseResults<T,T>        fdrResults;$/;"	m	class:ChronusQ::ResponseTBase
+fdrSettings	response/base.hpp	/^    FDResponseSettings       fdrSettings;$/;"	m	struct:ChronusQ::ResponseBase
+field	chronusqefp.hpp	/^    static double*         field;$/;"	m	class:ChronusQ::EFP
+fieldGauge	fields.hpp	/^    FieldGauge fieldGauge;$/;"	m	struct:ChronusQ::EMFieldBase
+fields	fields.hpp	/^        > fields; \/\/\/< Fields for the EM perturbation$/;"	m	struct:ChronusQ::EMPerturbation
+fields	realtime/fields.hpp	/^        > fields; \/\/\/< Fields for the EM perturbation$/;"	m	struct:ChronusQ::TDEMPerturbation
+finalize	cxxapi/boilerplate.hpp	/^  inline void finalize() {$/;"	f	namespace:ChronusQ
+finiteWidthNuc	aointegrals.hpp	/^    bool finiteWidthNuc;$/;"	m	struct:ChronusQ::OneETerms
+fixBlockNumber	memmanager.hpp	/^    inline void fixBlockNumber() {$/;"	f	class:ChronusQ::CQMemManager
+fockDamping	singleslater/extrap.hpp	/^  void SingleSlater<MatsT,IntsT>::fockDamping() {$/;"	f	class:ChronusQ::SingleSlater
+fockMO	singleslater.hpp	/^    oper_t_coll fockMO;     \/\/\/< Fock matrix in the MO basis$/;"	m	class:ChronusQ::SingleSlater
+fockMatrix	singleslater.hpp	/^    oper_t_coll fockMatrix;       \/\/\/< List of populated AO Fock matricies$/;"	m	class:ChronusQ::SingleSlater
+fockMatrixOrtho	singleslater.hpp	/^    oper_t_coll fockMatrixOrtho;   \/\/\/< List of populated orthonormal Fock matricies$/;"	m	class:ChronusQ::SingleSlater
+forceCart	basisset/basisset_def.hpp	/^    bool forceCart;$/;"	m	struct:ChronusQ::BasisSet
+forceCart_	basisset/reference.hpp	/^    bool forceCart_;  \/\/\/< Whether or not to force cartesian basis functions$/;"	m	class:ChronusQ::ReferenceBasisSet
+forceDamp	response/settings.hpp	/^    bool                forceDamp  = false;$/;"	m	struct:ChronusQ::FDResponseSettings
+formCoreH	singleslater.hpp	/^    inline void formCoreH(EMPerturbation &emPert) { formCoreH(emPert,coreType); }$/;"	f	class:ChronusQ::SingleSlater
+formCoreH	singleslater/fock.hpp	/^  void SingleSlater<MatsT,IntsT>::formCoreH(EMPerturbation& emPert, CORE_HAMILTONIAN_TYPE typ) {$/;"	f	class:ChronusQ::SingleSlater
+formDelta	singleslater/scf.hpp	/^  void SingleSlater<MatsT,IntsT>::formDelta() {$/;"	f	class:ChronusQ::SingleSlater
+formDensity	singleslater/quantum.hpp	/^  void SingleSlater<MatsT,IntsT>::formDensity() {$/;"	f	class:ChronusQ::SingleSlater
+formFXC	singleslater/kohnsham/fxc.hpp	/^  void KohnSham<MatsT, IntsT>::formFXC( MPI_Comm c,  $/;"	f	class:ChronusQ::KohnSham
+formFock	realtime/fock.hpp	/^  void RealTime<_SSTyp,IntsT>::formFock(bool increment, double t) {$/;"	f	class:ChronusQ::RealTime
+formFock	singleslater/fock.hpp	/^  void SingleSlater<MatsT,IntsT>::formFock($/;"	f	class:ChronusQ::SingleSlater
+formFock	singleslater/kohnsham.hpp	/^    virtual void formFock(EMPerturbation &pert, bool increment = false, double HFX = 0.) {$/;"	f	class:ChronusQ::KohnSham
+formFullFromMemory	response/particleparticle/singleslater.hpp	/^  MatsT * ParticleParticlePropagator<SingleSlater<MatsT,IntsT>>::formFullFromMemory() {$/;"	f	class:ChronusQ::ParticleParticlePropagator
+formFullFromMemory	response/polarization/singleslater.hpp	/^  MatsT * PolarizationPropagator<SingleSlater<MatsT, IntsT>>::formFullFromMemory() {$/;"	f	class:ChronusQ::PolarizationPropagator
+formFullFromMemory	response/tbase.hpp	/^    virtual T*  formFullFromMemory() { $/;"	f	class:ChronusQ::ResponseTBase
+formFullMat	response/settings.hpp	/^    bool formFullMat   = true; \/\/\/< Form The Full Matrix$/;"	m	struct:ChronusQ::ResponseSettings
+formFullMatrix	morspec.hpp	/^  typename MORSpec<Reference>::T* MORSpec<Reference>::formFullMatrix() {$/;"	f	class:ChronusQ::MORSpec
+formFullMatrix	response/particleparticle/singleslater.hpp	/^  MatsT * ParticleParticlePropagator<SingleSlater<MatsT, IntsT>>::formFullMatrix() {$/;"	f	class:ChronusQ::ParticleParticlePropagator
+formFullMatrix	response/polarization/singleslater.hpp	/^  MatsT * PolarizationPropagator<SingleSlater<MatsT, IntsT>>::formFullMatrix() {$/;"	f	class:ChronusQ::PolarizationPropagator
+formGD	singleslater/fock.hpp	/^  void SingleSlater<MatsT,IntsT>::formGD(EMPerturbation &pert, bool increment, double xHFX) {$/;"	f	class:ChronusQ::SingleSlater
+formGuess	singleslater/guess.hpp	/^  void SingleSlater<MatsT,IntsT>::formGuess() {$/;"	f	class:ChronusQ::SingleSlater
+formLinearTrans	morspec.hpp	/^    void formLinearTrans( $/;"	f	class:ChronusQ::MORSpec
+formLinearTrans	response/particleparticle.hpp	/^      inline void formLinearTrans( RC_coll<dcomplex> x ) {$/;"	f	class:ChronusQ::ParticleParticlePropagator
+formLinearTrans	response/particleparticle.hpp	/^      inline void formLinearTrans( RC_coll<double> x ) {$/;"	f	class:ChronusQ::ParticleParticlePropagator
+formLinearTrans	response/polarization.hpp	/^      inline void formLinearTrans( RC_coll<dcomplex> x ) {$/;"	f	class:ChronusQ::PolarizationPropagator
+formLinearTrans	response/polarization.hpp	/^      inline void formLinearTrans( RC_coll<double> x ) {$/;"	f	class:ChronusQ::PolarizationPropagator
+formLinearTrans	response/polarization.hpp	/^      void formLinearTrans(RC_coll<U> x, SINGLESLATER_POLAR_COPT op) {$/;"	f	class:ChronusQ::PolarizationPropagator
+formLinearTrans_direct	response/particleparticle.hpp	/^      void formLinearTrans_direct(MPI_Comm c, RC_coll<dcomplex> x){ $/;"	f	class:ChronusQ::ParticleParticlePropagator
+formLinearTrans_direct	response/particleparticle/hartreefock.hpp	/^  void ParticleParticlePropagator<HartreeFock<dcomplex,dcomplex>>::formLinearTrans_direct($/;"	f	class:ChronusQ::ParticleParticlePropagator
+formLinearTrans_direct	response/particleparticle/hartreefock.hpp	/^  void ParticleParticlePropagator<HartreeFock<dcomplex,double>>::formLinearTrans_direct($/;"	f	class:ChronusQ::ParticleParticlePropagator
+formLinearTrans_direct	response/particleparticle/hartreefock.hpp	/^  void ParticleParticlePropagator<HartreeFock<double,double>>::formLinearTrans_direct($/;"	f	class:ChronusQ::ParticleParticlePropagator
+formLinearTrans_direct	response/particleparticle/kohnsham.hpp	/^  void ParticleParticlePropagator<KohnSham<dcomplex,dcomplex>>::formLinearTrans_direct($/;"	f	class:ChronusQ::ParticleParticlePropagator
+formLinearTrans_direct	response/particleparticle/kohnsham.hpp	/^  void ParticleParticlePropagator<KohnSham<dcomplex,double>>::formLinearTrans_direct($/;"	f	class:ChronusQ::ParticleParticlePropagator
+formLinearTrans_direct	response/particleparticle/kohnsham.hpp	/^  void ParticleParticlePropagator<KohnSham<double,double>>::formLinearTrans_direct($/;"	f	class:ChronusQ::ParticleParticlePropagator
+formLinearTrans_direct	response/polarization.hpp	/^      void formLinearTrans_direct(MPI_Comm c, RC_coll<dcomplex> x,$/;"	f	class:ChronusQ::PolarizationPropagator
+formLinearTrans_direct	response/polarization/hartreefock.hpp	/^  void PolarizationPropagator<HartreeFock<dcomplex,dcomplex>>::formLinearTrans_direct($/;"	f	class:ChronusQ::PolarizationPropagator
+formLinearTrans_direct	response/polarization/hartreefock.hpp	/^  void PolarizationPropagator<HartreeFock<dcomplex,double>>::formLinearTrans_direct($/;"	f	class:ChronusQ::PolarizationPropagator
+formLinearTrans_direct	response/polarization/hartreefock.hpp	/^  void PolarizationPropagator<HartreeFock<double,double>>::formLinearTrans_direct($/;"	f	class:ChronusQ::PolarizationPropagator
+formLinearTrans_direct	response/polarization/kohnsham.hpp	/^  void PolarizationPropagator<KohnSham<dcomplex,dcomplex>>::formLinearTrans_direct($/;"	f	class:ChronusQ::PolarizationPropagator
+formLinearTrans_direct	response/polarization/kohnsham.hpp	/^  void PolarizationPropagator<KohnSham<dcomplex,double>>::formLinearTrans_direct($/;"	f	class:ChronusQ::PolarizationPropagator
+formLinearTrans_direct	response/polarization/kohnsham.hpp	/^  void PolarizationPropagator<KohnSham<double,double>>::formLinearTrans_direct($/;"	f	class:ChronusQ::PolarizationPropagator
+formLinearTrans_direct_helper	response/particleparticle/singleslater_helper.hpp	/^  void formLinearTrans_direct_helper(MPI_Comm c, Resp & res, bool doTDA,$/;"	f	namespace:ChronusQ
+formLinearTrans_direct_helper	response/polarization/singleslater_helper.hpp	/^  void formLinearTrans_direct_helper(MPI_Comm c, Resp & res,$/;"	f	namespace:ChronusQ
+formLinearTrans_direct_impl	response/particleparticle/hartreefock.hpp	/^  void ParticleParticlePropagator<HartreeFock<MatsT, IntsT>>::formLinearTrans_direct_impl($/;"	f	class:ChronusQ::ParticleParticlePropagator
+formLinearTrans_direct_impl	response/particleparticle/kohnsham.hpp	/^  void ParticleParticlePropagator<KohnSham<MatsT,IntsT>>::formLinearTrans_direct_impl($/;"	f	class:ChronusQ::ParticleParticlePropagator
+formLinearTrans_direct_impl	response/polarization/hartreefock.hpp	/^  void PolarizationPropagator<HartreeFock<MatsT, IntsT>>::formLinearTrans_direct_impl($/;"	f	class:ChronusQ::PolarizationPropagator
+formLinearTrans_direct_impl	response/polarization/kohnsham.hpp	/^  void PolarizationPropagator<KohnSham<MatsT, IntsT>>::formLinearTrans_direct_impl($/;"	f	class:ChronusQ::PolarizationPropagator
+formLinearTrans_impl	response/particleparticle.hpp	/^      void formLinearTrans_impl(RC_coll<U> x) {$/;"	f	class:ChronusQ::ParticleParticlePropagator
+formLinearTrans_incore	response/particleparticle.hpp	/^      void formLinearTrans_incore(RC_coll<dcomplex> x) {$/;"	f	class:ChronusQ::ParticleParticlePropagator
+formLinearTrans_incore	response/particleparticle/singleslater.hpp	/^  void ParticleParticlePropagator< SingleSlater<double,double> >::formLinearTrans_incore( $/;"	f	class:ChronusQ::ParticleParticlePropagator
+formLinearTrans_incore	response/particleparticle/singleslater.hpp	/^  void ParticleParticlePropagator<SingleSlater<dcomplex,dcomplex>>::formLinearTrans_incore( $/;"	f	class:ChronusQ::ParticleParticlePropagator
+formLinearTrans_incore	response/particleparticle/singleslater.hpp	/^  void ParticleParticlePropagator<SingleSlater<dcomplex,double>>::formLinearTrans_incore( $/;"	f	class:ChronusQ::ParticleParticlePropagator
+formLinearTrans_incore	response/polarization.hpp	/^      void formLinearTrans_incore(RC_coll<dcomplex> x, $/;"	f	class:ChronusQ::PolarizationPropagator
+formLinearTrans_incore	response/polarization/singleslater.hpp	/^  void PolarizationPropagator< SingleSlater<double,double> >::formLinearTrans_incore( $/;"	f	class:ChronusQ::PolarizationPropagator
+formLinearTrans_incore	response/polarization/singleslater.hpp	/^  void PolarizationPropagator<SingleSlater<dcomplex,dcomplex>>::formLinearTrans_incore( $/;"	f	class:ChronusQ::PolarizationPropagator
+formLinearTrans_incore	response/polarization/singleslater.hpp	/^  void PolarizationPropagator<SingleSlater<dcomplex,double>>::formLinearTrans_incore( $/;"	f	class:ChronusQ::PolarizationPropagator
+formLinearTrans_incore_impl	response/particleparticle/singleslater.hpp	/^  void ParticleParticlePropagator< SingleSlater<MatsT, IntsT> >::formLinearTrans_incore_impl( $/;"	f	class:ChronusQ::ParticleParticlePropagator
+formLinearTrans_incore_impl	response/polarization/singleslater.hpp	/^  void PolarizationPropagator< SingleSlater<MatsT, IntsT> >::formLinearTrans_incore_impl( $/;"	f	class:ChronusQ::PolarizationPropagator
+formMatDist	response/settings.hpp	/^    bool formMatDist     = false; \/\/\/< Form matrix distributed$/;"	m	struct:ChronusQ::ResponseSettings
+formModelBasis	morspec.hpp	/^    void formModelBasis(){ $/;"	f	class:ChronusQ::MORSpec
+formPropGrad	morspec.hpp	/^    MORSpec<Reference>::formPropGrad(ResponseOperator op) {$/;"	f	class:ChronusQ::MORSpec
+formPropGrad	response/particleparticle/singleslater.hpp	/^    ParticleParticlePropagator<SingleSlater<MatsT, IntsT>>::formPropGrad($/;"	f	class:ChronusQ::ParticleParticlePropagator
+formPropGrad	response/polarization/singleslater.hpp	/^    PolarizationPropagator<SingleSlater<MatsT, IntsT>>::formPropGrad($/;"	f	class:ChronusQ::PolarizationPropagator
+formPropagator	realtime/propagation.hpp	/^  void RealTime<_SSTyp,IntsT>::formPropagator() {$/;"	f	class:ChronusQ::RealTime
+formRHS	morspec.hpp	/^  void MORSpec<Reference>::formRHS() {$/;"	f	class:ChronusQ::MORSpec
+formRHS	response/particleparticle/singleslater.hpp	/^  void ParticleParticlePropagator<SingleSlater<MatsT, IntsT>>::formRHS() {$/;"	f	class:ChronusQ::ParticleParticlePropagator
+formRHS	response/polarization/singleslater.hpp	/^  void PolarizationPropagator<SingleSlater<MatsT, IntsT>>::formRHS() {$/;"	f	class:ChronusQ::PolarizationPropagator
+formVXC	singleslater/kohnsham/vxc.hpp	/^  void KohnSham<MatsT,IntsT>::formVXC() {$/;"	f	class:ChronusQ::KohnSham
+formZ_fxc	singleslater/kohnsham/fxc.hpp	/^  void KohnSham<MatsT, IntsT>::formZ_fxc(DENSITY_TYPE denType, bool isGGA, size_t NPts, size_t NBE, size_t IOff,$/;"	f	class:ChronusQ::KohnSham
+formZ_vxc	singleslater/kohnsham/vxc.hpp	/^  void KohnSham<MatsT,IntsT>::formZ_vxc(DENSITY_TYPE denTyp, bool isGGA, size_t NPts, size_t NBE, size_t IOff, $/;"	f	class:ChronusQ::KohnSham
+frag_idx	chronusqefp.hpp	/^    size_t          frag_idx;$/;"	m	class:ChronusQ::EFP
+free	memmanager.hpp	/^     void free( T* &ptr ) {$/;"	f	class:ChronusQ::CQMemManager
+free	memmanager.hpp	/^     void free( T* &ptr, Targs... args) {$/;"	f	class:ChronusQ::CQMemManager
+fullMatGrid	response/tbase.hpp	/^    CXXBLACS::BlacsGrid * fullMatGrid() const { return fullMatGrid_.get(); }$/;"	f	class:ChronusQ::ResponseTBase
+fullMatGrid_	response/tbase.hpp	/^    std::shared_ptr<CXXBLACS::BlacsGrid> fullMatGrid_;$/;"	m	class:ChronusQ::ResponseTBase
+fullMatrix	response/tbase.hpp	/^    T*                    fullMatrix()  const { return fullMatrix_; }$/;"	f	class:ChronusQ::ResponseTBase
+fullMatrix_	response/tbase.hpp	/^    T*            fullMatrix_;$/;"	m	class:ChronusQ::ResponseTBase
+functional_	dft.hpp	/^    xc_func_type functional_; \/\/\/< LibXC functional definition$/;"	m	class:ChronusQ::DFTFunctional
+functionals	singleslater/kohnsham.hpp	/^    std::vector<std::shared_ptr<DFTFunctional>> functionals; \/\/\/< XC kernels$/;"	m	class:ChronusQ::KohnSham
+gBecke	grid/integrator.hpp	/^    inline double gBecke(double x) {return hBecke(hBecke(hBecke(x)));}; \/\/ Eq. 20 f_3$/;"	f	class:ChronusQ::BeckeIntegrator
+genSettings	response/base.hpp	/^    ResponseSettings         genSettings;$/;"	m	struct:ChronusQ::ResponseBase
+generateBatch	grid/integrator.hpp	/^    void generateBatch(size_t Jst, size_t Jend, $/;"	f	class:ChronusQ::SphereIntegrator
+generateBatch	grid/integrator.hpp	/^    void generateBatch(size_t ist, size_t iend, $/;"	f	class:ChronusQ::Integrator3D
+generateQuadrature	grid/quadrature.hpp	/^    virtual void generateQuadrature() {$/;"	f	struct:ChronusQ::Quadrature
+generateShiftLevels	morspec.hpp	/^      generateShiftLevels(size_t nLevel, size_t nModel, double wMin, $/;"	f	class:ChronusQ::MORSpec
+getADim	response/particleparticle.hpp	/^      inline size_t getADim() const {$/;"	f	class:ChronusQ::ParticleParticlePropagator
+getAmp	fields.hpp	/^    std::valarray<double> getAmp() {$/;"	f	struct:ChronusQ::EMField
+getAmp	realtime/fields.hpp	/^    inline std::valarray<double> getAmp(double t) { $/;"	f	struct:ChronusQ::TDEMField
+getCDim	response/particleparticle.hpp	/^      inline size_t getCDim() const {$/;"	f	class:ChronusQ::ParticleParticlePropagator
+getDataInSection	cxxapi/input.hpp	/^    inline std::vector<std::string> getDataInSection( std::string section )  {$/;"	f	class:ChronusQ::CQInputFile
+getDims	util/files.hpp	/^      std::vector<hsize_t> getDims(const std::string &dataSet) {$/;"	f	class:ChronusQ::SafeFile
+getDipoleAmp	fields.hpp	/^    inline std::array<double, 3> getDipoleAmp(EMFieldTyp TYPE) {$/;"	f	struct:ChronusQ::EMPerturbation
+getDipoleAmp	realtime/fields.hpp	/^    inline std::array<double, 3> getDipoleAmp(EMFieldTyp TYPE, double t) {$/;"	f	struct:ChronusQ::TDEMPerturbation
+getEig	morspec.hpp	/^    bool   getEig    = false;$/;"	m	struct:ChronusQ::MORSettings
+getLWork	cqlinalg/util.hpp	/^  int getLWork(std::function<void(T*,int*)> func) {$/;"	f	namespace:ChronusQ
+getMOContributions	response/particleparticle/singleslater.hpp	/^    ParticleParticlePropagator<SingleSlater<MatsT,IntsT>>::getMOContributions(U *V, $/;"	f	class:ChronusQ::ParticleParticlePropagator
+getMOContributions	response/polarization/singleslater.hpp	/^    PolarizationPropagator<SingleSlater<MatsT, IntsT>>::getMOContributions(U *V, $/;"	f	class:ChronusQ::PolarizationPropagator
+getNAmp	fields.hpp	/^    inline std::array<double, N> getNAmp(EMFieldTyp TYPE) {$/;"	f	struct:ChronusQ::EMPerturbation
+getNAmp	realtime/fields.hpp	/^    inline std::array<double, N> getNAmp(EMFieldTyp TYPE, double t) {$/;"	f	struct:ChronusQ::TDEMPerturbation
+getNO1	response/particleparticle.hpp	/^      inline size_t getNO1(bool doStar) const {$/;"	f	class:ChronusQ::ParticleParticlePropagator
+getNO2	response/particleparticle.hpp	/^      inline size_t getNO2(bool doStar) const {$/;"	f	class:ChronusQ::ParticleParticlePropagator
+getNRCoeffs	singleslater/hartreefock/scf.hpp	/^  MatsT* HartreeFock<MatsT, IntsT>::getNRCoeffs() {$/;"	f	class:ChronusQ::HartreeFock
+getNRCoeffs	singleslater/kohnsham/scf.hpp	/^  MatsT* KohnSham<MatsT, IntsT>::getNRCoeffs() {$/;"	f	class:ChronusQ::KohnSham
+getNSingleDim	morspec.hpp	/^    inline size_t getNSingleDim(const bool doTDA = false) {$/;"	f	class:ChronusQ::MORSpec
+getNSingleDim	response/particleparticle.hpp	/^      inline virtual size_t getNSingleDim(const bool doTDA = false) {$/;"	f	class:ChronusQ::ParticleParticlePropagator
+getNSingleDim	response/polarization.hpp	/^      inline virtual size_t getNSingleDim(const bool doTDA = false) {$/;"	f	class:ChronusQ::PolarizationPropagator
+getNV1	response/particleparticle.hpp	/^      inline size_t getNV1(bool doStar) const {$/;"	f	class:ChronusQ::ParticleParticlePropagator
+getNV2	response/particleparticle.hpp	/^      inline size_t getNV2(bool doStar) const {$/;"	f	class:ChronusQ::ParticleParticlePropagator
+getNewOrbitals	singleslater/scf.hpp	/^  void SingleSlater<MatsT,IntsT>::getNewOrbitals(EMPerturbation &pert, $/;"	f	class:ChronusQ::SingleSlater
+getPert	realtime/fields.hpp	/^    EMPerturbation getPert(double t) {$/;"	f	struct:ChronusQ::TDEMPerturbation
+getPtr	singleslater/hartreefock.hpp	/^    std::shared_ptr<HartreeFock<MatsT,IntsT>> getPtr(){ return this->shared_from_this(); }$/;"	f	class:ChronusQ::HartreeFock
+getPtr	singleslater/kohnsham.hpp	/^    std::shared_ptr<KohnSham<MatsT,IntsT>> getPtr(){ return this->shared_from_this(); }$/;"	f	class:ChronusQ::KohnSham
+getResidualNorms	itersolver/gplhr.hpp	/^  void GPLHR<_F>::getResidualNorms(size_t N, size_t nR, _F *WMAT, double *RelRes, dcomplex *LAMBDA, double nrmA) { $/;"	f	class:ChronusQ::GPLHR
+getSize	memmanager.hpp	/^     size_t getSize(T* ptr) {$/;"	f	class:ChronusQ::CQMemManager
+getSol	itersolver.hpp	/^    inline void getSol(_F *SOL) {$/;"	f	class:ChronusQ::IterLinearSolver
+getStab	singleslater/hartreefock/scf.hpp	/^  std::pair<double,MatsT*> HartreeFock<MatsT, IntsT>::getStab(){$/;"	f	class:ChronusQ::HartreeFock
+getStab	singleslater/kohnsham/scf.hpp	/^  std::pair<double,MatsT*> KohnSham<MatsT, IntsT>::getStab(){$/;"	f	class:ChronusQ::KohnSham
+getTriU	itersolver/gplhr.hpp	/^  void GPLHR<_F>::getTriU(size_t N, _F *TRIUA, size_t LDTRIUA, _F *TRIUB, $/;"	f	class:ChronusQ::GPLHR
+getTypeClass	util/files.hpp	/^      H5T_class_t getTypeClass(const std::string &dataSet) {$/;"	f	class:ChronusQ::SafeFile
+gplhr_m	response/settings.hpp	/^    size_t gplhr_m     = 3;$/;"	m	struct:ChronusQ::ResidueResponseSettings
+gplhr_sigma	response/settings.hpp	/^    double gplhr_sigma = 0.;$/;"	m	struct:ChronusQ::ResidueResponseSettings
+grad	chronusqefp.hpp	/^    double*         grad;$/;"	m	class:ChronusQ::EFP
+grad_pc	chronusqefp.hpp	/^    double*         grad_pc;$/;"	m	class:ChronusQ::EFP
+guess	singleslater/base.hpp	/^    SS_GUESS guess = SAD;$/;"	m	struct:ChronusQ::SCFControls
+hBecke	grid/integrator.hpp	/^    inline double hBecke(double x) {return 1.5 * x - 0.5 * x * x * x;}; \/\/ Eq. 19$/;"	f	class:ChronusQ::BeckeIntegrator
+halfProj	itersolver.hpp	/^    inline void halfProj(size_t N, size_t nV, _F *V, size_t LDV, _F *S, $/;"	f	class:ChronusQ::GPLHR
+halfProj	itersolver/gplhr.hpp	/^  void GPLHR<_F>::halfProj(size_t N, size_t nV, size_t nS, _F *V, size_t LDV,$/;"	f	class:ChronusQ::GPLHR
+halfProj2	itersolver.hpp	/^    inline void halfProj2(size_t N, size_t nV, _F *V, size_t LDV, _F *AV, $/;"	f	class:ChronusQ::GPLHR
+halfProj2	itersolver/gplhr.hpp	/^  void GPLHR<_F>::halfProj2(size_t N, size_t nV, size_t nS, _F *V, size_t LDV,$/;"	f	class:ChronusQ::GPLHR
+hardLim	itersolver.hpp	/^    _F hardLim = -std::numeric_limits<double>::infinity();$/;"	m	class:ChronusQ::GPLHR
+hasResGuess_	response/tbase.hpp	/^    bool          hasResGuess_ = true;$/;"	m	class:ChronusQ::ResponseTBase
+iAtm	grid/integrator.hpp	/^    size_t iAtm; \/\/\/< Current center for integral$/;"	m	class:ChronusQ::BeckeIntegrator
+iCS	quantum/base.hpp	/^    bool  iCS;  \/\/\/< is closed shell?$/;"	m	class:ChronusQ::QuantumBase
+iRstrt	realtime.hpp	/^    size_t iRstrt  = 50; \/\/\/< Restart every N steps$/;"	m	struct:ChronusQ::IntegrationScheme
+iStep	realtime.hpp	/^    size_t  iStep = 0;  \/\/\/< Step index of current time point$/;"	m	struct:ChronusQ::IntegrationProgress
+inFile_	cxxapi/input.hpp	/^    std::shared_ptr<std::ifstream> inFile_ = nullptr;  \/\/\/< Input file$/;"	m	class:ChronusQ::CQInputFile
+incMet	response/polarization.hpp	/^      bool incMet    = true;$/;"	m	struct:ChronusQ::SingleSlaterPolarBase
+indE1	aointegrals.hpp	/^    oper_t_coll2 indE1;$/;"	m	class:ChronusQ::AOIntegrals
+initialize	cxxapi/boilerplate.hpp	/^  inline void initialize() {$/;"	f	namespace:ChronusQ
+intAlg	realtime.hpp	/^    IntegrationAlgorithm intAlg  = MMUT;         \/\/\/< Integration Algorithm$/;"	m	struct:ChronusQ::IntegrationScheme
+intParam	singleslater/kohnsham.hpp	/^    IntegrationParam intParam; \/\/\/< Numerical integration controls$/;"	m	class:ChronusQ::KohnSham
+intScheme	realtime.hpp	/^    IntegrationScheme intScheme;   \/\/\/< Integration scheme (MMUT, etc)$/;"	m	struct:ChronusQ::RealTimeBase
+integrate	grid/integrator.hpp	/^    T integrate(const F &func) {$/;"	f	class:ChronusQ::Integrator1D
+integrate	grid/integrator.hpp	/^    T integrate(const F &func) {$/;"	f	class:ChronusQ::Integrator2D
+integrate	grid/integrator.hpp	/^    T integrate(const F &func, Args... args) {$/;"	f	class:ChronusQ::BeckeIntegrator
+integrate	grid/integrator.hpp	/^    T integrate(const F &func, Args... args) {$/;"	f	class:ChronusQ::SphereIntegrator
+integrate	grid/integrator.hpp	/^    inline T integrate(const F &func, Args... args) {$/;"	f	class:ChronusQ::Integrator3D
+integrate	grid/integrator.hpp	/^    inline void integrate(T &res, const F &func, Args... args) {$/;"	f	class:ChronusQ::Integrator3D
+integrate	grid/integrator.hpp	/^    inline void integrate(T &res, const F &func, Args... args) {$/;"	f	class:ChronusQ::SphereIntegrator
+integrate	grid/integrator.hpp	/^    void integrate(T &res, const F &func, Args... args) {$/;"	f	class:ChronusQ::BeckeIntegrator
+integrate	grid/integrator.hpp	/^    void integrate(double SCALE, T &res, const F &func, Args... args) {$/;"	f	class:ChronusQ::Integrator3D
+integrate	grid/integrator.hpp	/^    void integrate(double SCALE, T &res, const F &func, Args... args) {$/;"	f	class:ChronusQ::SphereIntegrator
+internal	util/mpi.hpp	/^    int internal = 0;$/;"	m	struct:ChronusQ::MPI_Comm
+ints_type	singleslater.hpp	/^    typedef IntsT ints_type;$/;"	t	class:ChronusQ::SingleSlater
+isAllocated_	memmanager.hpp	/^    bool isAllocated_;$/;"	m	class:ChronusQ::CQMemManager
+isAntiHerOp	response/enums.hpp	/^  static inline bool isAntiHerOp(ResponseOperator op) {$/;"	f	namespace:ChronusQ
+isDist	response/settings.hpp	/^    bool isDist(){ return distMatFromRoot or formMatDist; } $/;"	f	struct:ChronusQ::ResponseSettings
+isDist	response/settings.hpp	/^    bool isDist(){ return false; } $/;"	f	struct:ChronusQ::ResponseSettings
+isGGA	dft.hpp	/^    bool isGGA() { return this->isGGA_; }$/;"	f	class:ChronusQ::DFTFunctional
+isGGA_	dft.hpp	/^    bool isGGA_;$/;"	m	class:ChronusQ::DFTFunctional
+isGGA_	singleslater/kohnsham.hpp	/^    bool isGGA_; \/\/\/< Whether or not the XC kernel is within the GGA$/;"	m	class:ChronusQ::KohnSham
+isHerOp	response/enums.hpp	/^  static inline bool isHerOp(ResponseOperator op){$/;"	f	namespace:ChronusQ
+iterLinearTrans	response/tbase.hpp	/^  void ResponseTBase<T>::iterLinearTrans(size_t nVec, U* V, U* AV) {$/;"	f	class:ChronusQ::ResponseTBase
+jobType	response/settings.hpp	/^    ResponseType jobType = RESIDUE;$/;"	m	struct:ChronusQ::ResponseSettings
+kinetic	aointegrals.hpp	/^    oper_t kinetic   = nullptr;   \/\/\/< Kinetic matrix $/;"	m	class:ChronusQ::AOIntegrals
+lapack_complex_double	cqlinalg/cqlinalg_config.hpp	61;"	d
+lapack_complex_float	cqlinalg/cqlinalg_config.hpp	60;"	d
+lenElecDipole	aointegrals.hpp	/^    oper_t_coll lenElecDipole;     \/\/\/< Electric Dipole matrix     (length)$/;"	m	class:ChronusQ::AOIntegrals
+lenElecOctupole	aointegrals.hpp	/^    oper_t_coll lenElecOctupole;   \/\/\/< Electric Octuupole matrix  (length)$/;"	m	class:ChronusQ::AOIntegrals
+lenElecQuadrupole	aointegrals.hpp	/^    oper_t_coll lenElecQuadrupole; \/\/\/< Electric Quadrupole matrix (length)$/;"	m	class:ChronusQ::AOIntegrals
+linearTrans_	itersolver.hpp	/^    LinearTrans_t linearTrans_;    \/\/\/< AX Product$/;"	m	class:ChronusQ::IterSolver
+loadFXCder	singleslater/kohnsham/fxc.hpp	/^  void KohnSham<MatsT,IntsT>::loadFXCder(size_t NPTS, double *Den, double *Gamma, double *EpsEval, double *VRhoEval, $/;"	f	class:ChronusQ::KohnSham
+loadVXCder	singleslater/kohnsham/vxc.hpp	/^  void KohnSham<MatsT,IntsT>::loadVXCder(size_t NPts, double *Den, double *Gamma,$/;"	f	class:ChronusQ::KohnSham
+lowBound	grid/quadrature.hpp	/^    double lowBound; \/\/\/< Lower bound for the numerical integration$/;"	m	struct:ChronusQ::Quadrature
+lowdinCharges	singleslater.hpp	/^    std::vector<double> lowdinCharges;$/;"	m	class:ChronusQ::SingleSlater
+m	itersolver.hpp	/^    size_t m = 1;$/;"	m	class:ChronusQ::GPLHR
+mSS_	itersolver.hpp	/^    size_t mSS_;     \/\/\/< Max subspace dimension$/;"	m	class:ChronusQ::IterSolver
+magDipole	aointegrals.hpp	/^    oper_t_coll magDipole;     \/\/\/< Electric Dipole matrix     (length)$/;"	m	class:ChronusQ::AOIntegrals
+magQuadrupole	aointegrals.hpp	/^    oper_t_coll magQuadrupole; \/\/\/< Electric Quadrupole matrix (length)$/;"	m	class:ChronusQ::AOIntegrals
+malloc	memmanager.hpp	/^     T* malloc(size_t n) {$/;"	f	class:ChronusQ::CQMemManager
+mapCen2BfSt	basisset/basisset_def.hpp	/^    std::vector<size_t> mapCen2BfSt; \/\/\/< Map Cen # -> Starting BF #$/;"	m	struct:ChronusQ::BasisSet
+mapSh2Bf	basisset/basisset_def.hpp	/^    std::vector<size_t> mapSh2Bf;  \/\/\/< Map Shell # -> BF #$/;"	m	struct:ChronusQ::BasisSet
+mapSh2Cen	basisset/basisset_def.hpp	/^    std::vector<size_t> mapSh2Cen; \/\/\/< Map Shell # -> Cen #$/;"	m	struct:ChronusQ::BasisSet
+massNumber	atom.hpp	/^    size_t massNumber;   \/\/\/< Mass Number$/;"	m	struct:ChronusQ::Atom
+matIsHer	response/settings.hpp	/^    bool matIsHer = false;$/;"	m	struct:ChronusQ::ResponseSettings
+mathematicaPrint	util/matout.hpp	/^void mathematicaPrint(std::ostream& out, std::string str, T* A, $/;"	f	namespace:ChronusQ
+maxIter	response/settings.hpp	/^    int64_t maxIter = 500;$/;"	m	struct:ChronusQ::ResponseSettings
+maxL	basisset/basisset_def.hpp	/^    size_t maxL;        \/\/\/< Max angular momentum of basis$/;"	m	struct:ChronusQ::BasisSet
+maxMacroIter_	itersolver.hpp	/^    size_t maxMacroIter_; \/\/\/< Maximum number of Macro iterations$/;"	m	class:ChronusQ::IterSolver
+maxMicroIter_	itersolver.hpp	/^    size_t maxMicroIter_; \/\/\/< Maximum number of Micro iterations$/;"	m	class:ChronusQ::IterSolver
+maxPrim	basisset/basisset_def.hpp	/^    size_t maxPrim;     \/\/\/< Max primitive dimension of basis$/;"	m	struct:ChronusQ::BasisSet
+maxSCFIter	singleslater/base.hpp	/^    size_t maxSCFIter = 128; \/\/\/< Maximum SCF iterations.$/;"	m	struct:ChronusQ::SCFControls
+md_ed_Polar	response/results.hpp	/^    U* md_ed_Polar = nullptr;$/;"	m	struct:ChronusQ::FDResponseResults
+md_md_Polar	response/results.hpp	/^    U* md_md_Polar = nullptr;$/;"	m	struct:ChronusQ::FDResponseResults
+memManager	aointegrals.hpp	/^    CQMemManager& memManager() { return memManager_; }$/;"	f	struct:ChronusQ::AOIntegralsBase
+memManager	quantum/base.hpp	/^    CQMemManager& memManager; \/\/\/< Memory manager for matrix allocation$/;"	m	class:ChronusQ::QuantumBase
+memManager_	aointegrals.hpp	/^    CQMemManager &memManager_; \/\/\/< CQMemManager to allocate matricies$/;"	m	struct:ChronusQ::AOIntegralsBase
+memManager_	chronusqefp.hpp	/^    CQMemManager    &memManager_;$/;"	m	class:ChronusQ::EFP
+memManager_	grid/integrator.hpp	/^    CQMemManager     &memManager_; \/\/\/< Memory managment$/;"	m	class:ChronusQ::BeckeIntegrator
+memManager_	itersolver.hpp	/^    CQMemManager &memManager_;$/;"	m	class:ChronusQ::IterSolver
+memManager_	realtime.hpp	/^    CQMemManager     &memManager_; \/\/\/< Memory manager$/;"	m	struct:ChronusQ::RealTimeBase
+memManager_	response/tbase.hpp	/^    CQMemManager& memManager_;$/;"	m	class:ChronusQ::ResponseTBase
+mem_backend	memmanager.hpp	/^  typedef boost::simple_segregated_storage<size_t> mem_backend;$/;"	t	namespace:ChronusQ
+methodSpecificProperties	singleslater.hpp	/^    void methodSpecificProperties() {$/;"	f	class:ChronusQ::SingleSlater
+mkAuxVar	singleslater/kohnsham/vxc.hpp	/^  void KohnSham<MatsT,IntsT>::mkAuxVar(bool isGGA, $/;"	f	class:ChronusQ::KohnSham
+mo1	wavefunction.hpp	/^    oper_t  mo1;  \/\/\/< Full (nC > 1) \/ ALPHA (nC == 1) MO coefficient matrix$/;"	m	class:ChronusQ::WaveFunction
+mo2	wavefunction.hpp	/^    oper_t  mo2;  \/\/\/< BETA (nC == 1) MO coefficient matrix$/;"	m	class:ChronusQ::WaveFunction
+modelBasis1_	morspec.hpp	/^    dcomplex*      modelBasis1_    = nullptr;$/;"	m	class:ChronusQ::MORSpec
+modelBasis1_LT_	morspec.hpp	/^    dcomplex*      modelBasis1_LT_ = nullptr;$/;"	m	class:ChronusQ::MORSpec
+modelBasis2_	morspec.hpp	/^    dcomplex*      modelBasis2_    = nullptr;$/;"	m	class:ChronusQ::MORSpec
+modelBasis2_LT_	morspec.hpp	/^    dcomplex*      modelBasis2_LT_ = nullptr;$/;"	m	class:ChronusQ::MORSpec
+modifyFock	singleslater/extrap.hpp	/^  void SingleSlater<MatsT,IntsT>::modifyFock() {$/;"	f	class:ChronusQ::SingleSlater
+molecule	aointegrals.hpp	/^    Molecule&     molecule()   { return molecule_;   }$/;"	f	struct:ChronusQ::AOIntegralsBase
+molecule_	aointegrals.hpp	/^    Molecule     &molecule_;   \/\/\/< Molecule object for nuclear potential$/;"	m	struct:ChronusQ::AOIntegralsBase
+molecule_	grid/integrator.hpp	/^    Molecule         &molecule_;   \/\/\/< Molecule object for nuclear potential$/;"	m	class:ChronusQ::BeckeIntegrator
+morSettings	morspec.hpp	/^    MORSettings morSettings;$/;"	m	struct:ChronusQ::MORSpecBase
+mu	response/particleparticle.hpp	/^    double                        mu          = 0;     \/\/ Chemical Potential$/;"	m	struct:ChronusQ::SingleSlaterParticleParticleBase
+mullikenCharges	singleslater.hpp	/^    std::vector<double> mullikenCharges;$/;"	m	class:ChronusQ::SingleSlater
+mult	chronusqefp.hpp	/^    double*         mult;$/;"	m	class:ChronusQ::EFP
+mult_coord	chronusqefp.hpp	/^    double*         mult_coord;$/;"	m	class:ChronusQ::EFP
+multip	molecule.hpp	/^    size_t multip;   \/\/\/< Spin multiplicity XXX: This implies <S^2>$/;"	m	struct:ChronusQ::Molecule
+nAng	singleslater/kohnsham.hpp	/^    size_t nAng         = 302;   \/\/\/< # Angular points$/;"	m	struct:ChronusQ::IntegrationParam
+nAtoms	molecule.hpp	/^    size_t nAtoms;   \/\/\/< Number of atoms in the Molecule$/;"	m	struct:ChronusQ::Molecule
+nBasis	basisset/basisset_def.hpp	/^    size_t nBasis;      \/\/\/< Number of CGTO basis functions$/;"	m	struct:ChronusQ::BasisSet
+nC	quantum/base.hpp	/^    int   nC;   \/\/\/< Number of spin components$/;"	m	class:ChronusQ::QuantumBase
+nExtrap	extrapolate.hpp	/^    size_t         nExtrap;     \/\/\/< Size of extrapolation space$/;"	m	class:ChronusQ::DIIS
+nGuess_	itersolver.hpp	/^    size_t nGuess_;$/;"	m	class:ChronusQ::IterDiagonalizer
+nIncFock	singleslater/base.hpp	/^    size_t nIncFock  = 20;   \/\/\/< Restart incremental fock build after n steps$/;"	m	struct:ChronusQ::SCFControls
+nKeep	singleslater/base.hpp	/^    size_t nKeep     = 10;    \/\/\/< Number of matrices to use for DIIS$/;"	m	struct:ChronusQ::SCFControls
+nMat	extrapolate.hpp	/^    size_t         nMat;        \/\/\/< Number of matrices to trace for each element of B$/;"	m	class:ChronusQ::DIIS
+nModel	morspec.hpp	/^    size_t nModel    = 16;$/;"	m	struct:ChronusQ::MORSettings
+nModelMax	morspec.hpp	/^    size_t nModelMax = 256;$/;"	m	struct:ChronusQ::MORSettings
+nO	wavefunction/base.hpp	/^    size_t nO;  \/\/\/< Total number of occupied orbitals$/;"	m	class:ChronusQ::WaveFunctionBase
+nOA	wavefunction/base.hpp	/^    size_t nOA; \/\/\/< Number of occupied alpha orbitals (nC == 1)$/;"	m	class:ChronusQ::WaveFunctionBase
+nOB	wavefunction/base.hpp	/^    size_t nOB; \/\/\/< Number of occupied beta orbitals  (nC == 1)$/;"	m	class:ChronusQ::WaveFunctionBase
+nPrimitive	basisset/basisset_def.hpp	/^    size_t nPrimitive;  \/\/\/< Number of primitive GTO functions$/;"	m	struct:ChronusQ::BasisSet
+nPts	cubegen.hpp	/^    std::array<size_t,3> nPts;$/;"	m	struct:ChronusQ::CubeGenBase
+nPts	grid/quadrature.hpp	/^    size_t              nPts;    \/\/\/< Number of integration points$/;"	m	struct:ChronusQ::Quadrature
+nRHS	response/settings.hpp	/^    size_t              nRHS       = 0;$/;"	m	struct:ChronusQ::FDResponseSettings
+nRHS_	itersolver.hpp	/^    size_t nRHS_;$/;"	m	class:ChronusQ::IterLinearSolver
+nRad	singleslater/kohnsham.hpp	/^    size_t nRad         = 100;   \/\/\/< # Radial points$/;"	m	struct:ChronusQ::IntegrationParam
+nRadPerBatch	singleslater/kohnsham.hpp	/^    size_t nRadPerBatch = 4;     \/\/\/< # Radial points \/ macro batch$/;"	m	struct:ChronusQ::IntegrationParam
+nRadPerMacroBatch	grid/integrator.hpp	/^    size_t nRadPerMacroBatch; \/\/\/< # Radial points per macro batch$/;"	m	class:ChronusQ::SphereIntegrator
+nRoots	response/settings.hpp	/^    size_t nRoots = 3;$/;"	m	struct:ChronusQ::ResidueResponseSettings
+nRoots_	itersolver.hpp	/^    size_t nRoots_;$/;"	m	class:ChronusQ::IterDiagonalizer
+nSCFIter	singleslater/base.hpp	/^    size_t nSCFIter = 0; \/\/\/< Number of SCF Iterations$/;"	m	struct:ChronusQ::SCFConvergence
+nSPC_	response/tbase.hpp	/^    std::function< void(size_t,T*,T*) >     nSPC_;$/;"	m	class:ChronusQ::ResponseTBase
+nSQ_	aointegrals.hpp	/^    size_t nSQ_;  \/\/\/< Squared basis functions \\f$ N_B^2\\f\$$/;"	m	struct:ChronusQ::AOIntegralsBase
+nShell	basisset/basisset_def.hpp	/^    size_t nShell;      \/\/\/< Number of CGTO basis shells$/;"	m	struct:ChronusQ::BasisSet
+nSingleDim_	response/tbase.hpp	/^    size_t        nSingleDim_;$/;"	m	class:ChronusQ::ResponseTBase
+nTT_	aointegrals.hpp	/^    size_t nTT_;  \/\/\/< Reduced number of basis functions \\f$ N_B(N_B+1)\/2 \\f\$$/;"	m	struct:ChronusQ::AOIntegralsBase
+nTotalE	molecule.hpp	/^    size_t nTotalE;  \/\/\/< Total number of electrons in the Molecule$/;"	m	struct:ChronusQ::Molecule
+nV	wavefunction/base.hpp	/^    size_t nV;  \/\/\/< Total number of virtual orbitals$/;"	m	class:ChronusQ::WaveFunctionBase
+nVA	wavefunction/base.hpp	/^    size_t nVA; \/\/\/< Number of virtual alpha orbitals  (nC == 1)$/;"	m	class:ChronusQ::WaveFunctionBase
+nVB	wavefunction/base.hpp	/^    size_t nVB; \/\/\/< Number of virtual beta orbitals   (nC == 1)$/;"	m	class:ChronusQ::WaveFunctionBase
+nVec	response/tbase.hpp	/^    size_t nVec;$/;"	m	struct:ChronusQ::RESPONSE_CONTRACTION
+n_frag_mult	chronusqefp.hpp	/^    size_t 	    n_frag_mult;$/;"	m	class:ChronusQ::EFP
+n_mult	chronusqefp.hpp	/^    size_t          n_mult;$/;"	m	class:ChronusQ::EFP
+n_pc	chronusqefp.hpp	/^    size_t          n_pc;$/;"	m	class:ChronusQ::EFP
+n_pol	chronusqefp.hpp	/^    size_t          n_pol;$/;"	m	class:ChronusQ::EFP
+n_pt	chronusqefp.hpp	/^    static size_t          n_pt;$/;"	m	class:ChronusQ::EFP
+needP	response/settings.hpp	/^    bool                needP      = false;$/;"	m	struct:ChronusQ::FDResponseSettings
+needQ	response/settings.hpp	/^    bool                needQ      = false;$/;"	m	struct:ChronusQ::FDResponseSettings
+needVL	response/settings.hpp	/^    size_t needVL = false;$/;"	m	struct:ChronusQ::ResidueResponseSettings
+needVR	response/settings.hpp	/^    size_t needVR = true;$/;"	m	struct:ChronusQ::ResidueResponseSettings
+newSMatrix	itersolver/gplhr.hpp	/^  void GPLHR<_F>::newSMatrix(size_t N, size_t nR, _F *V, size_t LDV, _F *Q, $/;"	f	class:ChronusQ::GPLHR
+npSQ_	aointegrals.hpp	/^    size_t npSQ_; \/\/\/< Squared primitive functions \\f$ N_P^2\\f\$$/;"	m	struct:ChronusQ::AOIntegralsBase
+npTT_	aointegrals.hpp	/^    size_t npTT_; \/\/\/< Reduced number of primitive functions \\f$ N_P(N_P+1)\/2 \\f\$$/;"	m	struct:ChronusQ::AOIntegralsBase
+nrmFDC	singleslater/base.hpp	/^    double nrmFDC;       \/\/\/< 2-Norm of [F,D]$/;"	m	struct:ChronusQ::SCFConvergence
+nucRepEnergy	molecule.hpp	/^    double   nucRepEnergy; \/\/\/< Nuclear-Nuclear repulsion energy$/;"	m	struct:ChronusQ::Molecule
+nucRepForce	molecule.hpp	/^    dynmat_t nucRepForce; \/\/\/< Nuclear gradient contribution$/;"	m	struct:ChronusQ::Molecule
+oneETerms	singleslater/base.hpp	/^    OneETerms oneETerms; \/\/\/< One electron terms to be computed$/;"	m	class:ChronusQ::SingleSlaterBase
+onePDM	quantum.hpp	/^    oper_t_coll onePDM;  \/\/\/< 1PDM array (Scalar + Magnetization)$/;"	m	class:ChronusQ::Quantum
+onePDMOrtho	singleslater.hpp	/^    oper_t_coll onePDMOrtho;   \/\/\/< List of populated orthonormal 1PDM matricies$/;"	m	class:ChronusQ::SingleSlater
+opaCross_eda	response/results.hpp	/^    double * opaCross_eda  = nullptr;$/;"	m	struct:ChronusQ::FDObservables
+oper_t	aointegrals.hpp	/^    typedef IntsT* oper_t; \/\/\/< Storage of an operator$/;"	t	class:ChronusQ::AOIntegrals
+oper_t	extrapolate.hpp	/^    typedef T*                        oper_t;$/;"	t	class:ChronusQ::DIIS
+oper_t	quantum.hpp	/^    typedef MatsT*               oper_t;$/;"	t	class:ChronusQ::Quantum
+oper_t	realtime.hpp	/^    typedef dcomplex*                 oper_t;$/;"	t	class:ChronusQ::RealTime
+oper_t	singleslater.hpp	/^    typedef MatsT*                    oper_t;$/;"	t	class:ChronusQ::SingleSlater
+oper_t	singleslater/kohnsham.hpp	/^    typedef MatsT*                   oper_t;$/;"	t	class:ChronusQ::KohnSham
+oper_t	wavefunction.hpp	/^    typedef MatsT*               oper_t;$/;"	t	class:ChronusQ::WaveFunction
+oper_t_coll	aointegrals.hpp	/^    typedef std::vector<oper_t> oper_t_coll; \/\/\/< A collection of operators$/;"	t	class:ChronusQ::AOIntegrals
+oper_t_coll	extrapolate.hpp	/^    typedef std::vector<oper_t>       oper_t_coll;$/;"	t	class:ChronusQ::DIIS
+oper_t_coll	quantum.hpp	/^    typedef std::vector<oper_t>  oper_t_coll;$/;"	t	class:ChronusQ::Quantum
+oper_t_coll	realtime.hpp	/^    typedef std::vector<oper_t>       oper_t_coll;$/;"	t	class:ChronusQ::RealTime
+oper_t_coll	singleslater.hpp	/^    typedef std::vector<oper_t>       oper_t_coll;$/;"	t	class:ChronusQ::SingleSlater
+oper_t_coll	singleslater/kohnsham.hpp	/^    typedef std::vector<oper_t>       oper_t_coll;$/;"	t	class:ChronusQ::KohnSham
+oper_t_coll	wavefunction.hpp	/^    typedef std::vector<oper_t>  oper_t_coll;$/;"	t	class:ChronusQ::WaveFunction
+oper_t_coll2	aointegrals.hpp	/^    typedef std::vector<oper_t_coll> oper_t_coll2; \/\/\/< A double collection of operators$/;"	t	class:ChronusQ::AOIntegrals
+oper_t_coll2	extrapolate.hpp	/^    typedef std::vector<oper_t_coll>  oper_t_coll2;$/;"	t	class:ChronusQ::DIIS
+oper_t_coll2	singleslater.hpp	/^    typedef std::vector<oper_t_coll>  oper_t_coll2;$/;"	t	class:ChronusQ::SingleSlater
+oper_t_coll2	singleslater/kohnsham.hpp	/^    typedef std::vector<oper_t_coll>  oper_t_coll2;$/;"	t	class:ChronusQ::KohnSham
+operator !=	util/mpi.hpp	/^  static inline bool operator!=(MPI_Comm c, MPI_Comm d){ $/;"	f	namespace:ChronusQ
+operator !=	util/mpi.hpp	/^  static inline bool operator!=(MPI_Comm c, int x){ $/;"	f	namespace:ChronusQ
+operator !=	util/mpi.hpp	/^  static inline bool operator!=(int x, MPI_Comm c){ $/;"	f	namespace:ChronusQ
+operator <<	aointegrals/print.hpp	/^  std::ostream& operator<<(std::ostream &out, const AOIntegralsBase &aoints) {$/;"	f	namespace:ChronusQ
+operator <<	memmanager.hpp	/^    friend inline std::ostream& operator<<(std::ostream &out , $/;"	f	class:ChronusQ::CQMemManager
+operator ==	util/mpi.hpp	/^  static inline bool operator==(MPI_Comm c, MPI_Comm d){ $/;"	f	namespace:ChronusQ
+operator ==	util/mpi.hpp	/^  static inline bool operator==(MPI_Comm c, int x){ $/;"	f	namespace:ChronusQ
+operator ==	util/mpi.hpp	/^  static inline bool operator==(int x, MPI_Comm c){ $/;"	f	namespace:ChronusQ
+operator int	util/mpi.hpp	/^    operator int() const { return internal; }$/;"	f	struct:ChronusQ::MPI_Comm
+orbHessCtl	response/polarization.hpp	/^      OrbitalHessianSettings orbHessCtl;$/;"	m	class:ChronusQ::PolarizationPropagator
+order	response/settings.hpp	/^    size_t              order      = 1;$/;"	m	struct:ChronusQ::FDResponseSettings
+ortho1	singleslater.hpp	/^    oper_t ortho1 = nullptr;   \/\/\/< Orthogonalization matrix which S -> I$/;"	m	class:ChronusQ::SingleSlater
+ortho2	singleslater.hpp	/^    oper_t ortho2 = nullptr;   \/\/\/< Inverse of ortho1$/;"	m	class:ChronusQ::SingleSlater
+ortho2aoDen	singleslater/scf.hpp	/^  void SingleSlater<MatsT,IntsT>::ortho2aoDen() {$/;"	f	class:ChronusQ::SingleSlater
+ortho2aoMOs	singleslater/scf.hpp	/^  void SingleSlater<MatsT,IntsT>::ortho2aoMOs() {$/;"	f	class:ChronusQ::SingleSlater
+orthoAOMO	singleslater/scf.hpp	/^  void SingleSlater<MatsT, IntsT>::orthoAOMO() {$/;"	f	class:ChronusQ::SingleSlater
+orthoType	singleslater/base.hpp	/^    ORTHO_TYPE            orthoType  = LOWDIN; \/\/\/< Orthogonalization scheme$/;"	m	class:ChronusQ::SingleSlaterBase
+oscStrength	response/results.hpp	/^    double * oscStrength      = nullptr;$/;"	m	struct:ChronusQ::ResObservables
+other	grid/quadrature.hpp	/^    Quadrature(Quadrature &&other)      = default;$/;"	m	struct:ChronusQ::Quadrature
+other	grid/quadrature.hpp	/^    Quadrature(const Quadrature &other) = default;$/;"	m	struct:ChronusQ::Quadrature
+overlap	aointegrals.hpp	/^    oper_t overlap   = nullptr;   \/\/\/< Overlap matrix $/;"	m	class:ChronusQ::AOIntegrals
+pc	chronusqefp.hpp	/^    const double*   pc;$/;"	m	class:ChronusQ::EFP
+pc_coord	chronusqefp.hpp	/^    const double*   pc_coord;$/;"	m	class:ChronusQ::EFP
+pert	realtime.hpp	/^    TDEMPerturbation  pert;        \/\/\/< TD field perturbation$/;"	m	struct:ChronusQ::RealTimeBase
+pert_has_type	fields.hpp	/^  inline bool pert_has_type( const EMPerturbation &pert, $/;"	f	namespace:ChronusQ
+phEpsilonScale	response/polarization/singleslater.hpp	/^  void PolarizationPropagator< SingleSlater<MatsT, IntsT> >::phEpsilonScale(bool doInc, $/;"	f	class:ChronusQ::PolarizationPropagator
+phTransitionVecAO2MO	response/polarization/singleslater.hpp	/^  void PolarizationPropagator< SingleSlater<MatsT, IntsT> >::phTransitionVecAO2MO($/;"	f	class:ChronusQ::PolarizationPropagator
+phTransitionVecMO2AO	response/polarization/singleslater.hpp	/^    PolarizationPropagator< SingleSlater<MatsT, IntsT> >::phTransitionVecMO2AO($/;"	f	class:ChronusQ::PolarizationPropagator
+point_type	grid/quadrature.hpp	/^    typedef _PtTyp point_type; \/\/\/< Storage type for the point$/;"	t	struct:ChronusQ::Quadrature
+pol	chronusqefp.hpp	/^    double*         pol;$/;"	m	class:ChronusQ::EFP
+pol_conj	chronusqefp.hpp	/^    double*         pol_conj;$/;"	m	class:ChronusQ::EFP
+pol_coord	chronusqefp.hpp	/^    double*         pol_coord;$/;"	m	class:ChronusQ::EFP
+populationAnalysis	singleslater/pop.hpp	/^  void SingleSlater<MatsT,IntsT>::populationAnalysis() {$/;"	f	class:ChronusQ::SingleSlater
+postDiagonalization	response/tbase.hpp	/^    virtual void postDiagonalization() {$/;"	f	class:ChronusQ::ResponseTBase
+postLinearSolve	response/particleparticle/singleslater.hpp	/^  void ParticleParticlePropagator<SingleSlater<MatsT,IntsT>>::postLinearSolve() {$/;"	f	class:ChronusQ::ParticleParticlePropagator
+postLinearSolve	response/polarization/singleslater.hpp	/^  void PolarizationPropagator<SingleSlater<MatsT, IntsT>>::postLinearSolve() {$/;"	f	class:ChronusQ::PolarizationPropagator
+postLinearSolve	response/tbase.hpp	/^    virtual void postLinearSolve(){$/;"	f	class:ChronusQ::ResponseTBase
+potential	aointegrals.hpp	/^    oper_t potential = nullptr; \/\/\/< Nuclear potential matrix $/;"	m	class:ChronusQ::AOIntegrals
+ppEpsilonScale	response/particleparticle/singleslater.hpp	/^  void ParticleParticlePropagator< SingleSlater<MatsT, IntsT> >::ppEpsilonScale($/;"	f	class:ChronusQ::ParticleParticlePropagator
+ppTransitionVecAO2MO	response/particleparticle/singleslater.hpp	/^  void ParticleParticlePropagator< SingleSlater<MatsT, IntsT> >::ppTransitionVecAO2MO($/;"	f	class:ChronusQ::ParticleParticlePropagator
+ppTransitionVecMO2AO	response/particleparticle/singleslater.hpp	/^    ParticleParticlePropagator< SingleSlater<MatsT, IntsT> >::ppTransitionVecMO2AO($/;"	f	class:ChronusQ::ParticleParticlePropagator
+preCondNoShift_	itersolver.hpp	/^    LinearTrans_t preCondNoShift_; \/\/\/< Unshifted preconditioner$/;"	m	class:ChronusQ::IterSolver
+preCondWShift_	itersolver.hpp	/^    Shift_t preCondWShift_;  \/\/\/< Shifted preconditioner$/;"	m	class:ChronusQ::IterSolver
+preConditioner	response/particleparticle/singleslater.hpp	/^  void ParticleParticlePropagator<SingleSlater<MatsT, IntsT>>::preConditioner(size_t nVec, $/;"	f	class:ChronusQ::ParticleParticlePropagator
+preConditioner	response/polarization/singleslater.hpp	/^  void PolarizationPropagator<SingleSlater<MatsT, IntsT>>::preConditioner(size_t nVec, $/;"	f	class:ChronusQ::PolarizationPropagator
+prettyMOPrint	singleslater/print.hpp	/^  void prettyMOPrint(std::ostream &out, size_t NB, size_t NOrb, double *EPS, $/;"	f	namespace:ChronusQ
+prettyPrintSmart	util/matout.hpp	/^void prettyPrintSmart(std::ostream& out, std::string str, T* A, $/;"	f	namespace:ChronusQ
+prettyPrintSmartBase	util/matout.hpp	/^void prettyPrintSmartBase(std::ostream& out, T* A, const size_t M, $/;"	f	namespace:ChronusQ
+prevFock	singleslater.hpp	/^    oper_t_coll prevFock;     \/\/\/< AO Fock from the previous SCF iteration$/;"	m	class:ChronusQ::SingleSlater
+print1PDM	quantum/print.hpp	/^  void Quantum<MatsT>::print1PDM(std::ostream &out) {$/;"	f	class:ChronusQ::Quantum
+print1PDMOrtho	singleslater/print.hpp	/^  void SingleSlater<MatsT,IntsT>::print1PDMOrtho(std::ostream &out) {$/;"	f	class:ChronusQ::SingleSlater
+printAllocTable	memmanager.hpp	/^     void printAllocTable(std::ostream &out) const {$/;"	f	class:ChronusQ::CQMemManager
+printEPS	wavefunction/print.hpp	/^  void WaveFunction<MatsT,IntsT>::printEPS(std::ostream &out) {$/;"	f	class:ChronusQ::WaveFunction
+printFDObservables	response/print.hpp	/^  void ResponseTBase<T>::printFDObservables(std::ostream &out) {$/;"	f	class:ChronusQ::ResponseTBase
+printFDRResults	response/tbase.hpp	/^    inline void printFDRResults(std::ostream &out) {$/;"	f	class:ChronusQ::ResponseTBase
+printFock	singleslater/print.hpp	/^  void SingleSlater<MatsT,IntsT>::printFock(std::ostream &out) {$/;"	f	class:ChronusQ::SingleSlater
+printFockTimings	singleslater/kohnsham.hpp	/^    virtual void printFockTimings(std::ostream &out) {$/;"	f	class:ChronusQ::KohnSham
+printFockTimings	singleslater/print.hpp	/^  void SingleSlater<MatsT, IntsT>::printFockTimings(std::ostream &out) {$/;"	f	class:ChronusQ::SingleSlater
+printGD	singleslater/print.hpp	/^  void SingleSlater<MatsT,IntsT>::printGD(std::ostream &out) {$/;"	f	class:ChronusQ::SingleSlater
+printJ	singleslater/print.hpp	/^  void SingleSlater<MatsT,IntsT>::printJ(std::ostream &out) {$/;"	f	class:ChronusQ::SingleSlater
+printK	singleslater/print.hpp	/^  void SingleSlater<MatsT,IntsT>::printK(std::ostream &out) {$/;"	f	class:ChronusQ::SingleSlater
+printLevel	response/settings.hpp	/^    int  printLevel = 1;$/;"	m	struct:ChronusQ::ResponseSettings
+printLevel	singleslater/base.hpp	/^    size_t printLevel; \/\/\/< Print Level$/;"	m	class:ChronusQ::SingleSlaterBase
+printMO	wavefunction/print.hpp	/^  void WaveFunction<MatsT,IntsT>::printMO(std::ostream &out) {$/;"	f	class:ChronusQ::WaveFunction
+printMOCoeffs	singleslater/base.hpp	/^    bool printMOCoeffs = false;$/;"	m	struct:ChronusQ::SCFControls
+printMOInfo	singleslater/print.hpp	/^  void SingleSlater<MatsT,IntsT>::printMOInfo(std::ostream &out) {$/;"	f	class:ChronusQ::SingleSlater
+printMiscProperties	singleslater/print.hpp	/^  void SingleSlater<MatsT,IntsT>::printMiscProperties(std::ostream &out) {$/;"	f	class:ChronusQ::SingleSlater
+printMultipoles	quantum/print.hpp	/^  void QuantumBase::printMultipoles(std::ostream &out) {$/;"	f	class:ChronusQ::QuantumBase
+printQuadrature	grid/quadrature.hpp	/^    void printQuadrature(){$/;"	f	struct:ChronusQ::Quadrature
+printRF	response/print.hpp	/^  void ResponseTBase<T>::printRF($/;"	f	class:ChronusQ::ResponseTBase
+printRTHeader	realtime/print.hpp	/^  void RealTime<_SSTyp,IntsT>::printRTHeader() {$/;"	f	class:ChronusQ::RealTime
+printRTStep	realtime/print.hpp	/^  void RealTime<_SSTyp,IntsT>::printRTStep() { $/;"	f	class:ChronusQ::RealTime
+printResMO	morspec.hpp	/^    virtual void printResMO(std::ostream &out, size_t nRoots, double *W,$/;"	f	class:ChronusQ::MORSpec
+printResMO	morspec.hpp	/^    void printResMO(std::ostream &out){$/;"	f	class:ChronusQ::MORSpec
+printResMO	response/particleparticle.hpp	/^      virtual void printResMO(std::ostream &out, size_t nRoots, double *W,$/;"	f	class:ChronusQ::ParticleParticlePropagator
+printResMO	response/particleparticle.hpp	/^      void printResMO(std::ostream &out) {$/;"	f	class:ChronusQ::ParticleParticlePropagator
+printResMO	response/polarization.hpp	/^      virtual void printResMO(std::ostream &out, size_t nRoots, double *W,$/;"	f	class:ChronusQ::PolarizationPropagator
+printResMO	response/polarization.hpp	/^      void printResMO(std::ostream &out) {$/;"	f	class:ChronusQ::PolarizationPropagator
+printResMO_impl	response/particleparticle/singleslater.hpp	/^  void ParticleParticlePropagator<SingleSlater<MatsT,IntsT>>::printResMO_impl($/;"	f	class:ChronusQ::ParticleParticlePropagator
+printResMO_impl	response/polarization/singleslater.hpp	/^  void PolarizationPropagator<SingleSlater<MatsT, IntsT>>::printResMO_impl($/;"	f	class:ChronusQ::PolarizationPropagator
+printResObservables	response/print.hpp	/^  void ResponseTBase<T>::printResObservables(std::ostream &out) {$/;"	f	class:ChronusQ::ResponseTBase
+printResidueResults	response/tbase.hpp	/^    inline void printResidueResults(std::ostream &out) {$/;"	f	class:ChronusQ::ResponseTBase
+printResults	response/base.hpp	/^    inline void printResults(std::ostream &out) {$/;"	f	struct:ChronusQ::ResponseBase
+printResults	response/tbase.hpp	/^    inline void printResults(std::ostream &out) {$/;"	f	class:ChronusQ::ResponseTBase
+printSCFHeader	singleslater/base/scf.hpp	/^  void SingleSlaterBase::printSCFHeader(std::ostream &out, $/;"	f	class:ChronusQ::SingleSlaterBase
+printSCFProg	singleslater/base/scf.hpp	/^  void SingleSlaterBase::printSCFProg(std::ostream &out,$/;"	f	class:ChronusQ::SingleSlaterBase
+printSpin	quantum/print.hpp	/^  void QuantumBase::printSpin(std::ostream &out) {$/;"	f	class:ChronusQ::QuantumBase
+printTMoments	response/print.hpp	/^  void ResponseTBase<T>::printTMoments(std::ostream &out) {$/;"	f	class:ChronusQ::ResponseTBase
+propagateWFN	realtime/propagation.hpp	/^  void RealTime<_SSTyp,IntsT>::propagateWFN() {$/;"	f	class:ChronusQ::RealTime
+propagator_	realtime.hpp	/^    _SSTyp<dcomplex,IntsT>    propagator_; \/\/\/< Object for time propagation$/;"	m	class:ChronusQ::RealTime
+prpAlg	realtime.hpp	/^    PropagatorAlgorithm  prpAlg  = Diagonalization; \/\/\/< exp(-iF) Algorithm$/;"	m	struct:ChronusQ::IntegrationScheme
+pt_coord	chronusqefp.hpp	/^    static const double*   pt_coord;$/;"	m	class:ChronusQ::EFP
+pts	grid/quadrature.hpp	/^    std::vector<_PtTyp> pts;     \/\/\/< Integration points$/;"	m	struct:ChronusQ::Quadrature
+q	grid/integrator.hpp	/^    _QTyp q; \/\/\/< Quadrature$/;"	m	class:ChronusQ::Integrator1D
+q1	grid/integrator.hpp	/^     _QTyp1 q1; \/\/\/< Quadrature over dimension 1$/;"	m	class:ChronusQ::Integrator2D
+q1	grid/integrator.hpp	/^     _QTyp1 q1; \/\/\/< Quadrature over dimension 1$/;"	m	class:ChronusQ::Integrator3D
+q2	grid/integrator.hpp	/^     _QTyp2 q2; \/\/\/< Quadrature over dimension 2$/;"	m	class:ChronusQ::Integrator2D
+q2	grid/integrator.hpp	/^     _QTyp2 q2; \/\/\/< Quadrature over dimension 2$/;"	m	class:ChronusQ::Integrator3D
+q3	grid/integrator.hpp	/^     _QTyp3 q3; \/\/\/< Quadrature over dimension 3$/;"	m	class:ChronusQ::Integrator3D
+rank	util/mpi.hpp	/^    static inline int rank() { return 0; }$/;"	f	struct:ChronusQ::MPI_Comm
+rcomm_	response/tbase.hpp	/^    MPI_Comm      rcomm_;$/;"	m	class:ChronusQ::ResponseTBase
+readData	util/files.hpp	/^      void readData(const std::string &dataSet, T* data) {$/;"	f	class:ChronusQ::SafeFile
+ref	response/tbase.hpp	/^    std::shared_ptr<Reference> ref() { return ref_; };$/;"	f	class:ChronusQ::ResponseRefBase
+refLongName_	singleslater/base.hpp	/^    std::string refLongName_;  \/\/\/< Long form of the reference name$/;"	m	class:ChronusQ::SingleSlaterBase
+refShells	basisset/reference.hpp	/^    std::unordered_map<int,ReferenceShell> refShells; $/;"	m	class:ChronusQ::ReferenceBasisSet
+refShortName_	singleslater/base.hpp	/^    std::string refShortName_; \/\/\/< Short form of the reference name$/;"	m	class:ChronusQ::SingleSlaterBase
+ref_	cubegen.hpp	/^    std::shared_ptr<WaveFunction<T>> ref_;$/;"	m	class:ChronusQ::WaveFunctionCubeGenBase
+ref_	morspec.hpp	/^    std::shared_ptr<Reference> ref_;$/;"	m	class:ChronusQ::MORSpec
+ref_	response/tbase.hpp	/^    std::shared_ptr<Reference> ref_;$/;"	m	class:ChronusQ::ResponseRefBase
+reference_	realtime.hpp	/^    SingleSlaterBase         *reference_ = nullptr;  \/\/\/< Initial conditions$/;"	m	class:ChronusQ::RealTime
+relativistic	aointegrals.hpp	/^    bool relativistic; \/\/spin-orbit, scalar relativity$/;"	m	struct:ChronusQ::OneETerms
+resGuess	morspec.hpp	/^    void                 resGuess(size_t, T*, size_t){ CErr(); };$/;"	f	class:ChronusQ::MORSpec
+resGuess	response/particleparticle.hpp	/^      void                 resGuess(size_t, MatsT*, size_t){ CErr(); };$/;"	f	class:ChronusQ::ParticleParticlePropagator
+resGuess	response/polarization/singleslater.hpp	/^  void PolarizationPropagator< SingleSlater<MatsT, IntsT> >::resGuess($/;"	f	class:ChronusQ::PolarizationPropagator
+resNorm_	itersolver.hpp	/^    std::vector<std::vector<double>> resNorm_;$/;"	m	class:ChronusQ::IterLinearSolver
+resNorms_	morspec.hpp	/^    double*        resNorms_       = nullptr;$/;"	m	class:ChronusQ::MORSpec
+resObs	response/base.hpp	/^    ResObservables resObs;$/;"	m	struct:ChronusQ::ResponseBase
+resResults	response/tbase.hpp	/^    ResidueResponseResults<T>     resResults;$/;"	m	class:ChronusQ::ResponseTBase
+resSettings	response/base.hpp	/^    ResidueResponseSettings  resSettings;$/;"	m	struct:ChronusQ::ResponseBase
+reset	response/tbase.hpp	/^    inline void reset() {$/;"	f	class:ChronusQ::ResponseTBase
+residueObservables	response/properties.hpp	/^  void ResponseTBase<T>::residueObservables() {$/;"	f	class:ChronusQ::ResponseTBase
+residueProperties	response/tbase.hpp	/^    inline void residueProperties() {$/;"	f	class:ChronusQ::ResponseTBase
+residueTMoments	response/properties.hpp	/^  void ResponseTBase<T>::residueTMoments() {$/;"	f	class:ChronusQ::ResponseTBase
+respFactory	morspec.hpp	/^    PolarizationPropagator<Reference>& respFactory(){ return respFactory_; }$/;"	f	class:ChronusQ::MORSpec
+respFactory_	morspec.hpp	/^    PolarizationPropagator<Reference> respFactory_;$/;"	m	class:ChronusQ::MORSpec
+respFullMatrix_	morspec.hpp	/^    typename Reference::value_type* respFullMatrix_ = nullptr;$/;"	m	class:ChronusQ::MORSpec
+restart	itersolver/gplhr.hpp	/^  void GPLHR<_F>::restart() { }$/;"	f	class:ChronusQ::GPLHR
+result_	chronusqefp.hpp	/^    enum efp_result result_;$/;"	m	class:ChronusQ::EFP	typeref:enum:ChronusQ::EFP::efp_result
+rhsBS	itersolver.hpp	/^    size_t rhsBS   = 1;$/;"	m	class:ChronusQ::IterLinearSolver
+rhsNorm_	itersolver.hpp	/^    std::vector<double>              rhsNorm_;$/;"	m	class:ChronusQ::IterLinearSolver
+ritzVecL_	morspec.hpp	/^    dcomplex*      ritzVecL_       = nullptr;$/;"	m	class:ChronusQ::MORSpec
+ritzVecR_	morspec.hpp	/^    dcomplex*      ritzVecR_       = nullptr;$/;"	m	class:ChronusQ::MORSpec
+rotatory_len_RM	response/results.hpp	/^    double * rotatory_len_RM  = nullptr;$/;"	m	struct:ChronusQ::ResObservables
+rotatory_vel_PMQ	response/results.hpp	/^    double * rotatory_vel_PMQ = nullptr;$/;"	m	struct:ChronusQ::ResObservables
+rstStep	realtime.hpp	/^    PropagationStep      rstStep = ForwardEuler; \/\/\/< Restart Step$/;"	m	struct:ChronusQ::IntegrationScheme
+run	itersolver/iterdiagonalizer.hpp	/^  void IterDiagonalizer<_F>::run() {$/;"	f	class:ChronusQ::IterDiagonalizer
+run	itersolver/iterlinearsolver.hpp	/^  void IterLinearSolver<_F>::run() {$/;"	f	class:ChronusQ::IterLinearSolver
+run	morspec.hpp	/^    inline void run() {$/;"	f	class:ChronusQ::MORSpec
+run	response/tbase.hpp	/^    inline virtual void run() {$/;"	f	class:ChronusQ::ResponseTBase
+runBatch	itersolver/gmres.hpp	/^  void GMRES<_F>::runBatch(size_t nRHS, size_t nShift, _F* RHS, _F *shifts, $/;"	f	class:ChronusQ::GMRES
+runBatch	itersolver/iterlinearsolver.hpp	/^  void IterLinearSolver<_F>::runBatch(size_t nRHS, size_t nShift, _F* RHS, $/;"	f	class:ChronusQ::IterLinearSolver
+runFDR	response/tbase.hpp	/^    inline void runFDR() { $/;"	f	class:ChronusQ::ResponseTBase
+runFullFDR	response/fdr.hpp	/^  void ResponseTBase<T>::runFullFDR(FDResponseResults<T,U> &results) {$/;"	f	class:ChronusQ::ResponseTBase
+runFullFDR	response/tbase.hpp	/^    inline void runFullFDR() {$/;"	f	class:ChronusQ::ResponseTBase
+runFullResidue	response/residue.hpp	/^  void ResponseTBase<T>::runFullResidue() {$/;"	f	class:ChronusQ::ResponseTBase
+runIterFDR	response/fdr.hpp	/^  void ResponseTBase<T>::runIterFDR(FDResponseResults<T,U> &results,$/;"	f	class:ChronusQ::ResponseTBase
+runIterFDR	response/tbase.hpp	/^    inline void runIterFDR() {$/;"	f	class:ChronusQ::ResponseTBase
+runIterResidue	response/residue.hpp	/^  void ResponseTBase<T>::runIterResidue() {$/;"	f	class:ChronusQ::ResponseTBase
+runMicro	itersolver/gplhr.hpp	/^  bool GPLHR<_F>::runMicro() {$/;"	f	class:ChronusQ::GPLHR
+runResidue	response/tbase.hpp	/^    inline void runResidue() {$/;"	f	class:ChronusQ::ResponseTBase
+safeWriteData	util/files.hpp	/^      void safeWriteData(const std::string &dataSet, T* data,$/;"	f	class:ChronusQ::SafeFile
+savFile	aointegrals.hpp	/^    SafeFile savFile; \/\/\/< Hard storage of integrals$/;"	m	struct:ChronusQ::AOIntegralsBase
+savFile	realtime.hpp	/^    SafeFile savFile; \/\/\/< Data File$/;"	m	struct:ChronusQ::RealTimeBase
+savFile	response/base.hpp	/^    SafeFile savFile; \/\/\/< Data File$/;"	m	struct:ChronusQ::ResponseBase
+savFile	singleslater/base.hpp	/^    SafeFile savFile;$/;"	m	class:ChronusQ::SingleSlaterBase
+saveCurrentState	singleslater/scf.hpp	/^  void SingleSlater<MatsT,IntsT>::saveCurrentState() {$/;"	f	class:ChronusQ::SingleSlater
+scfAlg	singleslater/base.hpp	/^    SCF_ALG   scfAlg  = _CONVENTIONAL_SCF;$/;"	m	struct:ChronusQ::SCFControls
+scfControls	singleslater/base.hpp	/^    SCFControls    scfControls; \/\/\/< Controls for the SCF procedure$/;"	m	class:ChronusQ::SingleSlaterBase
+scfConv	singleslater/base.hpp	/^    SCFConvergence scfConv;     \/\/\/< Current status of SCF convergence$/;"	m	class:ChronusQ::SingleSlaterBase
+scfDIIS	singleslater/extrap.hpp	/^  void SingleSlater<MatsT,IntsT>::scfDIIS(size_t nExtrap) {$/;"	f	class:ChronusQ::SingleSlater
+scfStep	singleslater/base.hpp	/^    SCF_STEP  scfStep = _CONVENTIONAL_SCF_STEP;$/;"	m	struct:ChronusQ::SCFControls
+schwartz	aointegrals.hpp	/^    double* schwartz = nullptr; \/\/\/< Schwartz bounds for the ERIs$/;"	m	class:ChronusQ::AOIntegrals
+selectShifts	morspec.hpp	/^    std::vector<double> selectShifts(std::vector<double> &candidate,$/;"	f	class:ChronusQ::MORSpec
+setAtoms	molecule.hpp	/^    void setAtoms(std::vector<Atom> _atoms) {$/;"	f	struct:ChronusQ::Molecule
+setCoreH	singleslater/base.hpp	/^    inline void setCoreH(CORE_HAMILTONIAN_TYPE cType) {$/;"	f	class:ChronusQ::SingleSlaterBase
+setFile	util/files.hpp	/^      inline void setFile(const std::string &name) { fName_ = name; }$/;"	f	class:ChronusQ::SafeFile
+setGuess	itersolver.hpp	/^    void setGuess(size_t nGuess, std::function<void(size_t,_F*,size_t)> func) {$/;"	f	class:ChronusQ::GPLHR
+setM	itersolver.hpp	/^    void setM(size_t __m) {$/;"	f	class:ChronusQ::GPLHR
+setRHS	itersolver/iterlinearsolver.hpp	/^  void IterLinearSolver<_F>::setRHS(size_t nRHS, T*RHS, size_t LDRHS) {$/;"	f	class:ChronusQ::IterLinearSolver
+setShifts	itersolver/iterlinearsolver.hpp	/^  void IterLinearSolver<_F>::setShifts(size_t nShift, T* shifts) {$/;"	f	class:ChronusQ::IterLinearSolver
+shData	basisset/basisset_def.hpp	/^    libint2_shellpair_data_t shData;       \/\/\/< Shell pair data$/;"	m	struct:ChronusQ::ShellPairData
+shellData	basisset/basisset_def.hpp	/^    ShellPairData               shellData; \/\/\/< Shell pair data$/;"	m	struct:ChronusQ::BasisSet
+shells	basisset/basisset_def.hpp	/^    std::vector<libint2::Shell> shells;    \/\/\/< Basis shells$/;"	m	struct:ChronusQ::BasisSet
+shells	basisset/reference.hpp	/^    std::vector<libint2::Shell> shells;          \/\/\/< Atomic Shells$/;"	m	struct:ChronusQ::ReferenceShell
+shiftVec_	itersolver.hpp	/^    Shift_t shiftVec_;       \/\/\/< (A - sB)X given AX$/;"	m	class:ChronusQ::IterSolver
+shifts	response/results.hpp	/^    std::vector<U> shifts;$/;"	m	struct:ChronusQ::FDResponseResults
+shifts_	itersolver.hpp	/^    std::vector<_F> shifts_;$/;"	m	class:ChronusQ::IterLinearSolver
+sigma	itersolver.hpp	/^    _F sigma = 0.;$/;"	m	class:ChronusQ::GPLHR
+size	fields.hpp	/^    size_t     size;$/;"	m	struct:ChronusQ::EMFieldBase
+size	util/mpi.hpp	/^    static inline int size() { return 1; }$/;"	f	struct:ChronusQ::MPI_Comm
+sizeOfData	util/files.hpp	/^      size_t sizeOfData(const std::string &dataSet) {$/;"	f	class:ChronusQ::SafeFile
+slaterRadius	atom.hpp	/^    double slaterRadius; \/\/\/< Slater radius (in Bohr)$/;"	m	struct:ChronusQ::Atom
+spinSepProp	response/particleparticle.hpp	/^    ParticleParticleProp_SpinSep  spinSepProp = PP_AB; \/\/ Default to AB$/;"	m	struct:ChronusQ::SingleSlaterParticleParticleBase
+split	cxxapi/input.hpp	/^  static inline void split(std::vector<std::string>& tokens, $/;"	f	namespace:ChronusQ
+ss_	chronusqefp.hpp	/^    SingleSlaterBase*  ss_;$/;"	m	class:ChronusQ::EFP
+ssptr	chronusqefp.hpp	/^    SingleSlaterBase* ssptr;$/;"	m	struct:ChronusQ::SSType
+starOrb	response/particleparticle.hpp	/^    std::pair<long int, long int> starOrb;             \/\/ Orbitals for *-ref$/;"	m	struct:ChronusQ::SingleSlaterParticleParticleBase
+stepSize	realtime.hpp	/^    double  stepSize;   \/\/\/< Current step size$/;"	m	struct:ChronusQ::IntegrationProgress
+tLenElecDipole_ge	response/results.hpp	/^    T * tLenElecDipole_ge      = nullptr;$/;"	m	struct:ChronusQ::ResidueResponseResults
+tLenElecOctupole_ge	response/results.hpp	/^    T * tLenElecOctupole_ge    = nullptr; $/;"	m	struct:ChronusQ::ResidueResponseResults
+tLenElecQuadrupole_ge	response/results.hpp	/^    T * tLenElecQuadrupole_ge  = nullptr;$/;"	m	struct:ChronusQ::ResidueResponseResults
+tMagDipole_ge	response/results.hpp	/^    T * tMagDipole_ge      = nullptr;$/;"	m	struct:ChronusQ::ResidueResponseResults
+tMagOctupole_ge	response/results.hpp	/^    T * tMagOctupole_ge    = nullptr; $/;"	m	struct:ChronusQ::ResidueResponseResults
+tMagQuadrupole_ge	response/results.hpp	/^    T * tMagQuadrupole_ge  = nullptr;$/;"	m	struct:ChronusQ::ResidueResponseResults
+tMax	realtime.hpp	/^    double tMax    = 0.1;  \/\/\/< Max simulation time in AU$/;"	m	struct:ChronusQ::IntegrationScheme
+tOff	realtime/fields/envelope.hpp	/^    double tOff; \/\/\/< Time to turn off the perturbation$/;"	m	struct:ChronusQ::FieldEnvelopeBase
+tOn	realtime/fields/envelope.hpp	/^    double tOn;  \/\/\/< Time to turn on the perturbation$/;"	m	struct:ChronusQ::FieldEnvelopeBase
+tVelElecDipole_ge	response/results.hpp	/^    T * tVelElecDipole_ge      = nullptr;$/;"	m	struct:ChronusQ::ResidueResponseResults
+tVelElecOctupole_ge	response/results.hpp	/^    T * tVelElecOctupole_ge    = nullptr; $/;"	m	struct:ChronusQ::ResidueResponseResults
+tVelElecQuadrupole_ge	response/results.hpp	/^    T * tVelElecQuadrupole_ge  = nullptr;$/;"	m	struct:ChronusQ::ResidueResponseResults
+target	morspec.hpp	/^    MOR_TARGET target = OPA_CROSS_SECTION_EDA;$/;"	m	struct:ChronusQ::MORSettings
+tdaOp	response/particleparticle.hpp	/^    ParticleParticleTDA           tdaOp       = PP_A;  \/\/ Default to A-TDA$/;"	m	struct:ChronusQ::SingleSlaterParticleParticleBase
+threshSchwartz	aointegrals.hpp	/^    double threshSchwartz = 1e-12; \/\/\/< Schwartz screening threshold$/;"	m	struct:ChronusQ::AOIntegralsBase
+tick	util/time.hpp	/^  static inline time_point tick() {$/;"	f	namespace:ChronusQ
+tock	util/time.hpp	/^  static inline double tock(const time_point& pt) {$/;"	f	namespace:ChronusQ
+totalEnergy	quantum/base.hpp	/^    double totalEnergy;\/\/\/< The total energy$/;"	m	class:ChronusQ::QuantumBase
+trim	cxxapi/input.hpp	/^  static inline std::string &trim(std::string &s) {$/;"	f	namespace:ChronusQ
+trim_left	cxxapi/input.hpp	/^  static inline std::string& trim_left(std::string &s) {$/;"	f	namespace:ChronusQ
+trim_right	cxxapi/input.hpp	/^  static inline std::string& trim_right(std::string &s) {$/;"	f	namespace:ChronusQ
+twoBodyContract	aointegrals.hpp	/^    inline void twoBodyContract($/;"	f	class:ChronusQ::AOIntegrals
+twoBodyContract	aointegrals.hpp	/^    void twoBodyContract($/;"	f	class:ChronusQ::AOIntegrals
+twoBodyContractDirect	aointegrals/contract/direct.hpp	/^  void AOIntegrals<IntsT>::twoBodyContractDirect($/;"	f	class:ChronusQ::AOIntegrals
+twoBodyContractIncore	aointegrals/contract/incore.hpp	/^  void AOIntegrals<IntsT>::twoBodyContractIncore($/;"	f	class:ChronusQ::AOIntegrals
+twoeH	singleslater.hpp	/^    oper_t_coll twoeH;      \/\/\/< List of populated HF perturbation tensors$/;"	m	class:ChronusQ::SingleSlater
+typ_	grid/integrator.hpp	/^    SHELL_EVAL_TYPE  typ_      ;   \/\/\/< Specification of basis evaluatio requirements$/;"	m	class:ChronusQ::BeckeIntegrator
+unNormCont	basisset/basisset_def.hpp	/^    std::vector<std::vector<double>> unNormCont;$/;"	m	struct:ChronusQ::BasisSet
+unNormCont	basisset/reference.hpp	/^    std::vector<std::vector<double>> unNormCont; \/\/\/< Unnormalized coefficients$/;"	m	struct:ChronusQ::ReferenceShell
+upBound	grid/quadrature.hpp	/^    double upBound;  \/\/\/< Upper bound for the numerical integration$/;"	m	struct:ChronusQ::Quadrature
+update	molecule.hpp	/^      inline void update() {$/;"	f	struct:ChronusQ::Molecule
+useAdaptiveSigma	itersolver.hpp	/^    bool useAdaptiveSigma() const { return false; }$/;"	f	class:ChronusQ::GPLHR
+useEigenEnergies	response/polarization.hpp	/^    bool useEigenEnergies = false;$/;"	m	struct:ChronusQ::OrbitalHessianSettings
+valarray2array	realtime/fock.hpp	/^  std::array<T,N> valarray2array(const std::valarray<T> &x) {$/;"	f	namespace:ChronusQ
+valarray2array	realtime/propagation.hpp	/^std::array<T,N> valarray2array(const std::valarray<T> &x) {$/;"	f
+value_type	singleslater.hpp	/^    typedef MatsT value_type;$/;"	t	class:ChronusQ::SingleSlater
+velElecDipole	aointegrals.hpp	/^    oper_t_coll velElecDipole;     \/\/\/< Electric Dipole matrix     (velocity)$/;"	m	class:ChronusQ::AOIntegrals
+velElecOctupole	aointegrals.hpp	/^    oper_t_coll velElecOctupole;   \/\/\/< Electric Octuupole matrix  (velocity)$/;"	m	class:ChronusQ::AOIntegrals
+velElecQuadrupole	aointegrals.hpp	/^    oper_t_coll velElecQuadrupole; \/\/\/< Electric Quadrupole matrix (velocity)$/;"	m	class:ChronusQ::AOIntegrals
+weights	grid/quadrature.hpp	/^    std::vector<double> weights; \/\/\/< Quadrature weights$/;"	m	struct:ChronusQ::Quadrature
+writeData	util/files.hpp	/^      void writeData(const std::string &dataSet, T* data) {$/;"	f	class:ChronusQ::SafeFile
+writeMeta	response/tbase.hpp	/^  void ResponseTBase<T>::writeMeta() {$/;"	f	class:ChronusQ::ResponseTBase
+writePreamble	cubegen.hpp	/^    virtual void writePreamble() {$/;"	f	struct:ChronusQ::CubeGenBase
+writePreamble	cubegen.hpp	/^    void writePreamble() {$/;"	f	class:ChronusQ::WaveFunctionCubeGenBase
+xHFX	dft.hpp	/^    double xHFX; \/\/\/< Scaling factor for HFX$/;"	m	class:ChronusQ::DFTFunctional
+xTime	realtime.hpp	/^    double  xTime = 0.; \/\/\/< Current time point$/;"	m	struct:ChronusQ::IntegrationProgress
+~AOIntegrals	aointegrals.hpp	/^    ~AOIntegrals() { dealloc(); }$/;"	f	class:ChronusQ::AOIntegrals
+~GMRES	itersolver.hpp	/^    ~GMRES() {$/;"	f	class:ChronusQ::GMRES
+~GPLHR	itersolver.hpp	/^    ~GPLHR() { $/;"	f	class:ChronusQ::GPLHR
+~IterDiagonalizer	itersolver.hpp	/^    ~IterDiagonalizer() {$/;"	f	class:ChronusQ::IterDiagonalizer
+~IterLinearSolver	itersolver.hpp	/^    ~IterLinearSolver() {$/;"	f	class:ChronusQ::IterLinearSolver
+~MORSpec	morspec.hpp	/^    ~MORSpec() { if(modelBasis1_) this->memManager_.free(modelBasis1_); }$/;"	f	class:ChronusQ::MORSpec
+~Quantum	quantum.hpp	/^    ~Quantum(){ dealloc(); }$/;"	f	class:ChronusQ::Quantum
+~RealTime	realtime.hpp	/^    ~RealTime(){ dealloc(); }$/;"	f	class:ChronusQ::RealTime
+~ResponseTBase	response/tbase.hpp	/^    ~ResponseTBase() {$/;"	f	class:ChronusQ::ResponseTBase
+~SingleSlater	singleslater.hpp	/^    ~SingleSlater() { dealloc(); }$/;"	f	class:ChronusQ::SingleSlater
+~WaveFunction	wavefunction.hpp	/^    ~WaveFunction(){ dealloc(); }$/;"	f	class:ChronusQ::WaveFunction

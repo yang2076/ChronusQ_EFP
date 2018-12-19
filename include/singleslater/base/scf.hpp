@@ -26,7 +26,8 @@
 
 #include <singleslater.hpp>
 #include <util/matout.hpp>
-
+#include <chronusqefp.hpp>
+#define _DEBUG_SCF
 namespace ChronusQ {
 
   /**
@@ -36,10 +37,9 @@ namespace ChronusQ {
    *  \warning SCF procedure assumes that the 1PDM and orbital (mo1/2) storage
    *  has been populated in some way.
    */ 
-  void SingleSlaterBase::SCF(EMPerturbation &pert) {
-
+  void SingleSlaterBase::SCF(EMPerturbation &pert, EFPBase* EFP_1, bool EFP_bool) {
+    
     SCFInit();
-
     // Initialize type independent parameters
     bool isConverged = false;
     scfControls.dampParam = scfControls.dampStartParam;
@@ -50,15 +50,21 @@ namespace ChronusQ {
                  
     if( scfControls.scfAlg == _NEWTON_RAPHSON_SCF )
       scfControls.doExtrap = false;
-
+    
+    
     // Compute initial properties
-    this->computeProperties(pert);
+    double efp_wf_denp = 0.0 ;
 
+    this->EFPEnergy = 0.0; 
+    this->computeProperties(pert,efp_wf_denp);
 
     if( printLevel > 0 and MPIRank(comm) == 0 ) {
       printSCFHeader(std::cout,pert);
       printSCFProg(std::cout,false);
     }
+
+    // EFP permanent multipole energy
+    EFP_multipole_contri(EFP_1,EFP_bool);
 
     for( scfConv.nSCFIter = 0; scfConv.nSCFIter < scfControls.maxSCFIter; 
          scfConv.nSCFIter++) {
@@ -68,13 +74,18 @@ namespace ChronusQ {
 
       // Exit loop on convergence
       if(isConverged) break;
+ 
 
       // Get new orbtials and densities from current state: 
       //   C/D(k) -> C/D(k + 1)
-      getNewOrbitals(pert);
-
+      getNewOrbitals(pert, EFP_1, EFP_bool);
+      
+      // EFP induction energy
+      double efp_wf_denp = 0.0;
+      EFP_wf_dependent(EFP_1, EFP_bool, &efp_wf_denp);
+      
       // Evaluate convergence
-      isConverged = evalConver(pert);
+      isConverged = evalConver(pert,&efp_wf_denp);
 
       // Print out iteration information
       if( printLevel > 0 and (MPIRank(comm) == 0)) printSCFProg(std::cout);
@@ -86,25 +97,40 @@ namespace ChronusQ {
 
     SCFFin();
 
+    efp_wf_denp = 0.0;
+    EFP_wf_dependent(EFP_1, EFP_bool, &efp_wf_denp);
+    
     // Compute initial properties
-    this->computeProperties(pert);
+    this->computeProperties(pert,efp_wf_denp);
 
+#ifdef _DEBUG_SCF
+    isConverged = true;
+#endif
     //printSCFFooter(isConverged);
     if(not isConverged)
       CErr(std::string("SCF Failed to converged within ") + 
         std::to_string(scfControls.maxSCFIter) + 
         std::string(" iterations"));
     else if( printLevel > 0 ) {
-      std::cout << std::endl << "SCF Completed: E("
+      std::cout << std::endl << "SCF Completed : E("
                 << refShortName_ << ") = " << std::fixed
                 << std::setprecision(10) << this->totalEnergy
                 << " Eh after " << scfConv.nSCFIter
                 << " SCF Iterations" << std::endl;
+      std::cout << "Energy details: " << std::endl
+                << "One electron energy: " 
+                << std::setprecision(10) << this->OBEnergy << std::endl
+                << "Two electron energy: " 
+                << std::setprecision(10) << this->MBEnergy << std::endl
+                << "Nuclear repulsion energy: " 
+                << std::setprecision(10) << this->NREnergy << std::endl
+                << "EFP impact: " 
+                << std::setprecision(10) << this->EFPEnergy << std::endl;
     }
 
     if( printLevel > 0 ) std::cout << BannerEnd << std::endl;
-
     if( printLevel > 0 ) {
+      this->printEFPContribution(std::cout,EFP_1,EFP_bool);
       this->printMOInfo(std::cout);
       this->printMultipoles(std::cout);
       this->printSpin(std::cout);
@@ -112,6 +138,7 @@ namespace ChronusQ {
     }
     
   }; // SingleSlaterBase::SCF()
+
 
   
   void SingleSlaterBase::printSCFHeader(std::ostream &out, 

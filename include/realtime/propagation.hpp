@@ -29,6 +29,7 @@
 #include <cqlinalg/blas3.hpp>
 #include <cqlinalg/blasutil.hpp>
 #include <cqlinalg/matfunc.hpp>
+#include <chronusqefp.hpp>
 
 #include <util/matout.hpp>
 #include <unsupported/Eigen/MatrixFunctions>
@@ -46,10 +47,11 @@ std::array<T,N> valarray2array(const std::valarray<T> &x) {
 namespace ChronusQ {
 
   template <template <typename, typename> class _SSTyp, typename IntsT>
-  void RealTime<_SSTyp,IntsT>::doPropagation() {
+  void RealTime<_SSTyp,IntsT>::doPropagation(EFPBase* EFP_,bool EFP_bool) {
 
     printRTHeader();
-
+    double wf_denp = 0.;
+    
     bool Start(false); // Start the MMUT iterations
     bool FinMM(false); // Wrap up the MMUT iterations
 
@@ -61,8 +63,6 @@ namespace ChronusQ {
 
       // Perturbation for the current time
       EMPerturbation pert_t = pert.getPert(curState.xTime);
-
-
 
 
 
@@ -147,12 +147,18 @@ namespace ChronusQ {
 
 
 
-     
+      
       // Form the Fock matrix at the current time
-      formFock(false,curState.xTime);
+      formFock(false,EFP_,EFP_bool,curState.xTime);
+
+      auto EFP_1 = dynamic_cast< EFP<IntsT,dcomplex>* >(EFP_);
+      if(EFP_bool == true and EFP_1 != NULL){
+        EFP_1->Wavefunction_dependent(&wf_denp);  
+      }
 
       // Compute properties for D(k) 
-      propagator_.computeProperties(pert_t);
+      propagator_.computeProperties(pert_t,wf_denp);
+      std::cout << "EFP_ind:" << wf_denp << std::endl;
 
       data.Time.push_back(curState.xTime);
       data.Energy.push_back(propagator_.totalEnergy);
@@ -223,7 +229,7 @@ namespace ChronusQ {
   void RealTime<_SSTyp,IntsT>::formPropagator() {
 
     size_t NB = propagator_.aoints.basisSet().nBasis;
-
+    
     // Form U
 
     // Restricted

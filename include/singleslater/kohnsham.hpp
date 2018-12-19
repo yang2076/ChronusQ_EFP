@@ -160,9 +160,9 @@ namespace ChronusQ {
      *
      *  Compute VXC and increment the fock matrix
      */  
-    virtual void formFock(EMPerturbation &pert, bool increment = false, double HFX = 0.) {
+    virtual void formFock(EMPerturbation &pert, EFPBase* EFP_1, bool EFP_bool, bool increment = false, double HFX = 0.) {
 
-      SingleSlater<MatsT,IntsT>::formFock(pert,increment,functionals.back()->xHFX);
+      SingleSlater<MatsT,IntsT>::formFock(pert,EFP_1,EFP_bool,increment,functionals.back()->xHFX);
 
       auto VXCStart = tick();
       formVXC();

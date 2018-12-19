@@ -87,6 +87,8 @@ namespace ChronusQ {
     // Energy expectation values
     double OBEnergy;   ///< 1-Body operator contribution to the energy
     double MBEnergy;   ///< Many(2)-Body operator contribution to the energy
+    double NREnergy;   ///< Nuclear Repulsion Energy
+    double EFPEnergy;   ///< EFP impact Energy
     double totalEnergy;///< The total energy
 
 
@@ -139,7 +141,7 @@ namespace ChronusQ {
      *  Function to compute the energy expectation values including
      *  field terms
      */ 
-    void computeEnergy(EMPerturbation &pert){
+    void computeEnergy(EMPerturbation &pert, double wf_denp){
 
       ROOT_ONLY(comm);
 
@@ -160,8 +162,7 @@ namespace ChronusQ {
         elecDipoleField[1] * elecDipole[1] +
         elecDipoleField[2] * elecDipole[2];
 
-
-      totalEnergy += field_delta; // Increment total energy
+      totalEnergy += field_delta+wf_denp; // Increment total energy
 
     };
 
@@ -172,12 +173,12 @@ namespace ChronusQ {
 
 
 
-    inline void computeProperties(EMPerturbation &pert) {
+    inline void computeProperties(EMPerturbation &pert, double wf_denp) {
 
       ROOT_ONLY(comm);
-
+      
       computeMultipole(pert);
-      computeEnergy(pert);
+      computeEnergy(pert,wf_denp);
       computeSpin();
       methodSpecificProperties();
 

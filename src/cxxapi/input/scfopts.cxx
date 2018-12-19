@@ -45,7 +45,8 @@ namespace ChronusQ {
       "DAMPPARAM",
       "DAMPERROR",
       "FIELD",
-      "PRINTMOS"
+      "PRINTMOS",
+      "EFP"
     };
 
     // Specified keywords
@@ -90,7 +91,9 @@ namespace ChronusQ {
     OPTOPT(
       ss.scfControls.nIncFock = input.getData<size_t>("SCF.NINCFOCK");
     )
-
+    // EFP option
+    OPTOPT(
+      ss.scfControls.EFP_bool = input.getData<bool>("SCF.EFP"); )
 
     // Guess
     OPTOPT(

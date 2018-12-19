@@ -1,0 +1,2 @@
+/usr/bin/ar qc libquantum.a  CMakeFiles/quantum.dir/impl.o
+/usr/bin/ranlib libquantum.a

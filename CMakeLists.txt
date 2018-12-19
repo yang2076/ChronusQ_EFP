@@ -111,6 +111,9 @@ include(FindLibint)
 include(FindLibXC)
 include(Boost)
 
+include_directories(${PROJECT_SOURCE_DIR}/external/libefp/src)
+link_directories(${PROJECT_SOURCE_DIR}/external/libefp/build)
+list(APPEND CQ_EXT_LINK ${PROJECT_SOURCE_DIR}/external/libefp/build/libefp.a)
 set(CQEX_LINK ${CQ_EXT_LINK} )
 
 # HDF5
@@ -149,5 +152,3 @@ configure_file(
 # Recurse into subdirectories
 add_subdirectory(src)
 
-enable_testing()
-add_subdirectory(tests)

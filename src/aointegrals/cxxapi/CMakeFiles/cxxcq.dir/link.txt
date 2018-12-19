@@ -1,0 +1,2 @@
+/usr/bin/ar qc libcxxcq.a  CMakeFiles/cxxcq.dir/input/parse.o CMakeFiles/cxxcq.dir/input/molopts.o CMakeFiles/cxxcq.dir/input/basisopts.o CMakeFiles/cxxcq.dir/input/singleslateropts.o CMakeFiles/cxxcq.dir/input/scfopts.o CMakeFiles/cxxcq.dir/input/rtopts.o CMakeFiles/cxxcq.dir/input/intsopts.o CMakeFiles/cxxcq.dir/input/miscopts.o CMakeFiles/cxxcq.dir/input/respopts.o CMakeFiles/cxxcq.dir/procedural.o
+/usr/bin/ranlib libcxxcq.a

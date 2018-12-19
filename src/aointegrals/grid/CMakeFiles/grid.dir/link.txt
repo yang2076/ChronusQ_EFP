@@ -1,0 +1,2 @@
+/usr/bin/ar qc libgrid.a  CMakeFiles/grid.dir/gausscheb.o CMakeFiles/grid.dir/gausslegendre.o CMakeFiles/grid.dir/eulermac.o CMakeFiles/grid.dir/lebedev.o
+/usr/bin/ranlib libgrid.a

@@ -27,7 +27,6 @@
 #include <chronusq_sys.hpp>
 #include <wavefunction.hpp>
 #include <singleslater/base.hpp>
-
 // Debug print triggered by Wavefunction
   
 #ifdef _WaveFunctionDebug
@@ -36,7 +35,7 @@
 
 namespace ChronusQ {
 
-
+  class EFPBase;
   /**
    *  \brief The SingleSlater class. The typed abstract interface for all
    *  classes for which the wave function is described by a single slater
@@ -47,7 +46,7 @@ namespace ChronusQ {
    *  Specializes the WaveFunction class of the same type
    */ 
   template <typename MatsT, typename IntsT>
-  class SingleSlater : public SingleSlaterBase, public WaveFunction<MatsT,IntsT> {
+  class SingleSlater : public SingleSlaterBase, public WaveFunction<MatsT,IntsT>{
 
   protected:
 
@@ -55,7 +54,6 @@ namespace ChronusQ {
     typedef MatsT*                    oper_t;
     typedef std::vector<oper_t>       oper_t_coll;
     typedef std::vector<oper_t_coll>  oper_t_coll2;
-
   private:
   public:
 
@@ -89,6 +87,7 @@ namespace ChronusQ {
     oper_t_coll onePDMOrtho;   ///< List of populated orthonormal 1PDM matricies
 
 
+
     // Current / change in state information (for use with SCF)
     oper_t_coll curOnePDM;    ///< List of the current 1PDMs
     oper_t_coll deltaOnePDM;  ///< List of the changes in the 1PDMs
@@ -98,7 +97,9 @@ namespace ChronusQ {
 
     // Stores the previous matrices to use for DIIS 
     oper_t_coll2 diisFock;    ///< List of AO Fock matrices for DIIS extrap
+    oper_t_coll  trans_1;
     oper_t_coll2 diisOnePDM;  ///< List of AO Density matrices for DIIS extrap
+    oper_t_coll  trans_2;
     oper_t_coll2 diisError;   ///< List of orthonormal [F,D] for DIIS extrap
 
     // 1-e integrals
@@ -108,10 +109,12 @@ namespace ChronusQ {
     oper_t_coll coreH;          ///< Core Hamiltonian (scalar and magnetization)
     oper_t_coll coreHPerturbed; ///< Perturbed Core Hamiltonian (scalar and magnetization)
 
+    // EFP contribution
+    oper_t_coll EFP_cou_contri;   ///< List of EFP impact on QM
+
     // Method specific propery storage
     std::vector<double> mullikenCharges;
     std::vector<double> lowdinCharges;
-
 
 
     // Constructors
@@ -132,6 +135,9 @@ namespace ChronusQ {
     { 
       // Allocate SingleSlater Object
       alloc(); 
+
+
+
 
       // Determine Real/Complex part of method string
       if(std::is_same<MatsT,double>::value) {
@@ -209,17 +215,17 @@ namespace ChronusQ {
 
 
     // Form a fock matrix (see include/singleslater/fock.hpp for docs)
-    virtual void formFock(EMPerturbation &, bool increment = false, double xHFX = 1.);
+    virtual void formFock(EMPerturbation &, EFPBase* EFP_1, bool EFP_bool, bool increment = false, double xHFX = 1.);
     void formGD(EMPerturbation &, bool increment = false, double xHFX = 1.);
 
     // Form initial guess orbitals
     // see include/singleslater/guess.hpp for docs)
-    void formGuess();
+    void formGuess(EFPBase* EFP_1,bool EFP_bool);
     void CoreGuess();
     void SADGuess();
     void RandomGuess();
-    void ReadGuessMO();
-    void ReadGuess1PDM();
+    void ReadGuessMO(EFPBase* EFP_1,bool EFP_bool);
+    void ReadGuess1PDM(EFPBase* EFP_1,bool EFP_bool);
     
 
     // Transformations to and from the orthonormal basis
@@ -239,13 +245,18 @@ namespace ChronusQ {
     void ortho2aoMOs();
 
     // Evaluate convergence
-    bool evalConver(EMPerturbation &);
+    bool evalConver(EMPerturbation &, double*);
 
     // Obtain new orbitals
-    void getNewOrbitals(EMPerturbation &, bool frmFock = true);
+    void getNewOrbitals(EMPerturbation &, EFPBase* EFP_1, bool EFP_bool, bool frmFock = true);
     void ConventionalSCF(bool modF);
     void NewtonRaphsonSCF();
     virtual MatsT* getNRCoeffs() = 0;
+
+    // EFP induction energy
+    void EFP_wf_dependent(EFPBase* EFP_1, bool EFP_bool, double* wf_denp_ptr);
+    // EFP permanent multipole energy
+    void EFP_multipole_contri(EFPBase* EFP_1,bool EFP_bool);
 
     // Misc procedural
     void diagOrthoFock();
@@ -268,6 +279,7 @@ namespace ChronusQ {
     void printK(std::ostream&)        ;
     void printMiscProperties(std::ostream&);
     void printMOInfo(std::ostream&); 
+    void printEFPContribution(std::ostream&,EFPBase*,bool);
     virtual void printFockTimings(std::ostream&);
 
     // SCF extrapolation functions (see include/singleslater/extrap.hpp for docs)

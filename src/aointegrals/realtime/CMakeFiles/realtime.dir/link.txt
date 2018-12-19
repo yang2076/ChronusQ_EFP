@@ -1,0 +1,2 @@
+/usr/bin/ar qc librealtime.a  CMakeFiles/realtime.dir/fields.o CMakeFiles/realtime.dir/impl.o
+/usr/bin/ranlib librealtime.a

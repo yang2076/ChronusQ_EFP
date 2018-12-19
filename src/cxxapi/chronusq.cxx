@@ -31,7 +31,6 @@
 #include <cerr.hpp>
 
 using namespace ChronusQ;
-
 int main(int argc, char *argv[]) {
 
   ChronusQ::initialize();
@@ -115,7 +114,6 @@ int main(int argc, char *argv[]) {
     }
 
   }
-
   RunChronusQ(inFileName,outFileName,rstFileName,scrFileName);
 
   ChronusQ::finalize();

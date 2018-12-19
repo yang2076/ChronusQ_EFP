@@ -27,11 +27,12 @@
 #include <chronusq_sys.hpp>
 #include <wavefunction/base.hpp>
 #include <aointegrals.hpp>
-
 #include <fields.hpp>
 #include <util/files.hpp>
 
 namespace ChronusQ {
+
+  class EFPBase;
 
   enum DIIS_ALG {
     CDIIS,      ///< Commutator DIIS
@@ -77,8 +78,8 @@ namespace ChronusQ {
   struct SCFControls {
 
     // Convergence criteria
-    double denConvTol = 1e-8;  ///< Density convergence criteria
-    double eneConvTol = 1e-10; ///< Energy convergence criteria
+    double denConvTol = 1e-10;  ///< Density convergence criteria
+    double eneConvTol = 1e-8; ///< Energy convergence criteria
 
     // TODO: need to add logic to set this
     // Extrapolation flag for DIIS and damping
@@ -108,7 +109,8 @@ namespace ChronusQ {
 
     // Misc control
     size_t maxSCFIter = 128; ///< Maximum SCF iterations.
-
+    // EFP option
+    bool EFP_bool = false;
 
 
     // Printing
@@ -202,18 +204,23 @@ namespace ChronusQ {
       
     // In essence, all derived classes should be able to:
     //   Form a Fock matrix with the ability to increment
-    virtual void formFock(EMPerturbation &, bool increment = false, double xHFX = 1.) = 0;
+    virtual void formFock(EMPerturbation &, EFPBase* EFP, bool EFP_bool, bool increment = false, double xHFX = 1.) = 0;
 
     //   Form an initial Guess (which populates the Fock, Density 
     //   and energy)
-    virtual void formGuess() = 0;
+    virtual void formGuess(EFPBase* EFP_1, bool EFP_bool) = 0;
 
     //   Form the core Hamiltonian
     virtual void formCoreH(EMPerturbation&) = 0;
 
     //   Obtain a new set of orbitals / densities from current
     //   set of densities
-    virtual void getNewOrbitals(EMPerturbation &, bool frmFock = true) = 0;
+    virtual void getNewOrbitals(EMPerturbation &, EFPBase* EFP_1, bool EFP_bool, bool frmFock = true) = 0;
+
+    //   EFP induction energy
+    virtual void EFP_wf_dependent(EFPBase* EFP_1,bool EFP_bool,double* wf_denp_ptr) = 0;
+    //   EFP permanent multipole energy
+    virtual void EFP_multipole_contri(EFPBase* EFP_1,bool EFP_bool) = 0;
 
     //   Save the current state of the wave function
     virtual void saveCurrentState() = 0;
@@ -225,13 +232,17 @@ namespace ChronusQ {
     //   Evaluate SCF convergence. This function should populate the
     //   SingleSlaterBase::scfConv variable and compare it to the 
     //   SingleSlaterBase::scfControls variable to evaluate convergence
-    virtual bool evalConver(EMPerturbation &) = 0;
+    virtual bool evalConver(EMPerturbation &, double*) = 0;
 
     //   Print SCF header, footer and progress
     void printSCFHeader(std::ostream &out, EMPerturbation &);
     void printSCFProg(std::ostream &out = std::cout,
       bool printDiff = true);
 
+    
+    //   Print EFP contribution
+    virtual void printEFPContribution(std::ostream &out, EFPBase* EFP_1, bool EFP_bool) = 0;
+    
     //   Initialize and finalize the SCF environment
     virtual void SCFInit() = 0;
     virtual void SCFFin()  = 0;
@@ -248,7 +259,7 @@ namespace ChronusQ {
     // Procedural Functions to be shared among all derived classes
       
     // Perform an SCF procedure (see include/singleslater/scf.hpp for docs)
-    void SCF(EMPerturbation &);
+    void SCF(EMPerturbation &, EFPBase* EFP_, bool EFP_bool);
 
   }; // class SingleSlaterBase
 

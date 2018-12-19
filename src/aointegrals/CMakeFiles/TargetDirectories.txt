@@ -1,0 +1,14 @@
+/home/yang2076/chronusq_public/src/aointegrals/cxxapi/CMakeFiles/linkexe.dir
+/home/yang2076/chronusq_public/src/aointegrals/cxxapi/CMakeFiles/chronusq.dir
+/home/yang2076/chronusq_public/src/aointegrals/cxxapi/CMakeFiles/cxxcq.dir
+/home/yang2076/chronusq_public/src/aointegrals/response/CMakeFiles/response.dir
+/home/yang2076/chronusq_public/src/aointegrals/wavefunction/CMakeFiles/wavefunction.dir
+/home/yang2076/chronusq_public/src/aointegrals/molecule/CMakeFiles/molecule.dir
+/home/yang2076/chronusq_public/src/aointegrals/basisset/CMakeFiles/basisset.dir
+/home/yang2076/chronusq_public/src/aointegrals/cqlinalg/CMakeFiles/cqlinalg.dir
+/home/yang2076/chronusq_public/src/aointegrals/aointegrals/CMakeFiles/aointegrals.dir
+/home/yang2076/chronusq_public/src/aointegrals/singleslater/CMakeFiles/singleslater.dir
+/home/yang2076/chronusq_public/src/aointegrals/quantum/CMakeFiles/quantum.dir
+/home/yang2076/chronusq_public/src/aointegrals/itersolver/CMakeFiles/itersolver.dir
+/home/yang2076/chronusq_public/src/aointegrals/grid/CMakeFiles/grid.dir
+/home/yang2076/chronusq_public/src/aointegrals/realtime/CMakeFiles/realtime.dir

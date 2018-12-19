@@ -1,0 +1,2 @@
+/usr/bin/ar qc libitersolver.a  CMakeFiles/itersolver.dir/impl.o
+/usr/bin/ranlib libitersolver.a

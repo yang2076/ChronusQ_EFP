@@ -1,0 +1,2 @@
+/usr/bin/ar qc libsingleslater.a  CMakeFiles/singleslater.dir/impl.o CMakeFiles/singleslater.dir/fock.o
+/usr/bin/ranlib libsingleslater.a

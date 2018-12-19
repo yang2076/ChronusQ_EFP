@@ -1,0 +1,2 @@
+/usr/bin/ar qc libresponse.a  CMakeFiles/response.dir/impl.o
+/usr/bin/ranlib libresponse.a

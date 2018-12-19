@@ -39,7 +39,6 @@ namespace ChronusQ {
   void SingleSlater<MatsT,IntsT>::modifyFock() {
 
     ROOT_ONLY(comm); 
-
     // Static Damping
     if (scfControls.doDamp) fockDamping();
 

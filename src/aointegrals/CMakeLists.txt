@@ -21,6 +21,7 @@
 #   E-Mail: xsli@uw.edu
 #
 add_library(aointegrals STATIC impl.cxx 
+aointegrals_efp_drivers.cxx
 aointegrals_onee_drivers.cxx
 aointegrals_onee_real_gto.cxx
 aointegrals_onee_complex_giao.cxx

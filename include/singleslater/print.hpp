@@ -489,6 +489,26 @@ namespace ChronusQ {
     out << "\n" << BannerEnd << "\n\n";
   }; // SingleSlater<T>::printMOInfo
 
+  template <typename MatsT, typename IntsT>
+  void SingleSlater<MatsT, IntsT>::printEFPContribution(std::ostream &out, EFPBase* EFP_1, bool EFP_bool){
+    
+    if(EFP_1 != NULL and EFP_bool == true){ 
+      auto EFP_ = dynamic_cast< EFP<IntsT,MatsT>* >(EFP_1);
+      auto efp_energy_2 = EFP_->EFP_get_contribution();
+      out << "\n\n\nEFP contribution data (The SCF energy above includes the part of induction from EFP)" << std::endl;
+      out << BannerTop << std::endl;
+      out << std::setw(38) << std::left <<"EFP-EFP electrostatic energy :" << efp_energy_2->electrostatic << std::endl;
+      out << std::setw(38) << std::left <<"QM-EFP electrostatic energy :" << efp_energy_2->electrostatic_point_charges << std::endl;
+      out << std::setw(38) << std::left <<"EFP charge penetration energy :" << efp_energy_2->charge_penetration << std::endl;
+      out << std::setw(38) << std::left <<"EFP polarization energy :" << efp_energy_2->polarization << std::endl;
+      out << std::setw(38) << std::left <<"EFP dispersion energy :" << efp_energy_2->dispersion << std::endl;
+      out << std::setw(38) << std::left <<"EFP ai dispersion energy :" << efp_energy_2->ai_dispersion << std::endl;
+      out << std::setw(38) << std::left <<"EFP exchange repulsion energy :" << efp_energy_2->exchange_repulsion << std::endl;
+      out << std::setw(38) << std::left <<"EFP total energy :" << (efp_energy_2->total) << std::endl;
+      out << std::setw(38) << std::left <<"SCF energy with total EFP :" << this->totalEnergy + efp_energy_2->total - efp_energy_2->polarization  << std::endl;
+    }
+
+  }; // SIngleSlater<T>::printEFPContribution
 
 
   template <typename MatsT, typename IntsT>

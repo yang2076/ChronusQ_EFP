@@ -1,0 +1,2 @@
+/usr/bin/ar qc libwavefunction.a  CMakeFiles/wavefunction.dir/impl.o
+/usr/bin/ranlib libwavefunction.a

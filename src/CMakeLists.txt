@@ -25,6 +25,7 @@ add_subdirectory(grid)
 add_subdirectory(molecule)
 add_subdirectory(basisset)
 add_subdirectory(aointegrals)
+add_subdirectory(EFP)
 add_subdirectory(quantum)
 add_subdirectory(wavefunction)
 add_subdirectory(singleslater)
@@ -33,8 +34,8 @@ add_subdirectory(itersolver)
 add_subdirectory(response)
 
 
-
 list(REVERSE CQEX_LINK)
+message ("CQ_EXT_LINK: ${CQEX_LINK}")
 add_subdirectory(cxxapi)
 
 set(CQEX_LINK ${CQEX_LINK} PARENT_SCOPE)

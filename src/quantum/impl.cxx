@@ -23,6 +23,8 @@
  */
 #include <quantum/impl.hpp>
 
+#include <quantum.hpp>
+#include <quantum/properties.hpp>
 namespace ChronusQ {
 
   template class Quantum<double>;
@@ -34,4 +36,8 @@ namespace ChronusQ {
   // Instantiate converting constructors
   template Quantum<dcomplex>::Quantum( Quantum<double> &&, int);
 
+  template double Quantum<double>::OperatorSpinCombine<double,SCALAR,double*>(double* const &);
+  template double Quantum<double>::OperatorSpinCombine<double,SCALAR,dcomplex*>(dcomplex* const &);
+  template double Quantum<dcomplex>::OperatorSpinCombine<double,SCALAR,double*>(double* const &);
+  template double Quantum<dcomplex>::OperatorSpinCombine<double,SCALAR,dcomplex*>(dcomplex* const &);
 }; // namespace ChronusQ

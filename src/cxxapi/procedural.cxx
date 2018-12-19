@@ -42,6 +42,7 @@
 #include <response.hpp>
 #include <realtime.hpp>
 #include <itersolver.hpp>
+#include <chronusqefp.hpp>
 
 #include <cqlinalg/blasext.hpp>
 #include <cqlinalg/eig.hpp>
@@ -52,24 +53,20 @@
 //#include <cubegen.hpp>
 
 namespace ChronusQ {
-
 #ifdef ENABLE_BCAST_COUNTER
   int bcastCounter = 0;
 #endif
-
   void RunChronusQ(std::string inFileName,
     std::string outFileName, std::string rstFileName,
     std::string scrFileName) {
-
     int rank = MPIRank();
     int size = MPISize();
-
+    
     // Redirect output to output file if not STDOUT
     std::shared_ptr<std::ofstream> outfile;
     std::streambuf *coutbuf = std::cout.rdbuf();
 
     if( outFileName.compare("STDOUT") and (rank == 0) ) {
-
       outfile = std::make_shared<std::ofstream>(outFileName);
       std::cout.rdbuf(outfile->rdbuf());
 
@@ -148,10 +145,15 @@ namespace ChronusQ {
 
     // EM Perturbation for SCF
     EMPerturbation emPert;
-
+    // SCF options
     CQSCFOptions(output,input,*ss,emPert);
-       
 
+    // EFP option for SCF
+    bool EFP_bool = (ss->scfControls).EFP_bool;
+    auto EFP_ = CQEFPControl(output,input,aoints,ss,EFP_bool);
+    auto EFP_1 = EFP_.get();
+
+   
 
     bool rstExists = false;
     if( ss->scfControls.guess == READMO or 
@@ -169,7 +171,7 @@ namespace ChronusQ {
       ss->savFile     = rstFile;
       aoints->savFile = rstFile;
     }
-
+      
 
     if( not jobType.compare("SCF") or not jobType.compare("RT") or 
         not jobType.compare("RESP") ) {
@@ -179,8 +181,8 @@ namespace ChronusQ {
       // If INCORE, compute and store the ERIs
       if(aoints->contrAlg == INCORE) aoints->computeERI(emPert);
 
-      ss->formGuess();
-      ss->SCF(emPert);
+      ss->formGuess(EFP_1,EFP_bool);
+      ss->SCF(emPert,EFP_1,EFP_bool);
     }
 
 
@@ -190,11 +192,14 @@ namespace ChronusQ {
 
       auto rt = CQRealTimeOptions(output,input,ss);
       rt->savFile = rstFile;
-      rt->doPropagation();
+      rt->EFP_user_data_change(EFP_1,EFP_bool);
+      rt->doPropagation(EFP_1,EFP_bool);
 
     }
 
     if( not jobType.compare("RESP") ) {
+      std::cout << "Before response" << std::endl;
+      std::cout << memManager << std::endl;
 
       auto resp = CQResponseOptions(output,input,ss);
       resp->savFile = rstFile;

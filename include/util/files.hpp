@@ -28,7 +28,7 @@
 #include <cxxapi/input.hpp>
 #include <cerr.hpp>
 
-#include <H5Cpp.h>
+#include "H5Cpp.h"
 
 template <typename T>
 inline H5::CompType H5PredType() {

@@ -1,0 +1,2 @@
+/usr/bin/ar qc libbasisset.a  CMakeFiles/basisset.dir/reference.o CMakeFiles/basisset.dir/basisset.o CMakeFiles/basisset.dir/basisset_eval.o
+/usr/bin/ranlib libbasisset.a

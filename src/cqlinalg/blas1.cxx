@@ -98,6 +98,18 @@ namespace ChronusQ {
         (&N,reinterpret_cast<double*>(X),&INCX,Y,&INCY);
   }; // InnerProd real = (complex,real)
 
+ template<>
+  double InnerProd(int N, double *X, int INCX, dcomplex *Y, int INCY) {
+    INCY *= 2;
+    return
+#ifdef _CQ_MKL
+      ddot
+#else
+      ddot_
+#endif 
+        (&N,X,&INCX,reinterpret_cast<double*>(Y),&INCY);
+  }; // InnerProd real = (complex,real)
+
 
 
 

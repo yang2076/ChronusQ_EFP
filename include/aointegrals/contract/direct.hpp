@@ -674,7 +674,7 @@ namespace ChronusQ {
 
       durInner += botInner - topInner;
 #endif
-
+#if 0
 #ifdef _BATCH_DIRECT
       assert(nthreads == 1);
 
@@ -771,7 +771,7 @@ namespace ChronusQ {
       auto botCont = std::chrono::high_resolution_clock::now();
       durCont += botCont - topCont;
 #endif
-
+#endif
 #endif
 
     }; // s2
@@ -824,14 +824,13 @@ namespace ChronusQ {
       if( list[iMat].HER ) {
 
         MatAdd('N','C',NB,NB,TT(0.5),AXthreads[iTh][iMat],NB,TT(0.5),
-          AXthreads[iTh][iMat],NB,reinterpret_cast<TT*>(intBuffer),NB);
+          AXthreads[iTh][iMat],NB,SCR,NB);
 
         if( nthreads != 1 )
-          MatAdd('N','N',NB,NB,TT(1.),reinterpret_cast<TT*>(intBuffer),NB,
-            TT(1.), list[iMat].AX,NB,list[iMat].AX,NB);
+          MatAdd('N','N',NB,NB,TT(1.),SCR,NB,TT(1.), list[iMat].AX,NB,list[iMat].AX,NB);
         else
-          SetMat('N',NB,NB,TT(1.),reinterpret_cast<TT*>(intBuffer),NB,
-            list[iMat].AX,NB);
+          SetMat('N',NB,NB,TT(1.),SCR,NB,list[iMat].AX,NB);
+
 
       } else {
 

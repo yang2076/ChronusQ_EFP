@@ -26,16 +26,17 @@
 
 #include <singleslater.hpp>
 #include <cqlinalg.hpp>
+#include <chronusqefp.hpp>
 #include <util/matout.hpp>
 
 namespace ChronusQ {
-
+   
   /**
    *  \brief List of default atomic multiplicities for 
    *  atomic SCF.
    *
    *  XXX: Only supported through Kr
-   */ 
+   */
   static std::map<size_t,size_t> defaultMult(
     {
       { 1  , 2 }, // H
@@ -83,7 +84,7 @@ namespace ChronusQ {
    *  determininant SCF in various ways
    */ 
   template <typename MatsT, typename IntsT>
-  void SingleSlater<MatsT,IntsT>::formGuess() {
+  void SingleSlater<MatsT,IntsT>::formGuess(EFPBase* EFP_1 ,bool EFP_bool) {
 
     if( printLevel > 0 )
       std::cout << "  *** Forming Initial Guess Density for SCF Procedure ***"
@@ -94,16 +95,17 @@ namespace ChronusQ {
     } else if( scfControls.guess == CORE ) CoreGuess();
     else if( scfControls.guess == SAD ) SADGuess();
     else if( scfControls.guess == RANDOM ) RandomGuess();
-    else if( scfControls.guess == READMO ) ReadGuessMO(); 
-    else if( scfControls.guess == READDEN ) ReadGuess1PDM(); 
+    else if( scfControls.guess == READMO ) ReadGuessMO(EFP_1,EFP_bool); 
+    else if( scfControls.guess == READDEN ) ReadGuess1PDM(EFP_1,EFP_bool); 
     else CErr("Unknown choice for SCF.GUESS",std::cout);
 
 
     // Common to all guess: form new set of orbitals from
     // initial guess at Fock.
     EMPerturbation pert; // Dummy EM perturbation
-    getNewOrbitals(pert,false);
+    getNewOrbitals(pert,EFP_1,EFP_bool,false);
     
+    size_t NB = this->aoints.basisSet().nBasis;
     // If RANDOM guess, scale the densites appropriately
     // *** Replicates on all MPI processes ***
     if( scfControls.guess == RANDOM ) {
@@ -172,7 +174,8 @@ namespace ChronusQ {
   void SingleSlater<MatsT,IntsT>::SADGuess() {
 
 
-
+    EFPBase* EFP_1 = NULL;
+    bool EFP_bool = false;
     // ROOT Communicator
     int color = (MPIRank(comm) == 0) ? 1 : MPI_UNDEFINED;
     MPI_Comm rcomm = MPICommSplit(comm,color,0);
@@ -186,6 +189,7 @@ namespace ChronusQ {
     size_t NB    = this->aoints.basisSet().nBasis;
     EMPerturbation pert;
 
+     
     // Zero out the densities (For all MPI processes)
     for(auto &X : this->onePDM) std::fill_n(X,NB*NB,0.);
 
@@ -297,8 +301,8 @@ namespace ChronusQ {
       aointsAtom.computeERIGTO();
 
 
-      ss->formGuess();
-      ss->SCF(pert);
+      ss->formGuess(EFP_1,EFP_bool);
+      ss->SCF(pert,EFP_1,EFP_bool);
 
       size_t NBbasis = basis.nBasis;
 
@@ -337,7 +341,7 @@ namespace ChronusQ {
       std::cout << std::endl
                 << "  *** Forming Initial Fock Matrix from SAD Density ***\n\n";
 
-    formFock(pert,false);
+    formFock(pert,EFP_1,EFP_bool,false);
 
 
   }; // SingleSlater<T>::SADGuess
@@ -389,7 +393,7 @@ namespace ChronusQ {
    *
    **/
   template <typename MatsT, typename IntsT>
-  void SingleSlater<MatsT,IntsT>::ReadGuess1PDM() {
+  void SingleSlater<MatsT,IntsT>::ReadGuess1PDM(EFPBase* EFP_1,bool EFP_bool) {
 
     if( printLevel > 0 )
       std::cout << "    * Reading in guess density from file "
@@ -610,7 +614,7 @@ namespace ChronusQ {
 
     std::cout << "\n" << std::endl;
     EMPerturbation pert;
-    formFock(pert,false);
+    formFock(pert,EFP_1,EFP_bool,false);
 
   } // SingleSlater<T>::ReadGuess1PDM()
 
@@ -621,7 +625,7 @@ namespace ChronusQ {
    *
    **/
   template <typename MatsT, typename IntsT>
-  void SingleSlater<MatsT,IntsT>::ReadGuessMO() {
+  void SingleSlater<MatsT,IntsT>::ReadGuessMO(EFPBase* EFP_1,bool EFP_bool) {
 
     if( printLevel > 0 )
       std::cout << "    * Reading in guess orbitals from file "
@@ -744,7 +748,7 @@ namespace ChronusQ {
 
     std::cout << "\n" << std::endl;
     EMPerturbation pert;
-    formFock(pert,false);
+    formFock(pert,EFP_1,EFP_bool,false);
 
   } // SingleSlater<T>::ReadGuessMO()
 

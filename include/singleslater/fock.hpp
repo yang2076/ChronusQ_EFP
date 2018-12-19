@@ -25,10 +25,13 @@
 #define __INCLUDED_SINGLESLATER_FOCK_HPP__
 
 #include <singleslater.hpp>
-
+#include <chronusqefp.hpp>
+#include <aointegrals.hpp>
 #include <util/time.hpp>
 #include <cqlinalg/blasext.hpp>
+#include <string>
 
+#include "efp.h" 
 #include <cqlinalg.hpp>
 #include <cqlinalg/svd.hpp>
 #include <cqlinalg/blasutil.hpp>
@@ -51,16 +54,16 @@ namespace ChronusQ {
    *  incremented using a previous density
    *
    *  Populates / overwrites fock strorage
-   */ 
+   */
   template <typename MatsT, typename IntsT>
   void SingleSlater<MatsT,IntsT>::formFock(
-    EMPerturbation &pert, bool increment, double xHFX) {
+    EMPerturbation &pert, EFPBase* EFP_1, bool EFP_bool, bool increment, double xHFX) {
 
     size_t NB = this->aoints.basisSet().nBasis;
     size_t NB2 = NB*NB;
 
     auto GDStart = tick(); // Start time for G[D]
-
+    
     // Form G[D]
     formGD(pert,increment,xHFX);
 
@@ -98,12 +101,53 @@ namespace ChronusQ {
           2. * dipAmp[i] * this->aoints.lenElecDipole[i][k];
 
     }
-  
+
+    // EFP contribution to Fock Matrix and energy
+    auto EFP_ = dynamic_cast< EFP<IntsT,MatsT>* >(EFP_1);
+
+    if( EFP_ != NULL and EFP_bool == true ){
+
+    // Begin EFP interior calculation of energy  	
+      std::cout << "efp_0" << std::endl;
+      EFP_->EFP_Compute(0);
+
+      std::cout << "efp_1" << std::endl;
+    // electrostatic contribution to Fock Matrix
+      if(EFP_cou_contri.size() == 0)
+        EFP_multipole_contri(EFP_1,EFP_bool);        
+      for(int i = 0; i < fockMatrix.size(); i++){
+        MatAdd('N','N', NB, NB, MatsT(1.), fockMatrix[i], NB, MatsT(2.), EFP_cou_contri[0], NB, fockMatrix[i], NB);
+      } 
+      std::cout << "efp_2" << std::endl;
+
+    // induction contribution to Fock Matrix
+
+      auto efp_pol_contri = this->memManager.template malloc<MatsT>(NB*NB);
+      memset(efp_pol_contri, 0, NB*NB*sizeof(MatsT));
+      auto Pol_contri = EFP_->One_electron_EFP_pol();
+      SetMat('N',NB,NB,IntsT(1.),Pol_contri,NB,efp_pol_contri,NB);
+      std::cout << "efp_3" << std::endl;
+
+
+      for(int i = 0; i < fockMatrix.size(); i++){
+        MatAdd('N','N', NB, NB, MatsT(1.), fockMatrix[i], NB, MatsT(2.), efp_pol_contri, NB, fockMatrix[i], NB);
+      }
+    // Energy of EFP impact on QM
+      this->EFPEnergy = this->template computeOBProperty<double,SCALAR>(efp_pol_contri)
+                      + this->template computeOBProperty<double,SCALAR>(EFP_cou_contri[0]);
+      std::cout << "efp_4" << std::endl;
+      this->memManager.template free(efp_pol_contri);
+      this->memManager.template free(Pol_contri);
+    }
+      
 #if 0
     printFock(std::cout);
 #endif
 
   }; // SingleSlater::fockFock
+
+  
+
 
 
   /**
@@ -418,6 +462,23 @@ namespace ChronusQ {
     memManager.free(SCR1); // Free SCR1
 
   }; // computeOrtho
+
+
+  template <typename MatsT, typename IntsT>
+  void SingleSlater<MatsT,IntsT>::EFP_multipole_contri(EFPBase* EFP_1,bool EFP_bool) {
+    auto EFP_ = dynamic_cast<EFP<IntsT,MatsT>* >(EFP_1);
+    if(EFP_ != NULL and EFP_bool == true){
+
+      size_t NB = this->aoints.basisSet().nBasis;
+      EFP_cou_contri.emplace_back(this->memManager.template malloc<MatsT>(NB*NB));
+      memset(EFP_cou_contri[0],0,NB*NB*sizeof(MatsT));
+      auto Cou_contri = EFP_->One_electron_EFP_coulomb();
+      SetMat('N',NB,NB,IntsT(1.),Cou_contri,NB,EFP_cou_contri[0],NB);
+      this->memManager.template free(Cou_contri);
+      
+    }
+
+  }; // EFP_multipole_contri
 
   template <typename MatsT, typename IntsT>
   void SingleSlater<MatsT,IntsT>::MOFOCK() {
