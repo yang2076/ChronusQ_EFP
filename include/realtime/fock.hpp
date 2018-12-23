@@ -70,10 +70,7 @@ namespace ChronusQ {
 
   template <template <typename, typename> class _SSTyp, typename IntsT>
   void RealTime<_SSTyp,IntsT>::Restart() {
-    std::cout << "*** Please pay attention to that you are using the restart RT job \n\
-for this moment. So the first line of dipole result is the original \n\
-value for time 0. but not the time you specified! The following results \n\
-will match the time shown at the left for the ongoing calculation." << std::endl;
+    std::cout << "*** Please pay attention to that you are using the restart RT job ***" << std::endl;
 
     const std::array<std::string,4> spinLabel =
       { "SCALAR", "MZ", "MY", "MX" };
